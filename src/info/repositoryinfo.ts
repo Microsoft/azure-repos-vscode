@@ -109,8 +109,8 @@ export class RepositoryInfo {
         if (this._collection === undefined) {
             return undefined;
         }
-
-        if (this._account !== this._collection) {
+        //While leaving the actual data alone, check for 'collection in the domain'
+        if (this._account.toLowerCase() !== this._collection.toLowerCase()) {
             return this.AccountUrl + "/" + this._collection;
         } else {
             return this.AccountUrl;
