@@ -130,4 +130,52 @@ describe("RepositoryInfo", function() {
         assert.equal(repoInfo.TeamProjectUrl, "https://account.visualstudio.com/teamproject");
     });
 
+    it("should verify 'collection in the domain' case insensitivity in repositoryInfo to RepositoryInfo constructor", function() {
+        let repoInfo: RepositoryInfo = new RepositoryInfo("https://account.visualstudio.com/DefaultCollection/teamproject/_git/repositoryName");
+        assert.equal(repoInfo.Host, "account.visualstudio.com");
+        assert.equal(repoInfo.Account, "account");
+        assert.isTrue(repoInfo.IsTeamServices);
+        assert.isTrue(repoInfo.IsTeamFoundation);
+        // To properly test 'collection in the domain' case insensitivity, ensure the collection name is a different case than the account (e.g., 'ACCOUNT' versus 'account')
+        let repositoryInfo = {
+           "serverUrl": "https://account.visualstudio.com",
+           "collection": {
+              "id": "5e082e28-e8b2-4314-9200-629619e91098",
+              "name": "ACCOUNT",
+              "url": "https://account.visualstudio.com/_apis/projectCollections/5e082e28-e8b2-4314-9200-629619e91098"
+           },
+           "repository": {
+              "id": "cc015c05-de20-4e3f-b3bc-3662b6bc0e42",
+              "name": "repositoryName",
+              "url": "https://account.visualstudio.com/DefaultCollection/_apis/git/repositories/cc015c05-de20-4e3f-b3bc-3662b6bc0e42",
+              "project": {
+                 "id": "ecbf2301-0e62-4b0d-a12d-1992f2ea95a8",
+                 "name": "teamproject",
+                 "description": "Our team project",
+                 "url": "https://account.visualstudio.com/DefaultCollection/_apis/projects/ecbf2301-0e62-4b0d-a12d-1992f2ea95a8",
+                 "state": 1,
+                 "revision": 14558
+              },
+              "remoteUrl": "https://account.visualstudio.com/teamproject/_git/repositoryName"
+           }
+        };
+        repoInfo = new RepositoryInfo(repositoryInfo);
+        assert.equal(repoInfo.Host, "account.visualstudio.com");
+        assert.equal(repoInfo.Account, "account");
+        assert.equal(repoInfo.AccountUrl, "https://account.visualstudio.com");
+        assert.equal(repoInfo.CollectionId, "5e082e28-e8b2-4314-9200-629619e91098");
+        // CollectionName should maintain the same case as in the JSON
+        assert.equal(repoInfo.CollectionName, "ACCOUNT");
+        // CollectionUrl should not contain the collection name since both account and collection name are the same (case insensitive)
+        assert.equal(repoInfo.CollectionUrl, "https://account.visualstudio.com");
+        assert.isTrue(repoInfo.IsTeamServices);
+        assert.isTrue(repoInfo.IsTeamFoundation);
+        assert.isFalse(repoInfo.IsTeamFoundationServer);
+        assert.equal(repoInfo.RepositoryId, "cc015c05-de20-4e3f-b3bc-3662b6bc0e42");
+        assert.equal(repoInfo.RepositoryName, "repositoryName");
+        assert.equal(repoInfo.RepositoryUrl, "https://account.visualstudio.com/teamproject/_git/repositoryName");
+        assert.equal(repoInfo.TeamProject, "teamproject");
+        assert.equal(repoInfo.TeamProjectUrl, "https://account.visualstudio.com/teamproject");
+    });
+
 });
