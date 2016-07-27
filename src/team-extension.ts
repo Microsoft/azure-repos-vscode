@@ -118,7 +118,7 @@ export class TeamExtension  {
                 });
             }
         } else {
-            VsCodeUtils.ShowErrorMessage(this._errorMessage);
+            VsCodeUtils.ShowErrorMessage(Strings.NoGitRepoInformation);
         }
     }
 
@@ -134,7 +134,7 @@ export class TeamExtension  {
                 VsCodeUtils.ShowErrorMessage(msg);
             });
         } else {
-            VsCodeUtils.ShowErrorMessage(this._errorMessage);
+            VsCodeUtils.ShowErrorMessage(Strings.NoGitRepoInformation);
         }
     }
 
