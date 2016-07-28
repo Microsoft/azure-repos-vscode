@@ -24,6 +24,7 @@ import { RepositoryInfo } from "./info/repositoryinfo";
 import { UserInfo } from "./info/userinfo";
 
 var os = require("os");
+var path = require("path");
 
 export class TeamExtension  {
     private _teamServicesStatusBarItem: StatusBarItem;
@@ -43,12 +44,16 @@ export class TeamExtension  {
     private _credentialManager : CredentialManager;
 
     constructor() {
+        this.setupFileSystemWatcherOnConfig();
+
         this.initializeExtension();
 
         // Add the event listener for settings changes, then re-initialized the extension
-        workspace.onDidChangeConfiguration(() => {
-            this.Reinitialize();
-        });
+        if (workspace) {
+            workspace.onDidChangeConfiguration(() => {
+                this.Reinitialize();
+            });
+        }
     }
 
     //Opens the pull request page given the remote and (current) branch
@@ -300,10 +305,10 @@ export class TeamExtension  {
     }
 
     private ensureInitialized(): boolean {
-        if (this._gitContext === undefined
-                || this._gitContext.RemoteUrl === undefined
-                || this._serverContext === undefined
-                || this._serverContext.RepoInfo.IsTeamFoundation === false) {
+        if (!this._gitContext
+                || !this._gitContext.RemoteUrl
+                || !this._serverContext
+                || !this._serverContext.RepoInfo.IsTeamFoundation) {
             this.setErrorStatus(Strings.NoGitRepoInformation);
             return false;
         } else if (this._errorMessage !== undefined) {
@@ -331,8 +336,13 @@ export class TeamExtension  {
     }
 
     private initializeExtension() : void {
+        //Don't initialize if we don't have a workspace
+        if (!workspace || !workspace.rootPath) {
+            return;
+        }
+
         this._gitContext = new GitContext(workspace.rootPath);
-        if (this._gitContext !== undefined && this._gitContext.RemoteUrl !== undefined && this._gitContext.IsTeamFoundation) {
+        if (this._gitContext && this._gitContext.RemoteUrl !== undefined && this._gitContext.IsTeamFoundation) {
             this.setupFileSystemWatcherOnHead();
             this._serverContext = new TeamServerContext(this._gitContext.RemoteUrl);
             this._settings = new Settings();
@@ -526,6 +536,56 @@ export class TeamExtension  {
             this._gitContext = new GitContext(workspace.rootPath);
             Logger.LogInfo("CurrentBranch is: " + this._gitContext.CurrentBranch);
             this.refreshPollingItems();
+        });
+    }
+
+    //Sets up a file system watcher on config so we can know when the remote origin has changed
+    private setupFileSystemWatcherOnConfig(): void {
+        //If we don't have a workspace, don't set up the file watcher
+        if (!workspace || !workspace.rootPath) {
+            return;
+        }
+        let pattern: string = path.join(workspace.rootPath, ".git", "config");
+        //We want to listen to file creation, change and delete events
+        let fsw:FileSystemWatcher = workspace.createFileSystemWatcher(pattern, false, false, false);
+        fsw.onDidCreate((uri) => {
+            //When a new local repo is initialized (e.g., git init), re-initialize the extension
+            Logger.LogInfo("config has been created, re-initializing the extension");
+            this.Reinitialize();
+        });
+        fsw.onDidChange((uri) => {
+            Logger.LogInfo("config has changed, checking if 'remote origin' changed");
+            let context: GitContext = new GitContext(uri.fsPath);
+            let remote: string = context.RemoteUrl;
+            if (remote === undefined) {
+                //There is either no remote defined yet or it isn't a Team Services repo
+                if (this._gitContext.RemoteUrl !== undefined) {
+                    //We previously had a Team Services repo and now we don't, reinitialize
+                    Logger.LogInfo("remote was removed, previously had a Team Services remote, re-initializing the extension");
+                    this.Reinitialize();
+                    return;
+                }
+                //There was no previous remote, so do nothing
+                Logger.LogInfo("remote does not exist, no previous Team Services remote, nothing to do");
+            } else if (this._gitContext !== undefined) {
+                //We have a valid gitContext already, check to see what changed
+                if (this._gitContext.RemoteUrl !== undefined) {
+                    //The config has changed, and we had a Team Services remote already
+                    if (remote.toLowerCase() !== this._gitContext.RemoteUrl.toLowerCase()) {
+                        //And they're different, reinitialize
+                        Logger.LogInfo("remote changed to a different Team Services remote, re-initializing the extension");
+                        this.Reinitialize();
+                    }
+                } else {
+                    //The remote was initialized to a Team Services remote, reinitialize
+                    Logger.LogInfo("remote initialized to a Team Services remote, re-initializing the extension");
+                    this.Reinitialize();
+                }
+            }
+        });
+        fsw.onDidDelete((uri) => {
+            Logger.LogInfo("config has been deleted, re-initializing the extension");
+            this.Reinitialize();
         });
     }
 

@@ -25,9 +25,7 @@ export class GitContext {
     private _isTeamFoundationServer: boolean = false;
 
     constructor(rootPath: string) {
-        this._isTeamServicesUrl = false;
-
-        if (rootPath != null) {
+        if (rootPath) {
             this._gitFolder = Utils.FindGitFolder(rootPath);
 
             if (this._gitFolder != null) {
