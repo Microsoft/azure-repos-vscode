@@ -4,8 +4,10 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import { QuickPickItem, Range, window } from "vscode";
+import { MessageItem, QuickPickItem, Range, window } from "vscode";
 import { Constants } from "./constants";
+
+import Q = require("q");
 
 export class BaseQuickPickItem implements QuickPickItem {
     label: string;
@@ -15,6 +17,12 @@ export class BaseQuickPickItem implements QuickPickItem {
 
 export class WorkItemQueryQuickPickItem extends BaseQuickPickItem {
     wiql: string;
+}
+
+export class UrlMessageItem implements MessageItem {
+    title: string;
+    url: string;
+    telemetryId: string;
 }
 
 export class VsCodeUtils {
@@ -40,6 +48,24 @@ export class VsCodeUtils {
 
     public static ShowErrorMessage(message: string) {
         window.showErrorMessage("(" + Constants.ExtensionName + ") " + message);
+    }
+
+    //Allow ability to show additional buttons with the message and return any chosen one via Promise
+    public static ShowErrorMessageWithOptions(message: string, ...urlMessageItem: UrlMessageItem[]) : Q.Promise<UrlMessageItem> {
+        let promiseToReturn: Q.Promise<UrlMessageItem>;
+        let deferred = Q.defer<UrlMessageItem>();
+        promiseToReturn = deferred.promise;
+
+        //Use the typescript spread operator to pass the rest parameter to showErrorMessage
+        window.showErrorMessage("(" + Constants.ExtensionName + ") " + message, ...urlMessageItem).then((item) => {
+            if (item) {
+                deferred.resolve(item);
+            } else {
+                deferred.resolve(undefined);
+            }
+        });
+
+        return promiseToReturn;
     }
 
     public static ShowWarningMessage(message: string) {

@@ -14,8 +14,9 @@ export class Strings {
     static NavigateToBuildSummary: string = "Click to view build";
     static NavigateToTeamServicesWebSite: string = "Click to view your team project website.";
     static NoAccessTokenFound: string = "A personal access token for this Team Services repository was not found in your local user settings.";
-    static NoAccessTokenRunLogin: string = "No personal access token was found for Team Services.  Please run the 'team login' command.";
-    static NoTeamServerCredentialsRunLogin: string = "No credentials were found for Team Foundation Server.  Please run the 'team login' command.";
+    static NoAccessTokenLearnMoreRunLogin: string = "You are not connected to Team Services. Please learn more and then run the 'team login' command.";
+    static NoAccessTokenRunLogin: string = "You are not connected to Team Services. Please run the 'team login' command.";
+    static NoTeamServerCredentialsRunLogin: string = "You are not connected to a Team Foundation Server.  Please run the 'team login' command.";
     static NoBuildsFound: string = "No builds were found for this repository and branch. Click to view your team project's build definitions page.";
     static NoGitRepoInformation: string = "No Team Services or Team Foundation Server Git repository configuration was found.  Ensure you've opened a folder that contains a Git repository.";
     static NoSourceFileForBlame: string = "A source file must be opened to show blame information.";
@@ -27,6 +28,7 @@ export class Strings {
     static SendFeedbackPrompt: string = "Enter your feedback here (1000 char limit)";
     static NoFeedbackSent: string = "No feedback was sent.";
     static ThanksForFeedback: string = "Thanks for sending feedback!";
+    static TokenLearnMore: string = "Learn more...";
 
     static ChoosePullRequest: string = "Choose a pull request";
     static ChooseWorkItem: string = "Choose a work item";

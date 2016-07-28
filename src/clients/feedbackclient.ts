@@ -18,6 +18,12 @@ export class FeedbackClient extends BaseClient {
         super(telemetryService);
     }
 
+    //This event *will* honor whether Application Insights is enabled or not.
+    public SendEvent(telemetryId: string): void {
+        this.ReportEvent(telemetryId, undefined);
+    }
+
+    //This feedback will go no matter whether Application Insights is enabled or not.
     public SendFeedback(): void {
         let self = this;
 

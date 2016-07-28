@@ -11,7 +11,7 @@ import { CredentialManager } from "./helpers/credentialmanager";
 import { Logger } from "./helpers/logger";
 import { Strings } from "./helpers/strings";
 import { Utils } from "./helpers/utils";
-import { VsCodeUtils } from "./helpers/vscodeutils";
+import { UrlMessageItem, VsCodeUtils } from "./helpers/vscodeutils";
 import { GitContext } from "./contexts/gitcontext";
 import { TeamServerContext} from "./contexts/servercontext";
 import { TelemetryService } from "./services/telemetry";
@@ -277,6 +277,28 @@ export class TeamExtension  {
         }
     }
 
+    private displayNoCredentialsMessage(): void {
+        let error: string = Strings.NoTeamServerCredentialsRunLogin;
+        let displayError: string = Strings.NoTeamServerCredentialsRunLogin;
+        let messageItem: UrlMessageItem = undefined;
+        if (this._serverContext.RepoInfo.IsTeamServices === true) {
+            messageItem = { title : Strings.TokenLearnMore,
+                            url : Constants.TokenLearnMoreUrl,
+                            telemetryId: TelemetryEvents.TokenLearnMoreClick };
+            //Need different messages for popup message and status bar
+            error = Strings.NoAccessTokenRunLogin;
+            displayError = Strings.NoAccessTokenLearnMoreRunLogin;
+        }
+        Logger.LogError(error);
+        this.setErrorStatus(error, CommandNames.Login, false);
+        VsCodeUtils.ShowErrorMessageWithOptions(displayError, messageItem).then((item) => {
+            if (item) {
+                Utils.OpenUrl(item.url);
+                this._feedbackClient.SendEvent(item.telemetryId);
+            }
+        });
+    }
+
     private ensureInitialized(): boolean {
         if (this._gitContext === undefined
                 || this._gitContext.RemoteUrl === undefined
@@ -324,13 +346,7 @@ export class TeamExtension  {
             let accountSettings = new AccountSettings(this._serverContext.RepoInfo.Account);
             this._credentialManager.GetCredentialHandler(this._serverContext, accountSettings.TeamServicesPersonalAccessToken).then((requestHandler) => {
                 if (requestHandler === undefined) {
-                    let error: string = Strings.NoAccessTokenRunLogin;
-                    if (this._serverContext.RepoInfo.IsTeamFoundationServer === true) {
-                        error = Strings.NoTeamServerCredentialsRunLogin;
-                    }
-                    Logger.LogError(error);
-                    this.setErrorStatus(error, CommandNames.Login, false);
-                    VsCodeUtils.ShowErrorMessage(error);
+                    this.displayNoCredentialsMessage();
                     return;
                 } else {
                     this._telemetry = new TelemetryService(this._settings, this._serverContext);
