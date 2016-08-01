@@ -411,7 +411,8 @@ export class TeamExtension  {
                 }
             }).fail((reason) => {
                 this.setErrorStatus(Utils.GetMessageForStatusCode(reason, reason.message), (reason.statusCode === 401 ? CommandNames.Login : undefined), false);
-                this.reportError(Utils.GetMessageForStatusCode(reason, reason.message, "Failed to get a credential handler"), reason);
+                //If we can't get a requestHandler, report the error via the feedbackclient
+                this._feedbackClient.ReportError(Utils.GetMessageForStatusCode(reason, reason.message, "Failed to get a credential handler"), reason);
             });
         }
     }
@@ -506,7 +507,7 @@ export class TeamExtension  {
     private reportError(message: string, reason?: any): void {
         Logger.LogError(message);
         if (reason !== undefined && (Utils.IsUnauthorized(reason) || Utils.IsOffline(reason))) {
-            //Don't log execeptions for Unauthorized or Offline scenarios
+            //Don't log exceptions for Unauthorized or Offline scenarios
             return;
         }
         this._telemetry.SendException(message);
