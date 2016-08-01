@@ -209,7 +209,7 @@ export class WorkItemTrackingService {
         let url:string = this.GetWorkItemsBaseUrl(teamProjectUrl) + "/create/" + issueType;
         let separator: string = "?";
         if (title !== undefined) {
-            url += separator + "[" + WorkItemFields.Title + "]=" + encodeURIComponent(title);
+            url += separator + "[" + WorkItemFields.Title + "]=" + title;
             separator = "&";
         }
         if (assignedTo !== undefined) {

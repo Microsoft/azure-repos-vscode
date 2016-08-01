@@ -38,7 +38,7 @@ describe("WorkItemTrackingService", function() {
         let issueType: string = "Bug";
         let title: string = "Fix this bug!";
 
-        assert.equal(WorkItemTrackingService.GetNewWorkItemUrl(url, issueType, title), url + "/_workitems" + "/create/" + issueType + "?[" + WorkItemFields.Title + "]=" + encodeURIComponent(title));
+        assert.equal(WorkItemTrackingService.GetNewWorkItemUrl(url, issueType, title), url + "/_workitems" + "/create/" + issueType + "?[" + WorkItemFields.Title + "]=" + title);
     });
 
     it("should verify GetNewWorkItemUrl with url, issueType, title and assignedTo", function() {
@@ -47,7 +47,7 @@ describe("WorkItemTrackingService", function() {
         let title: string = "Fix this bug!";
         let assignedTo: string = "raisap@outlook.com";
 
-        assert.equal(WorkItemTrackingService.GetNewWorkItemUrl(url, issueType, title, assignedTo), url + "/_workitems" + "/create/" + issueType + "?[" + WorkItemFields.Title + "]=" + encodeURIComponent(title) + "&" + "[" + WorkItemFields.AssignedTo + "]=" + assignedTo);
+        assert.equal(WorkItemTrackingService.GetNewWorkItemUrl(url, issueType, title, assignedTo), url + "/_workitems" + "/create/" + issueType + "?[" + WorkItemFields.Title + "]=" + title + "&" + "[" + WorkItemFields.AssignedTo + "]=" + assignedTo);
     });
 
     it("should verify GetMyQueryResultsUrl with url and queryName", function() {
