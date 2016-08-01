@@ -1,6 +1,6 @@
 # Visual Studio Team Services Extension
 ### *The extension now supports Team Foundation Server 2015 Update 2 and later!*
-This extension allows you to manage your pull requests for your Git repositories as well as monitor builds
+This extension allows you to connect to Team Services, manage your pull requests for your Git repositories as well as monitor builds
 and work items for your team project.  It  will use your Git repository information to connect to either
 Team Services or Team Foundation Server 2015 Update 2 (and later).
 
@@ -9,57 +9,41 @@ Team Services or Team Foundation Server 2015 Update 2 (and later).
 Here is the [Walkthrough of the Team Services extension for Visual Studio Code](https://www.youtube.com/watch?v=tpjj5i8f6BE)
 video that shows many of the features of the extension.
 
-## Create a Team Services account (optional)
-If you are planning on using the extension with Git repositories hosted on Team Services,
-[sign up for Team Services](https://www.visualstudio.com/en-us/get-started/setup/sign-up-for-visual-studio-team-services).
+## Prerequisites
+### Visual Studio Team Services
+If you are planning on using the extension with Git repositories hosted on Visual Studio Team Services, ensure you have a Team Services account.  If you do
+not have a Team Services account, find out how to [sign up for Team Services](https://www.visualstudio.com/en-us/get-started/setup/sign-up-for-visual-studio-team-services).
 
-## Team Foundation Server 2015 Update 2 (and later)
-If you are planning on using the extension with Git repositories on Team Foundation Server 2015 Update 2 and
-later, you will only need your NTLM credentials.  Earlier versions of Team Foundation Server are not
-supported at this time.
+### Team Foundation Server
+If you are planning on using the extension with Git repositories on Team Foundation Server, you must be running Team Foundation
+Server 2015 Update 2 or later.  Earlier versions of Team Foundation Server are not supported.
 
-## Install the Extension
-First, you will need to install [Visual Studio Code](https://code.visualstudio.com/download) `0.10.8` or
-later.  Then, in the Visual Studio Code Command Palette (`F1`) select `Install Extension` and choose
-`Visual Studio Team Services` by Microsoft.
+## Installation
+First, you will need to install [Visual Studio Code](https://code.visualstudio.com/download) `1.0.0` or later.
 
-### Team Services
-If you are connecting to Team Services, you will need a personal access token (PAT) to securely access your account.  The latest
-version of the extension will prompt for your token and store it securely.  Previously, you needed to store your token in your
-Visual Studio Code user settings.
+To install the extension with the latest version of Visual Studio Code (version 1.3.1 is the latest as of this writing), bring up the Visual Studio Code Command Palette (`F1`),
+type `install` and choose `Extensions: Install Extensions`.  In the `Search Extensions in Marketplace` text box, type `team`.  Find
+the `Visual Studio Team Services` extension published by *Microsoft* and click the `Install` button.  Restart Visual Studio Code.
+
+## Authentication
+### Visual Studio Team Services
+If you are connecting to Team Services, you will need a personal access token (PAT) to securely access your account. The latest
+version of the extension will prompt for your token and store it securely. In previous versions of the extension, you needed to create a
+token and store it in your Visual Studio Code user settings.
 
 If you do not have a personal access token yet, you will need to create one on your Team Services account.
-To learn more about access tokens and to create your own, go [here](https://www.visualstudio.com/en-us/get-started/setup/use-personal-access-tokens-to-authenticate) to learn how.
+To create the token, go [here](https://www.visualstudio.com/en-us/get-started/setup/use-personal-access-tokens-to-authenticate) to learn how.
 * When you create your token, create it with the **Build (read)**, **Code (read)** and **Work items (read)** scopes to ensure full functionality.
 * You can also use *All Scopes*, but the minimum required scopes are those listed above.
 
-#### Global access token
-The extension also supports a *global access token*.  A global access token is one that can be used across
-all of the Team Services accounts that you have access to (so you will not need to add a token per account
-in your User Settings).  To create a global token, set the "Accounts" value on the "Create a personal
-access token" page to "All accessible accounts".  After creating that global token, add an entry to
-`team.accessTokens` similar to the following:
-```javascript
-    "team.accessTokens": [
-        {
-            "account": "global",
-            "token": "global-access-token"
-        }
-    ]
-```
-- Replace **global-access-token** with the global token you created.
-
-If the extension doesn't find an *account-specific* access token, it'll look for the *global* token.
-
-**Note**: In an upcoming release, support for a global access token will be removed and you will be prompted
-to run the `team login` command and provide an account-specific token.  Until that time, you will be able to
-add the entry shown above and it will be used if no account-specific token is found.
+### Team Foundation Server
+If you are connecting to Team Foundation Server, you will only need your NTLM credentials (domain name, account name and password).
 
 ## Open a local Git Repository folder
-Open either the root folder or a sub-folder of the cloned Git repository.  Once a Team Services or Team
-Foundation Server 2015 Update 2 (and later) repository is detected by the extension, you will need to provide your credentials
-(if credentials weren't already found).  If you are required to provide your credentials, there will be
-an indicator in the status bar whose message will indicate that you need to login in.
+Once you have installed the extension, open either the root folder or a sub-folder of the cloned Git repository.  Once a Team
+Services or Team Foundation Server 2015 Update 2 (or later) repository is detected by the extension, you will need to provide
+your credentials (if credentials weren't already found).  If you are required to provide your credentials, there will be an
+indicator in the status bar whose message will indicate that you need to login in.
 
 The indicator looks like this:
 
