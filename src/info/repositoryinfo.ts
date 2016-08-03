@@ -5,6 +5,7 @@
 "use strict";
 
 import { Logger } from "../helpers/logger";
+import { RepoUtils } from "../helpers/repoutils";
 
 var url = require("url");
 
@@ -53,13 +54,13 @@ export class RepositoryInfo {
             this._protocol = purl.protocol;
             this._query = purl.query;
 
-            if (repositoryUrl.toLowerCase().indexOf("/_git/") >= 0) {
-                if (this._host.toLowerCase().indexOf(".visualstudio.com") >= 0) {
+            if (RepoUtils.IsTeamFoundationGitRepo(repositoryUrl)) {
+                if (RepoUtils.IsTeamFoundationServicesRepo(repositoryUrl)) {
                     let splitHost = this._host.split(".");
                     this._account = splitHost[0];
                     this._isTeamServicesUrl = true;
                     Logger.LogDebug("_isTeamServicesUrl: true");
-                } else {
+                } else if (RepoUtils.IsTeamFoundationServerRepo(repositoryUrl)) {
                     this._account = purl.host;
                     this._isTeamFoundationServer = true;
                 }
