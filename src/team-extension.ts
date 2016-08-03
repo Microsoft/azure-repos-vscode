@@ -366,6 +366,7 @@ export class TeamExtension  {
                     //Go get the details about the repository
                     let repositoryClient: QTeamServicesApi = new QTeamServicesApi(this._gitContext.RemoteUrl, [CredentialManager.GetCredentialHandler()]);
                     Logger.LogInfo("Getting repository information (vsts/info) with repositoryClient");
+                    Logger.LogDebug("RemoteUrl = " + this._gitContext.RemoteUrl);
                     repositoryClient.getVstsInfo().then((repoInfo) => {
                         Logger.LogInfo("Retrieved repository info with repositoryClient");
                         Logger.LogObject(repoInfo);
@@ -375,6 +376,7 @@ export class TeamExtension  {
                         let connectionUrl: string = (this._serverContext.RepoInfo.IsTeamServices === true ? this._serverContext.RepoInfo.AccountUrl : this._serverContext.RepoInfo.CollectionUrl);
                         let accountClient: QTeamServicesApi = new QTeamServicesApi(connectionUrl, [CredentialManager.GetCredentialHandler()]);
                         Logger.LogInfo("Getting connectionData with accountClient");
+                        Logger.LogDebug("connectionUrl = " + connectionUrl);
                         accountClient.connect().then((settings) => {
                             Logger.LogInfo("Retrieved connectionData with accountClient");
                             this.resetErrorStatus();

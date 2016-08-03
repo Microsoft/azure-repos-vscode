@@ -5,6 +5,7 @@
 "use strict";
 
 import { Utils } from "../helpers/utils";
+import { RepoUtils } from "../helpers/repoutils";
 
 var pgc = require("parse-git-config");
 var gri = require("git-repo-info");
@@ -44,23 +45,21 @@ export class GitContext {
                 this._gitCurrentBranch = this._gitRepoInfo.branch;
                 this._gitCurrentRef = "refs/heads/" + this._gitCurrentBranch;
 
-                if (this._gitOriginalRemoteUrl.toLowerCase().indexOf("/_git/") >= 0) {
+                //All Team Services and TFS Git remote urls contain /_git/
+                if (RepoUtils.IsTeamFoundationGitRepo(this._gitOriginalRemoteUrl)) {
                     let purl = url.parse(this._gitOriginalRemoteUrl);
                     if (purl != null) {
-                        let splitHostName = purl.hostname.split(".");
-                        if (splitHostName.length > 2) {
-                            this._isTeamServicesUrl = splitHostName[1] === "visualstudio" && splitHostName[2] === "com";
-                            if (this._isTeamServicesUrl === true) {
-                                let splitHref = purl.href.split("@");
-                                if (splitHref.length === 2) {  //RemoteUrl is SSH
-                                    //For Team Services, default to https:// as the protocol
-                                    this._gitRemoteUrl = "https://" + purl.hostname + purl.pathname;
-                                    this._isSsh = true;
-                                } else {
-                                    this._gitRemoteUrl = this._gitOriginalRemoteUrl;
-                                }
+                        if (RepoUtils.IsTeamFoundationServicesRepo(this._gitOriginalRemoteUrl)) {
+                            this._isTeamServicesUrl = true;
+                            let splitHref = purl.href.split("@");
+                            if (splitHref.length === 2) {  //RemoteUrl is SSH
+                                //For Team Services, default to https:// as the protocol
+                                this._gitRemoteUrl = "https://" + purl.hostname + purl.pathname;
+                                this._isSsh = true;
+                            } else {
+                                this._gitRemoteUrl = this._gitOriginalRemoteUrl;
                             }
-                        } else if (splitHostName.length === 1) {
+                        } else if (RepoUtils.IsTeamFoundationServerRepo(this._gitOriginalRemoteUrl)) {
                             this._isTeamFoundationServer = true;
                             this._gitRemoteUrl = this._gitOriginalRemoteUrl;
                             if (purl.protocol.toLowerCase() === "ssh:") {
