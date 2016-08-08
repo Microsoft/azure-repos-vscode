@@ -1,13 +1,15 @@
 # Visual Studio Team Services Extension
 ### *The extension now supports Team Foundation Server 2015 Update 2 and later!*
 This extension allows you to connect to Team Services, manage your pull requests for your Git repositories as well as monitor builds
-and work items for your team project.  It  will use your Git repository information to connect to either
+and work items for your team project.  It  will use your local Git repository information to connect to either
 Team Services or Team Foundation Server 2015 Update 2 (and later).
 
 ![Visual Studio Team Services extension](assets/vscode.png)
 
 Here is the [Walkthrough of the Team Services extension for Visual Studio Code](https://www.youtube.com/watch?v=tpjj5i8f6BE)
 video that shows many of the features of the extension.
+
+**Note**: The extension does *not* support Team Foundation Version Control (TFVC) at this time.  Therefore, you must use the extension for your **Git** repositories.
 
 ## Prerequisites
 ### Visual Studio Team Services
@@ -17,6 +19,12 @@ not have a Team Services account, find out how to [sign up for Team Services](ht
 ### Team Foundation Server
 If you are planning on using the extension with Git repositories on Team Foundation Server, you must be running Team Foundation
 Server 2015 Update 2 or later.  Earlier versions of Team Foundation Server are not supported.
+
+### Clone your Git repository
+Since the extension uses the remote origin of your Git repository to determine how to connect to Team Services (or your Team Foundation Server), in most cases you will need to have
+a Git repository already cloned locally.  If you intend on cloning an existing repository, do so before proceeding.  If you do not have a Git repository cloned locally but already
+have a Team Services account (or a Team Foundation Server instance), you may create a local repository (via `git init`) and once you set the "origin" remote for that local repository,
+the extension will detect the change to the remote and attempt to contact the Team Services account (or Team Foundation Server).
 
 ## Installation
 First, you will need to install [Visual Studio Code](https://code.visualstudio.com/download) `1.0.0` or later.
@@ -38,6 +46,8 @@ To create the token, go [here](https://www.visualstudio.com/en-us/get-started/se
 
 ### Team Foundation Server
 If you are connecting to Team Foundation Server, you will only need your NTLM credentials (domain name, account name and password).
+
+Details on how to connect to either Team Services or Team Foundation Server are found in the next section.
 
 ## Open a local Git Repository folder
 Once you have installed the extension, open either the root folder or a sub-folder of the cloned Git repository.  Once a Team

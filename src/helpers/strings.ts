@@ -28,7 +28,7 @@ export class Strings {
     static SendFeedbackPrompt: string = "Enter your feedback here (1000 char limit)";
     static NoFeedbackSent: string = "No feedback was sent.";
     static ThanksForFeedback: string = "Thanks for sending feedback!";
-    static TokenLearnMore: string = "Learn more...";
+    static LearnMore: string = "Learn more...";
 
     static ChoosePullRequest: string = "Choose a pull request";
     static ChooseWorkItem: string = "Choose a work item";

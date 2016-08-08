@@ -123,7 +123,15 @@ export class TeamExtension  {
                 });
             }
         } else {
-            VsCodeUtils.ShowErrorMessage(Strings.NoGitRepoInformation);
+            let messageItem : UrlMessageItem = { title : Strings.LearnMore,
+                                url : Constants.ReadmeLearnMoreUrl,
+                                telemetryId: TelemetryEvents.ReadmeLearnMoreClick };
+            VsCodeUtils.ShowErrorMessageWithOptions(Strings.NoGitRepoInformation, messageItem).then((item) => {
+                if (item) {
+                    Utils.OpenUrl(item.url);
+                    this._feedbackClient.SendEvent(item.telemetryId);
+                }
+            });
         }
     }
 
@@ -287,7 +295,7 @@ export class TeamExtension  {
         let displayError: string = Strings.NoTeamServerCredentialsRunLogin;
         let messageItem: UrlMessageItem = undefined;
         if (this._serverContext.RepoInfo.IsTeamServices === true) {
-            messageItem = { title : Strings.TokenLearnMore,
+            messageItem = { title : Strings.LearnMore,
                             url : Constants.TokenLearnMoreUrl,
                             telemetryId: TelemetryEvents.TokenLearnMoreClick };
             //Need different messages for popup message and status bar

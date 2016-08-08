@@ -9,6 +9,7 @@ export class Constants {
     static ExtensionName: string = "team";
     static OAuth: string = "OAuth";
     static TokenLearnMoreUrl: string = "https://aka.ms/v9r4jt";
+    static ReadmeLearnMoreUrl: string = "https://aka.ms/jkapah";
 }
 
 export class CommandNames {
@@ -58,6 +59,7 @@ export class TelemetryEvents {
     static OpenRepositoryHistory: string = TelemetryEvents.TelemetryPrefix + "openrepohistory";
     static OpenTeamSite: string = TelemetryEvents.TelemetryPrefix + "openteamprojectweb";
     static OpenPullRequestsPage: string = TelemetryEvents.TelemetryPrefix + "openpullrequestspage";
+    static ReadmeLearnMoreClick: string = TelemetryEvents.TelemetryPrefix + "readmelearnmoreclick";
     static SendAFrown: string = TelemetryEvents.TelemetryPrefix + "sendafrown";
     static SendASmile: string = TelemetryEvents.TelemetryPrefix + "sendasmile";
     static ShowMyWorkItemQueries: string = TelemetryEvents.TelemetryPrefix + "showmyworkitemqueries";
