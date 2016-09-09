@@ -6,6 +6,16 @@ var gulp  = require('gulp'),
 var exec  = require('child_process').exec;
 var tslint = require('gulp-tslint');
 var del = require('del');
+var argv = require('yargs').argv;
+
+// Default to list reporter when run directly.
+// CI build can pass 'reporter=junit' to create JUnit results files
+var reporterUnitTest = { reporter: 'list' };
+var reporterIntegrationTest = { reporter: 'list' };
+if (argv.reporter === "junit") {
+    reporterUnitTest = { reporter: 'mocha-junit-reporter', reporterOptions: { mochaFile: 'out/test/results/test-unittestresults.xml'} } ;
+    reporterIntegrationTest = { reporter: 'mocha-junit-reporter', reporterOptions: { mochaFile: 'out/test/results/test-integrationtestresults.xml'} } ;
+}
 
 function errorHandler(err) {
     console.error(err.message);
@@ -26,7 +36,14 @@ gulp.task('tslint-test', function () {
         .on('error', errorHandler);
 });
 
-gulp.task('clean', ['tslint-src', 'tslint-test'], function (done) {
+gulp.task('tslint-test-integration', function () {
+    return gulp.src(['./test-integration/**/*.ts'])
+        .pipe(tslint())
+        .pipe(tslint.report('prose', { emitError: true}))
+        .on('error', errorHandler);
+});
+
+gulp.task('clean', ['tslint-src', 'tslint-test', 'tslint-test-integration'], function (done) {
     return del(['out/**', '!out', '!out/src/credentialstore/linux', '!out/src/credentialstore/osx', '!out/src/credentialstore/win32'], done);
 });
 
@@ -45,13 +62,28 @@ gulp.task('publishbuild', ['build'], function () {
         .pipe(gulp.dest('./out/src/credentialstore/bin/win32'));
 });
 
+gulp.task('publishall', ['publishbuild'], function () {
+    gulp.src(['./test/contexts/testrepos/**/*'])
+        .pipe(gulp.dest('./out/test/contexts/testrepos'));
+    gulp.src(['./test/contexts/testrepos/**/*'])
+        .pipe(gulp.dest('./out/test/contexts/testrepos'));
+});
+
 //Tests will fail with MODULE_NOT_FOUND if I try to run 'publishBuild' before test target
 //gulp.task('test', ['publishBuild'], function() {
 gulp.task('test', function() {
     return gulp.src(['out/test/**/*.js'], {read: false})
-    .pipe(mocha({reporter: 'list'}))
+    .pipe(mocha(reporterUnitTest))
     .on('error', errorHandler);
 });
+
+gulp.task('test-integration', function() {
+    return gulp.src(['out/test-integration/**/*.js'], {read: false})
+    .pipe(mocha(reporterIntegrationTest))
+    .on('error', errorHandler);
+});
+
+gulp.task('test-all', ['test', 'test-integration'], function() { });
 
 gulp.task('packageonly', function (cb) {
   exec('vsce package', function (err, stdout, stderr) {
@@ -61,7 +93,7 @@ gulp.task('packageonly', function (cb) {
   });
 });
 
-gulp.task('package', ['publishbuild'], function (cb) {
+gulp.task('package', ['publishall'], function (cb) {
   exec('vsce package', function (err, stdout, stderr) {
     console.log(stdout);
     console.log(stderr);

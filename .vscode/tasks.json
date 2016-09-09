@@ -17,7 +17,7 @@
 	"tasks": [
 		{
 			"isBuildCommand": true,
-			"taskName": "publishbuild",
+			"taskName": "publishall",
 			"showOutput": "always"
 		},
 		{

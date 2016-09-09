@@ -26,6 +26,10 @@ import { UserInfo } from "./info/userinfo";
 var os = require("os");
 var path = require("path");
 
+/* tslint:disable:no-unused-variable */
+import Q = require("q");
+/* tslint:enable:no-unused-variable */
+
 export class TeamExtension  {
     private _teamServicesStatusBarItem: StatusBarItem;
     private _buildStatusBarItem: StatusBarItem;

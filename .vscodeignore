@@ -1,7 +1,9 @@
 .vscode/**
 typings/**
 out/test/**
+out/test-integration/**
 test/**
+test-integration/**
 src/**
 **/*.map
 .gitignore
@@ -10,3 +12,4 @@ gulpfile.js
 tsd.json
 tslint.json
 team-extension.log
+**/*.zip

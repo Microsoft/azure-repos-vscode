@@ -90,6 +90,9 @@ These are the clients used to talk to the services (see Services below).  The cl
 ### Helpers
 These are classes used to define constants, a logger, settings (configuration), strings and various utility functions.
 
+### Info
+These are classes used to hold data about particular objects (credentials, repository and user).
+
 ### Services
 All of the communication to Team Services should be done via services found in this folder.  These services should not know anything about the client-side types used to manipulate the Visual Studio Code UI.  The Q Promise APIs found in the vso-node-api package is the model used in this extension.
 
@@ -122,3 +125,8 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 We welcome pull requests!  Fork this repo and send us your contributions.  Go [here](https://help.github.com/articles/using-pull-requests/) to get familiar with GitHub pull requests.
 
 Before submitting your request, ensure that both `gulp` and `gulp test` succeed.
+
+**UPDATE**: With a recent commit, integration tests were added under the *test-integration* folder.  These tests are run by the CI build and the results are reported back to any pull request as a "build check".  The
+integration tests are not runnable outside of the CI build without setting up additional infrastructure.  As such, it isn't required that a contributor run these tests before submitting the pull request.
+However, if an issue arises that breaks the integration tests, please file an issue and I'll follow up as quickly as possible.  Note that the build for this repo is set to build every night and runs unit
+and integration tests at that time.
