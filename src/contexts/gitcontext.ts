@@ -25,14 +25,27 @@ export class GitContext {
     private _isTeamServicesUrl: boolean = false;
     private _isTeamFoundationServer: boolean = false;
 
-    constructor(rootPath: string) {
+    //When gitDir is provided, rootPath is the path to the Git repo
+    constructor(rootPath: string, gitDir?: string) {
         if (rootPath) {
-            this._gitFolder = Utils.FindGitFolder(rootPath);
+            //If gitDir, use rootPath as the .git folder
+            if (gitDir) {
+                this._gitFolder = rootPath;
+                gri._changeGitDir(gitDir);
+            } else {
+                this._gitFolder = Utils.FindGitFolder(rootPath);
+            }
 
             if (this._gitFolder != null) {
                 // With parse-git-config, cwd is the directory containing the path, .git/config, you want to sync
                 this._gitParentFolder = path.dirname(this._gitFolder);
-                this._gitConfig = pgc.sync({ cwd: this._gitParentFolder});
+                let syncObj: any = { cwd: this._gitParentFolder };
+                //If gitDir, send pgc the exact path to the config file to use
+                if (gitDir) {
+                    syncObj = { path: path.join(this._gitFolder, "config") };
+                }
+                this._gitConfig = pgc.sync(syncObj);
+
                 /* tslint:disable:quotemark */
                 let remote: any = this._gitConfig['remote "origin"'];
                 /* tslint:enable:quotemark */
@@ -41,7 +54,12 @@ export class GitContext {
                 }
                 this._gitOriginalRemoteUrl = remote.url;
 
-                this._gitRepoInfo = gri(this._gitFolder);
+                if (gitDir) {
+                    this._gitRepoInfo = gri(this._gitParentFolder);
+                } else {
+                    this._gitRepoInfo = gri(this._gitFolder);
+                }
+
                 this._gitCurrentBranch = this._gitRepoInfo.branch;
                 this._gitCurrentRef = "refs/heads/" + this._gitCurrentBranch;
 
@@ -63,6 +81,7 @@ export class GitContext {
                             this._isTeamFoundationServer = true;
                             this._gitRemoteUrl = this._gitOriginalRemoteUrl;
                             if (purl.protocol.toLowerCase() === "ssh:") {
+                                this._isSsh = true;
                                 // TODO: No support yet for SSH on-premises (no-op the extension)
                                 this._isTeamFoundationServer = false;
                             }
