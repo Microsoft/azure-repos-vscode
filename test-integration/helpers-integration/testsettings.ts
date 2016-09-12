@@ -87,9 +87,19 @@ export class TestSettings {
         return (workItemQueryId || "undefined-workitem-query-id");
     }
 
+    public static WorkItemLinkQueryPath(): string {
+        let workItemQueryPath : string = process.env.MSVSTS_TEAM_WORK_ITEM_LINK_QUERY_PATH;
+        return (workItemQueryPath || "undefined-workitem-link-query-id");
+    }
+
     public static WorkItemQueryPath(): string {
         let workItemQueryPath : string = process.env.MSVSTS_TEAM_WORK_ITEM_QUERY_PATH;
         return (workItemQueryPath || "undefined-workitem-query-path");
+    }
+
+    public static WorkItemTwoHundredTasksQueryPath(): string {
+        let workItemQueryPath : string = process.env.MSVSTS_TEAM_WORK_ITEM_TWO_HUNDRED_QUERY_PATH;
+        return (workItemQueryPath || "undefined-workitem-twohundredtasks-query-path");
     }
 
     public static ProjectGuid() : string {

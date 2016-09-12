@@ -46,6 +46,26 @@ describe("WorkItemTrackingService-Integration", function() {
         ctx.RepoInfo = Mocks.RepositoryInfo();
         ctx.UserInfo = undefined;
 
+        // for (var index = 0; index < 250; index++) {
+        //     let itemType : string = "Task";
+        //     let today: Date = new Date();
+        //     let title: string = "Task created by integration test (" + today.toLocaleString() + ")";
+        //     let svc: WorkItemTrackingService = new WorkItemTrackingService(ctx);
+        //     svc.CreateWorkItem(ctx, itemType, title).then(
+        //         function (item) {
+        //             assert.isNotNull(item, "item was null when it shouldn't have been");
+        //             if (index === 250) {
+        //             done();
+        //             }
+        //         },
+        //         function (err) {
+        //             //This will occur if the PAT used by the integration tests don't have RW on WIT
+        //             //assert.contains(err, "401");
+        //             done(err);
+        //         }
+        //     );
+        // }
+
         let itemType : string = "Bug";
         let today: Date = new Date();
         let title: string = "Work item created by integration test (" + today.toLocaleString() + ")";
@@ -142,7 +162,12 @@ describe("WorkItemTrackingService-Integration", function() {
                 assert.isNotNull(query);
                 //console.log(query);
                 expect(query.id).to.equal(TestSettings.WorkItemQueryId());
-                done();
+                svc.GetWorkItems(TestSettings.TeamProject(), query.wiql).then((items) => {
+                    assert.isTrue(items.length > 0);
+                    done();
+                }).catch((err) => {
+                    done(err);
+                });
             },
             function (err) {
                 done(err);
@@ -187,6 +212,61 @@ describe("WorkItemTrackingService-Integration", function() {
                 //console.log(items.length);
                 expect(item.id).to.equal(TestSettings.WorkItemId().toString());
                 done();
+            },
+            function (err) {
+                done(err);
+            }
+        );
+    });
+
+    it("should verify WorkItemTrackingService.GetWorkItemQuery with a Link query", function(done) {
+        this.timeout(TestSettings.TestTimeout()); //http://mochajs.org/#timeouts
+
+        var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl());
+        ctx.CredentialHandler = CredentialManager.GetCredentialHandler();
+        ctx.RepoInfo = Mocks.RepositoryInfo();
+        ctx.UserInfo = undefined;
+
+        let svc: WorkItemTrackingService = new WorkItemTrackingService(ctx);
+        svc.GetWorkItemQuery(TestSettings.TeamProject(), TestSettings.WorkItemLinkQueryPath()).then(
+            function (query) {
+                assert.isNotNull(query);
+                //console.log(query);
+                svc.GetWorkItems(TestSettings.TeamProject(), query.wiql).then((items) => {
+                    assert.isTrue(items.length > 0, "Expected at least 1 result but didn't get any.");
+                    //assert.isTrue(items.length === 200, "Expected the maximum of 200 work items but didn't get that amount.");  // current maximum work items returned
+                    done();
+                }).catch((err) => {
+                    done(err);
+                });
+            },
+            function (err) {
+                done(err);
+            }
+        );
+    });
+
+    it("should verify WorkItemTrackingService.GetWorkItemQuery with maximum 200 results", function(done) {
+        this.timeout(TestSettings.TestTimeout()); //http://mochajs.org/#timeouts
+
+        var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl());
+        ctx.CredentialHandler = CredentialManager.GetCredentialHandler();
+        ctx.RepoInfo = Mocks.RepositoryInfo();
+        ctx.UserInfo = undefined;
+
+        let svc: WorkItemTrackingService = new WorkItemTrackingService(ctx);
+        svc.GetWorkItemQuery(TestSettings.TeamProject(), TestSettings.WorkItemTwoHundredTasksQueryPath()).then(
+            function (query) {
+                assert.isNotNull(query);
+                //console.log(query);
+                svc.GetWorkItems(TestSettings.TeamProject(), query.wiql).then((items) => {
+                    assert.isTrue(items.length > 0, "Expected at least 1 result but didn't get any.");
+                    // current maximum work items returned
+                    assert.isTrue(items.length === 200, "Expected the maximum of 200 work items but didn't get that amount.");
+                    done();
+                }).catch((err) => {
+                    done(err);
+                });
             },
             function (err) {
                 done(err);
