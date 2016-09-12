@@ -56,4 +56,12 @@ describe("CredentialInfo", function() {
         assert.equal(ntlm.workstation, "workstation");
     });
 
+    it("should ensure properties work as intended", function() {
+        let credentialInfo: CredentialInfo = new CredentialInfo("pat-token");
+        let basic: BasicCredentialHandler = <BasicCredentialHandler>(credentialInfo.CredentialHandler);
+        credentialInfo.CredentialHandler = undefined;
+        assert.isUndefined(credentialInfo.CredentialHandler);
+        credentialInfo.CredentialHandler = basic;
+        assert.isNotNull(credentialInfo.CredentialHandler);
+    });
 });
