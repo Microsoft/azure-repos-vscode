@@ -14,7 +14,8 @@ var opener = require("opener");
 
 export class Utils {
 
-    public static FindGitFolder(startingPath: string): string {
+    //gitDir provided for unit testing purposes
+    public static FindGitFolder(startingPath: string, gitDir?: string): string {
         if (!fs.existsSync(startingPath)) { return null; }
 
         let gitPath: string;
@@ -24,7 +25,7 @@ export class Utils {
         if (!currentPath) { currentPath = process.cwd(); }
 
         do {
-            gitPath = path.join(currentPath, ".git");
+            gitPath = path.join(currentPath, gitDir || ".git");
 
             if (fs.existsSync(gitPath)) {
               return gitPath;

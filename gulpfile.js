@@ -66,8 +66,8 @@ gulp.task('publishbuild', ['build'], function () {
 gulp.task('publishall', ['publishbuild'], function () {
     gulp.src(['./test/contexts/testrepos/**/*'])
         .pipe(gulp.dest('./out/test/contexts/testrepos'));
-    gulp.src(['./test/contexts/testrepos/**/*'])
-        .pipe(gulp.dest('./out/test/contexts/testrepos'));
+    gulp.src(['./test/helpers/testrepos/**/*'])
+        .pipe(gulp.dest('./out/test/helpers/testrepos'));
 });
 
 //Tests will fail with MODULE_NOT_FOUND if I try to run 'publishBuild' before test target

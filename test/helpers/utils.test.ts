@@ -4,6 +4,7 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
+import { BuildResult } from "vso-node-api/interfaces/BuildInterfaces";
 import { Utils }  from "../../src/helpers/utils";
 import { Strings }  from "../../src/helpers/strings";
 
@@ -14,7 +15,11 @@ var expect = chai.expect;
 var assert = chai.assert;
 chai.should();
 
+const path = require("path");
+
 describe("Utils", function() {
+    let TEST_REPOS_FOLDER: string = "testrepos";
+    let DOT_GIT_FOLDER: string = "dotgit";
 
     beforeEach(function() {
         //
@@ -83,6 +88,24 @@ describe("Utils", function() {
 
         let message: string = Utils.GetMessageForStatusCode(reason, msg, prefix);
         assert.equal(message, prefix + " " + msg);
+    });
+
+    it("should verify FindGitFolder with subfolder", function() {
+        let repoName: string = "gitreposubfolder";
+        let repoPath: string = path.join(__dirname, TEST_REPOS_FOLDER, repoName, "folder", "subfolder");
+        // Pass in DOT_GIT_FOLDER to find our test repo folder
+        let actualRepoPath: string = Utils.FindGitFolder(repoPath, DOT_GIT_FOLDER);
+        // Although we started with a subfolder in the repository, ensure we get the DOT_GIT_FOLDER
+        assert.equal(actualRepoPath, path.join(__dirname, TEST_REPOS_FOLDER, repoName, DOT_GIT_FOLDER));
+    });
+
+    it("should verify GetBuildResultIcon with all values", function() {
+        expect(Utils.GetBuildResultIcon(BuildResult.Succeeded)).to.equal("octicon-check");
+        expect(Utils.GetBuildResultIcon(BuildResult.Canceled)).to.equal("octicon-alert");
+        expect(Utils.GetBuildResultIcon(BuildResult.Failed)).to.equal("octicon-stop");
+        expect(Utils.GetBuildResultIcon(BuildResult.PartiallySucceeded)).to.equal("octicon-alert");
+        expect(Utils.GetBuildResultIcon(BuildResult.None)).to.equal("octicon-question");
+        expect(Utils.GetBuildResultIcon(undefined)).to.equal("octicon-question");
     });
 
 });
