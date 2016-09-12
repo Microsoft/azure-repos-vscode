@@ -4,7 +4,8 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import { GitVcService }  from "../../src/services/gitvc";
+import { GitPullRequest, PullRequestAsyncStatus } from "vso-node-api/interfaces/GitInterfaces";
+import { GitVcService, PullRequestScore }  from "../../src/services/gitvc";
 
 var chai = require("chai");
 /* tslint:disable:no-unused-variable */
@@ -60,6 +61,41 @@ describe("GitVcService", function() {
         let branch: string = "branch";
 
         assert.equal(GitVcService.GetRepositoryHistoryUrl(repositoryUrl, branch), repositoryUrl + "/history" + "?itemVersion=GB" + branch + "&_a=history");
+    });
+
+    it("should verify failed pull request score", function() {
+        let pullRequest: GitPullRequest = {
+            mergeStatus: PullRequestAsyncStatus.Conflicts,
+            _links: undefined,
+            closedDate: undefined,
+            codeReviewId: undefined,
+            commits: undefined,
+            completionOptions: undefined,
+            completionQueueTime: undefined,
+            createdBy: undefined,
+            creationDate: undefined,
+            description: undefined,
+            mergeId: undefined,
+            lastMergeCommit: undefined,
+            lastMergeSourceCommit: undefined,
+            lastMergeTargetCommit: undefined,
+            pullRequestId: undefined,
+            remoteUrl: undefined,
+            repository: undefined,
+            reviewers: undefined,
+            sourceRefName: undefined,
+            status: undefined,
+            targetRefName: undefined,
+            title: undefined,
+            upgraded: undefined,
+            url: undefined,
+            workItemRefs: undefined
+        };
+        assert.equal(GitVcService.GetPullRequestScore(pullRequest), PullRequestScore.Failed);
+        pullRequest.mergeStatus = PullRequestAsyncStatus.Failure;
+        assert.equal(GitVcService.GetPullRequestScore(pullRequest), PullRequestScore.Failed);
+        pullRequest.mergeStatus = PullRequestAsyncStatus.RejectedByPolicy;
+        assert.equal(GitVcService.GetPullRequestScore(pullRequest), PullRequestScore.Failed);
     });
 
 });
