@@ -56,6 +56,23 @@ describe("TeamServicesClient-Integration", function() {
         );
     });
 
+    it("should verify repositoryClient.getVstsInfo and 404", function(done) {
+        this.timeout(TestSettings.TestTimeout()); //http://mochajs.org/#timeouts
+
+        let repositoryClient: QTeamServicesApi = new QTeamServicesApi(TestSettings.RemoteRepositoryUrl() + "1", [CredentialManager.GetCredentialHandler()]);
+        repositoryClient.getVstsInfo().then(
+            function (repoInfo) {
+                //console.log(repoInfo);
+                done();
+            },
+            function (err) {
+                assert.isNotNull(err, "err was null when it shouldn't have been");
+                expect(err.statusCode).to.equal(404);
+                done();
+            }
+        );
+    });
+
     it("should verify accountClient.connect", function(done) {
         this.timeout(TestSettings.TestTimeout()); //http://mochajs.org/#timeouts
 
