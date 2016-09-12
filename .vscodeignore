@@ -2,6 +2,7 @@
 typings/**
 out/test/**
 out/test-integration/**
+out/results/**
 test/**
 test-integration/**
 src/**

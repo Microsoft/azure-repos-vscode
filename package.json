@@ -122,6 +122,7 @@
     "chai": "^3.4.1",
     "del": "^2.2.0",
     "gulp": "^3.9.0",
+    "gulp-istanbul": "^1.1.1",
     "gulp-mocha": "^2.2.0",
     "gulp-tslint": "^3.2.0",
     "gulp-util": "^3.0.7",

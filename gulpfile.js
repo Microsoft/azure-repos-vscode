@@ -7,14 +7,15 @@ var exec  = require('child_process').exec;
 var tslint = require('gulp-tslint');
 var del = require('del');
 var argv = require('yargs').argv;
+var istanbul = require('gulp-istanbul');
 
 // Default to list reporter when run directly.
 // CI build can pass 'reporter=junit' to create JUnit results files
 var reporterUnitTest = { reporter: 'list' };
 var reporterIntegrationTest = { reporter: 'list' };
 if (argv.reporter === "junit") {
-    reporterUnitTest = { reporter: 'mocha-junit-reporter', reporterOptions: { mochaFile: 'out/test/results/test-unittestresults.xml'} } ;
-    reporterIntegrationTest = { reporter: 'mocha-junit-reporter', reporterOptions: { mochaFile: 'out/test/results/test-integrationtestresults.xml'} } ;
+    reporterUnitTest = { reporter: 'mocha-junit-reporter', reporterOptions: { mochaFile: 'out/results/tests/test-unittestresults.xml'} } ;
+    reporterIntegrationTest = { reporter: 'mocha-junit-reporter', reporterOptions: { mochaFile: 'out/results/tests/test-integrationtestresults.xml'} } ;
 }
 
 function errorHandler(err) {
@@ -80,6 +81,26 @@ gulp.task('test', function() {
 gulp.task('test-integration', function() {
     return gulp.src(['out/test-integration/**/*.js'], {read: false})
     .pipe(mocha(reporterIntegrationTest))
+    .on('error', errorHandler);
+});
+
+gulp.task('test-coverage', function() {
+    //credentialstore is brought in from separate repository, exclude it here
+    return gulp.src(['out/src/**/*.js', '!out/src/credentialstore/**'])
+    //.pipe(istanbul({includeUntested: true}))
+    .pipe(istanbul())
+    .pipe(istanbul.hookRequire()) //for using node.js
+    .on('finish', function() {
+        gulp.src('out/test*/**/*.js')
+          .pipe(mocha(reporterUnitTest))
+          .pipe(istanbul.writeReports(
+              {
+                  dir: 'out/results/coverage',
+                  reporters: ['cobertura','html'],
+                  reportOpts: { dir: 'out/results/coverage' }
+              }
+          ));
+    })
     .on('error', errorHandler);
 });
 
