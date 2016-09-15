@@ -9,6 +9,7 @@ var del = require('del');
 var argv = require('yargs').argv;
 var istanbul = require('gulp-istanbul');
 var tl = require('vsts-task-lib');
+var path = require('path');
 
 // Default to list reporter when run directly.
 // CI build can pass 'reporter=junit' to create JUnit results files
