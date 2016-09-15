@@ -8,6 +8,7 @@ var tslint = require('gulp-tslint');
 var del = require('del');
 var argv = require('yargs').argv;
 var istanbul = require('gulp-istanbul');
+var tl = require('vsts-task-lib');
 
 // Default to list reporter when run directly.
 // CI build can pass 'reporter=junit' to create JUnit results files
@@ -102,6 +103,14 @@ gulp.task('test-coverage', function() {
           ));
     })
     .on('error', errorHandler);
+});
+
+//The following task is used by the CI build to upload code coverage files
+//Added due to race condition between writeReports and ccPublisher.publish
+//It's OK for this to fail if the coverage file doesn't exist
+gulp.task('upload-coverage-file', function() {
+    var ccPublisher = new tl.CodeCoveragePublisher();
+    ccPublisher.publish('cobertura', path.join(__dirname, 'out/results/coverage/cobertura-coverage.xml'), path.join(__dirname, 'out/results/coverage'), "");
 });
 
 gulp.task('test-all', ['test', 'test-integration'], function() { });

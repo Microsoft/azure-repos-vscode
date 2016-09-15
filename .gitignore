@@ -3,3 +3,4 @@ out/
 *.vsix
 team-extension.log
 *.zip
+.taskkey
