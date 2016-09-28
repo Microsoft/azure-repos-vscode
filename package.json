@@ -5,6 +5,7 @@
   "version": "1.104.1",
   "publisher": "ms-vsts",
   "icon": "assets/team.png",
+  "markdown": "standard",
   "galleryBanner": {
     "color": "#65217C",
     "theme": "dark"
