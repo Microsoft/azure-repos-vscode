@@ -47,5 +47,6 @@ export class Strings {
     //Status codes
     static StatusCode401: string = "Unauthorized. Check your authentication credentials and try again.";
     static StatusCodeOffline: string = "It appears Visual Studio Code is offline.  Please connect and try again.";
+    static ProxyUnreachable: string = "It appears the configured proxy is not reachable.  Please check your connection and try again.";
 }
 /* tslint:enable:variable-name */

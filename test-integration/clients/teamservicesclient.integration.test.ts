@@ -9,7 +9,7 @@ import { TestSettings } from "../helpers-integration/testsettings";
 
 import { CredentialManager } from "../../src/helpers/credentialmanager";
 import { TeamServerContext } from "../../src/contexts/servercontext";
-import { QTeamServicesApi } from "../../src/clients/teamservicesclient";
+import { TeamServicesApi } from "../../src/clients/teamservicesclient";
 
 var chai = require("chai");
 /* tslint:disable:no-unused-variable */
@@ -35,61 +35,54 @@ describe("TeamServicesClient-Integration", function() {
         return credentialManager.RemoveCredentials(TestSettings.Account());
     });
 
-    it("should verify repositoryClient.getVstsInfo", function(done) {
+    it("should verify repositoryClient.getVstsInfo", async function(done) {
         this.timeout(TestSettings.TestTimeout()); //http://mochajs.org/#timeouts
 
-        let repositoryClient: QTeamServicesApi = new QTeamServicesApi(TestSettings.RemoteRepositoryUrl(), [CredentialManager.GetCredentialHandler()]);
-        repositoryClient.getVstsInfo().then(
-            function (repoInfo) {
-                //console.log(repoInfo);
-                assert.isNotNull(repoInfo, "repoInfo was null when it shouldn't have been");
-                assert.equal(repoInfo.serverUrl, TestSettings.AccountUrl());
-                assert.equal(repoInfo.collection.name, TestSettings.CollectionName());
-                assert.equal(repoInfo.repository.remoteUrl, TestSettings.RemoteRepositoryUrl());
-                assert.equal(repoInfo.repository.id, TestSettings.RepositoryId());
-                expect(repoInfo.repository.name).to.equal(TestSettings.RepositoryName());
-                done();
-            },
-            function (err) {
-                done(err);
-            }
-        );
+        try {
+            let repositoryClient: TeamServicesApi = new TeamServicesApi(TestSettings.RemoteRepositoryUrl(), [CredentialManager.GetCredentialHandler()]);
+            let repoInfo: any = await repositoryClient.getVstsInfo();
+            assert.isNotNull(repoInfo, "repoInfo was null when it shouldn't have been");
+            assert.equal(repoInfo.serverUrl, TestSettings.AccountUrl());
+            assert.equal(repoInfo.collection.name, TestSettings.CollectionName());
+            assert.equal(repoInfo.repository.remoteUrl, TestSettings.RemoteRepositoryUrl());
+            assert.equal(repoInfo.repository.id, TestSettings.RepositoryId());
+            expect(repoInfo.repository.name).to.equal(TestSettings.RepositoryName());
+            done();
+        } catch (err) {
+            done(err);
+        }
     });
 
-    it("should verify repositoryClient.getVstsInfo and 404", function(done) {
+    it("should verify repositoryClient.getVstsInfo and 404", async function(done) {
         this.timeout(TestSettings.TestTimeout()); //http://mochajs.org/#timeouts
 
-        let repositoryClient: QTeamServicesApi = new QTeamServicesApi(TestSettings.RemoteRepositoryUrl() + "1", [CredentialManager.GetCredentialHandler()]);
-        repositoryClient.getVstsInfo().then(
-            function (repoInfo) {
-                //console.log(repoInfo);
-                done();
-            },
-            function (err) {
-                assert.isNotNull(err, "err was null when it shouldn't have been");
-                expect(err.statusCode).to.equal(404);
-                done();
-            }
-        );
+        try {
+            let repositoryClient: TeamServicesApi = new TeamServicesApi(TestSettings.RemoteRepositoryUrl() + "1", [CredentialManager.GetCredentialHandler()]);
+            let repoInfo: any = await repositoryClient.getVstsInfo();
+            assert.isNull(repoInfo);
+            done();
+        } catch (err) {
+            assert.isNotNull(err, "err was null when it shouldn't have been");
+            expect(err.statusCode).to.equal(404);
+            done();
+        }
     });
 
-    it("should verify accountClient.connect", function(done) {
+    it("should verify accountClient.connect", async function(done) {
         this.timeout(TestSettings.TestTimeout()); //http://mochajs.org/#timeouts
 
-        let accountClient: QTeamServicesApi = new QTeamServicesApi(TestSettings.AccountUrl(), [CredentialManager.GetCredentialHandler()]);
-        accountClient.connect().then(
-            function (settings) {
-                //console.log(settings);
-                assert.isNotNull(settings, "settings was null when it shouldn't have been");
-                assert.isNotNull(settings.providerDisplayName);
-                assert.isNotNull(settings.customDisplayName);
-                assert.isNotNull(settings.authorizedUser.providerDisplayName);
-                assert.isNotNull(settings.authorizedUser.customDisplayName);
-                done();
-            },
-            function (err) {
-                done(err);
-            }
-        );
+        try {
+            let accountClient: TeamServicesApi = new TeamServicesApi(TestSettings.AccountUrl(), [CredentialManager.GetCredentialHandler()]);
+            let settings: any = await accountClient.connect();
+            //console.log(settings);
+            assert.isNotNull(settings, "settings was null when it shouldn't have been");
+            assert.isNotNull(settings.providerDisplayName);
+            assert.isNotNull(settings.customDisplayName);
+            assert.isNotNull(settings.authorizedUser.providerDisplayName);
+            assert.isNotNull(settings.authorizedUser.customDisplayName);
+            done();
+        } catch (err) {
+            done(err);
+        }
     });
 });

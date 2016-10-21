@@ -5,9 +5,10 @@
 "use strict";
 
 import { StatusBarItem, window } from "vscode";
+import { QueryHierarchyItem, WorkItemType } from "vso-node-api/interfaces/WorkItemTrackingInterfaces";
 import { BaseClient } from "./baseclient";
 import { Logger } from "../helpers/logger";
-import { WorkItemTrackingService } from "../services/workitemtracking";
+import { SimpleWorkItem, WorkItemTrackingService } from "../services/workitemtracking";
 import { TeamServerContext} from "../contexts/servercontext";
 import { BaseQuickPickItem, VsCodeUtils, WorkItemQueryQuickPickItem } from "../helpers/vscodeutils";
 import { CommandNames, TelemetryEvents, WitQueries, WitTypes } from "../helpers/constants";
@@ -15,8 +16,6 @@ import { Strings } from "../helpers/strings";
 import { Utils } from "../helpers/utils";
 import { TelemetryService } from "../services/telemetry";
 import { IPinnedQuery } from "../helpers/settings";
-
-import Q = require("q");
 
 export class WitClient extends BaseClient {
     private _serverContext: TeamServerContext;
@@ -42,206 +41,168 @@ export class WitClient extends BaseClient {
     }
 
     //Creates a new work item based on a single line of selected text
-    public CreateNewWorkItem(taskTitle: string): void {
-        let self = this;
-        this.ReportEvent(TelemetryEvents.OpenNewWorkItem);
+    public async CreateNewWorkItem(taskTitle: string): Promise<void> {
+        try {
+            this.ReportEvent(TelemetryEvents.OpenNewWorkItem);
+            let selectedType: BaseQuickPickItem = await window.showQuickPick(await this.getWorkItemTypes(), { matchOnDescription: true, placeHolder: Strings.ChooseWorkItemType });
+            if (selectedType) {
+                this.ReportEvent(TelemetryEvents.OpenNewWorkItem);
 
-        window.showQuickPick(this.getWorkItemTypes(), { matchOnDescription: true, placeHolder: Strings.ChooseWorkItemType }).then(
-            function (selectedType) {
-                if (selectedType) {
-                    self.ReportEvent(TelemetryEvents.OpenNewWorkItem);
-
-                    Logger.LogInfo("Selected work item type is " + selectedType.label);
-                    let newItemUrl: string = WorkItemTrackingService.GetNewWorkItemUrl(self._serverContext.RepoInfo.TeamProjectUrl, selectedType.label, taskTitle, self.getUserName(self._serverContext));
-                    Logger.LogInfo("New Work Item Url: " + newItemUrl);
-                    Utils.OpenUrl(newItemUrl);
-                }
-            },
-            function (err) {
-                self.handleError(err, "Error selecting work item type from QuickPick");
+                Logger.LogInfo("Selected work item type is " + selectedType.label);
+                let newItemUrl: string = WorkItemTrackingService.GetNewWorkItemUrl(this._serverContext.RepoInfo.TeamProjectUrl, selectedType.label, taskTitle, this.getUserName(this._serverContext));
+                Logger.LogInfo("New Work Item Url: " + newItemUrl);
+                Utils.OpenUrl(newItemUrl);
             }
-        );
+        } catch (err) {
+            this.handleError(err, "Error creating new work item");
+        }
     }
 
     //Navigates to a work item chosen from the results of a user-selected "My Queries" work item query
     //This method first displays the queries under "My Queries" and, when one is chosen, displays the associated work items.
     //If a work item is chosen, it is opened in the web browser.
-    public ShowMyWorkItemQueries(): void {
-        let self = this;
-        this.ReportEvent(TelemetryEvents.ShowMyWorkItemQueries);
+    public async ShowMyWorkItemQueries(): Promise<void> {
+        try {
+            this.ReportEvent(TelemetryEvents.ShowMyWorkItemQueries);
+            let query: WorkItemQueryQuickPickItem = await window.showQuickPick(await this.getMyWorkItemQueries(), { matchOnDescription: false, placeHolder: Strings.ChooseWorkItemQuery });
+            if (query) {
+                this.ReportEvent(TelemetryEvents.ViewWorkItems);
+                Logger.LogInfo("Selected query is " + query.label);
+                Logger.LogInfo("Getting work items for query...");
 
-        window.showQuickPick(this.getMyWorkItemQueries(), { matchOnDescription: false, placeHolder: Strings.ChooseWorkItemQuery }).then(
-            function (query) {
-                if (query) {
-                    self.ReportEvent(TelemetryEvents.ViewWorkItems);
-                    Logger.LogInfo("Selected query is " + query.label);
-                    Logger.LogInfo("Getting work items for query...");
-
-                    window.showQuickPick(self.getMyWorkItems(self._serverContext.RepoInfo.TeamProject, query.wiql), { matchOnDescription: true, placeHolder: Strings.ChooseWorkItem }).then(
-                        function (workItem) {
-                            if (workItem) {
-                                let url: string = undefined;
-                                if (workItem.id === undefined) {
-                                    self.ReportEvent(TelemetryEvents.OpenAdditionalQueryResults);
-                                    url = WorkItemTrackingService.GetMyQueryResultsUrl(self._serverContext.RepoInfo.TeamProjectUrl, self._myQueriesFolder, query.label);
-                                } else {
-                                    self.ReportEvent(TelemetryEvents.ViewWorkItem);
-                                    url = WorkItemTrackingService.GetEditWorkItemUrl(self._serverContext.RepoInfo.TeamProjectUrl, workItem.id);
-                                }
-                                Logger.LogInfo("Work Item Url: " + url);
-                                Utils.OpenUrl(url);
-                            }
-                        },
-                        function (err) {
-                            self.handleError(err, "Error selecting work item from QuickPick");
-                        }
-                    );
-                }
-            },
-            function (err) {
-                self.handleError(err, "Error selecting work item query from QuickPick");
-            }
-        );
-    }
-
-    public ShowPinnedQueryWorkItems(): void {
-        this.ReportEvent(TelemetryEvents.ViewPinnedQueryWorkItems);
-        this.getPinnedQueryText().then((queryText) => {
-            this.showWorkItems(queryText);
-        });
-    }
-
-    //Returns a Q.Promise containing an array of SimpleWorkItems that are "My" work items
-    public ShowMyWorkItems(): void {
-        this.ReportEvent(TelemetryEvents.ViewMyWorkItems);
-        this.showWorkItems(WitQueries.MyWorkItems);
-    }
-
-    private showWorkItems(wiql: string): void {
-        let self = this;
-        Logger.LogInfo("Getting work items...");
-        window.showQuickPick(self.getMyWorkItems(this._serverContext.RepoInfo.TeamProject, wiql), { matchOnDescription: true, placeHolder: Strings.ChooseWorkItem }).then(
-            function (workItem) {
+                let workItem: BaseQuickPickItem = await window.showQuickPick(await this.getMyWorkItems(this._serverContext.RepoInfo.TeamProject, query.wiql), { matchOnDescription: true, placeHolder: Strings.ChooseWorkItem });
                 if (workItem) {
                     let url: string = undefined;
                     if (workItem.id === undefined) {
-                        self.ReportEvent(TelemetryEvents.OpenAdditionalQueryResults);
-                        url = WorkItemTrackingService.GetWorkItemsBaseUrl(self._serverContext.RepoInfo.TeamProjectUrl);
+                        this.ReportEvent(TelemetryEvents.OpenAdditionalQueryResults);
+                        url = WorkItemTrackingService.GetMyQueryResultsUrl(this._serverContext.RepoInfo.TeamProjectUrl, this._myQueriesFolder, query.label);
                     } else {
-                        self.ReportEvent(TelemetryEvents.ViewWorkItem);
-                        url = WorkItemTrackingService.GetEditWorkItemUrl(self._serverContext.RepoInfo.TeamProjectUrl, workItem.id);
+                        this.ReportEvent(TelemetryEvents.ViewWorkItem);
+                        url = WorkItemTrackingService.GetEditWorkItemUrl(this._serverContext.RepoInfo.TeamProjectUrl, workItem.id);
                     }
                     Logger.LogInfo("Work Item Url: " + url);
                     Utils.OpenUrl(url);
                 }
-            },
-            function (err) {
-                self.handleError(err, "Error selecting work item query from QuickPick");
             }
-        );
-    }
-
-    public GetPinnedQueryResultCount() : Q.Promise<number> {
-        let svc: WorkItemTrackingService = new WorkItemTrackingService(this._serverContext);
-        Logger.LogInfo("Running pinned work item query to get count...");
-        Logger.LogInfo("TP: " + this._serverContext.RepoInfo.TeamProject);
-
-        return this.getPinnedQueryText().then((queryText) => {
-            return svc.GetQueryResultCount(this._serverContext.RepoInfo.TeamProject, queryText);
-        });
-    }
-
-    private getPinnedQueryText(): Q.Promise<string> {
-        let deferred = Q.defer<string>();
-        let promiseToReturn = deferred.promise;
-
-        if (this._pinnedQuery.queryText && this._pinnedQuery.queryText.length > 0) {
-            deferred.resolve(this._pinnedQuery.queryText);
-        } else if (this._pinnedQuery.queryPath && this._pinnedQuery.queryPath.length > 0) {
-            Logger.LogInfo("Getting my work item query...");
-            Logger.LogInfo("TP: " + this._serverContext.RepoInfo.TeamProject);
-            Logger.LogInfo("QueryPath: " + this._pinnedQuery.queryPath);
-            let svc: WorkItemTrackingService = new WorkItemTrackingService(this._serverContext);
-
-            svc.GetWorkItemQuery(this._serverContext.RepoInfo.TeamProject, this._pinnedQuery.queryPath).then((queryItem) => {
-                deferred.resolve(queryItem.wiql);
-            }).catch((reason) => {
-                deferred.reject(reason);
-            });
-        } else {
-            deferred.reject("No queryPath or queryText provided.");
+        } catch (err) {
+            this.handleError(err, "Error showing work item queries");
         }
-
-        return promiseToReturn;
     }
 
-    private getMyWorkItemQueries(): Q.Promise<Array<WorkItemQueryQuickPickItem>> {
-        let queries: Array<WorkItemQueryQuickPickItem> = [];
-        let promiseToReturn: Q.Promise<Array<WorkItemQueryQuickPickItem>>;
-        let deferred = Q.defer<Array<WorkItemQueryQuickPickItem>>();
-        promiseToReturn = deferred.promise;
+    public async ShowPinnedQueryWorkItems(): Promise<void> {
+        this.ReportEvent(TelemetryEvents.ViewPinnedQueryWorkItems);
 
+        try {
+            let queryText: string = await this.getPinnedQueryText();
+            await this.showWorkItems(queryText);
+        } catch (err) {
+            this.handleError(err, "Error showing pinned query work items");
+        }
+    }
+
+    public async ShowMyWorkItems(): Promise<void> {
+        this.ReportEvent(TelemetryEvents.ViewMyWorkItems);
+
+        try {
+            await this.showWorkItems(WitQueries.MyWorkItems);
+        } catch (err) {
+            this.handleError(err, "Error showing my work items");
+        }
+    }
+
+    private async showWorkItems(wiql: string): Promise<void> {
+        Logger.LogInfo("Getting work items...");
+        let workItem: BaseQuickPickItem = await window.showQuickPick(await this.getMyWorkItems(this._serverContext.RepoInfo.TeamProject, wiql), { matchOnDescription: true, placeHolder: Strings.ChooseWorkItem });
+        if (workItem) {
+            let url: string = undefined;
+            if (workItem.id === undefined) {
+                this.ReportEvent(TelemetryEvents.OpenAdditionalQueryResults);
+                url = WorkItemTrackingService.GetWorkItemsBaseUrl(this._serverContext.RepoInfo.TeamProjectUrl);
+            } else {
+                this.ReportEvent(TelemetryEvents.ViewWorkItem);
+                url = WorkItemTrackingService.GetEditWorkItemUrl(this._serverContext.RepoInfo.TeamProjectUrl, workItem.id);
+            }
+            Logger.LogInfo("Work Item Url: " + url);
+            Utils.OpenUrl(url);
+        }
+    }
+
+    public async GetPinnedQueryResultCount() : Promise<number> {
+        try {
+            Logger.LogInfo("Running pinned work item query to get count (" + this._serverContext.RepoInfo.TeamProject + ")...");
+            let queryText: string = await this.getPinnedQueryText();
+
+            let svc: WorkItemTrackingService = new WorkItemTrackingService(this._serverContext);
+            return svc.GetQueryResultCount(this._serverContext.RepoInfo.TeamProject, queryText);
+        } catch (err) {
+            this.handleError(err, "Error getting pinned query result count");
+        }
+    }
+
+    private async getPinnedQueryText(): Promise<string> {
+        let promise: Promise<string> = new Promise<string>(async /*?*/ (resolve, reject) => {
+            try {
+                if (this._pinnedQuery.queryText && this._pinnedQuery.queryText.length > 0) {
+                    resolve(this._pinnedQuery.queryText);
+                } else if (this._pinnedQuery.queryPath && this._pinnedQuery.queryPath.length > 0) {
+                    Logger.LogInfo("Getting my work item query (" + this._serverContext.RepoInfo.TeamProject + ")...");
+                    Logger.LogInfo("QueryPath: " + this._pinnedQuery.queryPath);
+                    let svc: WorkItemTrackingService = new WorkItemTrackingService(this._serverContext);
+
+                    let queryItem: QueryHierarchyItem = await svc.GetWorkItemQuery(this._serverContext.RepoInfo.TeamProject, this._pinnedQuery.queryPath);
+                    resolve(queryItem.wiql);
+                }
+            } catch (err) {
+                reject(err);
+            }
+        });
+        return promise;
+    }
+
+    private async getMyWorkItemQueries(): Promise<WorkItemQueryQuickPickItem[]> {
+        let queries: WorkItemQueryQuickPickItem[] = [];
         let svc: WorkItemTrackingService = new WorkItemTrackingService(this._serverContext);
-        Logger.LogInfo("Getting my work item queries...");
-        Logger.LogInfo("TP: " + this._serverContext.RepoInfo.TeamProject);
-        svc.GetWorkItemHierarchyItems(this._serverContext.RepoInfo.TeamProject).then((hierarchyItems) => {
-            Logger.LogInfo("Retrieved " + hierarchyItems.length + " hierarchyItems");
-            hierarchyItems.forEach(folder => {
-                if (folder && folder.isFolder === true && folder.isPublic === false) {
-                    // Because "My Queries" is localized and there is no API to get the name of the localized
-                    // folder, we need to save off the localized name when constructing URLs.
-                    this._myQueriesFolder = folder.name;
-                    if (folder.hasChildren === true) {
-                        //Gets all of the queries under "My Queries" and gets their name and wiql
-                        for (let index = 0; index < folder.children.length; index++) {
-                            queries.push({
-                                id: folder.children[index].id,
-                                label: folder.children[index].name,
-                                description: "",
-                                wiql: folder.children[index].wiql
-                            });
-                        }
+        Logger.LogInfo("Getting my work item queries (" + this._serverContext.RepoInfo.TeamProject + ")...");
+        let hierarchyItems: QueryHierarchyItem[] = await svc.GetWorkItemHierarchyItems(this._serverContext.RepoInfo.TeamProject);
+        Logger.LogInfo("Retrieved " + hierarchyItems.length + " hierarchyItems");
+        hierarchyItems.forEach(folder => {
+            if (folder && folder.isFolder === true && folder.isPublic === false) {
+                // Because "My Queries" is localized and there is no API to get the name of the localized
+                // folder, we need to save off the localized name when constructing URLs.
+                this._myQueriesFolder = folder.name;
+                if (folder.hasChildren === true) {
+                    //Gets all of the queries under "My Queries" and gets their name and wiql
+                    for (let index = 0; index < folder.children.length; index++) {
+                        queries.push({
+                            id: folder.children[index].id,
+                            label: folder.children[index].name,
+                            description: "",
+                            wiql: folder.children[index].wiql
+                        });
                     }
                 }
-            });
-
-            deferred.resolve(queries);
-        }).catch((reason) => {
-            deferred.reject(reason);
+            }
         });
-
-        return promiseToReturn;
+        return queries;
     }
 
-    private getMyWorkItems(teamProject: string, wiql: string): Q.Promise<Array<BaseQuickPickItem>> {
-        let workItems: Array<BaseQuickPickItem> = [];
-        let promiseToReturn: Q.Promise<Array<BaseQuickPickItem>>;
-        let deferred = Q.defer<Array<BaseQuickPickItem>>();
-        promiseToReturn = deferred.promise;
-
+    private async getMyWorkItems(teamProject: string, wiql: string): Promise<BaseQuickPickItem[]> {
+        let workItems: BaseQuickPickItem[] = [];
         let svc: WorkItemTrackingService = new WorkItemTrackingService(this._serverContext);
-        Logger.LogInfo("Getting my work items...");
-        Logger.LogInfo("TP: " + this._serverContext.RepoInfo.TeamProject);
-        svc.GetWorkItems(teamProject, wiql).then((simpleWorkItems) => {
-            Logger.LogInfo("Retrieved " + simpleWorkItems.length + " work items");
-
-            simpleWorkItems.forEach(wi => {
-                workItems.push({ label: wi.label, description: wi.description, id: wi.id});
-            });
-            if (simpleWorkItems.length === WorkItemTrackingService.MaxResults) {
-                workItems.push({
-                    id: undefined,
-                    label: Strings.BrowseAdditionalWorkItems,
-                    description: Strings.BrowseAdditionalWorkItemsDescription
-                });
-            }
-
-            deferred.resolve(workItems);
-        }).catch((reason) => {
-            deferred.reject(reason);
+        Logger.LogInfo("Getting my work items (" + this._serverContext.RepoInfo.TeamProject + ")...");
+        let simpleWorkItems: SimpleWorkItem[] = await svc.GetWorkItems(teamProject, wiql);
+        Logger.LogInfo("Retrieved " + simpleWorkItems.length + " work items");
+        simpleWorkItems.forEach(wi => {
+            workItems.push({ label: wi.label, description: wi.description, id: wi.id});
         });
-
-        return promiseToReturn;
+        if (simpleWorkItems.length === WorkItemTrackingService.MaxResults) {
+            workItems.push({
+                id: undefined,
+                label: Strings.BrowseAdditionalWorkItems,
+                description: Strings.BrowseAdditionalWorkItemsDescription
+            });
+        }
+        return workItems;
     }
 
     private getUserName(context: TeamServerContext): string {
@@ -257,27 +218,17 @@ export class WitClient extends BaseClient {
         return userName;
     }
 
-    private getWorkItemTypes(): Q.Promise<Array<BaseQuickPickItem>> {
-        let promiseToReturn: Q.Promise<Array<BaseQuickPickItem>>;
-        let deferred = Q.defer<Array<BaseQuickPickItem>>();
-        promiseToReturn = deferred.promise;
-
+    private async getWorkItemTypes(): Promise<BaseQuickPickItem[]> {
         let svc: WorkItemTrackingService = new WorkItemTrackingService(this._serverContext);
-        svc.GetWorkItemTypes(this._serverContext.RepoInfo.TeamProject).then((types) => {
-            let workItemTypes: Array<BaseQuickPickItem> = [];
-            types.forEach(type => {
-                workItemTypes.push({ label: type.name, description: type.description, id: undefined });
-            });
-            workItemTypes.sort((t1, t2) => {
-                return (t1.label.localeCompare(t2.label));
-            });
-
-            deferred.resolve(workItemTypes);
-        }).catch((reason) => {
-            deferred.reject(reason);
+        let types: WorkItemType[] = await svc.GetWorkItemTypes(this._serverContext.RepoInfo.TeamProject);
+        let workItemTypes: BaseQuickPickItem[] = [];
+        types.forEach(type => {
+            workItemTypes.push({ label: type.name, description: type.description, id: undefined });
         });
-
-        return promiseToReturn;
+        workItemTypes.sort((t1, t2) => {
+            return (t1.label.localeCompare(t2.label));
+        });
+        return workItemTypes;
     }
 
     private handleError(reason: any, infoMessage?: string, polling?: boolean) : void {

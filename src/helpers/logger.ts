@@ -27,10 +27,14 @@ export class Logger {
         }
     }
 
+    private static addPid(message: string): string {
+        return " [" + Logger.addZero(process.pid, 10000) + "] " + message;
+    }
+
     public static LogDebug(message: string) : void {
         Logger.initalize();
         if (Logger.initialized === true && this.loggingLevel === LoggingLevel.Debug) {
-            winston.log("debug", message);
+            winston.log("debug", this.addPid(message));
             console.log(Logger.getNow() + message);
         }
     }
@@ -39,7 +43,7 @@ export class Logger {
     public static LogError(message: string) : void {
         Logger.initalize();
         if (Logger.initialized === true && this.loggingLevel >= LoggingLevel.Error) {
-            winston.log("error", message);
+            winston.log("error", this.addPid(message));
             console.log(Logger.getNow() + "ERROR: " + message);
         }
         //When displaying messages, don't add timestamp or our severity level prefix
@@ -49,7 +53,7 @@ export class Logger {
     public static LogInfo(message: string) : void {
         Logger.initalize();
         if (Logger.initialized === true && this.loggingLevel >= LoggingLevel.Info) {
-            winston.log("info", message);
+            winston.log("info", " " + this.addPid(message));  //five-wide
             console.log(Logger.getNow() + message);
         }
     }
@@ -66,7 +70,7 @@ export class Logger {
     public static LogWarning(message: string) : void {
         Logger.initalize();
         if (Logger.initialized === true && this.loggingLevel >= LoggingLevel.Warn) {
-            winston.log("warn", message);
+            winston.log("warn", " " + this.addPid(message));  //five-wide
             console.log(Logger.getNow() + "WARNING: " + message);
         }
         //When displaying messages, don't add timestamp or our severity level prefix

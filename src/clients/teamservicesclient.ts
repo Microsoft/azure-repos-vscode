@@ -6,38 +6,23 @@
 
 import basem = require("vso-node-api/ClientApiBases");
 import VsoBaseInterfaces = require("vso-node-api/interfaces/common/VsoBaseInterfaces");
-import Q = require("q");
-
-// This class is not exported since we want to enforce the use of the Q-based class
-class TeamServicesApi extends basem.ClientApiBase {
+export class TeamServicesApi extends basem.ClientApiBase {
     constructor(baseUrl: string, handlers: VsoBaseInterfaces.IRequestHandler[]) {
-        super(baseUrl, handlers, "node-vsts-vscode-api");
-    }
+            super(baseUrl, handlers, "node-vsts-vscode-api");
+        }
 
-    getVstsInfo(onResult: (err: any, statusCode: number, obj: any) => void): void {
-        this.restClient.getJson(this.vsoClient.resolveUrl("/vsts/info"), "", null, null, onResult);
-    }
-}
-
-export class QTeamServicesApi extends basem.QClientApiBase {
-    api: TeamServicesApi;
-
-    constructor(baseUrl: string, handlers: VsoBaseInterfaces.IRequestHandler[]) {
-        super(baseUrl, handlers, TeamServicesApi);
-    }
-
-    public getVstsInfo(): Q.Promise<any> {
-        let defer: Q.Deferred<{}> = Q.defer();
-
-        this.api.getVstsInfo((err: any, statusCode: number, obj: any) => {
-            if (err) {
-                err.statusCode = statusCode;
-                defer.reject(err);
-            } else {
-                defer.resolve(obj);
-            }
+    public async getVstsInfo(): Promise<any> {
+        //Create an instance of Promise since we're calling a function with the callback pattern but want to return a Promise
+        let promise: Promise<any> = new Promise<any>((resolve, reject) => {
+            this.restClient.getJson(this.vsoClient.resolveUrl("/vsts/info"), "", null, null, function(err: any, statusCode: number, obj: any) {
+                if (err) {
+                    err.statusCode = statusCode;
+                    reject(err);
+                } else {
+                    resolve(obj);
+                }
+            });
         });
-
-        return defer.promise;
+        return promise;
     }
 }

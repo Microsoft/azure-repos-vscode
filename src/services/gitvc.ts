@@ -6,13 +6,13 @@
 
 import { GitPullRequest, GitPullRequestSearchCriteria, GitRepository,
          PullRequestAsyncStatus, PullRequestStatus} from "vso-node-api/interfaces/GitInterfaces";
-import { IQGitApi } from "vso-node-api/GitApi";
+import { IGitApi } from "vso-node-api/GitApi";
 import { WebApi } from "vso-node-api/WebApi";
 import { TeamServerContext } from "../contexts/servercontext";
 import { CredentialManager } from "../helpers/credentialmanager";
 
 export class GitVcService {
-    private _gitApi: IQGitApi;
+    private _gitApi: IGitApi;
 
     private static REVIEWER_VOTE_NO_RESPONSE: number = 0;
     private static REVIEWER_VOTE_APPROVED_WITH_SUGGESTIONS: number = 5;
@@ -21,21 +21,20 @@ export class GitVcService {
     private static REVIEWER_VOTE_REJECTED: number = -10;
 
     constructor(context: TeamServerContext) {
-        this._gitApi = new WebApi(context.RepoInfo.CollectionUrl, CredentialManager.GetCredentialHandler()).getQGitApi();
+        this._gitApi = new WebApi(context.RepoInfo.CollectionUrl, CredentialManager.GetCredentialHandler()).getGitApi();
     }
 
     //Returns a Q.Promise containing an array of GitPullRequest objectss for the creator and repository
     //If creatorId is undefined, all pull requests will be returned
-    public GetPullRequests(repositoryId: string, creatorId?: string, reviewerId?: string, status?: PullRequestStatus) : Q.Promise<Array<GitPullRequest>> {
+    public async GetPullRequests(repositoryId: string, creatorId?: string, reviewerId?: string, status?: PullRequestStatus) : Promise<GitPullRequest[]> {
         let criteria: GitPullRequestSearchCriteria = { creatorId: creatorId, includeLinks: false, repositoryId: repositoryId, reviewerId: reviewerId,
-                                                        sourceRefName: undefined, status: status, targetRefName: undefined };
-
-        return this._gitApi.getPullRequests(repositoryId, criteria);
+                                                       sourceRefName: undefined, status: status, targetRefName: undefined };
+        return await this._gitApi.getPullRequests(repositoryId, criteria);
     }
 
     //Returns a Q.Promise containing an array of GitRepository objects for the project
-    public GetRepositories(project: string): Q.Promise<Array<GitRepository>> {
-        return this._gitApi.getRepositories(project, false);
+    public async GetRepositories(project: string): Promise<GitRepository[]> {
+        return await this._gitApi.getRepositories(project, false);
     }
 
     //Construct the url to the file blame information

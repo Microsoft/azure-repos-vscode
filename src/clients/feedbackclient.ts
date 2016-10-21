@@ -24,46 +24,40 @@ export class FeedbackClient extends BaseClient {
     }
 
     //This feedback will go no matter whether Application Insights is enabled or not.
-    public SendFeedback(): void {
-        let self = this;
+    public async SendFeedback(): Promise<void> {
+        try {
+            let choices: BaseQuickPickItem[] = [];
+            choices.push({ label: Strings.SendASmile, description: undefined, id: TelemetryEvents.SendASmile });
+            choices.push({ label: Strings.SendAFrown, description: undefined, id: TelemetryEvents.SendAFrown });
 
-        let choices: Array<BaseQuickPickItem> = [];
-        choices.push({ label: Strings.SendASmile, description: undefined, id: TelemetryEvents.SendASmile });
-        choices.push({ label: Strings.SendAFrown, description: undefined, id: TelemetryEvents.SendAFrown });
-
-        window.showQuickPick(choices, { matchOnDescription: false, placeHolder: Strings.SendFeedback }).then(
-            function (choice) {
-                if (choice) {
-                    window.showInputBox({ value: undefined, prompt: Strings.SendFeedbackPrompt, placeHolder: undefined, password: false }).then((value) => {
-                        if (value === undefined) {
-                            let disposable = window.setStatusBarMessage(Strings.NoFeedbackSent);
-                            setInterval(() => disposable.dispose(), 1000 * 5);
-                            return;
-                        }
-
-                        //User does not need to provide any feedback text
-                        let providedEmail: string = "";
-                        window.showInputBox({ value: undefined, prompt: Strings.SendEmailPrompt, placeHolder: undefined, password: false }).then((email) => {
-                            if (email === undefined) {
-                                let disposable = window.setStatusBarMessage(Strings.NoFeedbackSent);
-                                setInterval(() => disposable.dispose(), 1000 * 5);
-                                return;
-                            }
-                            if (email) {
-                                providedEmail = email;
-                            }
-                            //This feedback will go no matter whether Application Insights is enabled or not.
-                            self.ReportFeedback(choice.id, { "VSCode.Feedback.Comment" : value, "VSCode.Feedback.Email" : providedEmail} );
-
-                            let disposable = window.setStatusBarMessage(Strings.ThanksForFeedback);
-                            setInterval(() => disposable.dispose(), 1000 * 5);
-                        });
-                    });
+            let choice: BaseQuickPickItem = await window.showQuickPick(choices, { matchOnDescription: false, placeHolder: Strings.SendFeedback });
+            if (choice) {
+                let value: string = await window.showInputBox({ value: undefined, prompt: Strings.SendFeedbackPrompt, placeHolder: undefined, password: false });
+                if (value === undefined) {
+                    let disposable = window.setStatusBarMessage(Strings.NoFeedbackSent);
+                    setInterval(() => disposable.dispose(), 1000 * 5);
+                    return;
                 }
-            },
-            function (err) {
-                self.ReportError(Utils.GetMessageForStatusCode(0, err.message, "Failed getting SendFeedback selection"));
+
+                //User does not need to provide any feedback text
+                let providedEmail: string = "";
+                let email: string = await window.showInputBox({ value: undefined, prompt: Strings.SendEmailPrompt, placeHolder: undefined, password: false });
+                if (email === undefined) {
+                    let disposable = window.setStatusBarMessage(Strings.NoFeedbackSent);
+                    setInterval(() => disposable.dispose(), 1000 * 5);
+                    return;
+                }
+                if (email) {
+                    providedEmail = email;
+                }
+                //This feedback will go no matter whether Application Insights is enabled or not.
+                this.ReportFeedback(choice.id, { "VSCode.Feedback.Comment" : value, "VSCode.Feedback.Email" : providedEmail} );
+
+                let disposable = window.setStatusBarMessage(Strings.ThanksForFeedback);
+                setInterval(() => disposable.dispose(), 1000 * 5);
             }
-        );
+        } catch (err) {
+            this.ReportError(Utils.GetMessageForStatusCode(0, err.message, "Failed getting SendFeedback selection"));
+        }
     }
 }

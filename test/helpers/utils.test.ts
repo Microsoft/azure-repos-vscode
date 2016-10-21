@@ -108,4 +108,42 @@ describe("Utils", function() {
         expect(Utils.GetBuildResultIcon(undefined)).to.equal("octicon-question");
     });
 
+    it("should verify IsProxyEnabled", function() {
+        let httpProxy: string = process.env.HTTP_PROXY;
+        let httpsProxy: string = process.env.HTTPS_PROXY;
+        try {
+            process.env.HTTP_PROXY = "vsts-vscode unit tests";
+            assert.isTrue(Utils.IsProxyEnabled());
+            process.env.HTTP_PROXY = "";
+            process.env.HTTPS_PROXY = "vsts-vscode unit tests";
+            assert.isTrue(Utils.IsProxyEnabled());
+            process.env.HTTPS_PROXY = "";
+        } finally {
+            if (httpProxy) {
+                process.env.HTTP_PROXY = httpProxy;
+            }
+            if (httpsProxy) {
+                process.env.HTTPS_PROXY = httpsProxy;
+            }
+        }
+    });
+
+    it("should verify IsProxyIssue", function() {
+        let httpProxy: string = process.env.HTTP_PROXY;
+        try {
+            process.env.HTTP_PROXY = "vsts-vscode unit tests";
+            let reason = { code: "ECONNRESET" };
+            assert.isTrue(Utils.IsProxyIssue(reason));
+            let reason2 = { statusCode: "ECONNRESET" };
+            assert.isTrue(Utils.IsProxyIssue(reason2));
+            let reason3 = { code: "ECONNREFUSED" };
+            assert.isTrue(Utils.IsProxyIssue(reason3));
+            let reason4 = { statusCode: "ECONNREFUSED" };
+            assert.isTrue(Utils.IsProxyIssue(reason4));
+        } finally {
+            if (httpProxy) {
+                process.env.HTTP_PROXY = httpProxy;
+            }
+        }
+    });
 });

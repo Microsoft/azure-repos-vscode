@@ -5,7 +5,7 @@
 "use strict";
 
 import { StatusBarItem, window } from "vscode";
-import { PullRequestStatus} from "vso-node-api/interfaces/GitInterfaces";
+import { GitPullRequest, PullRequestStatus} from "vso-node-api/interfaces/GitInterfaces";
 import { BaseClient } from "./baseclient";
 import { BaseQuickPickItem, VsCodeUtils } from "../helpers/vscodeutils";
 import { CommandNames, TelemetryEvents } from "../helpers/constants";
@@ -16,10 +16,6 @@ import { GitContext } from "../contexts/gitcontext";
 import { TeamServerContext} from "../contexts/servercontext";
 import { TelemetryService } from "../services/telemetry";
 import { GitVcService, PullRequestScore } from "../services/gitvc";
-
-/* tslint:disable:no-unused-variable */
-import Q = require("q");
-/* tslint:enable:no-unused-variable */
 
 var path = require("path");
 
@@ -43,29 +39,25 @@ export class GitClient extends BaseClient {
     }
 
     //Initial method to display, select and navigate to my pull requests
-    public GetMyPullRequests(): void {
-        let self = this;
+    public async GetMyPullRequests(): Promise<void> {
         this.ReportEvent(TelemetryEvents.ViewPullRequests);
 
-        window.showQuickPick(this.getMyPullRequests(false), { matchOnDescription: true, placeHolder: Strings.ChoosePullRequest }).then(
-            function (request) {
-                if (request) {
-                    self.ReportEvent(TelemetryEvents.ViewPullRequest);
-                    let discUrl: string = undefined;
-                    if (request.id !== undefined) {
-                        discUrl = GitVcService.GetPullRequestDiscussionUrl(self._serverContext.RepoInfo.RepositoryUrl, request.id);
-                    } else {
-                        discUrl = GitVcService.GetPullRequestsUrl(self._serverContext.RepoInfo.RepositoryUrl);
-                    }
-                    Logger.LogInfo("Pull Request Url: " + discUrl);
-                    Utils.OpenUrl(discUrl);
+        try {
+            let request: BaseQuickPickItem = await window.showQuickPick(this.getMyPullRequests(), { matchOnDescription: true, placeHolder: Strings.ChoosePullRequest });
+            if (request) {
+                this.ReportEvent(TelemetryEvents.ViewPullRequest);
+                let discUrl: string = undefined;
+                if (request.id !== undefined) {
+                    discUrl = GitVcService.GetPullRequestDiscussionUrl(this._serverContext.RepoInfo.RepositoryUrl, request.id);
+                } else {
+                    discUrl = GitVcService.GetPullRequestsUrl(this._serverContext.RepoInfo.RepositoryUrl);
                 }
-            },
-            function (err) {
-                let msg: string = Utils.GetMessageForStatusCode(0, err.message, "Error selecting pull request from QuickPick");
-                self.ReportError(msg);
+                Logger.LogInfo("Pull Request Url: " + discUrl);
+                Utils.OpenUrl(discUrl);
             }
-        );
+        } catch (err) {
+            this.handleError(err, "Error selecting pull request from QuickPick");
+        }
     }
 
     //Opens the blame page for the currently active file
@@ -132,65 +124,52 @@ export class GitClient extends BaseClient {
         Utils.OpenUrl(url);
     }
 
-    public PollMyPullRequests(): void {
-        this.getMyPullRequests(true).then((requests) => {
+    public async PollMyPullRequests(): Promise<void> {
+        try {
+            let requests: BaseQuickPickItem[] = await this.getMyPullRequests();
             this._statusBarItem.tooltip = Strings.BrowseYourPullRequests;
             //Remove the default Strings.BrowseYourPullRequests item from the calculation
             this._statusBarItem.text = GitClient.GetPullRequestStatusText(requests.length - 1);
-        }).catch((reason) => {
-            //Nothing to do
-        });
+        } catch (err) {
+            this.handleError(err, "Attempting to poll my pull requests", true);
+        }
     }
 
-    private getMyPullRequests(polling: boolean): Q.Promise<Array<BaseQuickPickItem>> {
-        let requestItems: Array<BaseQuickPickItem> = [];
-        let requestIds: Array<number> = [];
-
-        let promiseToReturn: Q.Promise<Array<BaseQuickPickItem>>;
-        let deferred = Q.defer<Array<BaseQuickPickItem>>();
-        promiseToReturn = deferred.promise;
+    private async getMyPullRequests(): Promise<BaseQuickPickItem[]> {
+        let requestItems: BaseQuickPickItem[] = [];
+        let requestIds: number[] = [];
 
         Logger.LogInfo("Getting pull requests that I requested...");
         let svc: GitVcService = new GitVcService(this._serverContext);
-        svc.GetPullRequests(this._serverContext.RepoInfo.RepositoryId, this._serverContext.UserInfo.Id, undefined, PullRequestStatus.Active).then((myPullRequests) => {
-            let icon: string = "octicon-search";
-            let label: string = `$(icon ${icon}) `;
-            requestItems.push({ label: label + Strings.BrowseYourPullRequests, description: undefined, id: undefined });
+        let myPullRequests: GitPullRequest[] = await svc.GetPullRequests(this._serverContext.RepoInfo.RepositoryId, this._serverContext.UserInfo.Id, undefined, PullRequestStatus.Active);
+        let icon: string = "octicon-search";
+        let label: string = `$(icon ${icon}) `;
+        requestItems.push({ label: label + Strings.BrowseYourPullRequests, description: undefined, id: undefined });
 
-            myPullRequests.forEach(pr => {
-                let score: PullRequestScore = GitVcService.GetPullRequestScore(pr);
-                requestItems.push(this.getPullRequestLabel(pr.createdBy.displayName, pr.title, pr.description, pr.pullRequestId.toString(), score));
-                requestIds.push(pr.pullRequestId);
-            });
-            Logger.LogInfo("Retrieved " + myPullRequests.length + " pull requests that I requested");
-
-            Logger.LogInfo("Getting pull requests for which I'm a reviewer...");
-            //Go get the active pull requests that I'm a reviewer for
-            svc.GetPullRequests(this._serverContext.RepoInfo.RepositoryId, undefined, this._serverContext.UserInfo.Id, PullRequestStatus.Active).then((myReviewPullRequests) => {
-                myReviewPullRequests.forEach(pr => {
-                    let score: PullRequestScore = GitVcService.GetPullRequestScore(pr);
-                    if (requestIds.indexOf(pr.pullRequestId) < 0) {
-                        requestItems.push(this.getPullRequestLabel(pr.createdBy.displayName, pr.title, pr.description, pr.pullRequestId.toString(), score));
-                    }
-                });
-                Logger.LogInfo("Retrieved " + myReviewPullRequests.length + " pull requests that I'm the reviewer");
-
-                //Remove the default Strings.BrowseYourPullRequests item from the calculation
-                this._statusBarItem.text = GitClient.GetPullRequestStatusText(requestItems.length - 1);
-                this._statusBarItem.tooltip = Strings.BrowseYourPullRequests;
-                this._statusBarItem.command = CommandNames.GetPullRequests;
-
-                deferred.resolve(requestItems);
-            }).catch((reason) => {
-                this.handleError(reason, polling, "Attempting to get pull requests that I'm the reviewer");
-                deferred.reject(reason);
-            });
-        }).catch((reason) => {
-            this.handleError(reason, polling, "Attempting to get pull requests that I requested");
-            deferred.reject(reason);
+        myPullRequests.forEach(pr => {
+            let score: PullRequestScore = GitVcService.GetPullRequestScore(pr);
+            requestItems.push(this.getPullRequestLabel(pr.createdBy.displayName, pr.title, pr.description, pr.pullRequestId.toString(), score));
+            requestIds.push(pr.pullRequestId);
         });
+        Logger.LogInfo("Retrieved " + myPullRequests.length + " pull requests that I requested");
 
-        return promiseToReturn;
+        Logger.LogInfo("Getting pull requests for which I'm a reviewer...");
+        //Go get the active pull requests that I'm a reviewer for
+        let myReviewPullRequests: GitPullRequest[] = await svc.GetPullRequests(this._serverContext.RepoInfo.RepositoryId, undefined, this._serverContext.UserInfo.Id, PullRequestStatus.Active);
+        myReviewPullRequests.forEach(pr => {
+            let score: PullRequestScore = GitVcService.GetPullRequestScore(pr);
+            if (requestIds.indexOf(pr.pullRequestId) < 0) {
+                requestItems.push(this.getPullRequestLabel(pr.createdBy.displayName, pr.title, pr.description, pr.pullRequestId.toString(), score));
+            }
+        });
+        Logger.LogInfo("Retrieved " + myReviewPullRequests.length + " pull requests that I'm the reviewer");
+
+        //Remove the default Strings.BrowseYourPullRequests item from the calculation
+        this._statusBarItem.text = GitClient.GetPullRequestStatusText(requestItems.length - 1);
+        this._statusBarItem.tooltip = Strings.BrowseYourPullRequests;
+        this._statusBarItem.command = CommandNames.GetPullRequests;
+
+        return requestItems;
     }
 
     private getPullRequestLabel(displayName: string, title: string, description: string, id: string, score: PullRequestScore): BaseQuickPickItem {
@@ -209,7 +188,7 @@ export class GitClient extends BaseClient {
         return { label: scoreLabel + " (" + displayName + ") " + title, description: description, id: id };
     }
 
-    private handleError(reason: any, polling: boolean, infoMessage?: string) : void {
+    private handleError(reason: any, infoMessage?: string, polling?: boolean) : void {
         let offline: boolean = Utils.IsOffline(reason);
         let msg: string = Utils.GetMessageForStatusCode(reason, reason.message);
         let logPrefix: string = (infoMessage === undefined) ? "" : infoMessage + " ";

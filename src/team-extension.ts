@@ -15,7 +15,7 @@ import { UrlMessageItem, VsCodeUtils } from "./helpers/vscodeutils";
 import { GitContext } from "./contexts/gitcontext";
 import { TeamServerContext} from "./contexts/servercontext";
 import { TelemetryService } from "./services/telemetry";
-import { QTeamServicesApi } from "./clients/teamservicesclient";
+import { TeamServicesApi } from "./clients/teamservicesclient";
 import { BuildClient } from "./clients/buildclient";
 import { FeedbackClient } from "./clients/feedbackclient";
 import { GitClient } from "./clients/gitclient";
@@ -87,44 +87,43 @@ export class TeamExtension  {
         }
     }
 
-    public Login() {
+    public async Login() {
         // For Login, we just need to verify _serverContext and don't want to set this._errorMessage
         if (this._serverContext !== undefined && this._serverContext.RepoInfo !== undefined && this._serverContext.RepoInfo.IsTeamFoundation === true) {
             if (this._serverContext.RepoInfo.IsTeamFoundationServer === true) {
                 let defaultUsername : string = this.getDefaultUsername();
-                window.showInputBox({ value: defaultUsername || "", prompt: Strings.ProvideUsername + " (" + this._serverContext.RepoInfo.Account + ")", placeHolder: "", password: false }).then((username) => {
-                    if (username !== undefined && username.length > 0) {
-                        window.showInputBox({ value: "", prompt: Strings.ProvidePassword + " (" + username + ")", placeHolder: "", password: true }).then((password) => {
-                            if (password !== undefined) {
-                                Logger.LogInfo("Login: Username and Password provided as authentication.");
-                                this._credentialManager.StoreCredentials(this._serverContext.RepoInfo.Host, username, password).then(() => {
-                                    // We don't test the credentials to make sure they're good here.  Do so on the next command that's run.
-                                    this.Reinitialize();
-                                }).catch((reason) => {
-                                    // TODO: Should the message direct the user to open an issue?  send feedback?
-                                    let msg: string = Strings.UnableToStoreCredentials + this._serverContext.RepoInfo.Host;
-                                    this.reportError(msg);
-                                    VsCodeUtils.ShowErrorMessage(msg);
-                                });
-                            }
-                        });
-                    }
-                });
-            } else if (this._serverContext.RepoInfo.IsTeamServices === true) {
-                // Until Device Flow, we can prompt for the PAT for Team Services
-                window.showInputBox({ value: "", prompt: Strings.ProvideAccessToken + " (" + this._serverContext.RepoInfo.Account + ")", placeHolder: "", password: true }).then((token) => {
-                    if (token !== undefined) {
-                        Logger.LogInfo("Login: Personal Access Token provided as authentication.");
-                        this._credentialManager.StoreCredentials(this._serverContext.RepoInfo.Host, Constants.OAuth, token).then(() => {
+                let username: string = await window.showInputBox({ value: defaultUsername || "", prompt: Strings.ProvideUsername + " (" + this._serverContext.RepoInfo.Account + ")", placeHolder: "", password: false });
+                if (username !== undefined && username.length > 0) {
+                    let password: string = await window.showInputBox({ value: "", prompt: Strings.ProvidePassword + " (" + username + ")", placeHolder: "", password: true });
+                    if (password !== undefined) {
+                        Logger.LogInfo("Login: Username and Password provided as authentication.");
+                        this._credentialManager.StoreCredentials(this._serverContext.RepoInfo.Host, username, password).then(() => {
+                            // We don't test the credentials to make sure they're good here.  Do so on the next command that's run.
                             this.Reinitialize();
                         }).catch((reason) => {
                             // TODO: Should the message direct the user to open an issue?  send feedback?
                             let msg: string = Strings.UnableToStoreCredentials + this._serverContext.RepoInfo.Host;
-                            this.reportError(msg);
+                            this._feedbackClient.ReportError(msg + " " + reason);
+                            Logger.LogDebug(msg + " " + reason);
                             VsCodeUtils.ShowErrorMessage(msg);
                         });
                     }
-                });
+                }
+            } else if (this._serverContext.RepoInfo.IsTeamServices === true) {
+                // Until Device Flow, we can prompt for the PAT for Team Services
+                let token: string = await window.showInputBox({ value: "", prompt: Strings.ProvideAccessToken + " (" + this._serverContext.RepoInfo.Account + ")", placeHolder: "", password: true });
+                if (token !== undefined) {
+                    Logger.LogInfo("Login: Personal Access Token provided as authentication.");
+                    this._credentialManager.StoreCredentials(this._serverContext.RepoInfo.Host, Constants.OAuth, token).then(() => {
+                        this.Reinitialize();
+                    }).catch((reason) => {
+                        // TODO: Should the message direct the user to open an issue?  send feedback?
+                        let msg: string = Strings.UnableToStoreCredentials + this._serverContext.RepoInfo.Host;
+                        this._feedbackClient.ReportError(msg + " " + reason);
+                        Logger.LogDebug(msg + " " + reason);
+                        VsCodeUtils.ShowErrorMessage(msg);
+                    });
+                }
             }
         } else {
             let messageItem : UrlMessageItem = { title : Strings.LearnMore,
@@ -147,7 +146,8 @@ export class TeamExtension  {
                 this.Reinitialize();
             }).catch((reason) => {
                 let msg: string = Strings.UnableToRemoveCredentials + this._serverContext.RepoInfo.Host;
-                this.reportError(msg);
+                this._feedbackClient.ReportError(msg + " " + reason);
+                Logger.LogDebug(msg + " " + reason);
                 VsCodeUtils.ShowErrorMessage(msg);
             });
         } else {
@@ -262,7 +262,7 @@ export class TeamExtension  {
     //Prompts for either a smile or frown, feedback text and an optional email address
     public SendFeedback(): void {
         //SendFeedback doesn't need to ensure the extension is initialized
-        return this._feedbackClient.SendFeedback();
+        this._feedbackClient.SendFeedback();
     }
 
     //Returns the list of work items assigned directly to the current user
@@ -366,7 +366,7 @@ export class TeamExtension  {
 
             this._credentialManager = new CredentialManager();
             let accountSettings = new AccountSettings(this._serverContext.RepoInfo.Account);
-            this._credentialManager.GetCredentialHandler(this._serverContext, accountSettings.TeamServicesPersonalAccessToken).then((requestHandler) => {
+            this._credentialManager.GetCredentialHandler(this._serverContext, accountSettings.TeamServicesPersonalAccessToken).then(async (requestHandler) => {
                 if (requestHandler === undefined) {
                     this.displayNoCredentialsMessage();
                     return;
@@ -376,20 +376,22 @@ export class TeamExtension  {
                     Logger.LogDebug("Started ApplicationInsights telemetry");
 
                     //Go get the details about the repository
-                    let repositoryClient: QTeamServicesApi = new QTeamServicesApi(this._gitContext.RemoteUrl, [CredentialManager.GetCredentialHandler()]);
+                    let repositoryClient: TeamServicesApi = new TeamServicesApi(this._gitContext.RemoteUrl, [CredentialManager.GetCredentialHandler()]);
                     Logger.LogInfo("Getting repository information (vsts/info) with repositoryClient");
                     Logger.LogDebug("RemoteUrl = " + this._gitContext.RemoteUrl);
-                    repositoryClient.getVstsInfo().then((repoInfo) => {
+                    try {
+                        let repoInfo: any = await repositoryClient.getVstsInfo();
                         Logger.LogInfo("Retrieved repository info with repositoryClient");
                         Logger.LogObject(repoInfo);
 
                         this._serverContext.RepoInfo = new RepositoryInfo(repoInfo);
                         //Now we need to go and get the authorized user information
                         let connectionUrl: string = (this._serverContext.RepoInfo.IsTeamServices === true ? this._serverContext.RepoInfo.AccountUrl : this._serverContext.RepoInfo.CollectionUrl);
-                        let accountClient: QTeamServicesApi = new QTeamServicesApi(connectionUrl, [CredentialManager.GetCredentialHandler()]);
+                        let accountClient: TeamServicesApi = new TeamServicesApi(connectionUrl, [CredentialManager.GetCredentialHandler()]);
                         Logger.LogInfo("Getting connectionData with accountClient");
                         Logger.LogDebug("connectionUrl = " + connectionUrl);
-                        accountClient.connect().then((settings) => {
+                        try {
+                            let settings: any = await accountClient.connect();
                             Logger.LogInfo("Retrieved connectionData with accountClient");
                             this.resetErrorStatus();
 
@@ -408,20 +410,20 @@ export class TeamExtension  {
                             this.logDebugInformation();
                             this.refreshPollingItems();
                             this.startPolling();
-                        }).fail((reason) => {
-                            this.setErrorStatus(Utils.GetMessageForStatusCode(reason, reason.message), (reason.statusCode === 401 ? CommandNames.Login : undefined), false);
-                            this.reportError(Utils.GetMessageForStatusCode(reason, reason.message, "Failed to get results with accountClient: "), reason);
-                        });
-                    }).fail((reason) => {
+                        } catch (err) {
+                            this.setErrorStatus(Utils.GetMessageForStatusCode(err, err.message), (err.statusCode === 401 ? CommandNames.Login : undefined), false);
+                            this.reportError(Utils.GetMessageForStatusCode(err, err.message, "Failed to get results with accountClient: "), err);
+                        }
+                    } catch (err) {
                         // We get a 404 on-prem if we aren't Update 2 or later
-                        if (this._serverContext.RepoInfo.IsTeamFoundationServer === true && reason.statusCode === 404) {
+                        if (this._serverContext.RepoInfo.IsTeamFoundationServer === true && err.statusCode === 404) {
                             this.setErrorStatus(Strings.UnsupportedServerVersion, undefined, false);
                             Logger.LogError(Strings.UnsupportedServerVersion);
                         } else {
-                            this.setErrorStatus(Utils.GetMessageForStatusCode(reason, reason.message), (reason.statusCode === 401 ? CommandNames.Login : undefined), false);
-                            this.reportError(Utils.GetMessageForStatusCode(reason, reason.message, "Failed (vsts/info) call with repositoryClient: "), reason);
+                            this.setErrorStatus(Utils.GetMessageForStatusCode(err, err.message), (err.statusCode === 401 ? CommandNames.Login : undefined), false);
+                            this.reportError(Utils.GetMessageForStatusCode(err, err.message, "Failed (vsts/info) call with repositoryClient: "), err);
                         }
-                    });
+                    }
                 }
             }).fail((reason) => {
                 this.setErrorStatus(Utils.GetMessageForStatusCode(reason, reason.message), (reason.statusCode === 401 ? CommandNames.Login : undefined), false);
@@ -460,10 +462,10 @@ export class TeamExtension  {
     }
 
     private logDebugInformation(): void {
-        Logger.LogDebug("Acct: " + this._serverContext.RepoInfo.Account + " "
-                            + "TP: " + this._serverContext.RepoInfo.TeamProject + " "
-                            + "Coll: " + this._serverContext.RepoInfo.CollectionName + " "
-                            + "Repo: " + this._serverContext.RepoInfo.RepositoryName + " "
+        Logger.LogDebug("Account: " + this._serverContext.RepoInfo.Account + " "
+                            + "Team Pproject: " + this._serverContext.RepoInfo.TeamProject + " "
+                            + "Collection: " + this._serverContext.RepoInfo.CollectionName + " "
+                            + "Repository: " + this._serverContext.RepoInfo.RepositoryName + " "
                             + "UserCustomDisplayName: " + this._serverContext.UserInfo.CustomDisplayName + " "
                             + "UserProviderDisplayName: " + this._serverContext.UserInfo.ProviderDisplayName + " "
                             + "UserId: " + this._serverContext.UserInfo.Id + " ");
@@ -473,6 +475,8 @@ export class TeamExtension  {
         Logger.LogDebug("gitCurrentBranch: " + this._gitContext.CurrentBranch);
         Logger.LogDebug("gitCurrentRef: " + this._gitContext.CurrentRef);
         Logger.LogDebug("gitIsSsh: " + this._gitContext.IsSsh);
+        Logger.LogDebug("proxy: " + (Utils.IsProxyEnabled() ? "enabled" : "not enabled")
+                        + ", team services: " + this._serverContext.RepoInfo.IsTeamServices.toString());
     }
 
     private logStart(loggingLevel: string, rootPath: string): void {
@@ -520,8 +524,12 @@ export class TeamExtension  {
     //Logs an error to the logger and sends an exception to telemetry service
     private reportError(message: string, reason?: any): void {
         Logger.LogError(message);
-        if (reason !== undefined && (Utils.IsUnauthorized(reason) || Utils.IsOffline(reason))) {
-            //Don't log exceptions for Unauthorized or Offline scenarios
+        if (reason && reason.message) {
+            // Log additional information for debugging purposes
+            Logger.LogDebug(reason.message);
+        }
+        if (reason !== undefined && (Utils.IsUnauthorized(reason) || Utils.IsOffline(reason) || Utils.IsProxyIssue(reason))) {
+            //Don't log exceptions for Unauthorized, Offline or Proxy scenarios
             return;
         }
         this._telemetry.SendException(message);

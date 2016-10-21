@@ -87,7 +87,10 @@ describe("GitVcService", function() {
             status: undefined,
             targetRefName: undefined,
             title: undefined,
-            upgraded: undefined,
+            autoCompleteSetBy: undefined,
+            closedBy: undefined,
+            artifactId: undefined,
+            supportsIterations: undefined,
             url: undefined,
             workItemRefs: undefined
         };

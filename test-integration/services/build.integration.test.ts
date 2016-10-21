@@ -7,6 +7,8 @@
 import { Mocks } from "../helpers-integration/mocks";
 import { TestSettings } from "../helpers-integration/testsettings";
 
+import { Build, BuildBadge } from "vso-node-api/interfaces/BuildInterfaces";
+
 import { CredentialManager } from "../../src/helpers/credentialmanager";
 import { TeamServerContext } from "../../src/contexts/servercontext";
 import { BuildService }  from "../../src/services/build";
@@ -36,7 +38,7 @@ describe("BuildService-Integration", function() {
         return credentialManager.RemoveCredentials(TestSettings.Account());
     });
 
-    it("should verify BuildService.GetBuildDefinitions", function(done) {
+    it("should verify BuildService.GetBuildDefinitions", async function(done) {
         this.timeout(TestSettings.TestTimeout()); //http://mochajs.org/#timeouts
 
         var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl());
@@ -44,21 +46,19 @@ describe("BuildService-Integration", function() {
         ctx.RepoInfo = Mocks.RepositoryInfo();
         ctx.UserInfo = undefined;
 
-        let svc: BuildService = new BuildService(ctx);
-        svc.GetBuildDefinitions(TestSettings.TeamProject()).then(
-            function (definitions) {
-                assert.isNotNull(definitions, "definitions was null when it shouldn't have been");
-                //console.log(definitions.length);
-                expect(definitions.length).to.equal(1);
-                done();
-            },
-            function (err) {
-                done(err);
-            }
-        );
+        try {
+            let svc: BuildService = new BuildService(ctx);
+            let definitions = await svc.GetBuildDefinitions(TestSettings.TeamProject());
+            assert.isNotNull(definitions, "definitions was null when it shouldn't have been");
+            //console.log(definitions.length);
+            expect(definitions.length).to.equal(1);
+            done();
+        } catch (err) {
+            done (err);
+        }
     });
 
-    it("should verify BuildService.GetBuildById", function(done) {
+    it("should verify BuildService.GetBuildById", async function(done) {
         this.timeout(TestSettings.TestTimeout()); //http://mochajs.org/#timeouts
 
         var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl());
@@ -66,21 +66,19 @@ describe("BuildService-Integration", function() {
         ctx.RepoInfo = Mocks.RepositoryInfo();
         ctx.UserInfo = undefined;
 
-        let svc: BuildService = new BuildService(ctx);
-        svc.GetBuildById(TestSettings.BuildId()).then(
-            function (build) {
-                assert.isNotNull(build, "build was null when it shouldn't have been");
-                //console.log(definitions.length);
-                expect(build.buildNumber).to.equal(TestSettings.BuildId().toString());
-                done();
-            },
-            function (err) {
-                done(err);
-            }
-        );
+        try {
+            let svc: BuildService = new BuildService(ctx);
+            let build: Build = await svc.GetBuildById(TestSettings.BuildId());
+            assert.isNotNull(build, "build was null when it shouldn't have been");
+            //console.log(definitions.length);
+            expect(build.buildNumber).to.equal(TestSettings.BuildId().toString());
+            done();
+        } catch (err) {
+            done(err);
+        }
     });
 
-    it("should verify BuildService.GetBuildsByDefinitionId", function(done) {
+    it("should verify BuildService.GetBuildsByDefinitionId", async function(done) {
         this.timeout(TestSettings.TestTimeout()); //http://mochajs.org/#timeouts
 
         var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl());
@@ -88,21 +86,19 @@ describe("BuildService-Integration", function() {
         ctx.RepoInfo = Mocks.RepositoryInfo();
         ctx.UserInfo = undefined;
 
-        let svc: BuildService = new BuildService(ctx);
-        svc.GetBuildsByDefinitionId(TestSettings.TeamProject(), TestSettings.BuildDefinitionId()).then(
-            function (builds) {
-                assert.isNotNull(builds, "builds was null when it shouldn't have been");
-                //console.log(definitions.length);
-                expect(builds.length).to.equal(1);
-                done();
-            },
-            function (err) {
-                done(err);
-            }
-        );
+        try {
+            let svc: BuildService = new BuildService(ctx);
+            let builds: Build[] = await svc.GetBuildsByDefinitionId(TestSettings.TeamProject(), TestSettings.BuildDefinitionId());
+            assert.isNotNull(builds, "builds was null when it shouldn't have been");
+            //console.log(definitions.length);
+            expect(builds.length).to.equal(1);
+            done();
+        } catch (err) {
+            done(err);
+        }
     });
 
-    it("should verify BuildService.GetBuildBadge", function(done) {
+    it("should verify BuildService.GetBuildBadge", async function(done) {
         this.timeout(TestSettings.TestTimeout()); //http://mochajs.org/#timeouts
 
         var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl());
@@ -110,16 +106,14 @@ describe("BuildService-Integration", function() {
         ctx.RepoInfo = Mocks.RepositoryInfo();
         ctx.UserInfo = undefined;
 
-        let svc: BuildService = new BuildService(ctx);
-        svc.GetBuildBadge(TestSettings.TeamProject(), WellKnownRepositoryTypes.TfsGit, TestSettings.RepositoryId(), "refs/heads/master").then(
-            function (badge) {
-                assert.isNotNull(badge, "badge was null when it shouldn't have been");
-                done();
-            },
-            function (err) {
-                done(err);
-            }
-        );
+        try {
+            let svc: BuildService = new BuildService(ctx);
+            let badge: BuildBadge = await svc.GetBuildBadge(TestSettings.TeamProject(), WellKnownRepositoryTypes.TfsGit, TestSettings.RepositoryId(), "refs/heads/master");
+            assert.isNotNull(badge, "badge was null when it shouldn't have been");
+            done();
+        } catch (err) {
+            done(err);
+        }
     });
 
 });

@@ -5,7 +5,7 @@
 "use strict";
 
 import { StatusBarItem } from "vscode";
-import { BuildResult, BuildStatus } from "vso-node-api/interfaces/BuildInterfaces";
+import { Build, BuildBadge, BuildResult, BuildStatus } from "vso-node-api/interfaces/BuildInterfaces";
 import { BaseClient } from "./baseclient";
 import { Logger } from "../helpers/logger";
 import { BuildService } from "../services/build";
@@ -16,10 +16,6 @@ import { Utils } from "../helpers/utils";
 import { VsCodeUtils } from "../helpers/vscodeutils";
 import { TelemetryService } from "../services/telemetry";
 import { GitContext } from "../contexts/gitcontext";
-
-/* tslint:disable:no-unused-variable */
-import Q = require("q");
-/* tslint:enable:no-unused-variable */
 
 export class BuildClient extends BaseClient {
     private _serverContext: TeamServerContext;
@@ -34,27 +30,24 @@ export class BuildClient extends BaseClient {
     }
 
     //Gets any available build status information and adds it to the status bar
-    public DisplayCurrentBranchBuildStatus(context: GitContext, polling: boolean): void {
-        let svc: BuildService = new BuildService(this._serverContext);
-
-        Logger.LogInfo("Getting current build from badge...");
-        svc.GetBuildBadge(this._serverContext.RepoInfo.TeamProject, WellKnownRepositoryTypes.TfsGit, this._serverContext.RepoInfo.RepositoryId, context.CurrentRef).then((buildBadge) => {
+    public async DisplayCurrentBranchBuildStatus(context: GitContext, polling: boolean): Promise<void> {
+        try {
+            let svc: BuildService = new BuildService(this._serverContext);
+            Logger.LogInfo("Getting current build from badge...");
+            let buildBadge: BuildBadge  = await svc.GetBuildBadge(this._serverContext.RepoInfo.TeamProject, WellKnownRepositoryTypes.TfsGit, this._serverContext.RepoInfo.RepositoryId, context.CurrentRef);
             if (buildBadge.buildId !== undefined) {
                 Logger.LogInfo("Found build id " + buildBadge.buildId.toString() + ". Getting build details...");
-                svc.GetBuildById(buildBadge.buildId).then((build) => {
-                    this._buildSummaryUrl = BuildService.GetBuildSummaryUrl(this._serverContext.RepoInfo.TeamProjectUrl, build.id.toString());
-                    Logger.LogInfo("Build summary info: " + build.id.toString() + " " + BuildStatus[build.status] +
-                        " " + BuildResult[build.result] + " " + this._buildSummaryUrl);
+                let build: Build = await svc.GetBuildById(buildBadge.buildId);
+                this._buildSummaryUrl = BuildService.GetBuildSummaryUrl(this._serverContext.RepoInfo.TeamProjectUrl, build.id.toString());
+                Logger.LogInfo("Build summary info: " + build.id.toString() + " " + BuildStatus[build.status] +
+                    " " + BuildResult[build.result] + " " + this._buildSummaryUrl);
 
-                    if (this._statusBarItem !== undefined) {
-                        let icon: string = Utils.GetBuildResultIcon(build.result);
-                        this._statusBarItem.command = CommandNames.OpenBuildSummaryPage;
-                        this._statusBarItem.text = `$(icon octicon-package) ` + `$(icon ${icon})`;
-                        this._statusBarItem.tooltip = "(" + BuildResult[build.result] + ") " + Strings.NavigateToBuildSummary + " " + build.buildNumber;
-                    }
-                }).fail((reason) => {
-                    this.handleError(reason, polling, "Failed to get build details by id");
-                });
+                if (this._statusBarItem !== undefined) {
+                    let icon: string = Utils.GetBuildResultIcon(build.result);
+                    this._statusBarItem.command = CommandNames.OpenBuildSummaryPage;
+                    this._statusBarItem.text = `$(icon octicon-package) ` + `$(icon ${icon})`;
+                    this._statusBarItem.tooltip = "(" + BuildResult[build.result] + ") " + Strings.NavigateToBuildSummary + " " + build.buildNumber;
+                }
             } else {
                 Logger.LogInfo("No builds were found for team " + this._serverContext.RepoInfo.TeamProject.toString() + ", repo type git, " +
                     "repo id " + this._serverContext.RepoInfo.RepositoryId.toString() + ", + branch " + (context.CurrentBranch === null ? "UNKNOWN" : context.CurrentBranch.toString()));
@@ -64,9 +57,9 @@ export class BuildClient extends BaseClient {
                     this._statusBarItem.tooltip = Strings.NoBuildsFound;
                 }
             }
-        }).fail((reason) => {
-            this.handleError(reason, polling, "Failed to get current branch build status");
-        });
+        } catch (err) {
+            this.handleError(err, polling, "Failed to get current branch build status");
+        }
     }
 
     public OpenBuildSummaryPage(): void {

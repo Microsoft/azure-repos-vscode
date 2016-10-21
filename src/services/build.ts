@@ -5,35 +5,38 @@
 "use strict";
 
 import { Build, BuildBadge, BuildQueryOrder, DefinitionReference, QueryDeletedOption } from "vso-node-api/interfaces/BuildInterfaces";
-import { IQBuildApi } from "vso-node-api/BuildApi";
+import { IBuildApi } from "vso-node-api/BuildApi";
 import { WebApi } from "vso-node-api/WebApi";
 import { TeamServerContext } from "../contexts/servercontext";
 import { CredentialManager } from "../helpers/credentialmanager";
 
-import Q = require("q");
-
 export class BuildService {
-    private _buildApi: IQBuildApi;
+    private _buildApi: IBuildApi;
 
     constructor(context: TeamServerContext) {
-        this._buildApi = new WebApi(context.RepoInfo.CollectionUrl, CredentialManager.GetCredentialHandler()).getQBuildApi();
+        this._buildApi = new WebApi(context.RepoInfo.CollectionUrl, CredentialManager.GetCredentialHandler()).getBuildApi();
     }
 
-    //Returns the build definitions (regardless of type) for the team project
-    public GetBuildDefinitions(teamProject: string): Q.Promise<DefinitionReference[]> {
-        return this._buildApi.getDefinitions(teamProject);
-    }
-
-    //Returns the "latest"" build for this definition
-    public GetBuildsByDefinitionId(teamProject: string, definitionId: number): Q.Promise<Array<Build>> {
-        return this._buildApi.getBuilds(teamProject, [ definitionId ], null, null, null, null, null, null, null, null, null, null, null,
-                                        1, null, 1, QueryDeletedOption.ExcludeDeleted, BuildQueryOrder.FinishTimeDescending);
+    //Get the latest build id and badge of a build definition based on current project, repo and branch
+    public async GetBuildBadge(project: string, repoType: string, repoId: string, branchName: string) : Promise<BuildBadge> {
+        return await this._buildApi.getBuildBadge(project, repoType, repoId, branchName);
     }
 
     //Get extra details of a build based on the build id
-    public GetBuildById(buildId: number): Q.Promise<Build> {
-        return this._buildApi.getBuild(buildId);
+    public async GetBuildById(buildId: number): Promise<Build> {
+        return await this._buildApi.getBuild(buildId);
     };
+
+    //Returns the build definitions (regardless of type) for the team project
+    public async GetBuildDefinitions(teamProject: string): Promise<DefinitionReference[]> {
+        return await this._buildApi.getDefinitions(teamProject);
+    }
+
+    //Returns the "latest" build for this definition
+    public async GetBuildsByDefinitionId(teamProject: string, definitionId: number): Promise<Build[]> {
+        return await this._buildApi.getBuilds(teamProject, [ definitionId ], null, null, null, null, null, null, null, null, null, null,
+                                              1, null, 1, QueryDeletedOption.ExcludeDeleted, BuildQueryOrder.FinishTimeDescending);
+    }
 
     //Construct the url to the individual build definition (completed view)
     //https://account.visualstudio.com/DefaultCollection/project/_build#_a=completed&definitionId=34
@@ -58,8 +61,4 @@ export class BuildService {
         return remoteUrl + "/_build";
     }
 
-    //Get the latest build id and badge of a build definition based on current project, repo and branch
-    public GetBuildBadge(project: string, repoType: string, repoId: string, branchName: string) : Q.Promise<BuildBadge> {
-        return this._buildApi.getBuildBadge(project, repoType, repoId, branchName);
-    }
 }

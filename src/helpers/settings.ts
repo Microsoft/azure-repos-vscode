@@ -38,7 +38,7 @@ export class PinnedQuerySettings extends BaseSettings {
     }
 
     private getPinnedQuery(account: string) : IPinnedQuery {
-        let pinnedQueries = this.readSetting<Array<IPinnedQuery>>(SettingNames.PinnedQueries, undefined);
+        let pinnedQueries = this.readSetting<IPinnedQuery[]>(SettingNames.PinnedQueries, undefined);
         if (pinnedQueries !== undefined) {
             Logger.LogDebug("Found pinned queries in user configuration settings.");
             let global: IPinnedQuery = undefined;
@@ -75,7 +75,7 @@ export class AccountSettings extends BaseSettings {
     }
 
     private getAccessToken(account: string) : string {
-        let tokens: any = this.readSetting<Array<any>>(SettingNames.AccessTokens, undefined);
+        let tokens: any = this.readSetting<any[]>(SettingNames.AccessTokens, undefined);
         if (tokens !== undefined) {
             Logger.LogDebug("Found access tokens in user configuration settings.");
             let global: string = undefined;

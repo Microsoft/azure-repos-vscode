@@ -81,11 +81,45 @@ export class Utils {
             case "EAI_AGAIN":
                 msg = msg + Strings.StatusCodeOffline;
                 break;
+            case "ECONNRESET":
+            case "ECONNREFUSED":
+                if (this.IsProxyEnabled()) {
+                    msg = msg + Strings.ProxyUnreachable;
+                    break;
+                }
+                return message;
             default:
                 return message;
         }
 
         return msg;
+    }
+
+    //Use some common error codes to indicate offline status
+    public static IsProxyEnabled(): boolean {
+        if (process.env.HTTPS_PROXY || process.env.HTTP_PROXY) {
+            return true;
+        }
+        return false;
+    }
+
+    public static IsProxyIssue(reason: any): boolean {
+        // If the proxy isn't enabled/set, it can't be a proxy issue
+        if (!this.IsProxyEnabled()) {
+            return false;
+        }
+
+        // If proxy is set, check for error codes
+        if (reason !== undefined) {
+            if (reason.code === "ECONNRESET" || reason.code === "ECONNREFUSED") {
+                return true;
+            }
+            if (reason.statusCode === "ECONNRESET" || reason.statusCode === "ECONNREFUSED") {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     //Use some common error codes to indicate offline status
