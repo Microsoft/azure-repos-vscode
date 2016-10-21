@@ -14,3 +14,4 @@ tsd.json
 tslint.json
 team-extension.log
 **/*.zip
+.taskkey
