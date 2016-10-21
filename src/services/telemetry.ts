@@ -16,7 +16,7 @@ export class TelemetryService {
     private _appInsightsClient: Client;
     private _serverContext: TeamServerContext;
     private _telemetryEnabled: boolean = true;
-    private _extensionVersion: string = "1.104.1";
+    private _extensionVersion: string = "1.108.0";
     private _collectionId: string = "UNKNOWN";
     //Default to a new uuid in case the extension fails before being initialized
     private _userId: string = uuid.v1();
@@ -39,6 +39,8 @@ export class TelemetryService {
                     .setAutoCollectRequests(false)
                     .start();
         this._appInsightsClient = appInsights.getClient(insightsKey);
+        //Need to use HTTPS with v0.15.16 of App Insights
+        this._appInsightsClient.config.endpointUrl = "https://dc.services.visualstudio.com/v2/track";
 
         //Assign common properties to all telemetry sent from the default client
         this.setCommonProperties();
