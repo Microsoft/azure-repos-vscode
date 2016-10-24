@@ -140,7 +140,7 @@ export class WitClient extends BaseClient {
     }
 
     private async getPinnedQueryText(): Promise<string> {
-        let promise: Promise<string> = new Promise<string>(async /*?*/ (resolve, reject) => {
+        let promise: Promise<string> = new Promise<string>(async (resolve, reject) => {
             try {
                 if (this._pinnedQuery.queryText && this._pinnedQuery.queryText.length > 0) {
                     resolve(this._pinnedQuery.queryText);

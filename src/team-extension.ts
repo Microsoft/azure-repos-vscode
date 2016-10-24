@@ -463,7 +463,7 @@ export class TeamExtension  {
 
     private logDebugInformation(): void {
         Logger.LogDebug("Account: " + this._serverContext.RepoInfo.Account + " "
-                            + "Team Pproject: " + this._serverContext.RepoInfo.TeamProject + " "
+                            + "Team Project: " + this._serverContext.RepoInfo.TeamProject + " "
                             + "Collection: " + this._serverContext.RepoInfo.CollectionName + " "
                             + "Repository: " + this._serverContext.RepoInfo.RepositoryName + " "
                             + "UserCustomDisplayName: " + this._serverContext.UserInfo.CustomDisplayName + " "
