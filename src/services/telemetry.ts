@@ -37,6 +37,7 @@ export class TelemetryService {
                     .setAutoCollectConsole(false)
                     .setAutoCollectPerformance(false)
                     .setAutoCollectRequests(false)
+                    .setAutoCollectExceptions(false)
                     .start();
         this._appInsightsClient = appInsights.getClient(insightsKey);
         //Need to use HTTPS with v0.15.16 of App Insights
