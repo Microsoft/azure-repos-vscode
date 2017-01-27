@@ -92,9 +92,13 @@ describe("WorkItemTrackingService-Integration", function() {
 
         try {
             let svc: WorkItemTrackingService = new WorkItemTrackingService(ctx);
-            let count: number = await svc.GetQueryResultCount(TestSettings.TeamProject(), WitQueries.MyWorkItems);
+            let query: QueryHierarchyItem = await svc.GetWorkItemQuery(TestSettings.TeamProject(), TestSettings.WorkItemQueryPath());
+            assert.isNotNull(query);
+            //console.log(query);
+            expect(query.id).to.equal(TestSettings.WorkItemQueryId());
+            let count: number = await svc.GetQueryResultCount(TestSettings.TeamProject(), query.wiql);
             //console.log("count = " + count);
-            expect(count).to.equal(0);
+            expect(count).to.be.at.least(2);
             done();
         } catch (err) {
             done(err);

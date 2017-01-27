@@ -51,7 +51,7 @@ describe("BuildService-Integration", function() {
             let definitions = await svc.GetBuildDefinitions(TestSettings.TeamProject());
             assert.isNotNull(definitions, "definitions was null when it shouldn't have been");
             //console.log(definitions.length);
-            expect(definitions.length).to.equal(1);
+            expect(definitions.length).to.be.at.least(1);
             done();
         } catch (err) {
             done (err);
