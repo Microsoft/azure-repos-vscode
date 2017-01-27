@@ -38,9 +38,9 @@ export class Repository {
             new FindWorkspace(localPath));
     }
 
-    public async GetStatus(): Promise<IPendingChange[]> {
+    public async GetStatus(ignoreFiles?: boolean): Promise<IPendingChange[]> {
         return this.RunCommand<IPendingChange[]>(
-            new Status());
+            new Status(ignoreFiles === undefined ? true : ignoreFiles));
     }
 
     public async Version(): Promise<string> {

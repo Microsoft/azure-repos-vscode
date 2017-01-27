@@ -8,6 +8,8 @@ import { IExecutionResult, ITfvcCommand, IPendingChange } from "../interfaces";
 import { ArgumentBuilder } from "./argumentbuilder";
 import { CommandHelper } from "./commandhelper";
 
+var fs = require("fs");
+
 /**
  * This command returns the status of the workspace as a list of pending changes.
  * NOTE: Currently this command does not support all of the options of the command line
@@ -16,16 +18,17 @@ import { CommandHelper } from "./commandhelper";
  */
 export class Status implements ITfvcCommand<IPendingChange[]> {
     private _localPaths: string[];
+    private _ignoreFolers: boolean;
 
-    public constructor(localPaths?: string[]) {
+    public constructor(ignoreFolders: boolean, localPaths?: string[]) {
+        this._ignoreFolers = ignoreFolders;
         this._localPaths = localPaths;
     }
 
     //TODO need to pass in context here as an optional parameter
     public GetArguments(): string[] {
-        const builder = new ArgumentBuilder("status")
+        const builder: ArgumentBuilder = new ArgumentBuilder("status")
             .AddSwitchWithValue("format", "xml", false)
-            //.AddSwitchWithValue("collection", )
             .AddSwitch("recursive");
 
         if (this._localPaths && this._localPaths.length > 0) {
@@ -54,22 +57,35 @@ export class Status implements ITfvcCommand<IPendingChange[]> {
      */
     public async ParseOutput(executionResult: IExecutionResult): Promise<IPendingChange[]> {
         let changes: IPendingChange[] = [];
-        const xml = CommandHelper.trimToXml(executionResult.stdout);
+        const xml: string = CommandHelper.TrimToXml(executionResult.stdout);
         // Parse the xml using xml2js
-        const json = await CommandHelper.parseXml(xml);
+        const json: any = await CommandHelper.ParseXml(xml);
         if (json && json.status) {
             // get all the pending changes first
-            const pending = json.status.pendingchanges[0].pendingchange;
+            const pending: any = json.status.pendingchanges[0].pendingchange;
             for (let i = 0; i < pending.length; i++) {
-                changes.push(this.convert(pending[i].$, false));
+                this.add(changes, this.convert(pending[i].$, false), this._ignoreFolers);
             }
             // next, get all the candidate pending changes
-            const candidate = json.status.candidatependingchanges[0].pendingchange;
+            const candidate: any = json.status.candidatependingchanges[0].pendingchange;
             for (let i = 0; i < candidate.length; i++) {
-                changes.push(this.convert(candidate[i].$, false));
+                this.add(changes, this.convert(candidate[i].$, false), this._ignoreFolers);
             }
         }
         return changes;
+    }
+
+    private add(changes: IPendingChange[], newChange: IPendingChange, ignoreFolders: boolean) {
+        if (ignoreFolders) {
+            // check to see if the local item is a file or folder
+            const f: string = newChange.localItem;
+            const stats: any = fs.lstatSync(f);
+            if (stats.isDirectory()) {
+                // It's a directory/folder and we don't want those
+                return;
+            }
+        }
+        changes.push(newChange);
     }
 
     private convert(jsonChange: any, isCandidate: boolean): IPendingChange {

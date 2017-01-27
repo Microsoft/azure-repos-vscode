@@ -35,7 +35,7 @@ export class UIHelper {
                 }
             }
         }
-        return null;
+        return undefined;
     }
 
     public static GetFileName(change: IPendingChange) {
