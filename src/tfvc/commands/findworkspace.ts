@@ -38,7 +38,7 @@ export class FindWorkspace implements ITfvcCommand<IWorkspace> {
      * Collection: http://java-tfs2015:8081/tfs/
      * $/tfsTest_01: D:\tmp\test
      */
-    public ParseOutput(executionResult: IExecutionResult): IWorkspace {
+    public async ParseOutput(executionResult: IExecutionResult): Promise<IWorkspace> {
         const stdout = executionResult.stdout;
 
         // Find the workspace name and collectionUrl

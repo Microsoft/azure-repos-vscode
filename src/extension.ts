@@ -7,11 +7,14 @@
 import { commands, ExtensionContext } from "vscode";
 import { CommandNames, TfvcCommandNames } from "./helpers/constants";
 import { TeamExtension } from "./team-extension";
+import { TfvcExtension } from "./tfvc/tfvc-extension";
 
 var teamExtension: TeamExtension;
+var tfvcExtension: TfvcExtension;
 
 export function activate(context: ExtensionContext) {
     teamExtension = new TeamExtension();
+    tfvcExtension = new TfvcExtension();
 
     context.subscriptions.push(commands.registerCommand(CommandNames.GetPullRequests, () => teamExtension.GetMyPullRequests()));
     context.subscriptions.push(commands.registerCommand(CommandNames.Login, () => teamExtension.Login()));
@@ -33,5 +36,5 @@ export function activate(context: ExtensionContext) {
     context.subscriptions.push(commands.registerCommand(CommandNames.Reinitialize, () => teamExtension.Reinitialize()));
 
     // TFVC Commands
-    context.subscriptions.push(commands.registerCommand(TfvcCommandNames.Status, () => teamExtension.TfvcStatus()));
+    context.subscriptions.push(commands.registerCommand(TfvcCommandNames.Status, () => tfvcExtension.TfvcStatus()));
 }

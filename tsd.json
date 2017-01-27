@@ -19,6 +19,9 @@
     },
     "node-uuid/node-uuid.d.ts": {
       "commit": "dade4414712ce84e3c63393f1aae407e9e7e6af7"
+    },
+    "xml2js/index.d.ts": {
+      "commit": "b189999c7832d2250ca8ec52ccd03385225c78cd"
     }
   }
 }

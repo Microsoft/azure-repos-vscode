@@ -6,12 +6,17 @@
 
 import { ITfvcCommand, IExecutionResult } from "./interfaces";
 import { Tfvc } from "./tfvc";
-import { IWorkspace } from "./interfaces";
+import { IWorkspace, IPendingChange } from "./interfaces";
 import { GetVersion } from "./commands/getversion";
 import { FindWorkspace } from "./commands/findworkspace";
+import { Status } from "./commands/status";
 
 var _ = require("underscore");
 
+/**
+ * The Repository class allows you to perform TFVC commands on the workspace represented 
+ * by the repositoryRootFolder.
+ */
 export class Repository {
 
     public constructor(
@@ -33,6 +38,11 @@ export class Repository {
             new FindWorkspace(localPath));
     }
 
+    public async GetStatus(): Promise<IPendingChange[]> {
+        return this.RunCommand<IPendingChange[]>(
+            new Status());
+    }
+
     public async Version(): Promise<string> {
         return this.RunCommand<string>(
             new GetVersion());
@@ -40,7 +50,7 @@ export class Repository {
 
     public async RunCommand<T>(cmd: ITfvcCommand<T>): Promise<T> {
         const result = await this.exec(cmd.GetArguments(), cmd.GetOptions());
-        return cmd.ParseOutput(result);
+        return await cmd.ParseOutput(result);
     }
 
     private async exec(args: string[], options: any = {}): Promise<IExecutionResult> {

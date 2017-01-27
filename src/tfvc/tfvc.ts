@@ -35,8 +35,10 @@ export class Tfvc {
                     tfvcErrorCode: TfvcErrorCodes.TfvcNotFound
                 });
             }
-            //TODO check the version of TFVC command line
         }
+        //TODO check to make sure that the file exists in that location
+        //TODO check the version of TFVC command line
+
     }
 
     public Open(repositoryRootFolder: string, env: any = {}): Repository {

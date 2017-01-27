@@ -19,11 +19,17 @@ export interface IWorkspace {
     //List<Mapping> mappings;
 }
 
-export interface IFileStatus {
-    x: string;
-    y: string;
-    path: string;
-    rename?: string;
+export interface IPendingChange {
+    changeType: string;
+    computer: string;
+    date: string;
+    localItem: string;
+    lock: string;
+    owner: string;
+    serverItem: string;
+    version: string;
+    workspace: string;
+    isCandidate: boolean;
 }
 
 export interface IExecutionResult {
@@ -45,5 +51,5 @@ export interface ITfvcErrorData {
 export interface ITfvcCommand<T> {
     GetArguments(): string[];
     GetOptions(): any;
-    ParseOutput(executionResult: IExecutionResult): T;
+    ParseOutput(executionResult: IExecutionResult): Promise<T>;
 }
