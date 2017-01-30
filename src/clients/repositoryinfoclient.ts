@@ -97,7 +97,7 @@ export class RepositoryInfoClient {
             repository: {
                 id: "00000000-0000-0000-0000-000000000000",
                 name: "NoNameTfvcRepository",
-                url: "http://xplatalm.visualstudio.com/repository-url-does-not-exist",
+                url: serverUrl,
                 project: {
                     id: projectId,
                     name: projectName,
