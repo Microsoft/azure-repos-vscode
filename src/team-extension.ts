@@ -365,13 +365,16 @@ export class TeamExtension  {
             return;
         }
 
+        //If Logging is enabled, the user must have used the extension before so we can enable
+        //it here.  This will allow us to log errors when we begin processing TFVC commands.
+        this._settings = new Settings();
+        this.logStart(this._settings.LoggingLevel, workspace.rootPath);
+
         //RepositoryContext has some initial information about the repository (what we can get without authenticating with server)
         this._repoContext = await RepositoryContextFactory.CreateRepositoryContext(workspace.rootPath);
         if (this._repoContext) {
             this.setupFileSystemWatcherOnHead();
             this._serverContext = new TeamServerContext(this._repoContext.RemoteUrl);
-            this._settings = new Settings();
-            this.logStart(this._settings.LoggingLevel, workspace.rootPath);
             this._pinnedQuerySettings = new PinnedQuerySettings(this._serverContext.RepoInfo.Account);
             this._teamServicesStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, 100);
             //We need to be able to send feedback even if we aren't authenticated with the server
