@@ -36,7 +36,7 @@ export class TfvcContext implements IRepositoryContext {
             this._tfvcRemoteUrl = tfvcWorkspace.server; // "https://xplatalm.visualstudio.com/defaultcollection/"; //This comes from workfold
             this._isTeamServicesUrl = RepoUtils.IsTeamFoundationServicesRepo(this._tfvcRemoteUrl); // true;
             this._isTeamFoundationServer = RepoUtils.IsTeamFoundationServerRepo(this._tfvcRemoteUrl); //TODO: Not sure I want to do this here; // false;
-            this._teamProjectName = "L2.VSCodeExtension";
+            this._teamProjectName = "L2.VSCodeExtension";  //TOOD: Fix this up once I can get the TeamProjectName from tf.cmd
             return true;
         } catch (err) {
             //TODO: Log an error (or display a message later?)
