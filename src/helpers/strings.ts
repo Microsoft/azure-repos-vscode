@@ -18,7 +18,7 @@ export class Strings {
     static NoAccessTokenRunLogin: string = "You are not connected to Team Services. Please run the 'team login' command.";
     static NoTeamServerCredentialsRunLogin: string = "You are not connected to a Team Foundation Server.  Please run the 'team login' command.";
     static NoBuildsFound: string = "No builds were found for this repository and branch. Click to view your team project's build definitions page.";
-    static NoGitRepoInformation: string = "No Team Services or Team Foundation Server Git repository configuration was found.  Ensure you've opened a folder that contains a Git repository.";
+    static NoRepoInformation: string = "No Team Services or Team Foundation Server repository configuration was found.  Ensure you've opened a folder that contains a repository.";
     static NoSourceFileForBlame: string = "A source file must be opened to show blame information.";
 
     static SendAFrown: string = "Send a Frown";

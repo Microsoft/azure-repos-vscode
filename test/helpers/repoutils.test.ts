@@ -103,24 +103,39 @@ describe("RepoUtils", function() {
         assert.isTrue(RepoUtils.IsTeamFoundationGitRepo(url));
         url = "https://account.visualstudio.com/DefaultCollection/VSOnline/_git/Java.IntelliJ";
         assert.isTrue(RepoUtils.IsTeamFoundationServicesRepo(url));
-
-        //The following url has no "/_git/" in the path
-        url = "https://account.visualstudio.com/DefaultCollection/VSOnline/Java.IntelliJ";
-        assert.isFalse(RepoUtils.IsTeamFoundationServicesRepo(url));
     });
 
-    it("should detect invalid Team Foundation Git urls", function() {
+    it("should allow any other url as a valid Team Foundation repository", function() {
         let url : string;
 
-        //The following urls have no "/_git/" in the path
-        url = "https://account.visualstudio.com/DefaultCollection/VSOnline/Java.IntelliJ";
-        assert.isFalse(RepoUtils.IsTeamFoundationServicesRepo(url));
+        //This test exists to inform the developer of the fact that if we can't determine the url,
+        //we have to assume that it is a TFVC repository.  See the RepoUtils class for more details.
+
+        //This is true because we know it isn't Git but not that it isn't Tfvc
+        // url = "https://account.visualstudio.com/DefaultCollection/VSOnline/Java.IntelliJ";
+        // assert.isTrue(RepoUtils.IsTeamFoundationServicesRepo(url), "Java.IntelliJ url is not detected as a valid Team Services repo");
+
+        //This is true because we know it isn't Git but not that it isn't Tfvc
+        //(we could write explicit code for GitHub but are not choosing to do so now)
         url = "git@github.com:Microsoft/Git-Credential-Manager-for-Mac-and-Linux.git";
-        assert.isFalse(RepoUtils.IsTeamFoundationServicesRepo(url));
+        assert.isTrue(RepoUtils.IsTeamFoundationServerRepo(url), "GitHub SSH url is not detected as a valid Team Services repo");
+
+        //This is true because we know it isn't Git but not that it isn't Tfvc
+        //(we could write explicit code for GitHub but are not choosing to do so now)
         url = "https://github.com/Microsoft/vsts-vscode.git";
-        assert.isFalse(RepoUtils.IsTeamFoundationServicesRepo(url));
+        assert.isTrue(RepoUtils.IsTeamFoundationServerRepo(url), "GitHub url is not detected as a valid Team Services repo");
+
+        //This is true because we know it isn't Git but not that it isn't Tfvc
+        url = "foo";
+        assert.isTrue(RepoUtils.IsTeamFoundationServerRepo(url), "foo url is not detected as a valid Team Services repo");
+    });
+
+    it("should detect a valid Team Services repository but not as a Git repository", function() {
+        let url : string;
+
         url = "https://account.visualstudio.com/DefaultCollection/VSOnline/Java.IntelliJ";
-        assert.isFalse(RepoUtils.IsTeamFoundationServicesRepo(url));
+        assert.isTrue(RepoUtils.IsTeamFoundationServicesRepo(url), "Java.IntelliJ url is not detected as a valid Team Services repo");
+        assert.isFalse(RepoUtils.IsTeamFoundationGitRepo(url), "Java.IntelliJ url is  detected as a valid Git repo");
     });
 
 });

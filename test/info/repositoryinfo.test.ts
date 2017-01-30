@@ -17,13 +17,15 @@ describe("RepositoryInfo", function() {
 
     /* Team Server URLs */
     it("should verify host, account and isTeamFoundationServer for valid remoteUrl", function() {
-        let repoInfo: RepositoryInfo = new RepositoryInfo("http://jeyou-dev00000:8080/tfs/DefaultCollection/_git/GitAgile");
+        let url: string = "http://jeyou-dev00000:8080/tfs/DefaultCollection/_git/GitAgile";
+        let repoInfo: RepositoryInfo = new RepositoryInfo(url);
         assert.equal(repoInfo.Host, "jeyou-dev00000:8080");  //TODO: Should host on-prem contain the port number?
         assert.equal(repoInfo.Account, "jeyou-dev00000:8080");  //TODO: Should account on-prem contain the port number?
         assert.isUndefined(repoInfo.AccountUrl);  // we only get this when we pass a JSON blob
         assert.isTrue(repoInfo.IsTeamFoundation);
         assert.isTrue(repoInfo.IsTeamFoundationServer);
         assert.isFalse(repoInfo.IsTeamServices);
+        assert.equal(repoInfo.RepositoryUrl, url);
 
         // For on-prem currently, these should not be set
         assert.equal(repoInfo.CollectionId, undefined);
@@ -31,7 +33,6 @@ describe("RepositoryInfo", function() {
         assert.equal(repoInfo.CollectionUrl, undefined);
         assert.equal(repoInfo.RepositoryId, undefined);
         assert.equal(repoInfo.RepositoryName, undefined);
-        assert.equal(repoInfo.RepositoryUrl, undefined);
         assert.equal(repoInfo.TeamProject, undefined);
         assert.equal(repoInfo.TeamProjectUrl, undefined);
     });
@@ -56,7 +57,7 @@ describe("RepositoryInfo", function() {
                  "state": 1,
                  "revision": 7
               },
-              "remoteUrl": "http://server:8080/tfs/DefaultCollection/_git/repositoryName"
+              "remoteUrl": "http://server:8080/tfs/DefaultCollection/teamproject/_git/repositoryName"
            }
         };
         let repoInfo = new RepositoryInfo(repositoryInfo);

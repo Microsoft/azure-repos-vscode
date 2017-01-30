@@ -62,6 +62,11 @@ export class TestSettings {
         return (remoteRepositoryUrl || "undefined-remote-repository-url");
     }
 
+    public static RemoteTfvcRepositoryUrl() : string {
+        let remoteRepositoryUrl : string = process.env.MSVSTS_TEAM_REMOTE_TFVC_REPOSITORY_URL;
+        return (remoteRepositoryUrl || "undefined-remote-tfvc-repository-url");
+    }
+
     public static RepositoryId(): string {
         let repositoryId : string = process.env.MSVSTS_TEAM_REPOSITORY_ID;
         return (repositoryId || "undefined-repository-id");

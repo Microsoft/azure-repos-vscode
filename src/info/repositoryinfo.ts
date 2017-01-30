@@ -9,6 +9,10 @@ import { RepoUtils } from "../helpers/repoutils";
 
 var url = require("url");
 
+//When a RepositoryInfo object is created, we have already verified whether or not it
+//is either a Team Services or Team Foundation Server repository.  With the introduction
+//of TFVC support, we cannot determine if it is TFVC based on url alone.  Therfore,
+//we have to assume that are creating a RepositoryInfo for an existing TF repo.
 export class RepositoryInfo {
     private _host: string;
     private _hostName: string;
@@ -23,6 +27,7 @@ export class RepositoryInfo {
     private _collectionId: string;
     private _teamProject: string;
     private _repositoryName: string;
+    private _repositoryUrl: string;
     private _serverUrl: string;
 
     // Indicates whether the repository is Team Services
@@ -54,38 +59,37 @@ export class RepositoryInfo {
             this._protocol = purl.protocol;
             this._query = purl.query;
 
-            if (RepoUtils.IsTeamFoundationGitRepo(repositoryUrl)) {
-                if (RepoUtils.IsTeamFoundationServicesRepo(repositoryUrl)) {
-                    let splitHost = this._host.split(".");
-                    this._account = splitHost[0];
-                    this._isTeamServicesUrl = true;
-                    Logger.LogDebug("_isTeamServicesUrl: true");
-                } else if (RepoUtils.IsTeamFoundationServerRepo(repositoryUrl)) {
-                    this._account = purl.host;
-                    this._isTeamFoundationServer = true;
+            this._repositoryUrl = repositoryUrl;
+            if (RepoUtils.IsTeamFoundationServicesRepo(repositoryUrl)) {
+                let splitHost = this._host.split(".");
+                this._account = splitHost[0];
+                this._isTeamServicesUrl = true;
+                Logger.LogDebug("_isTeamServicesUrl: true");
+            } else if (RepoUtils.IsTeamFoundationServerRepo(repositoryUrl)) {
+                this._account = purl.host;
+                this._isTeamFoundationServer = true;
+            }
+            if (typeof repositoryInfo === "object") {
+                Logger.LogDebug("Parsing values from repositoryInfo object as any");
+                //The following properties are returned from the vsts/info api
+                //If you add additional properties to the server context, they need to be set here
+                this._collection = repositoryInfo.collection.name;
+                Logger.LogDebug("_collection: " + this._collection);
+                this._collectionId = repositoryInfo.collection.id;
+                Logger.LogDebug("_collectionId: " + this._collectionId);
+                this._repositoryId = repositoryInfo.repository.id;
+                Logger.LogDebug("_repositoryId: " + this._repositoryId);
+                this._repositoryName = repositoryInfo.repository.name;
+                Logger.LogDebug("_repositoryName: " + this._repositoryName);
+                this._teamProject = repositoryInfo.repository.project.name;
+                Logger.LogDebug("_teamProject: " + this._teamProject);
+                if (this._isTeamFoundationServer === true) {
+                    Logger.LogDebug("_isTeamFoundationServer: true");
+                    //_serverUrl is only set for TeamFoundationServer repositories
+                    this._serverUrl = repositoryInfo.serverUrl;
                 }
-                if (typeof repositoryInfo === "object") {
-                    Logger.LogDebug("Parsing values from repositoryInfo object as any");
-                    //The following properties are returned from the vsts/info api
-                    //If you add additional properties to the server context, they need to be set here
-                    this._collection = repositoryInfo.collection.name;
-                    Logger.LogDebug("_collection: " + this._collection);
-                    this._collectionId = repositoryInfo.collection.id;
-                    Logger.LogDebug("_collectionId: " + this._collectionId);
-                    this._repositoryId = repositoryInfo.repository.id;
-                    Logger.LogDebug("_repositoryId: " + this._repositoryId);
-                    this._repositoryName = repositoryInfo.repository.name;
-                    Logger.LogDebug("_repositoryName: " + this._repositoryName);
-                    this._teamProject = repositoryInfo.repository.project.name;
-                    Logger.LogDebug("_teamProject: " + this._teamProject);
-                    if (this._isTeamFoundationServer === true) {
-                        Logger.LogDebug("_isTeamFoundationServer: true");
-                        //_serverUrl is only set for TeamFoundationServer repositories
-                        this._serverUrl = repositoryInfo.serverUrl;
-                    }
-                } else {
-                    Logger.LogDebug("Parsing values from repositoryInfo as string url");
-                }
+            } else {
+                Logger.LogDebug("Parsing values from repositoryInfo as string url");
             }
         }
     }
@@ -136,10 +140,7 @@ export class RepositoryInfo {
         return this._repositoryName;
     }
     public get RepositoryUrl(): string {
-        if (this._repositoryName === undefined) {
-            return undefined;
-        }
-        return this.TeamProjectUrl + "/_git/" + this._repositoryName;
+        return this._repositoryUrl;
     }
     public get TeamProjectUrl(): string {
         if (this._teamProject === undefined) {

@@ -6,13 +6,15 @@
 
 import { Utils } from "../helpers/utils";
 import { RepoUtils } from "../helpers/repoutils";
+import { IRepositoryContext, RepositoryType } from "./repositorycontext";
 
 var pgc = require("parse-git-config");
 var gri = require("git-repo-info");
 var path = require("path");
 var url = require("url");
 
-export class GitContext {
+//Gets as much information as it can regarding the Git repository without calling the server (vsts/info)
+export class GitContext implements IRepositoryContext {
     private _gitConfig: any;
     private _gitRepoInfo: any;
     private _gitFolder: string;
@@ -92,13 +94,27 @@ export class GitContext {
         }
     }
 
+    //constructor already initializes the GitContext
+    public async Initialize(): Promise<Boolean> {
+        return true;
+    }
+
+    //Git implementation
     public get CurrentBranch(): string {
         return this._gitCurrentBranch;
     }
     public get CurrentRef(): string {
         return this._gitCurrentRef;
     }
-    public get GitFolder(): string {
+
+    //TFVC implementation
+    //For Git, TeamProjectName is set after the call to vsts/info
+    public get TeamProjectName(): string {
+        return undefined;
+    }
+
+    //IRepositoryContext implementation
+    public get RepoFolder(): string {
         return this._gitFolder;
     }
     public get IsSsh(): boolean {
@@ -115,5 +131,8 @@ export class GitContext {
     }
     public get RepositoryParentFolder(): string {
         return this._gitParentFolder;
+    }
+    public get Type(): RepositoryType {
+        return RepositoryType.GIT;
     }
 }

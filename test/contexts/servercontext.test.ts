@@ -23,12 +23,26 @@ describe("TeamServerContext", function() {
         }
     });
 
-    it("should verify context is not a TeamFoundation context", function() {
-        // We expect "/_git/" in the repository Url
+    it("should verify context is a TeamFoundation context with Team Services account", function() {
+        // This could be a TFVC repository
         let context: TeamServerContext = new TeamServerContext("https://account.visualstudio.com/DefaultCollection/teamproject/");
-        assert.isFalse(context.RepoInfo.IsTeamServices);
-        assert.isFalse(context.RepoInfo.IsTeamFoundation);
+        assert.isTrue(context.RepoInfo.IsTeamServices);
+        assert.isTrue(context.RepoInfo.IsTeamFoundation);
         assert.isFalse(context.RepoInfo.IsTeamFoundationServer);
+    });
+
+    it("should verify context is a IsTeamServices and TeamFoundation context", function() {
+        let context: TeamServerContext = new TeamServerContext("https://account.visualstudio.com/DefaultCollection/teamproject/_git/repositoryName");
+        assert.isTrue(context.RepoInfo.IsTeamServices);
+        assert.isTrue(context.RepoInfo.IsTeamFoundation);
+        assert.isFalse(context.RepoInfo.IsTeamFoundationServer);
+    });
+
+    it("should verify context is a TeamFoundation context with TFS account", function() {
+        let context: TeamServerContext = new TeamServerContext("http://server:8080/tfs/DefaultCollection/teamproject");
+        assert.isFalse(context.RepoInfo.IsTeamServices, "isTeamServices should be false");
+        //TODO: assert.isTrue(context.RepoInfo.IsTeamFoundation, "isTeamFoundation should be true");
+        //TODO: assert.isFalse(context.RepoInfo.IsTeamFoundationServer, "isTeamFoundationServer should be true");
     });
 
 });

@@ -78,6 +78,26 @@ describe("BuildService-Integration", function() {
         }
     });
 
+    it("should verify BuildService.GetBuilds", async function(done) {
+        this.timeout(TestSettings.TestTimeout()); //http://mochajs.org/#timeouts
+
+        var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl());
+        ctx.CredentialHandler = CredentialManager.GetCredentialHandler();
+        ctx.RepoInfo = Mocks.RepositoryInfo();
+        ctx.UserInfo = undefined;
+
+        try {
+            let svc: BuildService = new BuildService(ctx);
+            let builds = await svc.GetBuilds(TestSettings.TeamProject());
+            assert.isNotNull(builds, "builds was null when it shouldn't have been");
+            //console.log(builds.length);
+            expect(builds.length).to.be.at.least(1);
+            done();
+        } catch (err) {
+            done (err);
+        }
+    });
+
     it("should verify BuildService.GetBuildsByDefinitionId", async function(done) {
         this.timeout(TestSettings.TestTimeout()); //http://mochajs.org/#timeouts
 

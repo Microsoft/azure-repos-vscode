@@ -85,4 +85,35 @@ describe("TeamServicesClient-Integration", function() {
             done(err);
         }
     });
+
+    it("should verify repositoryClient.validateTfvcCollectionUrl", async function(done) {
+        this.timeout(TestSettings.TestTimeout()); //http://mochajs.org/#timeouts
+
+        let success: boolean;
+        try {
+            let repositoryClient: TeamServicesApi = new TeamServicesApi(TestSettings.RemoteTfvcRepositoryUrl(), [CredentialManager.GetCredentialHandler()]);
+            await repositoryClient.validateTfvcCollectionUrl();
+            success = true;
+            done();
+        } catch (err) {
+            done(err);
+        } finally {
+            assert.isTrue(success);
+        }
+    });
+
+    it("should verify repositoryClient.validateTfvcCollectionUrl and 404", async function(done) {
+        this.timeout(TestSettings.TestTimeout()); //http://mochajs.org/#timeouts
+
+        try {
+            let repositoryClient: TeamServicesApi = new TeamServicesApi(TestSettings.RemoteTfvcRepositoryUrl() + "1", [CredentialManager.GetCredentialHandler()]);
+            await repositoryClient.validateTfvcCollectionUrl();
+            assert.Fail(undefined, undefined, "validateTfvcCollectionUrl should have thrown but didn't."); //It shouldn't get here
+            done();
+        } catch (err) {
+            assert.isNotNull(err, "err was null when it shouldn't have been");
+            expect(err.statusCode).to.equal(404);
+            done();
+        }
+    });
 });

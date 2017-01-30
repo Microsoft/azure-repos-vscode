@@ -4,7 +4,7 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import { Build, BuildBadge, BuildQueryOrder, DefinitionReference, QueryDeletedOption } from "vso-node-api/interfaces/BuildInterfaces";
+import { Build, BuildBadge, BuildQueryOrder, BuildStatus, DefinitionReference, QueryDeletedOption } from "vso-node-api/interfaces/BuildInterfaces";
 import { IBuildApi } from "vso-node-api/BuildApi";
 import { WebApi } from "vso-node-api/WebApi";
 import { TeamServerContext } from "../contexts/servercontext";
@@ -30,6 +30,12 @@ export class BuildService {
     //Returns the build definitions (regardless of type) for the team project
     public async GetBuildDefinitions(teamProject: string): Promise<DefinitionReference[]> {
         return await this._buildApi.getDefinitions(teamProject);
+    }
+
+    //Returns the most recent 100 completed builds
+    public async GetBuilds(teamProject: string): Promise<Build[]> {
+        return await this._buildApi.getBuilds(teamProject, null, null, null, null, null, null, null, BuildStatus.Completed, null, null, null,
+                                              100, null, 1, QueryDeletedOption.ExcludeDeleted, BuildQueryOrder.FinishTimeDescending);
     }
 
     //Returns the "latest" build for this definition

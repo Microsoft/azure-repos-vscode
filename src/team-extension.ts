@@ -12,7 +12,8 @@ import { Logger } from "./helpers/logger";
 import { Strings } from "./helpers/strings";
 import { Utils } from "./helpers/utils";
 import { UrlMessageItem, VsCodeUtils } from "./helpers/vscodeutils";
-import { GitContext } from "./contexts/gitcontext";
+import { RepositoryContextFactory } from "./contexts/repocontextfactory";
+import { IRepositoryContext, RepositoryType } from "./contexts/repositorycontext";
 import { TeamServerContext} from "./contexts/servercontext";
 import { TelemetryService } from "./services/telemetry";
 import { TeamServicesApi } from "./clients/teamservicesclient";
@@ -20,7 +21,7 @@ import { BuildClient } from "./clients/buildclient";
 import { FeedbackClient } from "./clients/feedbackclient";
 import { GitClient } from "./clients/gitclient";
 import { WitClient } from "./clients/witclient";
-import { RepositoryInfo } from "./info/repositoryinfo";
+import { RepositoryInfoClient } from "./clients/repositoryinfoclient";
 import { UserInfo } from "./info/userinfo";
 
 var os = require("os");
@@ -42,7 +43,7 @@ export class TeamExtension  {
     private _witClient: WitClient;
     private _feedbackClient: FeedbackClient;
     private _serverContext: TeamServerContext;
-    private _gitContext: GitContext;
+    private _repoContext: IRepositoryContext;
     private _settings: Settings;
     private _pinnedQuerySettings: PinnedQuerySettings;
     private _credentialManager : CredentialManager;
@@ -63,7 +64,9 @@ export class TeamExtension  {
     //Opens the pull request page given the remote and (current) branch
     public CreatePullRequest(): void {
         if (this.ensureInitialized()) {
-            this._gitClient.CreatePullRequest(this._gitContext);
+            if (this._gitClient) {
+                this._gitClient.CreatePullRequest(this._repoContext);
+            }
         } else {
             VsCodeUtils.ShowErrorMessage(this._errorMessage);
         }
@@ -72,7 +75,7 @@ export class TeamExtension  {
     //Gets any available build status information and adds it to the status bar
     public DisplayCurrentBranchBuildStatus(): void {
         if (this.ensureInitialized()) {
-            this._buildClient.DisplayCurrentBranchBuildStatus(this._gitContext, false);
+            this._buildClient.DisplayCurrentBuildStatus(this._repoContext, false);
         } else {
             VsCodeUtils.ShowErrorMessage(this._errorMessage);
         }
@@ -81,7 +84,9 @@ export class TeamExtension  {
     //Initial method to display, select and navigate to my pull requests
     public GetMyPullRequests(): void {
         if (this.ensureInitialized()) {
-            this._gitClient.GetMyPullRequests();
+            if (this._gitClient) {
+                this._gitClient.GetMyPullRequests();
+            }
         } else {
             VsCodeUtils.ShowErrorMessage(this._errorMessage);
         }
@@ -129,7 +134,7 @@ export class TeamExtension  {
             let messageItem : UrlMessageItem = { title : Strings.LearnMore,
                                 url : Constants.ReadmeLearnMoreUrl,
                                 telemetryId: TelemetryEvents.ReadmeLearnMoreClick };
-            VsCodeUtils.ShowErrorMessageWithOptions(Strings.NoGitRepoInformation, messageItem).then((item) => {
+            VsCodeUtils.ShowErrorMessageWithOptions(Strings.NoRepoInformation, messageItem).then((item) => {
                 if (item) {
                     Utils.OpenUrl(item.url);
                     this._feedbackClient.SendEvent(item.telemetryId);
@@ -151,14 +156,16 @@ export class TeamExtension  {
                 VsCodeUtils.ShowErrorMessage(msg);
             });
         } else {
-            VsCodeUtils.ShowErrorMessage(Strings.NoGitRepoInformation);
+            VsCodeUtils.ShowErrorMessage(Strings.NoRepoInformation);
         }
     }
 
     //Opens the build summary page for a particular build
     public OpenBlamePage(): void {
         if (this.ensureInitialized()) {
-            this._gitClient.OpenBlamePage(this._gitContext);
+            if (this._gitClient) {
+                this._gitClient.OpenBlamePage(this._repoContext);
+            }
         } else {
             VsCodeUtils.ShowErrorMessage(this._errorMessage);
         }
@@ -176,7 +183,9 @@ export class TeamExtension  {
     //Opens the file history page for the currently active file
     public OpenFileHistory(): void {
         if (this.ensureInitialized()) {
-            this._gitClient.OpenFileHistory(this._gitContext);
+            if (this._gitClient) {
+                this._gitClient.OpenFileHistory(this._repoContext);
+            }
         } else {
             VsCodeUtils.ShowErrorMessage(this._errorMessage);
         }
@@ -196,7 +205,9 @@ export class TeamExtension  {
     //Opens a browser to a new pull request for the current branch
     public OpenNewPullRequest(): void {
         if (this.ensureInitialized()) {
-            this._gitClient.OpenNewPullRequest(this._gitContext.RemoteUrl, this._gitContext.CurrentBranch);
+            if (this._gitClient) {
+                this._gitClient.OpenNewPullRequest(this._repoContext.RemoteUrl, this._repoContext.CurrentBranch);
+            }
         } else {
             VsCodeUtils.ShowErrorMessage(this._errorMessage);
         }
@@ -227,7 +238,9 @@ export class TeamExtension  {
     //Opens the main pull requests page
     public OpenPullRequestsPage(): void {
         if (this.ensureInitialized()) {
-            this._gitClient.OpenPullRequestsPage();
+            if (this._gitClient) {
+                this._gitClient.OpenPullRequestsPage();
+            }
         } else {
             VsCodeUtils.ShowErrorMessage(this._errorMessage);
         }
@@ -317,11 +330,10 @@ export class TeamExtension  {
     }
 
     private ensureInitialized(): boolean {
-        if (!this._gitContext
-                || !this._gitContext.RemoteUrl
+        if (!this._repoContext
                 || !this._serverContext
                 || !this._serverContext.RepoInfo.IsTeamFoundation) {
-            this.setErrorStatus(Strings.NoGitRepoInformation);
+            this.setErrorStatus(Strings.NoRepoInformation);
             return false;
         } else if (this._errorMessage !== undefined) {
             return false;
@@ -347,16 +359,17 @@ export class TeamExtension  {
         return undefined;
     }
 
-    private initializeExtension() : void {
+    private async initializeExtension() : Promise<void> {
         //Don't initialize if we don't have a workspace
         if (!workspace || !workspace.rootPath) {
             return;
         }
 
-        this._gitContext = new GitContext(workspace.rootPath);
-        if (this._gitContext && this._gitContext.RemoteUrl !== undefined && this._gitContext.IsTeamFoundation) {
+        //RepositoryContext has some initial information about the repository (what we can get without authenticating with server)
+        this._repoContext = await RepositoryContextFactory.CreateRepositoryContext(workspace.rootPath);
+        if (this._repoContext) {
             this.setupFileSystemWatcherOnHead();
-            this._serverContext = new TeamServerContext(this._gitContext.RemoteUrl);
+            this._serverContext = new TeamServerContext(this._repoContext.RemoteUrl);
             this._settings = new Settings();
             this.logStart(this._settings.LoggingLevel, workspace.rootPath);
             this._pinnedQuerySettings = new PinnedQuerySettings(this._serverContext.RepoInfo.Account);
@@ -375,16 +388,18 @@ export class TeamExtension  {
                     this._feedbackClient = new FeedbackClient(this._telemetry);
                     Logger.LogDebug("Started ApplicationInsights telemetry");
 
-                    //Go get the details about the repository
-                    let repositoryClient: TeamServicesApi = new TeamServicesApi(this._gitContext.RemoteUrl, [CredentialManager.GetCredentialHandler()]);
-                    Logger.LogInfo("Getting repository information (vsts/info) with repositoryClient");
-                    Logger.LogDebug("RemoteUrl = " + this._gitContext.RemoteUrl);
-                    try {
-                        let repoInfo: any = await repositoryClient.getVstsInfo();
-                        Logger.LogInfo("Retrieved repository info with repositoryClient");
-                        Logger.LogObject(repoInfo);
+                    //Set up the client we need to talk to the server for more repository information
+                    //TODO: Handle this guy throwing!!
+                    let repositoryInfoClient: RepositoryInfoClient = new RepositoryInfoClient(this._repoContext, CredentialManager.GetCredentialHandler());
 
-                        this._serverContext.RepoInfo = new RepositoryInfo(repoInfo);
+                    Logger.LogInfo("Getting repository information with repositoryInfoClient");
+                    Logger.LogDebug("RemoteUrl = " + this._repoContext.RemoteUrl);
+                    try {
+                        //At this point, we have either successfully called git.exe or tf.cmd (we just need to verify the remote urls)
+                        //For Git repositories, we call vsts/info and get collection ids, etc.
+                        //For TFVC, we have to (potentially) make multiple other calls to get collection ids, etc.
+                        this._serverContext.RepoInfo = await repositoryInfoClient.GetRepositoryInfo();
+
                         //Now we need to go and get the authorized user information
                         let connectionUrl: string = (this._serverContext.RepoInfo.IsTeamServices === true ? this._serverContext.RepoInfo.AccountUrl : this._serverContext.RepoInfo.CollectionUrl);
                         let accountClient: TeamServicesApi = new TeamServicesApi(connectionUrl, [CredentialManager.GetCredentialHandler()]);
@@ -402,7 +417,10 @@ export class TeamExtension  {
 
                             this.initializeStatusBars();
                             this._buildClient = new BuildClient(this._serverContext, this._telemetry, this._buildStatusBarItem);
-                            this._gitClient = new GitClient(this._serverContext, this._telemetry, this._pullRequestStatusBarItem);
+                            //Don't initialize the Git client if we aren't a Git repository
+                            if (this._repoContext.Type === RepositoryType.GIT) {
+                                this._gitClient = new GitClient(this._serverContext, this._telemetry, this._pullRequestStatusBarItem);
+                            }
                             this._witClient = new WitClient(this._serverContext, this._telemetry, this._pinnedQuerySettings.PinnedQuery, this._pinnedQueryStatusBarItem);
                             this._telemetry.SendEvent(TelemetryEvents.StartUp);
 
@@ -415,13 +433,14 @@ export class TeamExtension  {
                             this.reportError(Utils.GetMessageForStatusCode(err, err.message, "Failed to get results with accountClient: "), err);
                         }
                     } catch (err) {
+                        //TODO: With TFVC, creating a RepositoryInfo can throw (can't get project collection, can't get team project, etc.)
                         // We get a 404 on-prem if we aren't Update 2 or later
                         if (this._serverContext.RepoInfo.IsTeamFoundationServer === true && err.statusCode === 404) {
                             this.setErrorStatus(Strings.UnsupportedServerVersion, undefined, false);
                             Logger.LogError(Strings.UnsupportedServerVersion);
                         } else {
                             this.setErrorStatus(Utils.GetMessageForStatusCode(err, err.message), (err.statusCode === 401 ? CommandNames.Login : undefined), false);
-                            this.reportError(Utils.GetMessageForStatusCode(err, err.message, "Failed (vsts/info) call with repositoryClient: "), err);
+                            this.reportError(Utils.GetMessageForStatusCode(err, err.message, "Failed call with repositoryClient: "), err);
                         }
                     }
                 }
@@ -441,11 +460,14 @@ export class TeamExtension  {
             this._teamServicesStatusBarItem.tooltip = Strings.NavigateToTeamServicesWebSite;
             this._teamServicesStatusBarItem.show();
 
-            this._pullRequestStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, 99);
-            this._pullRequestStatusBarItem.command = CommandNames.GetPullRequests;
-            this._pullRequestStatusBarItem.text = GitClient.GetPullRequestStatusText(0);
-            this._pullRequestStatusBarItem.tooltip = Strings.BrowseYourPullRequests;
-            this._pullRequestStatusBarItem.show();
+            //Only initialize the status bar item if this is a Git repository
+            if (this._repoContext.Type === RepositoryType.GIT) {
+                this._pullRequestStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, 99);
+                this._pullRequestStatusBarItem.command = CommandNames.GetPullRequests;
+                this._pullRequestStatusBarItem.text = GitClient.GetPullRequestStatusText(0);
+                this._pullRequestStatusBarItem.tooltip = Strings.BrowseYourPullRequests;
+                this._pullRequestStatusBarItem.show();
+            }
 
             this._buildStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, 98);
             this._buildStatusBarItem.command = CommandNames.OpenBuildSummaryPage;
@@ -469,12 +491,14 @@ export class TeamExtension  {
                             + "UserCustomDisplayName: " + this._serverContext.UserInfo.CustomDisplayName + " "
                             + "UserProviderDisplayName: " + this._serverContext.UserInfo.ProviderDisplayName + " "
                             + "UserId: " + this._serverContext.UserInfo.Id + " ");
-        Logger.LogDebug("gitFolder: " + this._gitContext.GitFolder);
-        Logger.LogDebug("gitRemoteUrl: " + this._gitContext.RemoteUrl);
-        Logger.LogDebug("gitRepositoryParentFolder: " + this._gitContext.RepositoryParentFolder);
-        Logger.LogDebug("gitCurrentBranch: " + this._gitContext.CurrentBranch);
-        Logger.LogDebug("gitCurrentRef: " + this._gitContext.CurrentRef);
-        Logger.LogDebug("gitIsSsh: " + this._gitContext.IsSsh);
+        Logger.LogDebug("gitFolder: " + this._repoContext.RepoFolder);
+        Logger.LogDebug("gitRemoteUrl: " + this._repoContext.RemoteUrl);
+        if (this._repoContext.Type === RepositoryType.GIT) {
+            Logger.LogDebug("gitRepositoryParentFolder: " + this._repoContext.RepositoryParentFolder);
+            Logger.LogDebug("gitCurrentBranch: " + this._repoContext.CurrentBranch);
+            Logger.LogDebug("gitCurrentRef: " + this._repoContext.CurrentRef);
+        }
+        Logger.LogDebug("IsSsh: " + this._repoContext.IsSsh);
         Logger.LogDebug("proxy: " + (Utils.IsProxyEnabled() ? "enabled" : "not enabled")
                         + ", team services: " + this._serverContext.RepoInfo.IsTeamServices.toString());
     }
@@ -495,29 +519,32 @@ export class TeamExtension  {
 
     private pollBuildStatus(): void {
         if (this.ensureInitialized()) {
-            this._buildClient.DisplayCurrentBranchBuildStatus(this._gitContext, true);
+            Logger.LogInfo("Polling for latest current build status...");
+            this._buildClient.DisplayCurrentBuildStatus(this._repoContext, true);
         }
     }
 
     private pollMyPullRequests(): void {
         if (this.ensureInitialized()) {
-            this._gitClient.PollMyPullRequests();
+            //Only poll for pull requests when repository is Git
+            if (this._repoContext.Type === RepositoryType.GIT) {
+                Logger.LogInfo("Polling for pull requests...");
+                this._gitClient.PollMyPullRequests();
+            }
         }
     }
 
     private pollPinnedQuery(): void {
         if (this.ensureInitialized()) {
+            Logger.LogInfo("Polling for the pinned work itemquery");
             this._witClient.PollPinnedQuery();
         }
     }
 
     //Polls for latest pull requests and current branch build status information
     private refreshPollingItems(): void {
-        Logger.LogInfo("Polling for pull requests...");
         this.pollMyPullRequests();
-        Logger.LogInfo("Polling for latest current branch build status...");
         this.pollBuildStatus();
-        Logger.LogInfo("Polling for the pinned work itemquery");
         this.pollPinnedQuery();
     }
 
@@ -551,65 +578,70 @@ export class TeamExtension  {
     }
 
     //Sets up a file system watcher on HEAD so we can know when the current branch has changed
-    private setupFileSystemWatcherOnHead(): void {
-        let pattern: string = this._gitContext.GitFolder + "/HEAD";
-        let fsw:FileSystemWatcher = workspace.createFileSystemWatcher(pattern, true, false, true);
-        fsw.onDidChange((uri) => {
-            Logger.LogInfo("HEAD has changed, re-parsing GitContext object");
-            this._gitContext = new GitContext(workspace.rootPath);
-            Logger.LogInfo("CurrentBranch is: " + this._gitContext.CurrentBranch);
-            this.refreshPollingItems();
-        });
+    private async setupFileSystemWatcherOnHead(): Promise<void> {
+        if (this._repoContext && this._repoContext.Type === RepositoryType.GIT) {
+            let pattern: string = this._repoContext.RepoFolder + "/HEAD";
+            let fsw:FileSystemWatcher = workspace.createFileSystemWatcher(pattern, true, false, true);
+            fsw.onDidChange(async (uri) => {
+                Logger.LogInfo("HEAD has changed, re-parsing RepoContext object");
+                this._repoContext = await RepositoryContextFactory.CreateRepositoryContext(workspace.rootPath);
+                Logger.LogInfo("CurrentBranch is: " + this._repoContext.CurrentBranch);
+                this.refreshPollingItems();
+            });
+        }
     }
 
     //Sets up a file system watcher on config so we can know when the remote origin has changed
-    private setupFileSystemWatcherOnConfig(): void {
+    private async setupFileSystemWatcherOnConfig(): Promise<void> {
         //If we don't have a workspace, don't set up the file watcher
         if (!workspace || !workspace.rootPath) {
             return;
         }
-        let pattern: string = path.join(workspace.rootPath, ".git", "config");
-        //We want to listen to file creation, change and delete events
-        let fsw:FileSystemWatcher = workspace.createFileSystemWatcher(pattern, false, false, false);
-        fsw.onDidCreate((uri) => {
-            //When a new local repo is initialized (e.g., git init), re-initialize the extension
-            Logger.LogInfo("config has been created, re-initializing the extension");
-            this.Reinitialize();
-        });
-        fsw.onDidChange((uri) => {
-            Logger.LogInfo("config has changed, checking if 'remote origin' changed");
-            let context: GitContext = new GitContext(uri.fsPath);
-            let remote: string = context.RemoteUrl;
-            if (remote === undefined) {
-                //There is either no remote defined yet or it isn't a Team Services repo
-                if (this._gitContext.RemoteUrl !== undefined) {
-                    //We previously had a Team Services repo and now we don't, reinitialize
-                    Logger.LogInfo("remote was removed, previously had a Team Services remote, re-initializing the extension");
-                    this.Reinitialize();
-                    return;
-                }
-                //There was no previous remote, so do nothing
-                Logger.LogInfo("remote does not exist, no previous Team Services remote, nothing to do");
-            } else if (this._gitContext !== undefined) {
-                //We have a valid gitContext already, check to see what changed
-                if (this._gitContext.RemoteUrl !== undefined) {
-                    //The config has changed, and we had a Team Services remote already
-                    if (remote.toLowerCase() !== this._gitContext.RemoteUrl.toLowerCase()) {
-                        //And they're different, reinitialize
-                        Logger.LogInfo("remote changed to a different Team Services remote, re-initializing the extension");
+
+        if (this._repoContext && this._repoContext.Type === RepositoryType.GIT) {
+            let pattern: string = path.join(workspace.rootPath, ".git", "config");
+            //We want to listen to file creation, change and delete events
+            let fsw:FileSystemWatcher = workspace.createFileSystemWatcher(pattern, false, false, false);
+            fsw.onDidCreate((uri) => {
+                //When a new local repo is initialized (e.g., git init), re-initialize the extension
+                Logger.LogInfo("config has been created, re-initializing the extension");
+                this.Reinitialize();
+            });
+            fsw.onDidChange(async (uri) => {
+                Logger.LogInfo("config has changed, checking if 'remote origin' changed");
+                let context: IRepositoryContext = await RepositoryContextFactory.CreateRepositoryContext(uri.fsPath);
+                let remote: string = context.RemoteUrl;
+                if (remote === undefined) {
+                    //There is either no remote defined yet or it isn't a Team Services repo
+                    if (this._repoContext.RemoteUrl !== undefined) {
+                        //We previously had a Team Services repo and now we don't, reinitialize
+                        Logger.LogInfo("remote was removed, previously had a Team Services remote, re-initializing the extension");
+                        this.Reinitialize();
+                        return;
+                    }
+                    //There was no previous remote, so do nothing
+                    Logger.LogInfo("remote does not exist, no previous Team Services remote, nothing to do");
+                } else if (this._repoContext !== undefined) {
+                    //We have a valid gitContext already, check to see what changed
+                    if (this._repoContext.RemoteUrl !== undefined) {
+                        //The config has changed, and we had a Team Services remote already
+                        if (remote.toLowerCase() !== this._repoContext.RemoteUrl.toLowerCase()) {
+                            //And they're different, reinitialize
+                            Logger.LogInfo("remote changed to a different Team Services remote, re-initializing the extension");
+                            this.Reinitialize();
+                        }
+                    } else {
+                        //The remote was initialized to a Team Services remote, reinitialize
+                        Logger.LogInfo("remote initialized to a Team Services remote, re-initializing the extension");
                         this.Reinitialize();
                     }
-                } else {
-                    //The remote was initialized to a Team Services remote, reinitialize
-                    Logger.LogInfo("remote initialized to a Team Services remote, re-initializing the extension");
-                    this.Reinitialize();
                 }
-            }
-        });
-        fsw.onDidDelete((uri) => {
-            Logger.LogInfo("config has been deleted, re-initializing the extension");
-            this.Reinitialize();
-        });
+            });
+            fsw.onDidDelete((uri) => {
+                Logger.LogInfo("config has been deleted, re-initializing the extension");
+                this.Reinitialize();
+            });
+        }
     }
 
     //Sets up the interval to refresh polling items

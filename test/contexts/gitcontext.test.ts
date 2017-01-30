@@ -53,7 +53,7 @@ describe("GitContext", function() {
         assert.isFalse(gc.IsTeamServices);
         assert.equal(gc.RemoteUrl, undefined);
         assert.equal(gc.RepositoryParentFolder, path.join(__dirname, TEST_REPOS_FOLDER, repoName));
-        assert.equal(gc.GitFolder, repoPath);
+        assert.equal(gc.RepoFolder, repoPath);
     });
 
     it("should verify GitHub origin remote", function() {
@@ -68,7 +68,7 @@ describe("GitContext", function() {
         assert.isFalse(gc.IsTeamServices);
         assert.equal(gc.RemoteUrl, undefined);
         assert.equal(gc.RepositoryParentFolder, path.join(__dirname, TEST_REPOS_FOLDER, repoName));
-        assert.equal(gc.GitFolder, repoPath);
+        assert.equal(gc.RepoFolder, repoPath);
     });
 
     it("should verify TeamServices origin remote", function() {
@@ -83,7 +83,8 @@ describe("GitContext", function() {
         assert.isTrue(gc.IsTeamServices);
         assert.equal(gc.RemoteUrl, "https://account.visualstudio.com/DefaultCollection/teamproject/_git/gitrepo");
         assert.equal(gc.RepositoryParentFolder, path.join(__dirname, TEST_REPOS_FOLDER, repoName));
-        assert.equal(gc.GitFolder, repoPath);
+        assert.equal(gc.RepoFolder, repoPath);
+        assert.isUndefined(gc.TeamProjectName); //For Git repositories, teamproject comes from vsts/info (not remoteUrl)
     });
 
     it("should verify TeamServices origin remote cloned with ssh", function() {
@@ -99,7 +100,7 @@ describe("GitContext", function() {
         //The remote URL is the https and no longer has port number
         assert.equal(gc.RemoteUrl, "https://account.visualstudio.com/DefaultCollection/_git/repository");
         assert.equal(gc.RepositoryParentFolder, path.join(__dirname, TEST_REPOS_FOLDER, repoName));
-        assert.equal(gc.GitFolder, repoPath);
+        assert.equal(gc.RepoFolder, repoPath);
     });
 
     it("should verify TeamFoundationServer origin remote", function() {
@@ -114,7 +115,7 @@ describe("GitContext", function() {
         assert.isFalse(gc.IsTeamServices);
         assert.equal(gc.RemoteUrl, "http://devmachine:8080/tfs/DefaultCollection/_git/GitAgile");
         assert.equal(gc.RepositoryParentFolder, path.join(__dirname, TEST_REPOS_FOLDER, repoName));
-        assert.equal(gc.GitFolder, repoPath);
+        assert.equal(gc.RepoFolder, repoPath);
     });
 
     it("should verify TeamFoundationServer origin remote cloned with ssh", function() {
@@ -131,7 +132,7 @@ describe("GitContext", function() {
         //The remote URL is the same as the original
         assert.equal(gc.RemoteUrl, "ssh://devmachine:22/tfs/DefaultCollection/_git/GitJava");
         assert.equal(gc.RepositoryParentFolder, path.join(__dirname, TEST_REPOS_FOLDER, repoName));
-        assert.equal(gc.GitFolder, repoPath);
+        assert.equal(gc.RepoFolder, repoPath);
     });
 
 });

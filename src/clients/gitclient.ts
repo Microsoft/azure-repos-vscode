@@ -12,7 +12,7 @@ import { CommandNames, TelemetryEvents } from "../helpers/constants";
 import { Logger } from "../helpers/logger";
 import { Strings } from "../helpers/strings";
 import { Utils } from "../helpers/utils";
-import { GitContext } from "../contexts/gitcontext";
+import { IRepositoryContext, RepositoryType } from "../contexts/repositorycontext";
 import { TeamServerContext} from "../contexts/servercontext";
 import { TelemetryService } from "../services/telemetry";
 import { GitVcService, PullRequestScore } from "../services/gitvc";
@@ -31,7 +31,8 @@ export class GitClient extends BaseClient {
     }
 
     //Opens the pull request page given the remote and (current) branch
-    public CreatePullRequest(context: GitContext): void {
+    public CreatePullRequest(context: IRepositoryContext): void {
+        this.ensureGitContext(context);
         this.ReportEvent(TelemetryEvents.OpenNewPullRequest);
         let pullRequestUrl: string = GitVcService.GetCreatePullRequestUrl(context.RemoteUrl, context.CurrentBranch);
         Logger.LogInfo("OpenPullRequest: " + pullRequestUrl);
@@ -61,7 +62,8 @@ export class GitClient extends BaseClient {
     }
 
     //Opens the blame page for the currently active file
-    public OpenBlamePage(context: GitContext): void {
+    public OpenBlamePage(context: IRepositoryContext): void {
+        this.ensureGitContext(context);
         let url: string = undefined;
 
         let editor = window.activeTextEditor;
@@ -84,7 +86,8 @@ export class GitClient extends BaseClient {
     }
 
     //Opens the file history page for the currently active file
-    public OpenFileHistory(context: GitContext): void {
+    public OpenFileHistory(context: IRepositoryContext): void {
+        this.ensureGitContext(context);
         let historyUrl: string = undefined;
 
         let editor = window.activeTextEditor;
@@ -229,5 +232,12 @@ export class GitClient extends BaseClient {
         let octipullrequest: string = "octicon-git-pull-request";
 
         return `$(icon ${octipullrequest}) ` + total.toString();
+    }
+
+    //Ensure that we don't accidentally send non-Git (e.g., TFVC) contexts to the Git client
+    private ensureGitContext(context: IRepositoryContext): void {
+        if (context.Type !== RepositoryType.GIT) {
+            throw new Error("context sent to GitClient is not a Git context object.");
+        }
     }
 }
