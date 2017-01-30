@@ -9,6 +9,7 @@ import { Tfvc } from "../tfvc/tfvc";
 import { Repository } from "../tfvc/repository";
 import { IWorkspace } from "../tfvc/interfaces";
 import { RepoUtils } from "../helpers/repoutils";
+import { Logger } from "../helpers/logger";
 
 export class TfvcContext implements IRepositoryContext {
     private _tfvcFolder: string;
@@ -25,21 +26,26 @@ export class TfvcContext implements IRepositoryContext {
 
     //Need to call tf.cmd to get TFVC information (and constructors can't be async)
     public async Initialize(): Promise<Boolean> {
-        //TODO: This will call tf.cmd workfold to determine if we're a TFVC repo
-        //If that succeeds, set _tfvcFolder, _tfvcRemoteUrl and the flags.  That
-        //call will also return the teamProject name for us.
         try {
+            Logger.LogDebug(`Looking for TFVC repository at ${this._tfvcFolder})`);
             const tfvc: Tfvc = new Tfvc();
             const repo: Repository = tfvc.Open(this._tfvcFolder);
             const tfvcWorkspace: IWorkspace = await repo.FindWorkspace(this._tfvcFolder);
 
-            this._tfvcRemoteUrl = tfvcWorkspace.server; // "https://xplatalm.visualstudio.com/defaultcollection/"; //This comes from workfold
-            this._isTeamServicesUrl = RepoUtils.IsTeamFoundationServicesRepo(this._tfvcRemoteUrl); // true;
-            this._isTeamFoundationServer = RepoUtils.IsTeamFoundationServerRepo(this._tfvcRemoteUrl); //TODO: Not sure I want to do this here; // false;
-            this._teamProjectName = "L2.VSCodeExtension";  //TOOD: Fix this up once I can get the TeamProjectName from tf.cmd
+            this._tfvcRemoteUrl = tfvcWorkspace.server;
+            this._isTeamServicesUrl = RepoUtils.IsTeamFoundationServicesRepo(this._tfvcRemoteUrl);
+            this._isTeamFoundationServer = RepoUtils.IsTeamFoundationServerRepo(this._tfvcRemoteUrl);
+            this._teamProjectName = tfvcWorkspace.defaultTeamProject;
+            Logger.LogDebug(`Found a TFVC repository.`);
             return true;
         } catch (err) {
-            //TODO: Log an error (or display a message later?)
+            //Check explicitly to see if tfvcErrorCode exists on the err (which is of type any)
+            if (err.tfvcErrorCode) {
+                //For now, log any failure to initialize Tfvc to the debug log
+                Logger.LogDebug(`Failed to initialize TFVC (${err.tfvcErrorCode}): ${err.message}`);
+            } else {
+                Logger.LogDebug(`Failed to initialize TFVC: ${err.message}`);
+            }
             return false;
         }
     }

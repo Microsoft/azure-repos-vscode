@@ -4,6 +4,7 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
+import url = require("url");
 import VsoBaseInterfaces = require("vso-node-api/interfaces/common/VsoBaseInterfaces");
 import { CoreApiClient } from "./coreapiclient";
 import { Logger } from "../helpers/logger";
@@ -53,25 +54,38 @@ export class RepositoryInfoClient {
                 //repositoryClient = new TeamServicesApi(serverUrl, [this._handler]);
                 let valid: boolean = await this.validateTfvcCollectionUrl(serverUrl, this._handler);
                 if (!valid) {
-                    return undefined; //not what we expected (which is a tfvc team services repo)
+                    Logger.LogDebug(`Unable to validate the Team Services TFVC repository. Collection: ${collectionName}, Url: ${serverUrl}`);
+                    return undefined; //TODO: Handle this case (in the caller)
                 }
+                Logger.LogDebug(`Successfully validated the Team Services TFVC repository. Collection: ${collectionName}, Url: ${serverUrl}`);
             } else {
-                //TODO: on-prem TFS...?!
+                serverUrl = this._repoContext.RemoteUrl;
+                // A full Team Foundation Server collection url is required for the validate call to succeed.
+                // So we try the url given. If that fails, we assume it is a server Url and the collection is
+                // the defaultCollection. If that assumption fails we return false.
+                if (this.validateTfvcCollectionUrl(serverUrl, this._handler)) {
+                    let parts: string[] = this.splitTfvcCollectionUrl(serverUrl);
+                    serverUrl = parts[0];
+                    collectionName = parts[1];
+                    Logger.LogDebug(`Validated the TFS TFVC repository. Collection: ${collectionName}, Url: ${serverUrl}`);
+                } else {
+                    Logger.LogDebug(`Unable to validate the TFS TFVC repository. Url: ${serverUrl}  Attempting with DefaultCollection...`);
+                    collectionName = "DefaultCollection";
+                    if (!this.validateTfvcCollectionUrl(url.resolve(serverUrl, collectionName), this._handler)) {
+                        Logger.LogDebug(`Unable to validate the TFS TFVC repository with DefaultCollection`);
+                        return undefined; //TODO: Handle this case (in the caller)
+                    }
+                    Logger.LogDebug(`Validated the TFS TFVC repository with DefaultCollection`);
+                }
             }
 
-            let collection: TeamProjectCollection;
             let coreApiClient: CoreApiClient = new CoreApiClient();
-            if (RepoUtils.IsTeamFoundationServicesRepo(this._repoContext.RemoteUrl)) {
-                //TODO: This can throw
-                collection = await coreApiClient.GetProjectCollection(serverUrl, collectionName); // + "1");
-                Logger.LogDebug(`Found a team project collection for url '${serverUrl}' and collection name '${collectionName}'. ${collection.id}`);
-            } else {
-                //TODO: On-prem TFS
-            }
-
-            // Now get the team project information from the server
             //TODO: This can throw
-            let project: TeamProject = await this.getProjectFromServer(coreApiClient, serverUrl, teamProjectName);
+            //The following call works for VSTS, TFS 2017 and TFS 2015U3 (multiple collections, spaces in the name)
+            let collection: TeamProjectCollection = await coreApiClient.GetProjectCollection(serverUrl, collectionName); // + "1");
+
+            //TODO: This can throw
+            let project: TeamProject = await this.getProjectFromServer(coreApiClient, url.resolve(serverUrl, collectionName), teamProjectName);
             Logger.LogDebug(`Found a team project for url '${serverUrl}' and collection name '${collectionName}'. ${project.id}`);
 
             //Now, create the JSON blob to send to new RepositoryInfo(repoInfo);
@@ -80,6 +94,43 @@ export class RepositoryInfoClient {
             return repositoryInfo;
         }
         return repositoryInfo;
+    }
+
+    private splitTfvcCollectionUrl(collectionUrl: string): string[] {
+        let result: string[] = [ , ];
+        if (!collectionUrl) {
+            return result;
+        }
+
+        // Now find the TRUE last separator (before the collection name)
+        let trimmedUrl: string = this.trimTrailingSeparators(collectionUrl);
+        let index: number = trimmedUrl.lastIndexOf("/");
+        if (index >= 0) {
+            // result0 is the server url without the collection name
+            result[0] = trimmedUrl.substring(0, index + 1);
+            // result1 is just the collection name (no separators)
+            result[1] = trimmedUrl.substring(index + 1);
+        } else {
+            // We can't determine the collection name so leave it empty
+            result[0] = collectionUrl;
+            result[1] = "";
+        }
+
+        return result;
+    }
+
+    private trimTrailingSeparators(uri: string): string {
+        if (uri) {
+            let lastIndex: number = uri.length;
+            while (lastIndex > 0 && uri.charAt(lastIndex - 1) === "/".charAt(0)) {
+                lastIndex--;
+            }
+            if (lastIndex >= 0) {
+                return uri.substring(0, lastIndex);
+            }
+        }
+
+        return uri;
     }
 
     //TODO: serverUrl could be a guess (need to add accountName as collection?)
