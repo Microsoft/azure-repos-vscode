@@ -91,6 +91,7 @@ export class BuildClient extends BaseClient {
             }
         }
         if (matchingBuild) {
+            //We dont' use imageUrl (which is a SVG) since we don't actually render the badge.
             return { buildId: matchingBuild.id, imageUrl: undefined };
         }
         return emptyBuild;
