@@ -4,6 +4,8 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
+import { assert, expect } from "chai";
+
 import { Mocks } from "../helpers-integration/mocks";
 import { TestSettings } from "../helpers-integration/testsettings";
 
@@ -13,13 +15,6 @@ import { CredentialManager } from "../../src/helpers/credentialmanager";
 import { TeamServerContext } from "../../src/contexts/servercontext";
 import { BuildService }  from "../../src/services/build";
 import { WellKnownRepositoryTypes } from "../../src/helpers/constants";
-
-var chai = require("chai");
-/* tslint:disable:no-unused-variable */
-var expect = chai.expect;
-/* tslint:enable:no-unused-variable */
-var assert = chai.assert;
-chai.should();
 
 describe("BuildService-Integration", function() {
     this.timeout(TestSettings.SuiteTimeout());

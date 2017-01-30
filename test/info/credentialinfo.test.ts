@@ -4,16 +4,11 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
+import { assert } from "chai";
+
 import { CredentialInfo } from "../../src/info/credentialinfo";
 import { BasicCredentialHandler } from "vso-node-api/handlers/basiccreds";
 import { NtlmCredentialHandler } from "vso-node-api/handlers/ntlm";
-
-var chai = require("chai");
-/* tslint:disable:no-unused-variable */
-var expect = chai.expect;
-/* tslint:enable:no-unused-variable */
-var assert = chai.assert;
-chai.should();
 
 describe("CredentialInfo", function() {
 

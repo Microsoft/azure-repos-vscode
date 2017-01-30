@@ -4,6 +4,8 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
+import { assert, expect } from "chai";
+
 import { Mocks } from "../helpers-integration/mocks";
 import { TestSettings } from "../helpers-integration/testsettings";
 
@@ -12,13 +14,6 @@ import { GitPullRequest, GitRepository } from "vso-node-api/interfaces/GitInterf
 import { CredentialManager } from "../../src/helpers/credentialmanager";
 import { TeamServerContext } from "../../src/contexts/servercontext";
 import { GitVcService, PullRequestScore }  from "../../src/services/gitvc";
-
-var chai = require("chai");
-/* tslint:disable:no-unused-variable */
-var expect = chai.expect;
-/* tslint:enable:no-unused-variable */
-var assert = chai.assert;
-chai.should();
 
 describe("GitVcService-Integration", function() {
     this.timeout(TestSettings.SuiteTimeout());

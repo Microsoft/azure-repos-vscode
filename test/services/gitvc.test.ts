@@ -4,15 +4,10 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
+import { assert } from "chai";
+
 import { GitPullRequest, PullRequestAsyncStatus } from "vso-node-api/interfaces/GitInterfaces";
 import { GitVcService, PullRequestScore }  from "../../src/services/gitvc";
-
-var chai = require("chai");
-/* tslint:disable:no-unused-variable */
-var expect = chai.expect;
-/* tslint:enable:no-unused-variable */
-var assert = chai.assert;
-chai.should();
 
 describe("GitVcService", function() {
 

@@ -4,14 +4,9 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import { WorkItemFields, WorkItemTrackingService }  from "../../src/services/workitemtracking";
+import { assert } from "chai";
 
-var chai = require("chai");
-/* tslint:disable:no-unused-variable */
-var expect = chai.expect;
-/* tslint:enable:no-unused-variable */
-var assert = chai.assert;
-chai.should();
+import { WorkItemFields, WorkItemTrackingService }  from "../../src/services/workitemtracking";
 
 describe("WorkItemTrackingService", function() {
 

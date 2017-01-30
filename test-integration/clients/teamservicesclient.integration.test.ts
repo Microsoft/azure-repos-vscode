@@ -4,19 +4,14 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
+import { assert, expect } from "chai";
+
 import { Mocks } from "../helpers-integration/mocks";
 import { TestSettings } from "../helpers-integration/testsettings";
 
 import { CredentialManager } from "../../src/helpers/credentialmanager";
 import { TeamServerContext } from "../../src/contexts/servercontext";
 import { TeamServicesApi } from "../../src/clients/teamservicesclient";
-
-var chai = require("chai");
-/* tslint:disable:no-unused-variable */
-var expect = chai.expect;
-/* tslint:enable:no-unused-variable */
-var assert = chai.assert;
-chai.should();
 
 describe("TeamServicesClient-Integration", function() {
     this.timeout(TestSettings.SuiteTimeout()); //http://mochajs.org/#timeouts
@@ -108,7 +103,7 @@ describe("TeamServicesClient-Integration", function() {
         try {
             let repositoryClient: TeamServicesApi = new TeamServicesApi(TestSettings.RemoteTfvcRepositoryUrl() + "1", [CredentialManager.GetCredentialHandler()]);
             await repositoryClient.validateTfvcCollectionUrl();
-            assert.Fail(undefined, undefined, "validateTfvcCollectionUrl should have thrown but didn't."); //It shouldn't get here
+            assert.fail(undefined, undefined, "validateTfvcCollectionUrl should have thrown but didn't."); //It shouldn't get here
             done();
         } catch (err) {
             assert.isNotNull(err, "err was null when it shouldn't have been");

@@ -4,14 +4,9 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import { TeamServerContext } from "../../src/contexts/servercontext";
+import { assert } from "chai";
 
-var chai = require("chai");
-/* tslint:disable:no-unused-variable */
-var expect = chai.expect;
-/* tslint:enable:no-unused-variable */
-var assert = chai.assert;
-chai.should();
+import { TeamServerContext } from "../../src/contexts/servercontext";
 
 describe("TeamServerContext", function() {
 

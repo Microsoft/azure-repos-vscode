@@ -4,6 +4,8 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
+import { assert, expect } from "chai";
+
 import { Mocks } from "../helpers-integration/mocks";
 import { TestSettings } from "../helpers-integration/testsettings";
 
@@ -13,13 +15,6 @@ import { WitQueries } from "../../src/helpers/constants";
 import { CredentialManager } from "../../src/helpers/credentialmanager";
 import { TeamServerContext } from "../../src/contexts/servercontext";
 import { SimpleWorkItem, WorkItemTrackingService }  from "../../src/services/workitemtracking";
-
-var chai = require("chai");
-/* tslint:disable:no-unused-variable */
-var expect = chai.expect;
-/* tslint:enable:no-unused-variable */
-var assert = chai.assert;
-chai.should();
 
 describe("WorkItemTrackingService-Integration", function() {
     this.timeout(TestSettings.SuiteTimeout());

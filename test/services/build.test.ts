@@ -4,14 +4,9 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import { BuildService }  from "../../src/services/build";
+import { assert } from "chai";
 
-var chai = require("chai");
-/* tslint:disable:no-unused-variable */
-var expect = chai.expect;
-/* tslint:enable:no-unused-variable */
-var assert = chai.assert;
-chai.should();
+import { BuildService }  from "../../src/services/build";
 
 describe("BuildService", function() {
 

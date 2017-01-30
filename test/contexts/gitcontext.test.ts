@@ -4,16 +4,10 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import { GitContext }  from "../../src/contexts/gitcontext";
-
-var chai = require("chai");
-/* tslint:disable:no-unused-variable */
-var expect = chai.expect;
-/* tslint:enable:no-unused-variable */
-var assert = chai.assert;
-chai.should();
-
+import { assert } from "chai";
 const path = require("path");
+
+import { GitContext }  from "../../src/contexts/gitcontext";
 
 describe("GitContext", function() {
     let TEST_REPOS_FOLDER: string = "testrepos";

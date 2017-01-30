@@ -4,14 +4,9 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import { RepositoryInfo } from "../../src/info/repositoryinfo";
+import { assert } from "chai";
 
-var chai = require("chai");
-/* tslint:disable:no-unused-variable */
-var expect = chai.expect;
-/* tslint:enable:no-unused-variable */
-var assert = chai.assert;
-chai.should();
+import { RepositoryInfo } from "../../src/info/repositoryinfo";
 
 describe("RepositoryInfo", function() {
 
