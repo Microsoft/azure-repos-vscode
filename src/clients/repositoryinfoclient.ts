@@ -121,10 +121,10 @@ export class RepositoryInfoClient {
             await repositoryClient.validateTfvcCollectionUrl();
             return true;
         } catch (err) {
-            if (err.errorCode === "404") { //check this!!
+            if (err.errorCode === "404") { //TODO: ensure 404s are handled appropriately
                 return false;
             } else {
-                throw err; //check this!!
+                throw err; //TODO: ensure unexpected exceptions are handled appropriately
             }
         }
     }
