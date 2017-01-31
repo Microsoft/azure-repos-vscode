@@ -27,6 +27,11 @@ export class Repository {
         this._tfvc = tfvc;
         this._repositoryRootFolder = repositoryRootFolder;
         this._env = env;
+
+        // Add the environment variables that we need to make sure the CLC runs as fast as possible and
+        // provides English strings back to us to parse.
+        this._env.TF_NOTELEMETRY = "TRUE";
+        this._env.TF_ADDITIONAL_JAVA_ARGS = "-Duser.country=US -Duser.language=en";
     }
 
     public get Tfvc(): Tfvc {
