@@ -95,8 +95,8 @@ export class GitContext implements IRepositoryContext {
     }
 
     //constructor already initializes the GitContext
-    public async Initialize(): Promise<Boolean> {
-        return true;
+    public async Initialize(): Promise<void> {
+        return;
     }
 
     //Git implementation

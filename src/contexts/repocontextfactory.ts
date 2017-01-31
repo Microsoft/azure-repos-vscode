@@ -20,11 +20,9 @@ export class RepositoryContextFactory {
         if (!repoContext ||
             repoContext.IsTeamFoundation === false) {
             //Check if we have a TFVC repository
-
-            //TODO: This is where we'll first call the tf.cmd workfold to determine if we're a TFVC repository
             repoContext = new TfvcContext(path);
-            let initialized: Boolean = await repoContext.Initialize();
-            if (!initialized ||
+            await repoContext.Initialize();
+            if (!repoContext ||
                 repoContext.IsTeamFoundation === false) {
                 //We don't have any Team Services repository
                 return undefined;

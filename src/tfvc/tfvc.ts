@@ -40,12 +40,21 @@ export class Tfvc {
         }
 
         // check to make sure that the file exists in that location
-        const stats: any = fs.lstatSync(this._tfvcPath);
-        if (!stats || !stats.isFile()) {
+        let exists: boolean = fs.existsSync(this._tfvcPath);
+        if (exists) {
+            // if it exists, check to ensure that it's a file and not a folder
+            const stats: any = fs.lstatSync(this._tfvcPath);
+            if (!stats || !stats.isFile()) {
                 throw new TfvcError({
-                    message: Strings.TfMissingError,
+                    message: Strings.TfMissingError + this._tfvcPath,
                     tfvcErrorCode: TfvcErrorCodes.TfvcNotFound
                 });
+            }
+        } else {
+            throw new TfvcError({
+                message: Strings.TfMissingError + this._tfvcPath,
+                tfvcErrorCode: TfvcErrorCodes.TfvcNotFound
+            });
         }
     }
 

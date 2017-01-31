@@ -369,89 +369,95 @@ export class TeamExtension  {
         //it here.  This will allow us to log errors when we begin processing TFVC commands.
         this._settings = new Settings();
         this.logStart(this._settings.LoggingLevel, workspace.rootPath);
+        this._teamServicesStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, 100);
 
-        //RepositoryContext has some initial information about the repository (what we can get without authenticating with server)
-        this._repoContext = await RepositoryContextFactory.CreateRepositoryContext(workspace.rootPath);
-        if (this._repoContext) {
-            this.setupFileSystemWatcherOnHead();
-            this._serverContext = new TeamServerContext(this._repoContext.RemoteUrl);
-            this._pinnedQuerySettings = new PinnedQuerySettings(this._serverContext.RepoInfo.Account);
-            this._teamServicesStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, 100);
-            //We need to be able to send feedback even if we aren't authenticated with the server
-            this._feedbackClient = new FeedbackClient(new TelemetryService(this._settings));
+        try {
+            //RepositoryContext has some initial information about the repository (what we can get without authenticating with server)
+            this._repoContext = await RepositoryContextFactory.CreateRepositoryContext(workspace.rootPath);
+            if (this._repoContext) {
+                this.setupFileSystemWatcherOnHead();
+                this._serverContext = new TeamServerContext(this._repoContext.RemoteUrl);
+                this._pinnedQuerySettings = new PinnedQuerySettings(this._serverContext.RepoInfo.Account);
+                //We need to be able to send feedback even if we aren't authenticated with the server
+                this._feedbackClient = new FeedbackClient(new TelemetryService(this._settings));
 
-            this._credentialManager = new CredentialManager();
-            let accountSettings = new AccountSettings(this._serverContext.RepoInfo.Account);
-            this._credentialManager.GetCredentialHandler(this._serverContext, accountSettings.TeamServicesPersonalAccessToken).then(async (requestHandler) => {
-                if (requestHandler === undefined) {
-                    this.displayNoCredentialsMessage();
-                    return;
-                } else {
-                    this._telemetry = new TelemetryService(this._settings, this._serverContext);
-                    this._feedbackClient = new FeedbackClient(this._telemetry);
-                    Logger.LogDebug("Started ApplicationInsights telemetry");
+                this._credentialManager = new CredentialManager();
+                let accountSettings = new AccountSettings(this._serverContext.RepoInfo.Account);
+                this._credentialManager.GetCredentialHandler(this._serverContext, accountSettings.TeamServicesPersonalAccessToken).then(async (requestHandler) => {
+                    if (requestHandler === undefined) {
+                        this.displayNoCredentialsMessage();
+                        return;
+                    } else {
+                        this._telemetry = new TelemetryService(this._settings, this._serverContext);
+                        this._feedbackClient = new FeedbackClient(this._telemetry);
+                        Logger.LogDebug("Started ApplicationInsights telemetry");
 
-                    //Set up the client we need to talk to the server for more repository information
-                    //TODO: Handle this guy throwing!!
-                    let repositoryInfoClient: RepositoryInfoClient = new RepositoryInfoClient(this._repoContext, CredentialManager.GetCredentialHandler());
+                        //Set up the client we need to talk to the server for more repository information
+                        //TODO: Handle this guy throwing!!
+                        let repositoryInfoClient: RepositoryInfoClient = new RepositoryInfoClient(this._repoContext, CredentialManager.GetCredentialHandler());
 
-                    Logger.LogInfo("Getting repository information with repositoryInfoClient");
-                    Logger.LogDebug("RemoteUrl = " + this._repoContext.RemoteUrl);
-                    try {
-                        //At this point, we have either successfully called git.exe or tf.cmd (we just need to verify the remote urls)
-                        //For Git repositories, we call vsts/info and get collection ids, etc.
-                        //For TFVC, we have to (potentially) make multiple other calls to get collection ids, etc.
-                        this._serverContext.RepoInfo = await repositoryInfoClient.GetRepositoryInfo();
-
-                        //Now we need to go and get the authorized user information
-                        let connectionUrl: string = (this._serverContext.RepoInfo.IsTeamServices === true ? this._serverContext.RepoInfo.AccountUrl : this._serverContext.RepoInfo.CollectionUrl);
-                        let accountClient: TeamServicesApi = new TeamServicesApi(connectionUrl, [CredentialManager.GetCredentialHandler()]);
-                        Logger.LogInfo("Getting connectionData with accountClient");
-                        Logger.LogDebug("connectionUrl = " + connectionUrl);
+                        Logger.LogInfo("Getting repository information with repositoryInfoClient");
+                        Logger.LogDebug("RemoteUrl = " + this._repoContext.RemoteUrl);
                         try {
-                            let settings: any = await accountClient.connect();
-                            Logger.LogInfo("Retrieved connectionData with accountClient");
-                            this.resetErrorStatus();
+                            //At this point, we have either successfully called git.exe or tf.cmd (we just need to verify the remote urls)
+                            //For Git repositories, we call vsts/info and get collection ids, etc.
+                            //For TFVC, we have to (potentially) make multiple other calls to get collection ids, etc.
+                            this._serverContext.RepoInfo = await repositoryInfoClient.GetRepositoryInfo();
 
-                            this._serverContext.UserInfo = new UserInfo(settings.authenticatedUser.id,
-                                                                        settings.authenticatedUser.providerDisplayName,
-                                                                        settings.authenticatedUser.customDisplayName);
-                            this._telemetry.Update(this._serverContext.RepoInfo.CollectionId, this._serverContext.UserInfo.Id);
+                            //Now we need to go and get the authorized user information
+                            let connectionUrl: string = (this._serverContext.RepoInfo.IsTeamServices === true ? this._serverContext.RepoInfo.AccountUrl : this._serverContext.RepoInfo.CollectionUrl);
+                            let accountClient: TeamServicesApi = new TeamServicesApi(connectionUrl, [CredentialManager.GetCredentialHandler()]);
+                            Logger.LogInfo("Getting connectionData with accountClient");
+                            Logger.LogDebug("connectionUrl = " + connectionUrl);
+                            try {
+                                let settings: any = await accountClient.connect();
+                                Logger.LogInfo("Retrieved connectionData with accountClient");
+                                this.resetErrorStatus();
 
-                            this.initializeStatusBars();
-                            this._buildClient = new BuildClient(this._serverContext, this._telemetry, this._buildStatusBarItem);
-                            //Don't initialize the Git client if we aren't a Git repository
-                            if (this._repoContext.Type === RepositoryType.GIT) {
-                                this._gitClient = new GitClient(this._serverContext, this._telemetry, this._pullRequestStatusBarItem);
+                                this._serverContext.UserInfo = new UserInfo(settings.authenticatedUser.id,
+                                                                            settings.authenticatedUser.providerDisplayName,
+                                                                            settings.authenticatedUser.customDisplayName);
+                                this._telemetry.Update(this._serverContext.RepoInfo.CollectionId, this._serverContext.UserInfo.Id);
+
+                                this.initializeStatusBars();
+                                this._buildClient = new BuildClient(this._serverContext, this._telemetry, this._buildStatusBarItem);
+                                //Don't initialize the Git client if we aren't a Git repository
+                                if (this._repoContext.Type === RepositoryType.GIT) {
+                                    this._gitClient = new GitClient(this._serverContext, this._telemetry, this._pullRequestStatusBarItem);
+                                }
+                                this._witClient = new WitClient(this._serverContext, this._telemetry, this._pinnedQuerySettings.PinnedQuery, this._pinnedQueryStatusBarItem);
+                                this._telemetry.SendEvent(TelemetryEvents.StartUp);
+
+                                Logger.LogObject(settings);
+                                this.logDebugInformation();
+                                this.refreshPollingItems();
+                                this.startPolling();
+                            } catch (err) {
+                                this.setErrorStatus(Utils.GetMessageForStatusCode(err, err.message), (err.statusCode === 401 ? CommandNames.Login : undefined), false);
+                                this.reportError(Utils.GetMessageForStatusCode(err, err.message, "Failed to get results with accountClient: "), err);
                             }
-                            this._witClient = new WitClient(this._serverContext, this._telemetry, this._pinnedQuerySettings.PinnedQuery, this._pinnedQueryStatusBarItem);
-                            this._telemetry.SendEvent(TelemetryEvents.StartUp);
-
-                            Logger.LogObject(settings);
-                            this.logDebugInformation();
-                            this.refreshPollingItems();
-                            this.startPolling();
                         } catch (err) {
-                            this.setErrorStatus(Utils.GetMessageForStatusCode(err, err.message), (err.statusCode === 401 ? CommandNames.Login : undefined), false);
-                            this.reportError(Utils.GetMessageForStatusCode(err, err.message, "Failed to get results with accountClient: "), err);
-                        }
-                    } catch (err) {
-                        //TODO: With TFVC, creating a RepositoryInfo can throw (can't get project collection, can't get team project, etc.)
-                        // We get a 404 on-prem if we aren't Update 2 or later
-                        if (this._serverContext.RepoInfo.IsTeamFoundationServer === true && err.statusCode === 404) {
-                            this.setErrorStatus(Strings.UnsupportedServerVersion, undefined, false);
-                            Logger.LogError(Strings.UnsupportedServerVersion);
-                        } else {
-                            this.setErrorStatus(Utils.GetMessageForStatusCode(err, err.message), (err.statusCode === 401 ? CommandNames.Login : undefined), false);
-                            this.reportError(Utils.GetMessageForStatusCode(err, err.message, "Failed call with repositoryClient: "), err);
+                            //TODO: With TFVC, creating a RepositoryInfo can throw (can't get project collection, can't get team project, etc.)
+                            // We get a 404 on-prem if we aren't Update 2 or later
+                            if (this._serverContext.RepoInfo.IsTeamFoundationServer === true && err.statusCode === 404) {
+                                this.setErrorStatus(Strings.UnsupportedServerVersion, undefined, false);
+                                Logger.LogError(Strings.UnsupportedServerVersion);
+                            } else {
+                                this.setErrorStatus(Utils.GetMessageForStatusCode(err, err.message), (err.statusCode === 401 ? CommandNames.Login : undefined), false);
+                                this.reportError(Utils.GetMessageForStatusCode(err, err.message, "Failed call with repositoryClient: "), err);
+                            }
                         }
                     }
-                }
-            }).fail((reason) => {
-                this.setErrorStatus(Utils.GetMessageForStatusCode(reason, reason.message), (reason.statusCode === 401 ? CommandNames.Login : undefined), false);
-                //If we can't get a requestHandler, report the error via the feedbackclient
-                this._feedbackClient.ReportError(Utils.GetMessageForStatusCode(reason, reason.message, "Failed to get a credential handler"), reason);
-            });
+                }).fail((reason) => {
+                    this.setErrorStatus(Utils.GetMessageForStatusCode(reason, reason.message), (reason.statusCode === 401 ? CommandNames.Login : undefined), false);
+                    //If we can't get a requestHandler, report the error via the feedbackclient
+                    this._feedbackClient.ReportError(Utils.GetMessageForStatusCode(reason, reason.message, "Failed to get a credential handler"), reason);
+                });
+            }
+        } catch (err) {
+            Logger.LogError(err.message);
+            //For now, don't report these errors via the _feedbackClient
+            this.setErrorStatus(err.message, undefined, false);
         }
     }
 

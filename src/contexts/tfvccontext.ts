@@ -25,29 +25,17 @@ export class TfvcContext implements IRepositoryContext {
     }
 
     //Need to call tf.cmd to get TFVC information (and constructors can't be async)
-    public async Initialize(): Promise<Boolean> {
-        try {
-            Logger.LogDebug(`Looking for TFVC repository at ${this._tfvcFolder})`);
-            const tfvc: Tfvc = new Tfvc();
-            const repo: Repository = tfvc.Open(this._tfvcFolder);
-            const tfvcWorkspace: IWorkspace = await repo.FindWorkspace(this._tfvcFolder);
+    public async Initialize(): Promise<void> {
+        Logger.LogDebug(`Looking for TFVC repository at ${this._tfvcFolder})`);
+        const tfvc: Tfvc = new Tfvc();
+        const repo: Repository = tfvc.Open(this._tfvcFolder);
+        const tfvcWorkspace: IWorkspace = await repo.FindWorkspace(this._tfvcFolder);
 
-            this._tfvcRemoteUrl = tfvcWorkspace.server;
-            this._isTeamServicesUrl = RepoUtils.IsTeamFoundationServicesRepo(this._tfvcRemoteUrl);
-            this._isTeamFoundationServer = RepoUtils.IsTeamFoundationServerRepo(this._tfvcRemoteUrl);
-            this._teamProjectName = tfvcWorkspace.defaultTeamProject;
-            Logger.LogDebug(`Found a TFVC repository.`);
-            return true;
-        } catch (err) {
-            //Check explicitly to see if tfvcErrorCode exists on the err (which is of type any)
-            if (err.tfvcErrorCode) {
-                //For now, log any failure to initialize Tfvc to the debug log
-                Logger.LogDebug(`Failed to initialize TFVC (${err.tfvcErrorCode}): ${err.message}`);
-            } else {
-                Logger.LogDebug(`Failed to initialize TFVC: ${err.message}`);
-            }
-            return false;
-        }
+        this._tfvcRemoteUrl = tfvcWorkspace.server;
+        this._isTeamServicesUrl = RepoUtils.IsTeamFoundationServicesRepo(this._tfvcRemoteUrl);
+        this._isTeamFoundationServer = RepoUtils.IsTeamFoundationServerRepo(this._tfvcRemoteUrl);
+        this._teamProjectName = tfvcWorkspace.defaultTeamProject;
+        Logger.LogDebug(`Found a TFVC repository for url: '${this._tfvcRemoteUrl}' and team project: '${this._teamProjectName}'.`);
     }
 
     // Tfvc implementation

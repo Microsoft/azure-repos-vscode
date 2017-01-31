@@ -31,7 +31,6 @@ export class RepositoryInfoClient {
         if (this._repoContext.Type === RepositoryType.GIT) {
             Logger.LogDebug(`Getting repository information for a Git repository at ${this._repoContext.RemoteUrl}`);
             repositoryClient = new TeamServicesApi(this._repoContext.RemoteUrl, [this._handler]);
-            //TODO: This can throw
             repoInfo = await repositoryClient.getVstsInfo();
             repositoryInfo = new RepositoryInfo(repoInfo);
             return repositoryInfo;
@@ -51,13 +50,13 @@ export class RepositoryInfoClient {
                 // If validation fails, we return false.
                 collectionName = repositoryInfo.Account;
                 serverUrl = `https://${repositoryInfo.Account}.visualstudio.com/`;
-                //repositoryClient = new TeamServicesApi(serverUrl, [this._handler]);
                 let valid: boolean = await this.validateTfvcCollectionUrl(serverUrl, this._handler);
                 if (!valid) {
-                    Logger.LogDebug(`Unable to validate the Team Services TFVC repository. Collection: ${collectionName}, Url: ${serverUrl}`);
-                    return undefined; //TODO: Handle this case (in the caller)
+                    let error: string = `Unable to validate the Team Services TFVC repository. Collection name: '${collectionName}', Url: '${serverUrl}'`;
+                    Logger.LogDebug(error);
+                    throw new Error(error);
                 }
-                Logger.LogDebug(`Successfully validated the Team Services TFVC repository. Collection: ${collectionName}, Url: ${serverUrl}`);
+                Logger.LogDebug(`Successfully validated the Team Services TFVC repository. Collection name: '${collectionName}', 'Url: ${serverUrl}'`);
             } else {
                 serverUrl = this._repoContext.RemoteUrl;
                 // A full Team Foundation Server collection url is required for the validate call to succeed.
@@ -67,26 +66,28 @@ export class RepositoryInfoClient {
                     let parts: string[] = this.splitTfvcCollectionUrl(serverUrl);
                     serverUrl = parts[0];
                     collectionName = parts[1];
-                    Logger.LogDebug(`Validated the TFS TFVC repository. Collection: ${collectionName}, Url: ${serverUrl}`);
+                    Logger.LogDebug(`Validated the TFS TFVC repository. Collection name: '${collectionName}', Url: '${serverUrl}'`);
                 } else {
-                    Logger.LogDebug(`Unable to validate the TFS TFVC repository. Url: ${serverUrl}  Attempting with DefaultCollection...`);
+                    Logger.LogDebug(`Unable to validate the TFS TFVC repository. Url: '${serverUrl}'  Attempting with DefaultCollection...`);
                     collectionName = "DefaultCollection";
                     if (!this.validateTfvcCollectionUrl(url.resolve(serverUrl, collectionName), this._handler)) {
-                        Logger.LogDebug(`Unable to validate the TFS TFVC repository with DefaultCollection`);
-                        return undefined; //TODO: Handle this case (in the caller)
+                        let error: string = `Unable to validate the TFS TFVC repository with DefaultCollection`;
+                        Logger.LogDebug(error);
+                        throw new Error(error);
                     }
                     Logger.LogDebug(`Validated the TFS TFVC repository with DefaultCollection`);
                 }
             }
 
             let coreApiClient: CoreApiClient = new CoreApiClient();
-            //TODO: This can throw
             //The following call works for VSTS, TFS 2017 and TFS 2015U3 (multiple collections, spaces in the name)
-            let collection: TeamProjectCollection = await coreApiClient.GetProjectCollection(serverUrl, collectionName); // + "1");
+            Logger.LogDebug(`Getting project collection...  url: '${serverUrl}', and collection name: '${collectionName}'`);
+            let collection: TeamProjectCollection = await coreApiClient.GetProjectCollection(serverUrl, collectionName);
+            Logger.LogDebug(`Found a project collection for url: '${serverUrl}' and collection name: '${collectionName}'.`);
 
-            //TODO: This can throw
+            Logger.LogDebug(`Getting team project...  Url: '${serverUrl}', collection name: '${collectionName}', and project: '${teamProjectName}'`);
             let project: TeamProject = await this.getProjectFromServer(coreApiClient, url.resolve(serverUrl, collectionName), teamProjectName);
-            Logger.LogDebug(`Found a team project for url '${serverUrl}' and collection name '${collectionName}'. ${project.id}`);
+            Logger.LogDebug(`Found a team project for url: '${serverUrl}', collection name: '${collectionName}', and project id: '${project.id}'`);
 
             //Now, create the JSON blob to send to new RepositoryInfo(repoInfo);
             repoInfo = this.getTfvcRepoInfoBlob(serverUrl, collection.id, collection.name, collection.url, project.id, project.name, project.description, project.url);
@@ -133,11 +134,9 @@ export class RepositoryInfoClient {
         return uri;
     }
 
-    //TODO: serverUrl could be a guess (need to add accountName as collection?)
     //RepositoryInfo uses repository.remoteUrl to set up accountUrl
     private getTfvcRepoInfoBlob(serverUrl: string, collectionId: string, collectionName: string, collectionUrl: string,
                                 projectId: string, projectName: string, projectDesc: string, projectUrl: string): any {
-        //TODO: Not sure if remoteUrl should always be the same as serverUrl...?
         return {
             serverUrl: serverUrl,
             collection: {
@@ -172,10 +171,10 @@ export class RepositoryInfoClient {
             await repositoryClient.validateTfvcCollectionUrl();
             return true;
         } catch (err) {
-            if (err.errorCode === "404") { //TODO: ensure 404s are handled appropriately
+            if (err.errorCode === "404") {
                 return false;
             } else {
-                throw err; //TODO: ensure unexpected exceptions are handled appropriately
+                throw err;
             }
         }
     }
