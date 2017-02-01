@@ -6,7 +6,7 @@
 
 import { FileSystemWatcher, StatusBarAlignment, StatusBarItem, window, workspace } from "vscode";
 import { AccountSettings, Settings } from "./helpers/settings";
-import { CommandNames, Constants, TelemetryEvents } from "./helpers/constants";
+import { CommandNames, Constants, TelemetryEvents, TfvcTelemetryEvents } from "./helpers/constants";
 import { CredentialManager } from "./helpers/credentialmanager";
 import { Logger } from "./helpers/logger";
 import { Strings } from "./helpers/strings";
@@ -231,7 +231,7 @@ export class ExtensionManager  {
                                 this.initializeStatusBars();
                                 await this.initializeClients();
 
-                                this._telemetry.SendEvent(TelemetryEvents.StartUp);
+                                this.sendStartupTelemetry();
 
                                 Logger.LogObject(settings);
                                 this.logDebugInformation();
@@ -264,6 +264,17 @@ export class ExtensionManager  {
                 this.setErrorStatus(err.message, undefined, false);
             }
         }
+    }
+
+    //Sends the "StartUp" event based on repository type
+    private sendStartupTelemetry(): void {
+        let event: string = TelemetryEvents.StartUp;
+
+        if (this._repoContext.Type === RepositoryType.TFVC) {
+            event = TfvcTelemetryEvents.StartUp;
+        }
+
+        this._telemetry.SendEvent(event);
     }
 
     //Determines which Tfvc errors to display in the status bar ui

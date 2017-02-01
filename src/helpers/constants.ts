@@ -78,6 +78,12 @@ export class TelemetryEvents {
     static ViewWorkItems: string = TelemetryEvents.TelemetryPrefix + "viewworkitems";
 }
 
+export class TfvcTelemetryEvents {
+    static TelemetryPrefix: string = "tfvc/";
+    static Status: string = TfvcTelemetryEvents.TelemetryPrefix + "status";
+    static StartUp: string = TfvcTelemetryEvents.TelemetryPrefix + "startup";
+}
+
 export class WellKnownRepositoryTypes {
     static TfsGit: string = "TfsGit";
 }

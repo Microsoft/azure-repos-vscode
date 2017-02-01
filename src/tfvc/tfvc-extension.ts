@@ -6,6 +6,7 @@
 
 import { window, workspace } from "vscode";
 import { ExtensionManager } from "../extensionmanager";
+import { TfvcTelemetryEvents } from "../helpers/constants";
 import { Tfvc } from "./tfvc";
 import { Repository } from "./repository";
 import { UIHelper } from "./uihelper";
@@ -32,6 +33,7 @@ export class TfvcExtension  {
         }
 
         try {
+            this._manager.Telemetry.SendEvent(TfvcTelemetryEvents.Status);
             const chosenItem: IPendingChange = await UIHelper.ChoosePendingChange(await this._repo.GetStatus());
             if (chosenItem) {
                 window.showTextDocument(await workspace.openTextDocument(chosenItem.localItem));
