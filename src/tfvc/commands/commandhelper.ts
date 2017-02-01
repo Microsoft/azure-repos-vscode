@@ -7,6 +7,21 @@
 import { parseString } from "xml2js";
 
 export class CommandHelper {
+    public static SplitIntoLines(stdout: string, skipWarnings?: boolean): string[] {
+        let lines: string[] = stdout.replace(/\r\n/g, "\n").split("\n");
+        skipWarnings = skipWarnings === undefined ? true : skipWarnings;
+
+        // Ignore WARNings that may be above the desired lines
+        if (skipWarnings) {
+            let index = 0;
+            while (index < lines.length && lines[index].startsWith("WARN")) {
+                index++;
+            }
+            lines = lines.splice(index);
+        }
+        return lines;
+    }
+
     public static async ParseXml(xml: string): Promise<any> {
         return new Promise<any>((resolve, reject) => {
             parseString(
