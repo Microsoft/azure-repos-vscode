@@ -19,14 +19,16 @@ export class CredentialInfo {
     constructor(username: string, password?: string, domain?: string, workstation?: string);
 
     constructor(username: string, password?: string, domain?: string, workstation?: string) {
-        this._username = username;
-        this._password = password;
         if (username !== undefined && password !== undefined) {
-            // NTLM (we don't support Basic auth)            
-            this._credentialHandler = getNtlmHandler(username, password, domain, workstation);
+            // NTLM (we don't support Basic auth)
+            this._username = username;
+            this._password = password;
+            this._credentialHandler = getNtlmHandler(this._username, this._password, domain, workstation);
         } else {
-            // Personal Access Token (use username since it is first argument to constructor)
-            this._credentialHandler = getBasicHandler(Constants.OAuth, username);
+            // Personal Access Token
+            this._username = Constants.OAuth;
+            this._password = username; //use username since it is first argument to constructor
+            this._credentialHandler = getBasicHandler(this._username, this._password);
         }
     }
 
