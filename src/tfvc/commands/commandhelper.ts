@@ -13,7 +13,7 @@ export class CommandHelper {
 
         // Ignore WARNings that may be above the desired lines
         if (skipWarnings) {
-            let index = 0;
+            let index: number = 0;
             while (index < lines.length && lines[index].startsWith("WARN")) {
                 index++;
             }

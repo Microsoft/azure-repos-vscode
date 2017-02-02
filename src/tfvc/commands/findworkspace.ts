@@ -57,8 +57,8 @@ export class FindWorkspace implements ITfvcCommand<IWorkspace> {
         let mappings: IWorkspaceMapping[] = [];
         let teamProject: string = undefined;
 
-        for (let i = 0; i <= lines.length; i++) {
-            const line = lines[i];
+        for (let i: number = 0; i <= lines.length; i++) {
+            const line: string = lines[i];
             if (!line) {
                 continue;
             }
