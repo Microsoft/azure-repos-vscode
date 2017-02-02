@@ -37,20 +37,9 @@ export class TeamExtension  {
         this._manager = manager;
     }
 
-    //Opens the pull request page given the remote and (current) branch
-    public CreatePullRequest(): void {
-        if (this._manager.EnsureInitialized()) {
-            if (this._gitClient) {
-                this._gitClient.CreatePullRequest(this._manager.RepoContext);
-            }
-        } else {
-            this._manager.DisplayErrorMessage();
-        }
-    }
-
     //Gets any available build status information and adds it to the status bar
     public DisplayCurrentBranchBuildStatus(): void {
-        if (this._manager.EnsureInitialized()) {
+        if (this._manager.EnsureInitialized(RepositoryType.ANY)) {
             this._buildClient.DisplayCurrentBuildStatus(this._manager.RepoContext, false);
         } else {
             this._manager.DisplayErrorMessage();
@@ -59,7 +48,7 @@ export class TeamExtension  {
 
     //Initial method to display, select and navigate to my pull requests
     public GetMyPullRequests(): void {
-        if (this._manager.EnsureInitialized()) {
+        if (this._manager.EnsureInitialized(RepositoryType.GIT)) {
             if (this._gitClient) {
                 this._gitClient.GetMyPullRequests();
             }
@@ -132,7 +121,7 @@ export class TeamExtension  {
 
     //Opens the build summary page for a particular build
     public OpenBlamePage(): void {
-        if (this._manager.EnsureInitialized()) {
+        if (this._manager.EnsureInitialized(RepositoryType.GIT)) {
             if (this._gitClient) {
                 this._gitClient.OpenBlamePage(this._manager.RepoContext);
             }
@@ -143,7 +132,7 @@ export class TeamExtension  {
 
     //Opens the build summary page for a particular build
     public OpenBuildSummaryPage(): void {
-        if (this._manager.EnsureInitialized()) {
+        if (this._manager.EnsureInitialized(RepositoryType.ANY)) {
             this._buildClient.OpenBuildSummaryPage();
         } else {
             this._manager.DisplayErrorMessage();
@@ -152,7 +141,8 @@ export class TeamExtension  {
 
     //Opens the file history page for the currently active file
     public OpenFileHistory(): void {
-        if (this._manager.EnsureInitialized()) {
+        //TODO: Add History support for TFVC
+        if (this._manager.EnsureInitialized(RepositoryType.GIT)) {
             if (this._gitClient) {
                 this._gitClient.OpenFileHistory(this._manager.RepoContext);
             }
@@ -163,7 +153,7 @@ export class TeamExtension  {
 
     //Opens a browser to a new Bug
     public OpenNewBug(): void {
-        if (this._manager.EnsureInitialized()) {
+        if (this._manager.EnsureInitialized(RepositoryType.ANY)) {
             //Bug is in all three templates
             let taskTitle = VsCodeUtils.GetActiveSelection();
             this._witClient.CreateNewItem(WitTypes.Bug, taskTitle);
@@ -174,7 +164,7 @@ export class TeamExtension  {
 
     //Opens a browser to a new pull request for the current branch
     public OpenNewPullRequest(): void {
-        if (this._manager.EnsureInitialized()) {
+        if (this._manager.EnsureInitialized(RepositoryType.GIT)) {
             if (this._gitClient) {
                 this._gitClient.OpenNewPullRequest(this._manager.RepoContext.RemoteUrl, this._manager.RepoContext.CurrentBranch);
             }
@@ -185,7 +175,7 @@ export class TeamExtension  {
 
     //Opens a browser to a new Task
     public OpenNewTask(): void {
-        if (this._manager.EnsureInitialized()) {
+        if (this._manager.EnsureInitialized(RepositoryType.ANY)) {
             //Issue is only in Agile and CMMI templates (not Scrum)
             //Task is in all three templates (Agile, CMMI, Scrum)
             let taskTitle = VsCodeUtils.GetActiveSelection();
@@ -197,7 +187,7 @@ export class TeamExtension  {
 
     //Opens a browser to a new work item (based on the work item type selected)
     public OpenNewWorkItem(): void {
-        if (this._manager.EnsureInitialized()) {
+        if (this._manager.EnsureInitialized(RepositoryType.ANY)) {
             let taskTitle = VsCodeUtils.GetActiveSelection();
             this._witClient.CreateNewWorkItem(taskTitle);
         } else {
@@ -207,7 +197,7 @@ export class TeamExtension  {
 
     //Opens the main pull requests page
     public OpenPullRequestsPage(): void {
-        if (this._manager.EnsureInitialized()) {
+        if (this._manager.EnsureInitialized(RepositoryType.GIT)) {
             if (this._gitClient) {
                 this._gitClient.OpenPullRequestsPage();
             }
@@ -218,7 +208,7 @@ export class TeamExtension  {
 
     //Opens the team project web site
     public OpenTeamProjectWebSite(): void {
-        if (this._manager.EnsureInitialized()) {
+        if (this._manager.EnsureInitialized(RepositoryType.ANY)) {
             this._manager.ReportEvent(TelemetryEvents.OpenTeamSite);
             Logger.LogInfo("OpenTeamProjectWebSite: " + this._manager.ServerContext.RepoInfo.TeamProjectUrl);
             Utils.OpenUrl(this._manager.ServerContext.RepoInfo.TeamProjectUrl);
@@ -229,7 +219,7 @@ export class TeamExtension  {
 
     //Meant to be used when coming back online via status bar items
     public RefreshPollingStatus(): void {
-        if (this._manager.EnsureInitialized()) {
+        if (this._manager.EnsureInitialized(RepositoryType.ANY)) {
             this.refreshPollingItems();
         } else {
             this._manager.DisplayErrorMessage();
@@ -244,7 +234,7 @@ export class TeamExtension  {
 
     //Returns the list of work items assigned directly to the current user
     public ViewMyWorkItems(): void {
-        if (this._manager.EnsureInitialized()) {
+        if (this._manager.EnsureInitialized(RepositoryType.ANY)) {
             this._witClient.ShowMyWorkItems();
         } else {
             this._manager.DisplayErrorMessage();
@@ -253,7 +243,7 @@ export class TeamExtension  {
 
     //Returns the list of work items from the pinned query
     public ViewPinnedQueryWorkItems(): void {
-        if (this._manager.EnsureInitialized()) {
+        if (this._manager.EnsureInitialized(RepositoryType.ANY)) {
             this._witClient.ShowPinnedQueryWorkItems();
         } else {
             this._manager.DisplayErrorMessage();
@@ -264,7 +254,7 @@ export class TeamExtension  {
     //This method first displays the queries under "My Queries" and, when one is chosen, displays the associated work items.
     //If a work item is chosen, it is opened in the web browser.
     public ViewWorkItems(): void {
-        if (this._manager.EnsureInitialized()) {
+        if (this._manager.EnsureInitialized(RepositoryType.ANY)) {
             this._witClient.ShowMyWorkItemQueries();
         } else {
             this._manager.DisplayErrorMessage();
@@ -313,11 +303,12 @@ export class TeamExtension  {
         this._pinnedQueryStatusBarItem.show();
     }
 
-    public InitializeClients() {
+    public InitializeClients(repoType: RepositoryType) {
+        //We can initialize for any repo type (just skip _gitClient if not Git)
         this._pinnedQuerySettings = new PinnedQuerySettings(this._manager.ServerContext.RepoInfo.Account);
         this._buildClient = new BuildClient(this._manager.ServerContext, this._manager.Telemetry, this._buildStatusBarItem);
         //Don't initialize the Git client if we aren't a Git repository
-        if (this._manager.RepoContext.Type === RepositoryType.GIT) {
+        if (repoType === RepositoryType.GIT) {
             this._gitClient = new GitClient(this._manager.ServerContext, this._manager.Telemetry, this._pullRequestStatusBarItem);
         }
         this._witClient = new WitClient(this._manager.ServerContext, this._manager.Telemetry, this._pinnedQuerySettings.PinnedQuery, this._pinnedQueryStatusBarItem);
@@ -326,14 +317,17 @@ export class TeamExtension  {
     }
 
     private pollBuildStatus(): void {
-        if (this._manager.EnsureInitialized()) {
+        if (this._manager.EnsureInitialized(RepositoryType.ANY)) {
             Logger.LogInfo("Polling for latest current build status...");
             this._buildClient.DisplayCurrentBuildStatus(this._manager.RepoContext, true);
         }
     }
 
     private pollMyPullRequests(): void {
-        if (this._manager.EnsureInitialized()) {
+        //Since we're polling, we don't want to display an error every so often
+        //if user opened a TFVC repository (via EnsureInitialized).  So send
+        //ALL to EnsureInitialized but check it before actually polling.
+        if (this._manager.EnsureInitialized(RepositoryType.ANY)) {
             //Only poll for pull requests when repository is Git
             if (this._manager.RepoContext.Type === RepositoryType.GIT) {
                 Logger.LogInfo("Polling for pull requests...");
@@ -343,7 +337,7 @@ export class TeamExtension  {
     }
 
     private pollPinnedQuery(): void {
-        if (this._manager.EnsureInitialized()) {
+        if (this._manager.EnsureInitialized(RepositoryType.ANY)) {
             Logger.LogInfo("Polling for the pinned work itemquery");
             this._witClient.PollPinnedQuery();
         }

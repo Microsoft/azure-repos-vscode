@@ -6,7 +6,8 @@
 
 export enum RepositoryType {
     GIT,
-    TFVC
+    TFVC,
+    ANY
 }
 
 export interface IRepositoryContext {

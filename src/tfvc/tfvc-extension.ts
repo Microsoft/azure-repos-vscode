@@ -5,6 +5,7 @@
 "use strict";
 
 import { window, workspace } from "vscode";
+import { RepositoryType } from "../contexts/repositorycontext";
 import { ExtensionManager } from "../extensionmanager";
 import { TfvcTelemetryEvents } from "../helpers/constants";
 import { Tfvc } from "./tfvc";
@@ -27,7 +28,7 @@ export class TfvcExtension  {
      * open the file in the editor.
      */
     public async TfvcStatus(): Promise<void> {
-        if (!this._manager.EnsureInitialized()) {
+        if (!this._manager.EnsureInitialized(RepositoryType.TFVC)) {
             this._manager.DisplayErrorMessage();
             return;
         }
@@ -43,7 +44,12 @@ export class TfvcExtension  {
         }
     }
 
-    public async InitializeClients() {
+    public async InitializeClients(repoType: RepositoryType): Promise<void> {
+        //We only need to initialize for Tfvc repositories
+        if (repoType !== RepositoryType.TFVC) {
+            return;
+        }
+
         this._tfvc = new Tfvc();
         this._repo = this._tfvc.Open(this._manager.ServerContext, workspace.rootPath);
 

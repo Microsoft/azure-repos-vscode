@@ -26,6 +26,7 @@ import { TfvcExtension } from "./tfvc/tfvc-extension";
 import { TfvcErrorCodes } from "./tfvc/tfvcerror";
 
 var path = require("path");
+var util = require("util");
 
 /* tslint:disable:no-unused-variable */
 import Q = require("q");
@@ -93,12 +94,22 @@ export class ExtensionManager  {
         this.initializeExtension();
     }
 
-    public EnsureInitialized(): boolean {
+    public EnsureInitialized(expectedType: RepositoryType): boolean {
         if (!this._repoContext
                 || !this._serverContext
                 || !this._serverContext.RepoInfo.IsTeamFoundation) {
             this.setErrorStatus(Strings.NoRepoInformation);
             return false;
+        } else if (expectedType !== this._repoContext.Type
+                   && expectedType !== RepositoryType.ANY) {
+            //Display the message straightaway in this case (instead of using status bar)
+            if (expectedType === RepositoryType.GIT) {
+                VsCodeUtils.ShowErrorMessage(Strings.NotAGitRepository);
+                return false;
+            } else if (expectedType === RepositoryType.TFVC) {
+                VsCodeUtils.ShowErrorMessage(Strings.NotATfvcRepository);
+                return false;
+            }
         } else if (this._errorMessage !== undefined) {
             return false;
         }
@@ -106,7 +117,10 @@ export class ExtensionManager  {
     }
 
     public DisplayErrorMessage(message?: string) {
-        VsCodeUtils.ShowErrorMessage(message ? message : this._errorMessage);
+        let msg: string = message ? message : this._errorMessage;
+        if (msg) {
+            VsCodeUtils.ShowErrorMessage(message ? message : this._errorMessage);
+        }
     }
 
     public DisplayWarningMessage(message: string) {
@@ -150,8 +164,9 @@ export class ExtensionManager  {
                             url : Constants.TokenLearnMoreUrl,
                             telemetryId: TelemetryEvents.TokenLearnMoreClick };
             //Need different messages for popup message and status bar
-            error = Strings.NoAccessTokenRunLogin;
-            displayError = Strings.NoAccessTokenLearnMoreRunLogin;
+            //Add the account name to the message to help the user
+            error =  util.format(Strings.NoAccessTokenRunLogin, this._serverContext.RepoInfo.Account);
+            displayError = util.format(Strings.NoAccessTokenLearnMoreRunLogin, this._serverContext.RepoInfo.Account);
         }
         Logger.LogError(error);
         this.setErrorStatus(error, CommandNames.Login, false);
@@ -229,7 +244,7 @@ export class ExtensionManager  {
                                 this._telemetry.Update(this._serverContext.RepoInfo.CollectionId, this._serverContext.UserInfo.Id);
 
                                 this.initializeStatusBars();
-                                await this.initializeClients();
+                                await this.initializeClients(this._repoContext.Type);
 
                                 this.sendStartupTelemetry();
 
@@ -288,7 +303,7 @@ export class ExtensionManager  {
 
     //Set up the initial status bars
     private initializeStatusBars() {
-        if (this.EnsureInitialized()) {
+        if (this.EnsureInitialized(RepositoryType.ANY)) {
             this._teamServicesStatusBarItem.command = CommandNames.OpenTeamSite;
             this._teamServicesStatusBarItem.text = this._serverContext.RepoInfo.TeamProject;
             this._teamServicesStatusBarItem.tooltip = Strings.NavigateToTeamServicesWebSite;
@@ -300,9 +315,9 @@ export class ExtensionManager  {
     }
 
     //Set up the initial status bars
-    private async initializeClients() {
-        await this._teamExtension.InitializeClients();
-        await this._tfvcExtension.InitializeClients();
+    private async initializeClients(repoType: RepositoryType) {
+        await this._teamExtension.InitializeClients(repoType);
+        await this._tfvcExtension.InitializeClients(repoType);
     }
 
     private logDebugInformation(): void {
