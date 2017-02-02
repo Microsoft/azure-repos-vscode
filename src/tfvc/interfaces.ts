@@ -10,6 +10,21 @@ export interface ITfvc {
     url: string;
 }
 
+export interface IItemInfo {
+    serverItem: string;
+    localItem: string;
+    localVersion?: string;
+    serverVersion?: string;
+    change?: string;
+    type?: string;
+    lock?: string;
+    lockOwner?: string;
+    deletionId?: string;
+    lastModified?: string;
+    fileType?: string;
+    fileSize?: string;
+}
+
 export interface IWorkspace {
     name: string;
     server: string;

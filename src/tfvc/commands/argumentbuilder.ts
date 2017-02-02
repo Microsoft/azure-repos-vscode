@@ -17,7 +17,7 @@ export class ArgumentBuilder implements IArgumentProvider {
 
     public constructor(command: string, serverContext?: TeamServerContext) {
         if (!command) {
-            throw TfvcError.createArgumentMissingError("command");
+            throw TfvcError.CreateArgumentMissingError("command");
         }
         this.Add(command);
         this.AddSwitch("noprompt");
@@ -42,6 +42,15 @@ export class ArgumentBuilder implements IArgumentProvider {
 
     public Add(arg: string): ArgumentBuilder {
         this._arguments.push(arg);
+        return this;
+    }
+
+    public AddAll(args: string[]): ArgumentBuilder {
+        if (args) {
+            for (let i: number = 0; i < args.length; i++) {
+                this.Add(args[i]);
+            }
+        }
         return this;
     }
 

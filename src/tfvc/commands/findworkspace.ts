@@ -20,7 +20,7 @@ export class FindWorkspace implements ITfvcCommand<IWorkspace> {
 
     public constructor(localPath: string) {
         if (!localPath) {
-            throw TfvcError.createArgumentMissingError("localPath");
+            throw TfvcError.CreateArgumentMissingError("localPath");
         }
         this._localPath = localPath;
     }

@@ -17,7 +17,7 @@ export class TfvcError {
     tfvcErrorCode: string;
     tfvcCommand: string;
 
-    public static createArgumentMissingError(argumentName: string): TfvcError {
+    public static CreateArgumentMissingError(argumentName: string): TfvcError {
         return new TfvcError({
                 // This is a developer error - no need to localize
                 message: `Argument is required: ${argumentName}`,
