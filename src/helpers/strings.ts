@@ -14,8 +14,8 @@ export class Strings {
     static NavigateToBuildSummary: string = "Click to view build";
     static NavigateToTeamServicesWebSite: string = "Click to view your team project website.";
     static NoAccessTokenFound: string = "A personal access token for this Team Services repository was not found in your local user settings.";
-    static NoAccessTokenLearnMoreRunLogin: string = "You are not connected to Team Services. Select 'Learn more...' and then run the 'team login' command.";
-    static NoAccessTokenRunLogin: string = "You are not connected to Team Services. Please run the 'team login' command.";
+    static NoAccessTokenLearnMoreRunLogin: string = "You are not connected to Team Services (%s). Select 'Learn more...' and then run the 'team login' command.";
+    static NoAccessTokenRunLogin: string = "You are not connected to Team Services (%s). Please run the 'team login' command.";
     static NoTeamServerCredentialsRunLogin: string = "You are not connected to a Team Foundation Server.  Please run the 'team login' command.";
     static NoBuildsFound: string = "No builds were found for this repository and branch. Click to view your team project's build definitions page.";
     static NoRepoInformation: string = "No Team Services or Team Foundation Server repository configuration was found.  Ensure you've opened a folder that contains a repository.";
@@ -54,9 +54,12 @@ export class Strings {
 
     // TFVC messages/errors
     static ChooseItemQuickPickPlaceHolder: string = "Choose a file to open it.";
+    static NotAGitRepository: string = "The open folder is not a Git repository.  Please check the folder location and try again.";
     static NotATfvcRepository: string = "The open folder is not a TFVC repository.  Please check the folder location and try again.";
+    static TokenNotAllScopes: string = "The personal access token provided does not have All Scopes.  All Scopes is required for TFVC support.";
     static TfvcLocationMissingError: string = "The path to the TFVC command line was not found in the user settings. Please set this value (tfvc.location) and try again.";
     static TfMissingError: string = "Unable to find the TF executable at the expected location. Please verify the installation and location of TF. Expected path: ";
+    static TfInitializeFailureError: string = "Unable to initialize the TF executable. Please verify the installation of Java and ensure it is in the PATH.";
     static TfExecFailedError: string = "Execution of the TFVC command line failed unexpectedly.";
     static TfVersionWarning: string = "The installed version of the TF command line does not meet the minimum suggested version. You may run into errors or limitations with certain commands until you upgrade. Minimum suggested version: ";
     static TfNoPendingChanges: string = "There are no matching pending changes.";

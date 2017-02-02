@@ -150,6 +150,12 @@ export class Tfvc {
             } else if (/project collection URL to use could not be determined/i.test(result.stderr)) {
                 tfvcErrorCode = TfvcErrorCodes.NotATfvcRepository;
                 message = Strings.NotATfvcRepository;
+            } else if (/Access denied connecting.*authenticating as OAuth/i.test(result.stderr)) {
+                tfvcErrorCode = TfvcErrorCodes.AuthenticationFailed;
+                message = Strings.TokenNotAllScopes;
+            } else if (/'java' is not recognized as an internal or external command/.test(result.stderr)) {
+                tfvcErrorCode = TfvcErrorCodes.TfvcNotFound;
+                message = Strings.TfInitializeFailureError;
             }
 
             Logger.LogDebug(`TFVC errors: ${result.stderr}`);
