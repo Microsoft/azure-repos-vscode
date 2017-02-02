@@ -30,15 +30,6 @@ export class GitClient extends BaseClient {
         this._statusBarItem = statusBarItem;
     }
 
-    //Opens the pull request page given the remote and (current) branch
-    public CreatePullRequest(context: IRepositoryContext): void {
-        this.ensureGitContext(context);
-        this.ReportEvent(TelemetryEvents.OpenNewPullRequest);
-        let pullRequestUrl: string = GitVcService.GetCreatePullRequestUrl(context.RemoteUrl, context.CurrentBranch);
-        Logger.LogInfo("OpenPullRequest: " + pullRequestUrl);
-        Utils.OpenUrl(pullRequestUrl);
-    }
-
     //Initial method to display, select and navigate to my pull requests
     public async GetMyPullRequests(): Promise<void> {
         this.ReportEvent(TelemetryEvents.ViewPullRequests);
