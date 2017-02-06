@@ -1,7 +1,7 @@
 {
   "name": "team",
   "displayName": "Visual Studio Team Services",
-  "description": "Connect to Team Services, monitor your builds and manage your pull requests and work items for your Git repositories",
+  "description": "Connect to Team Services, monitor your builds and manage your pull requests and work items for your source repositories",
   "version": "1.108.0",
   "publisher": "ms-vsts",
   "icon": "assets/team.png",
@@ -53,6 +53,11 @@
           "type": "number",
           "default": 5,
           "description": "Specify the number of minutes to wait when polling for new builds and pull requests."
+        },
+        "tfvc.location": {
+          "type": "string",
+          "default": "",
+          "description": "Specify the full path to the TF executable to use for TFVC functionality."
         }
       }
     },
