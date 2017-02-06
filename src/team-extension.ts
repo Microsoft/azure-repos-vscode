@@ -40,7 +40,7 @@ export class TeamExtension  {
     //Gets any available build status information and adds it to the status bar
     public DisplayCurrentBranchBuildStatus(): void {
         if (this._manager.EnsureInitialized(RepositoryType.ANY)) {
-            this._buildClient.DisplayCurrentBuildStatus(this._manager.RepoContext, false);
+            this._buildClient.DisplayCurrentBuildStatus(this._manager.RepoContext, false, this._manager.Settings.BuildDefinitionId);
         } else {
             this._manager.DisplayErrorMessage();
         }
@@ -146,6 +146,8 @@ export class TeamExtension  {
                 this._gitClient.OpenFileHistory(this._manager.RepoContext);
             } else if (this._manager.RepoContext.Type === RepositoryType.TFVC) {
                 this._manager.Tfvc.TfvcViewHistory();
+            } else {
+                this._manager.DisplayErrorMessage(Strings.NoRepoInformation);
             }
         } else {
             this._manager.DisplayErrorMessage();
@@ -320,7 +322,7 @@ export class TeamExtension  {
     private pollBuildStatus(): void {
         if (this._manager.EnsureInitialized(RepositoryType.ANY)) {
             Logger.LogInfo("Polling for latest current build status...");
-            this._buildClient.DisplayCurrentBuildStatus(this._manager.RepoContext, true);
+            this._buildClient.DisplayCurrentBuildStatus(this._manager.RepoContext, true, this._manager.Settings.BuildDefinitionId);
         }
     }
 

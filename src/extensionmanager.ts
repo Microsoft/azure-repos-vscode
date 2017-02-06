@@ -196,7 +196,7 @@ export class ExtensionManager  {
 
         try {
             //RepositoryContext has some initial information about the repository (what we can get without authenticating with server)
-            this._repoContext = await RepositoryContextFactory.CreateRepositoryContext(workspace.rootPath);
+            this._repoContext = await RepositoryContextFactory.CreateRepositoryContext(workspace.rootPath, this._settings);
             if (this._repoContext) {
                 this.setupFileSystemWatcherOnHead();
                 this._serverContext = new TeamServerContext(this._repoContext.RemoteUrl);
@@ -217,7 +217,6 @@ export class ExtensionManager  {
                         Logger.LogDebug("Started ApplicationInsights telemetry");
 
                         //Set up the client we need to talk to the server for more repository information
-                        //TODO: Handle this guy throwing!!
                         let repositoryInfoClient: RepositoryInfoClient = new RepositoryInfoClient(this._repoContext, CredentialManager.GetCredentialHandler());
 
                         Logger.LogInfo("Getting repository information with repositoryInfoClient");
@@ -287,6 +286,8 @@ export class ExtensionManager  {
 
         if (this._repoContext.Type === RepositoryType.TFVC) {
             event = TfvcTelemetryEvents.StartUp;
+        } else if (this._repoContext.Type === RepositoryType.EXTERNAL) {
+            event = TelemetryEvents.ExternalRepository;
         }
 
         this._telemetry.SendEvent(event);
@@ -376,7 +377,7 @@ export class ExtensionManager  {
             let fsw:FileSystemWatcher = workspace.createFileSystemWatcher(pattern, true, false, true);
             fsw.onDidChange(async (uri) => {
                 Logger.LogInfo("HEAD has changed, re-parsing RepoContext object");
-                this._repoContext = await RepositoryContextFactory.CreateRepositoryContext(workspace.rootPath);
+                this._repoContext = await RepositoryContextFactory.CreateRepositoryContext(workspace.rootPath, this._settings);
                 Logger.LogInfo("CurrentBranch is: " + this._repoContext.CurrentBranch);
                 this.notifyBranchChanged(this._repoContext.CurrentBranch);
             });
@@ -406,7 +407,7 @@ export class ExtensionManager  {
             });
             fsw.onDidChange(async (uri) => {
                 Logger.LogInfo("config has changed, checking if 'remote origin' changed");
-                let context: IRepositoryContext = await RepositoryContextFactory.CreateRepositoryContext(uri.fsPath);
+                let context: IRepositoryContext = await RepositoryContextFactory.CreateRepositoryContext(uri.fsPath, this._settings);
                 let remote: string = context.RemoteUrl;
                 if (remote === undefined) {
                     //There is either no remote defined yet or it isn't a Team Services repo

@@ -102,11 +102,24 @@ export class AccountSettings extends BaseSettings {
     }
 }
 
-export class Settings extends BaseSettings {
+export interface ISettings {
+    AppInsightsEnabled: boolean;
+    AppInsightsKey: string;
+    LoggingLevel: string;
+    PollingInterval: number;
+    RemoteUrl: string;
+    TeamProject: string;
+    BuildDefinitionId: number;
+}
+
+export class Settings extends BaseSettings implements ISettings {
     private _appInsightsEnabled: boolean;
     private _appInsightsKey: string;
     private _loggingLevel: string;
     private _pollingInterval: number;
+    private _remoteUrl: string;
+    private _teamProject: string;
+    private _buildDefinitionId: number;
 
     constructor() {
         super();
@@ -125,6 +138,9 @@ export class Settings extends BaseSettings {
 
         this._appInsightsEnabled = this.readSetting<boolean>(SettingNames.AppInsightsEnabled, true);
         this._appInsightsKey = this.readSetting<string>(SettingNames.AppInsightsKey, undefined);
+        this._remoteUrl = this.readSetting<string>(SettingNames.RemoteUrl, undefined);
+        this._teamProject = this.readSetting<string>(SettingNames.TeamProject, undefined);
+        this._buildDefinitionId = this.readSetting<number>(SettingNames.BuildDefinitionId, 0);
     }
 
     public get AppInsightsEnabled(): boolean {
@@ -141,5 +157,17 @@ export class Settings extends BaseSettings {
 
     public get PollingInterval(): number {
         return this._pollingInterval;
+    }
+
+    public get RemoteUrl(): string {
+        return this._remoteUrl;
+    }
+
+    public get TeamProject(): string {
+        return this._teamProject;
+    }
+
+    public get BuildDefinitionId(): number {
+        return this._buildDefinitionId;
     }
 }

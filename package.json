@@ -54,6 +54,21 @@
           "default": 5,
           "description": "Specify the number of minutes to wait when polling for new builds and pull requests."
         },
+        "team.remoteUrl": {
+          "type": "string",
+          "default": "",
+          "description": "Specify the url to a project collection to use when your source code repository is not hosted with Microsoft. Requires team.teamProject."
+        },
+        "team.teamProject": {
+          "type": "string",
+          "default": "",
+          "description": "Specify the team project to use when your source code repository is not hosted with Microsoft. Requires team.remoteUrl."
+        },
+        "team.buildDefinitionId": {
+          "type": "number",
+          "default": 0,
+          "description": "Specify the team project's build definition Id to monitor when your source code repository is not hosted with Microsoft. Requires both team.remoteUrl and team.teamProject."
+        },
         "tfvc.location": {
           "type": "string",
           "default": "",

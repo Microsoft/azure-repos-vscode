@@ -5,37 +5,35 @@
 "use strict";
 
 import { IRepositoryContext, RepositoryType } from "./repositorycontext";
-import { Tfvc } from "../tfvc/tfvc";
-import { Repository } from "../tfvc/repository";
-import { IWorkspace } from "../tfvc/interfaces";
 import { RepoUtils } from "../helpers/repoutils";
 import { Logger } from "../helpers/logger";
 import { ISettings } from "../helpers/settings";
 
-export class TfvcContext implements IRepositoryContext {
-    private _tfvcFolder: string;
-    private _gitParentFolder: string;
-    private _tfvcRemoteUrl: string;
+export class ExternalContext implements IRepositoryContext {
+    private _folder: string;
+    private _remoteUrl: string;
     private _isSsh: boolean = false;
     private _isTeamServicesUrl: boolean = false;
     private _isTeamFoundationServer: boolean = false;
     private _teamProjectName: string;
 
     constructor(rootPath: string) {
-        this._tfvcFolder = rootPath;
+        //The passed in path is the workspace.rootPath (which could be a sub-folder)
+        this._folder = rootPath;
     }
 
     //Need to call tf.cmd to get TFVC information (and constructors can't be async)
     public async Initialize(settings: ISettings): Promise<boolean> {
-        Logger.LogDebug(`Looking for TFVC repository at ${this._tfvcFolder}`);
-        const tfvc: Tfvc = new Tfvc();
-        const repo: Repository = tfvc.Open(undefined, this._tfvcFolder);
-        const tfvcWorkspace: IWorkspace = await repo.FindWorkspace(this._tfvcFolder);
-        this._tfvcRemoteUrl = tfvcWorkspace.server;
-        this._isTeamServicesUrl = RepoUtils.IsTeamFoundationServicesRepo(this._tfvcRemoteUrl);
-        this._isTeamFoundationServer = RepoUtils.IsTeamFoundationServerRepo(this._tfvcRemoteUrl);
-        this._teamProjectName = tfvcWorkspace.defaultTeamProject;
-        Logger.LogDebug(`Found a TFVC repository for url: '${this._tfvcRemoteUrl}' and team project: '${this._teamProjectName}'.`);
+        Logger.LogDebug(`Looking for an External Context at ${this._folder}`);
+        if (!settings.RemoteUrl || !settings.TeamProject) {
+            Logger.LogDebug(`No External Context at ${this._folder}`);
+            return false;
+        }
+        this._remoteUrl = settings.RemoteUrl;
+        this._isTeamServicesUrl = RepoUtils.IsTeamFoundationServicesRepo(this._remoteUrl);
+        this._isTeamFoundationServer = RepoUtils.IsTeamFoundationServerRepo(this._remoteUrl);
+        this._teamProjectName = settings.TeamProject;
+        Logger.LogDebug(`Found an External Context at ${this._folder}`);
         return true;
     }
 
@@ -54,7 +52,7 @@ export class TfvcContext implements IRepositoryContext {
 
     // IRepositoryContext implementation
     public get RepoFolder(): string {
-        return this._tfvcFolder;
+        return this._folder;
     }
     public get IsSsh(): boolean {
         return this._isSsh;
@@ -66,12 +64,12 @@ export class TfvcContext implements IRepositoryContext {
         return this._isTeamServicesUrl;
     }
     public get RemoteUrl(): string {
-        return this._tfvcRemoteUrl;
+        return this._remoteUrl;
     }
     public get RepositoryParentFolder(): string {
-        return this._gitParentFolder;
+        return undefined;
     }
     public get Type(): RepositoryType {
-        return RepositoryType.TFVC;
+        return RepositoryType.EXTERNAL;
     }
 }

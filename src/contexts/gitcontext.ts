@@ -4,14 +4,15 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
+import url = require("url");
 import { Utils } from "../helpers/utils";
 import { RepoUtils } from "../helpers/repoutils";
 import { IRepositoryContext, RepositoryType } from "./repositorycontext";
+import { ISettings } from "../helpers/settings";
 
 var pgc = require("parse-git-config");
 var gri = require("git-repo-info");
 var path = require("path");
-var url = require("url");
 
 //Gets as much information as it can regarding the Git repository without calling the server (vsts/info)
 export class GitContext implements IRepositoryContext {
@@ -95,8 +96,8 @@ export class GitContext implements IRepositoryContext {
     }
 
     //constructor already initializes the GitContext
-    public async Initialize(): Promise<void> {
-        return;
+    public async Initialize(settings: ISettings): Promise<boolean> {
+        return true;
     }
 
     //Git implementation

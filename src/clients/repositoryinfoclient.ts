@@ -35,7 +35,7 @@ export class RepositoryInfoClient {
             repoInfo = await repositoryClient.getVstsInfo();
             repositoryInfo = new RepositoryInfo(repoInfo);
             return repositoryInfo;
-        } else if (this._repoContext.Type === RepositoryType.TFVC) {
+        } else if (this._repoContext.Type === RepositoryType.TFVC || this._repoContext.Type === RepositoryType.EXTERNAL) {
             Logger.LogDebug(`Getting repository information for a TFVC repository at ${this._repoContext.RemoteUrl}`);
             //For TFVC, the teamProjectName is retrieved by tf.cmd and set on the context
             let teamProjectName: string = this._repoContext.TeamProjectName;

@@ -49,10 +49,14 @@ export class SettingNames {
     static AppInsights: string = SettingNames.SettingsPrefix + "appInsights.";
     static AppInsightsEnabled: string = SettingNames.AppInsights + "enabled";
     static AppInsightsKey: string = SettingNames.AppInsights + "key";
+    static RemoteUrl: string = SettingNames.SettingsPrefix + "remoteUrl";
+    static TeamProject: string = SettingNames.SettingsPrefix + "teamProject";
+    static BuildDefinitionId: string = SettingNames.SettingsPrefix + "buildDefinitionId";
 }
 
 export class TelemetryEvents {
     static TelemetryPrefix: string = Constants.ExtensionName + "/";
+    static ExternalRepository: string = TelemetryEvents.TelemetryPrefix + "externalrepo";
     static OpenAdditionalQueryResults: string = TelemetryEvents.TelemetryPrefix + "openaddlqueryresults";
     static OpenBlamePage: string = TelemetryEvents.TelemetryPrefix + "openblame";
     static OpenBuildSummaryPage: string = TelemetryEvents.TelemetryPrefix + "openbuildsummary";

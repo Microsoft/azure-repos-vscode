@@ -4,17 +4,20 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
+import { ISettings } from "../helpers/settings";
+
 export enum RepositoryType {
     GIT,
     TFVC,
-    ANY
+    ANY,
+    EXTERNAL
 }
 
 export interface IRepositoryContext {
     Type: RepositoryType;
 
     //Added Initialize() so TFVC could call tf.cmd async
-    Initialize(): Promise<void>;
+    Initialize(settings: ISettings): Promise<boolean>;
 
     IsSsh: boolean;
     IsTeamFoundation: boolean;
@@ -28,5 +31,5 @@ export interface IRepositoryContext {
     CurrentRef: string;
 
     //TFVC-specific values
-    TeamProjectName: string; //For TFVC, we can get this from the client
+    TeamProjectName: string;
 }

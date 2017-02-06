@@ -51,9 +51,9 @@ export class BuildService {
     }
 
     //Construct the url to the individual build summary
-    //https://account.visualstudio.com/DefaultCollection/project/_build#_a=summary&buildId=1977
+    //https://account.visualstudio.com/DefaultCollection/project/_build/index?buildId=1977&_a=summary
     public static GetBuildSummaryUrl(remoteUrl: string, buildId: string) : string {
-        return BuildService.GetBuildsUrl(remoteUrl) + "#_a=summary" + "&buildId=" + buildId;
+        return BuildService.GetBuildsUrl(remoteUrl) + "/index?buildId=" + buildId + "&_a=summary";
     }
 
     //Construct the url to the build definitions page for the project

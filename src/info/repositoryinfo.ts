@@ -4,10 +4,9 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
+import url = require("url");
 import { Logger } from "../helpers/logger";
 import { RepoUtils } from "../helpers/repoutils";
-
-var url = require("url");
 
 //When a RepositoryInfo object is created, we have already verified whether or not it
 //is either a Team Services or Team Foundation Server repository.  With the introduction
@@ -52,9 +51,9 @@ export class RepositoryInfo {
         let purl = url.parse(repositoryUrl);
         if (purl != null) {
             this._host = purl.host;
-            this._hostName = purl.hostName;
+            this._hostName = purl.hostname;
             this._path = purl.path;
-            this._pathName = purl.pathName;
+            this._pathName = purl.pathname;
             this._port = purl.port;
             this._protocol = purl.protocol;
             this._query = purl.query;

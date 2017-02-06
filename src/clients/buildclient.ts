@@ -30,17 +30,26 @@ export class BuildClient extends BaseClient {
     }
 
     //Gets any available build status information and adds it to the status bar
-    public async DisplayCurrentBuildStatus(context: IRepositoryContext, polling: boolean): Promise<void> {
+    public async DisplayCurrentBuildStatus(context: IRepositoryContext, polling: boolean, definitionId?: number): Promise<void> {
         try {
             let svc: BuildService = new BuildService(this._serverContext);
             Logger.LogInfo("Getting current build from badge...");
             let buildBadge: BuildBadge;
             if (context.Type === RepositoryType.GIT) {
                 buildBadge = await svc.GetBuildBadge(this._serverContext.RepoInfo.TeamProject, WellKnownRepositoryTypes.TfsGit, this._serverContext.RepoInfo.RepositoryId, context.CurrentRef);
-            } else { //TODO: explicitly check for TFVC?
+            } else if (context.Type === RepositoryType.TFVC || context.Type === RepositoryType.EXTERNAL && !definitionId) {
+                //If either TFVC or External and no definition Id, show default builds page
                 buildBadge = await this.getTfvcBuildBadge(svc, this._serverContext.RepoInfo.TeamProject);
+            } else if (definitionId) {
+                //TODO: Allow definitionId to override Git and TFVC defaults (above)?
+                let builds: Build[] = await svc.GetBuildsByDefinitionId(this._serverContext.RepoInfo.TeamProject, definitionId);
+                if (builds.length > 0) {
+                    buildBadge = { buildId: builds[0].id, imageUrl: undefined };
+                } else {
+                    Logger.LogInfo(`Found zero builds for definition id ${definitionId}`);
+                }
             }
-            if (buildBadge.buildId !== undefined) {
+            if (buildBadge && buildBadge.buildId !== undefined) {
                 Logger.LogInfo("Found build id " + buildBadge.buildId.toString() + ". Getting build details...");
                 let build: Build = await svc.GetBuildById(buildBadge.buildId);
                 this._buildSummaryUrl = BuildService.GetBuildSummaryUrl(this._serverContext.RepoInfo.TeamProjectUrl, build.id.toString());
@@ -63,7 +72,7 @@ export class BuildClient extends BaseClient {
                 }
             }
         } catch (err) {
-            this.handleError(err, polling, "Failed to get current branch build status");
+            this.handleError(err, polling, "Failed to get current build status");
         }
     }
 
