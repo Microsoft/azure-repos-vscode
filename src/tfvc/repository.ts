@@ -8,10 +8,11 @@ import { TeamServerContext} from "../contexts/servercontext";
 import { Logger } from "../helpers/logger";
 import { ITfvcCommand, IExecutionResult } from "./interfaces";
 import { Tfvc } from "./tfvc";
-import { IArgumentProvider, IWorkspace, IPendingChange } from "./interfaces";
+import { IArgumentProvider, IItemInfo, IWorkspace, IPendingChange } from "./interfaces";
 import { GetVersion } from "./commands/getversion";
 import { FindWorkspace } from "./commands/findworkspace";
 import { Status } from "./commands/status";
+import { GetInfo } from "./commands/getinfo";
 
 var _ = require("underscore");
 
@@ -51,6 +52,12 @@ export class Repository {
         Logger.LogDebug(`TFVC Repository.FindWorkspace with localPath='${localPath}'`);
         return this.RunCommand<IWorkspace>(
             new FindWorkspace(localPath));
+    }
+
+    public async GetInfo(itemPaths: string[]): Promise<IItemInfo[]> {
+        Logger.LogDebug(`TFVC Repository.GetInfo`);
+        return this.RunCommand<IItemInfo[]>(
+            new GetInfo(this._serverContext, itemPaths));
     }
 
     public async GetStatus(ignoreFiles?: boolean): Promise<IPendingChange[]> {

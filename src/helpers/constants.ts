@@ -80,6 +80,8 @@ export class TelemetryEvents {
 
 export class TfvcTelemetryEvents {
     static TelemetryPrefix: string = "tfvc/";
+    static OpenFileHistory: string = TfvcTelemetryEvents.TelemetryPrefix + "openfilehistory";
+    static OpenRepositoryHistory: string = TfvcTelemetryEvents.TelemetryPrefix + "openrepohistory";
     static Status: string = TfvcTelemetryEvents.TelemetryPrefix + "status";
     static StartUp: string = TfvcTelemetryEvents.TelemetryPrefix + "startup";
 }

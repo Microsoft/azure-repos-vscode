@@ -8,10 +8,11 @@ import { window, workspace } from "vscode";
 import { RepositoryType } from "../contexts/repositorycontext";
 import { ExtensionManager } from "../extensionmanager";
 import { TfvcTelemetryEvents } from "../helpers/constants";
+import { Utils } from "../helpers/utils";
 import { Tfvc } from "./tfvc";
 import { Repository } from "./repository";
 import { UIHelper } from "./uihelper";
-import { IPendingChange } from "./interfaces";
+import { IItemInfo, IPendingChange } from "./interfaces";
 
 export class TfvcExtension  {
     private _tfvc: Tfvc;
@@ -38,6 +39,37 @@ export class TfvcExtension  {
             const chosenItem: IPendingChange = await UIHelper.ChoosePendingChange(await this._repo.GetStatus());
             if (chosenItem) {
                 window.showTextDocument(await workspace.openTextDocument(chosenItem.localItem));
+            }
+        } catch (err) {
+            this._manager.DisplayErrorMessage(err.message);
+        }
+    }
+
+    /**
+     * This command runs the info command on the passed in itemPath and
+     * opens a web browser to the appropriate history page.
+     */
+    public async TfvcViewHistory(itemPath?: string): Promise<void> {
+        if (!this._manager.EnsureInitialized(RepositoryType.TFVC)) {
+            this._manager.DisplayErrorMessage();
+            return;
+        }
+
+        try {
+            if (!itemPath) {
+                this._manager.Telemetry.SendEvent(TfvcTelemetryEvents.OpenRepositoryHistory);
+                //Just display the history url of the entire repo
+                Utils.OpenUrl(this._manager.RepoContext.RemoteUrl + "_versionControl?_a=history");
+                return;
+            }
+            let itemInfos: IItemInfo[] = await this._repo.GetInfo([itemPath]);
+            //With a single file, show that file's history
+            if (itemInfos && itemInfos.length === 1) {
+                this._manager.Telemetry.SendEvent(TfvcTelemetryEvents.OpenFileHistory);
+                let serverPath: string = itemInfos[0].serverItem;
+                let file: string = encodeURIComponent(serverPath);
+                Utils.OpenUrl(this._manager.RepoContext.RemoteUrl + "_versionControl?path=" + file + "&_a=history");
+                return;
             }
         } catch (err) {
             this._manager.DisplayErrorMessage(err.message);
