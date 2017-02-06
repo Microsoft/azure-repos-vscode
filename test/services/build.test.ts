@@ -33,7 +33,7 @@ describe("BuildService", function() {
         let url: string = "https://account.visualstudio.com/DefaultCollection/project";
         let arg: string = "42";
 
-        assert.equal(BuildService.GetBuildSummaryUrl(url, arg), url + "/_build#_a=summary&buildId=" + arg);
+        assert.equal(BuildService.GetBuildSummaryUrl(url, arg), url + "/_build/index?buildId=" + arg + "&_a=summary");
     });
 
     it("should verify GetBuildsUrl", function() {
