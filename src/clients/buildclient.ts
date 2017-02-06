@@ -59,7 +59,7 @@ export class BuildClient extends BaseClient {
                 if (this._statusBarItem !== undefined) {
                     this._statusBarItem.command = CommandNames.OpenBuildSummaryPage;
                     this._statusBarItem.text = `$(icon octicon-package) ` + `$(icon octicon-dash)`;
-                    this._statusBarItem.tooltip = Strings.NoBuildsFound;
+                    this._statusBarItem.tooltip = context.Type === RepositoryType.GIT ? Strings.NoBuildsFound : Strings.NoTfvcBuildsFound;
                 }
             }
         } catch (err) {
