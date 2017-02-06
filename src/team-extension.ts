@@ -145,14 +145,7 @@ export class TeamExtension  {
             if (this._manager.RepoContext.Type === RepositoryType.GIT && this._gitClient) {
                 this._gitClient.OpenFileHistory(this._manager.RepoContext);
             } else if (this._manager.RepoContext.Type === RepositoryType.TFVC) {
-                let editor = window.activeTextEditor;
-                //If the VSCode editor isn't open or we don't have a
-                //team project just open the history of the repository
-                if (!editor || !this._manager.RepoContext.TeamProjectName) {
-                    this._manager.Tfvc.TfvcViewHistory();
-                } else {
-                    this._manager.Tfvc.TfvcViewHistory(editor.document.fileName);
-                }
+                this._manager.Tfvc.TfvcViewHistory();
             }
         } else {
             this._manager.DisplayErrorMessage();

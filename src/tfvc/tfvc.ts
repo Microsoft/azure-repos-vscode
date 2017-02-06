@@ -156,6 +156,8 @@ export class Tfvc {
             } else if (/'java' is not recognized as an internal or external command/.test(result.stderr)) {
                 tfvcErrorCode = TfvcErrorCodes.TfvcNotFound;
                 message = Strings.TfInitializeFailureError;
+            } else if (/There is no working folder mapping/i.test(result.stderr)) {
+                tfvcErrorCode = TfvcErrorCodes.FileNotInMappings;
             }
 
             Logger.LogDebug(`TFVC errors: ${result.stderr}`);

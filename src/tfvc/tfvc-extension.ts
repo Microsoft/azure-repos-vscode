@@ -4,12 +4,14 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
+import url = require("url");
 import { window, workspace } from "vscode";
 import { RepositoryType } from "../contexts/repositorycontext";
 import { ExtensionManager } from "../extensionmanager";
 import { TfvcTelemetryEvents } from "../helpers/constants";
 import { Utils } from "../helpers/utils";
 import { Tfvc } from "./tfvc";
+import { TfvcErrorCodes } from "./tfvcerror";
 import { Repository } from "./repository";
 import { UIHelper } from "./uihelper";
 import { IItemInfo, IPendingChange } from "./interfaces";
@@ -49,30 +51,44 @@ export class TfvcExtension  {
      * This command runs the info command on the passed in itemPath and
      * opens a web browser to the appropriate history page.
      */
-    public async TfvcViewHistory(itemPath?: string): Promise<void> {
+    public async TfvcViewHistory(): Promise<void> {
         if (!this._manager.EnsureInitialized(RepositoryType.TFVC)) {
             this._manager.DisplayErrorMessage();
             return;
         }
 
         try {
+            let itemPath: string;
+            let editor = window.activeTextEditor;
+            //Get the path to the file open in the VSCode editor (if any)
+            if (editor) {
+                itemPath = editor.document.fileName;
+            }
             if (!itemPath) {
-                this._manager.Telemetry.SendEvent(TfvcTelemetryEvents.OpenRepositoryHistory);
-                //Just display the history url of the entire repo
-                Utils.OpenUrl(this._manager.RepoContext.RemoteUrl + "_versionControl?_a=history");
+                //If no file open in editor, just display the history url of the entire repo
+                this.showRepositoryHistory();
                 return;
             }
+
             let itemInfos: IItemInfo[] = await this._repo.GetInfo([itemPath]);
             //With a single file, show that file's history
             if (itemInfos && itemInfos.length === 1) {
                 this._manager.Telemetry.SendEvent(TfvcTelemetryEvents.OpenFileHistory);
                 let serverPath: string = itemInfos[0].serverItem;
                 let file: string = encodeURIComponent(serverPath);
-                Utils.OpenUrl(this._manager.RepoContext.RemoteUrl + "_versionControl?path=" + file + "&_a=history");
+                Utils.OpenUrl(url.resolve(this._manager.RepoContext.RemoteUrl, "_versionControl?path=" + file + "&_a=history"));
                 return;
+            } else {
+                //If the file is in the workspace folder (but not mapped), just display the history url of the entire repo
+                this.showRepositoryHistory();
             }
         } catch (err) {
-            this._manager.DisplayErrorMessage(err.message);
+            if (err.tfvcErrorCode && err.tfvcErrorCode === TfvcErrorCodes.FileNotInMappings) {
+                //If file open in editor is not in the mappings, just display the history url of the entire repo
+                this.showRepositoryHistory();
+            } else {
+                this._manager.DisplayErrorMessage(err.message);
+            }
         }
     }
 
@@ -95,6 +111,11 @@ export class TfvcExtension  {
         const outputChannel = window.createOutputChannel("TFVC");
         outputChannel.appendLine("Using TFVC command line: " + this._tfvc.Location + " (" + version + ")");
         this._tfvc.onOutput(line => outputChannel.append(line)); //TODO add disposable to unhook event
+    }
+
+    private showRepositoryHistory(): void {
+        this._manager.Telemetry.SendEvent(TfvcTelemetryEvents.OpenRepositoryHistory);
+        Utils.OpenUrl(url.resolve(this._manager.RepoContext.RemoteUrl, "_versionControl?_a=history"));
     }
 
     dispose() {

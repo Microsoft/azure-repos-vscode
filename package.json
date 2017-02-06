@@ -57,7 +57,7 @@
         "tfvc.location": {
           "type": "string",
           "default": "",
-          "description": "Specify the full path to the TF executable to use for TFVC functionality."
+          "description": "Specify the full path to the TF executable or script to use for TFVC functionality."
         }
       }
     },

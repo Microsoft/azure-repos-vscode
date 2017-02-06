@@ -83,4 +83,5 @@ export class TfvcErrorCodes {
     public static get CantCreatePipe(): string { return "CantCreatePipe"; }
     public static get CantAccessRemote(): string { return "CantAccessRemote"; }
     public static get RepositoryNotFound(): string { return "RepositoryNotFound"; }
+    public static get FileNotInMappings(): string { return "FileNotInMappings"; }
 };
