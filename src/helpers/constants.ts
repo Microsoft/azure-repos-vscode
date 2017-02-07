@@ -29,6 +29,8 @@ export class CommandNames {
     static RefreshPollingStatus: string = CommandNames.CommandPrefix + "RefreshPollingStatus";
     static Reinitialize: string = CommandNames.CommandPrefix + "Reinitialize";
     static SendFeedback: string = CommandNames.CommandPrefix + "SendFeedback";
+    static Signin: string = CommandNames.CommandPrefix + "Signin";
+    static Signout: string = CommandNames.CommandPrefix + "Signout";
     static ViewWorkItemQueries: string = CommandNames.CommandPrefix + "ViewWorkItemQueries";
     static ViewWorkItems: string = CommandNames.CommandPrefix + "ViewWorkItems";
     static ViewPinnedQueryWorkItems: string = CommandNames.CommandPrefix + "ViewPinnedQueryWorkItems";

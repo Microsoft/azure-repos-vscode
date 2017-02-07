@@ -14,9 +14,9 @@ export class Strings {
     static NavigateToBuildSummary: string = "Click to view build";
     static NavigateToTeamServicesWebSite: string = "Click to view your team project website.";
     static NoAccessTokenFound: string = "A personal access token for this Team Services repository was not found in your local user settings.";
-    static NoAccessTokenLearnMoreRunLogin: string = "You are not connected to Team Services (%s). Select 'Learn more...' and then run the 'team login' command.";
-    static NoAccessTokenRunLogin: string = "You are not connected to Team Services (%s). Please run the 'team login' command.";
-    static NoTeamServerCredentialsRunLogin: string = "You are not connected to a Team Foundation Server.  Please run the 'team login' command.";
+    static NoAccessTokenLearnMoreRunSignin: string = "You are not connected to Team Services (%s). Select 'Learn more...' and then run the 'team signin' command.";
+    static NoAccessTokenRunSignin: string = "You are not connected to Team Services (%s). Please run the 'team signin' command.";
+    static NoTeamServerCredentialsRunSignin: string = "You are not connected to a Team Foundation Server.  Please run the 'team signin' command.";
     static NoBuildsFound: string = "No builds were found for this repository and branch. Click to view your team project's build definitions page.";
     static NoTfvcBuildsFound: string = "No builds were found for this repository. Click to view your team project's build definitions page.";
     static NoRepoInformation: string = "No Team Services or Team Foundation Server repository configuration was found.  Ensure you've opened a folder that contains a repository.";

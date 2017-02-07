@@ -2,7 +2,7 @@
   "name": "team",
   "displayName": "Visual Studio Team Services",
   "description": "Connect to Team Services, monitor your builds and manage your pull requests and work items for your source repositories",
-  "version": "1.108.0",
+  "version": "1.113.0",
   "publisher": "ms-vsts",
   "icon": "assets/team.png",
   "markdown": "standard",
@@ -133,6 +133,14 @@
       {
         "command": "team.Logout",
         "title": "team logout"
+      },
+      {
+        "command": "team.Signin",
+        "title": "team signin"
+      },
+      {
+        "command": "team.Signout",
+        "title": "team signout"
       },
       {
         "command": "tfvc.Status",

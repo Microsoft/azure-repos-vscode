@@ -156,8 +156,8 @@ export class ExtensionManager  {
     }
 
     private displayNoCredentialsMessage(): void {
-        let error: string = Strings.NoTeamServerCredentialsRunLogin;
-        let displayError: string = Strings.NoTeamServerCredentialsRunLogin;
+        let error: string = Strings.NoTeamServerCredentialsRunSignin;
+        let displayError: string = Strings.NoTeamServerCredentialsRunSignin;
         let messageItem: UrlMessageItem = undefined;
         if (this._serverContext.RepoInfo.IsTeamServices === true) {
             messageItem = { title : Strings.LearnMore,
@@ -165,8 +165,8 @@ export class ExtensionManager  {
                             telemetryId: TelemetryEvents.TokenLearnMoreClick };
             //Need different messages for popup message and status bar
             //Add the account name to the message to help the user
-            error =  util.format(Strings.NoAccessTokenRunLogin, this._serverContext.RepoInfo.Account);
-            displayError = util.format(Strings.NoAccessTokenLearnMoreRunLogin, this._serverContext.RepoInfo.Account);
+            error =  util.format(Strings.NoAccessTokenRunSignin, this._serverContext.RepoInfo.Account);
+            displayError = util.format(Strings.NoAccessTokenLearnMoreRunSignin, this._serverContext.RepoInfo.Account);
         }
         Logger.LogError(error);
         this.setErrorStatus(error, CommandNames.Login, false);

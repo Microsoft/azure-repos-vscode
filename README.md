@@ -27,9 +27,9 @@ have a Team Services account (or a Team Foundation Server instance), you may cre
 the extension will detect the change to the remote and attempt to contact the Team Services account (or Team Foundation Server).
 
 ## Installation
-First, you will need to install [Visual Studio Code](https://code.visualstudio.com/download) `1.0.0` or later.
+First, you will need to install [Visual Studio Code](https://code.visualstudio.com/download) `1.7.0` or later.
 
-To install the extension with the latest version of Visual Studio Code (version 1.3.1 is the latest as of this writing), bring up the Visual Studio Code Command Palette (`F1`),
+To install the extension with the latest version of Visual Studio Code (version 1.9.0 is the latest as of this writing), bring up the Visual Studio Code Command Palette (`F1`),
 type `install` and choose `Extensions: Install Extensions`.  In the `Search Extensions in Marketplace` text box, type `team`.  Find
 the `Visual Studio Team Services` extension published by *Microsoft* and click the `Install` button.  Restart Visual Studio Code.
 
@@ -53,13 +53,13 @@ Details on how to connect to either Team Services or Team Foundation Server are 
 Once you have installed the extension, open either the root folder or a sub-folder of the cloned Git repository.  Once a Team
 Services or Team Foundation Server 2015 Update 2 (or later) repository is detected by the extension, you will need to provide
 your credentials (if credentials weren't already found).  If you are required to provide your credentials, there will be an
-indicator in the status bar whose message will indicate that you need to login in.
+indicator in the status bar whose message will indicate that you need to sign in.
 
 The indicator looks like this:
 
 ![Team Error indicator](assets/team-error.png)
 
-To log in to your account, run the `team login` command.  If your repository is a Team Services repository,
+To sign in to your account, run the `team signin` command.  If your repository is a Team Services repository,
 you will be prompted to enter your personal access token.  When you do, it will be stored securely on your
 computer and used to connect to Team Services.  If your repository is on Team Foundation Server 2015 Update
 2 or later, you will be prompted to enter your username and password.  After both are provided, they will
@@ -67,7 +67,7 @@ be stored securely on your computer and used to connect to your TFS server.
 
 Once your credentials are verified, the status bar indicators will be active and the remaining commands will
 be ready to use.  The stored credentials will be used for each connection to the server until they are either
-removed by the `team logout` command or overwritten by a subsequent `team login` command.
+removed by the `team signout` command or overwritten by a subsequent `team signin` command.
 
 **Note:** In order for the extension to be activated, a repository *folder* must be opened.  The extension
 won't be activated if only a single *file* in the repository is opened.
@@ -118,6 +118,15 @@ feedback of up to 1000 characters.  Optionally, provide your email address so we
 you do not want to provide your email address, just leave it empty (we'll still get your feedback).  *Note:*
 Feedback can be sent even if telemetry reporting is disabled.
 
+* `team signin` – Use this command to sign in to a Team Services account or Team Foundation Server 2015 Update 2
+(and later) server.  When your credentials are provided, they will be stored securely on your computer.  The saved
+credentials will be used for that account until they are removed by the `team signout` command or overwritten by a
+subsequent `team signin` command.  See the "Secure Credential Storage" topic below for more details.
+
+* `team signout` – Use this command to sign out from a Team Services account or Team Foundation Server 2015 Update 2
+(and later) server.  Signing out will remove your credentials from your local computer.  To sign back in, you will
+need to run the `team signin` command again.
+
 * `team view blame` – If a file in the repository is opened in the editor, it will open your browser to the
 blame page for that file in the current branch in the server repository.
 
@@ -127,14 +136,9 @@ blame page for that file in the current branch in the server repository.
 history page for that file in the current branch in the server repository.  Otherwise, the history of the current
 branch in the server repository will be opened.
 
-* `team login` – Use this command to log in to a Team Services account or Team Foundation Server 2015 Update 2
-(and later) server.  When your credentials are provided, they will be stored securely on your computer.  The saved
-credentials will be used for that account until they are removed by the `team logout` command or overwritten by a
-subsequent `team login` command.  See the "Secure Credential Storage" topic below for more details.
+* `team login` – With version 1.113.0, this command is being deprecated in favor of `team signin`.  It will be removed in a future update.
 
-* `team logout` – Use this command to log out from a Team Services account or Team Foundation Server 2015 Update 2
-(and later) server.  Logging out will remove your credentials from your local computer.  To log back in, you will
-need to run the `team login` command again.
+* `team logout` – With version 1.113.0, this command is being deprecated in favor of `team signout`.  It will be removed in a future update.
 
 * `team view pull requests` – Same behavior as clicking on the Pull Requests status bar item.
 
@@ -150,10 +154,10 @@ work item in your browser.    This command will return a maximum of 200 results 
 work items...".  Choosing that option will open your browser to show all of the results of your query.
 
 ## Secure Credential Storage
-When you run the `team login` command, the credentials that you provide will be stored securely on your computer.  On
+When you run the `team signin` command, the credentials that you provide will be stored securely on your computer.  On
 Windows, your credentials wil be stored by Windows Credential Manager.  On OS X, your credentials will be stored in the
 Keychain.  On Linux, your credentials will be stored in a file on your local file system in a subdirectory of your
-home folder.  That file is created only with RW rights for the user running Visual Studio Code.  It is not encrypted
+home folder.  That file is created only with RW rights for the user running Visual Studio Code.  It is **not encrypted**
 on disk.
 
 ## How to disable telemetry reporting
@@ -210,6 +214,20 @@ then the account name to use is `servername:8080`.
 
 You can also create a *global* pinned query which will be the default if you have not configured one for your account by
 replacing *your-account-name* with *global* in the previous examples.
+
+## Using External (non-Microsoft) Source Repositories
+With version 1.113.0, you can now use the extension with repositories that are *not* hosted with either Team Services or Team Foundation Server.  You
+will be able to monitor your builds (for a specific build definition) and work items that *are* hosted with either Team Services or Team Foundation
+Server by specifying your account information.  You will, of course, still need to authenticate (provide credentials).  To do this, set the following
+settings in VS Code.  It is recommended that you set these in your Workspace Settings (and not User Settings).
+
+  ```javascript
+    "team.remoteUrl": "https://account.visualstudio.com",
+    "team.teamProject": "myTeamProject",
+    "team.buildDefinitionId": 42,
+  ```
+  
+To determine your build definition id, open the build summary for the build you'd like to monitor and grab the value of the _buildId=_ parameter in the url.
 
 ## Support
 Support for this extension is provided on our [GitHub Issue Tracker](https://github.com/Microsoft/vsts-vscode/issues).  You

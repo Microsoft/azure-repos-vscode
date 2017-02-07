@@ -57,8 +57,8 @@ export class TeamExtension  {
         }
     }
 
-    public async Login() {
-        // For Login, we just need to verify _serverContext and don't want to set this._errorMessage
+    public async Signin() {
+        // For Signin, we just need to verify _serverContext and don't want to set this._errorMessage
         if (this._manager.ServerContext !== undefined && this._manager.ServerContext.RepoInfo !== undefined && this._manager.ServerContext.RepoInfo.IsTeamFoundation === true) {
             if (this._manager.ServerContext.RepoInfo.IsTeamFoundationServer === true) {
                 let defaultUsername : string = this.getDefaultUsername();
@@ -66,7 +66,7 @@ export class TeamExtension  {
                 if (username !== undefined && username.length > 0) {
                     let password: string = await window.showInputBox({ value: "", prompt: Strings.ProvidePassword + " (" + username + ")", placeHolder: "", password: true });
                     if (password !== undefined) {
-                        Logger.LogInfo("Login: Username and Password provided as authentication.");
+                        Logger.LogInfo("Signin: Username and Password provided as authentication.");
                         this._manager.CredentialManager.StoreCredentials(this._manager.ServerContext.RepoInfo.Host, username, password).then(() => {
                             // We don't test the credentials to make sure they're good here.  Do so on the next command that's run.
                             this._manager.Reinitialize();
@@ -81,7 +81,7 @@ export class TeamExtension  {
                 // Until Device Flow, we can prompt for the PAT for Team Services
                 let token: string = await window.showInputBox({ value: "", prompt: Strings.ProvideAccessToken + " (" + this._manager.ServerContext.RepoInfo.Account + ")", placeHolder: "", password: true });
                 if (token !== undefined) {
-                    Logger.LogInfo("Login: Personal Access Token provided as authentication.");
+                    Logger.LogInfo("Signin: Personal Access Token provided as authentication.");
                     this._manager.CredentialManager.StoreCredentials(this._manager.ServerContext.RepoInfo.Host, Constants.OAuth, token).then(() => {
                         this._manager.Reinitialize();
                     }).catch((reason) => {
@@ -104,11 +104,11 @@ export class TeamExtension  {
         }
     }
 
-    public Logout() {
+    public Signout() {
         // For Logout, we just need to verify _serverContext and don't want to set this._errorMessage
         if (this._manager.ServerContext !== undefined && this._manager.ServerContext.RepoInfo !== undefined && this._manager.ServerContext.RepoInfo.IsTeamFoundation === true) {
             this._manager.CredentialManager.RemoveCredentials(this._manager.ServerContext.RepoInfo.Host).then(() => {
-                Logger.LogInfo("Logout: Removed credentials for host '" + this._manager.ServerContext.RepoInfo.Host + "'");
+                Logger.LogInfo("Signout: Removed credentials for host '" + this._manager.ServerContext.RepoInfo.Host + "'");
                 this._manager.Reinitialize();
             }).catch((reason) => {
                 let msg: string = Strings.UnableToRemoveCredentials + this._manager.ServerContext.RepoInfo.Host;
