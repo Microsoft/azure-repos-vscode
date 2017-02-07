@@ -218,8 +218,8 @@ replacing *your-account-name* with *global* in the previous examples.
 ## Using External (non-Microsoft) Source Repositories
 With version 1.113.0, you can now use the extension with repositories that are *not* hosted with either Team Services or Team Foundation Server.  You
 will be able to monitor your builds (for a specific build definition) and work items that *are* hosted with either Team Services or Team Foundation
-Server by specifying your account information.  You will, of course, still need to authenticate (provide credentials).  To do this, set the following
-settings in VS Code.  It is recommended that you set these in your Workspace Settings (and not User Settings).
+Server by specifying your account information.  To do this, set the following settings in VS Code.  It is recommended that you set these in your
+Workspace Settings (and not User Settings).  You will, of course, still need to authenticate (provide credentials).
 
   ```javascript
     "team.remoteUrl": "https://account.visualstudio.com",
