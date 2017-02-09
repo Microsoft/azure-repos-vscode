@@ -6,6 +6,7 @@
 
 import { assert } from "chai";
 import * as path from "path";
+import { Strings } from "../../../src/helpers/strings";
 import { Undo } from "../../../src/tfvc/commands/undo";
 import { TfvcError } from "../../../src/tfvc/tfvcerror";
 import { IExecutionResult } from "../../../src/tfvc/interfaces";
@@ -175,6 +176,63 @@ describe("Tfvc-UndoCommand", function() {
         let filesUndone: string[] = await cmd.ParseOutput(executionResult);
         assert.equal(filesUndone.length, 1);
         assert.equal(filesUndone[0], localPaths[0]);
+    });
+
+    //If we have at least 1 file undone but at least 1 with no pending changes, exit code is 1
+    //Proceed normally but ignore the files that have no pending changes.
+    it("should verify parse output - multiple files - several no pending changes", async function() {
+        let noChangesPaths: string[] = [path.join("folder1", "file1.txt"), path.join("folder2", "file2.txt")];
+        let localPaths: string[] = ["README.md"].concat(noChangesPaths);
+        let cmd: Undo = new Undo(undefined, localPaths);
+        let executionResult: IExecutionResult = {
+            exitCode: 1,
+            stdout: "Undoing add: README.md\n" +
+                "No pending changes were found for " + noChangesPaths[0] + "\n" +
+                "No pending changes were found for " + noChangesPaths[1] + "\n",
+            stderr: undefined
+        };
+
+        let filesUndone: string[] = await cmd.ParseOutput(executionResult);
+        assert.equal(filesUndone.length, 1);
+        assert.equal(filesUndone[0], "README.md");
+    });
+
+    //If all files have no pending changes, exit code is 100 but we don't want to fail
+    it("should verify parse output - multiple files - all no pending changes", async function() {
+        let noChangesPaths: string[] = [path.join("folder1", "file1.txt"), path.join("folder2", "file2.txt")];
+        let localPaths: string[] = noChangesPaths;
+        let cmd: Undo = new Undo(undefined, localPaths);
+        let executionResult: IExecutionResult = {
+            exitCode: 100,
+            stdout: "" +
+                "No pending changes were found for " + noChangesPaths[0] + "\n" +
+                "No pending changes were found for " + noChangesPaths[1] + "\n",
+            stderr: undefined
+        };
+
+        let filesUndone: string[] = await cmd.ParseOutput(executionResult);
+        assert.isDefined(filesUndone);
+        assert.equal(filesUndone.length, 0);
+    });
+
+    it("should verify parse output - error exit code", async function() {
+        let noChangesPaths: string[] = [path.join("folder1", "file1.txt"), path.join("folder2", "file2.txt")];
+        let localPaths: string[] = noChangesPaths;
+        let cmd: Undo = new Undo(undefined, localPaths);
+        let executionResult: IExecutionResult = {
+            exitCode: 42,
+            stdout: "Something bad this way comes.",
+            stderr: undefined
+        };
+
+        try {
+            await cmd.ParseOutput(executionResult);
+        } catch (err) {
+            assert.equal(err.exitCode, 42);
+            assert.equal(err.tfvcCommand, "undo");
+            assert.equal(err.message.indexOf(Strings.TfExecFailedError), 0);
+            assert.equal(err.stdout.indexOf("Something bad this way comes."), 0);
+        }
     });
 
 });

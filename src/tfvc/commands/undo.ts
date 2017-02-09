@@ -7,7 +7,6 @@
 import * as path from "path";
 import { TeamServerContext} from "../../contexts/servercontext";
 import { IArgumentProvider, IExecutionResult, ITfvcCommand } from "../interfaces";
-import { TfvcError } from "../tfvcerror";
 import { ArgumentBuilder } from "./argumentbuilder";
 import { CommandHelper } from "./commandhelper";
 
@@ -22,9 +21,7 @@ export class Undo implements ITfvcCommand<string[]> {
     private _itemPaths: string[];
 
     public constructor(serverContext: TeamServerContext, itemPaths: string[]) {
-        if (!itemPaths || itemPaths.length === 0) {
-            throw TfvcError.CreateArgumentMissingError("itemPaths");
-        }
+        CommandHelper.RequireStringArrayArgument(itemPaths, "itemPaths");
         this._serverContext = serverContext;
         this._itemPaths = itemPaths;
     }
@@ -44,21 +41,28 @@ export class Undo implements ITfvcCommand<string[]> {
      * Undoing add: file2.java
      */
     public async ParseOutput(executionResult: IExecutionResult): Promise<string[]> {
-        //TODO: (Undo All) What if we've been passed 5 files and the 3rd has no pending changes?
-        if (CommandHelper.HasError(executionResult, "No pending changes were found for ")) {
-            //TODO: Log calling Undo on a file where nothing needed to be undone
-            return [];
-        }
+        let lines: string[] = CommandHelper.SplitIntoLines(executionResult.stdout, false, true /*filterEmptyLines*/);
 
-        // Throw if any OTHER errors are found in stderr or if exitcode is not 0
-        CommandHelper.ProcessErrors(this.GetArguments().GetCommand(), executionResult);
+        //If we didn't succeed without any issues, we have a bit of work to do.
+        //'tf undo' can return a non-zero exit code when:
+        //  * Some of the files have no pending changes (exitCode === 1)
+        //  * All of the files have no pending changes (exitCode === 100)
+        //If some of the files have no pending changes, we want to process the ones that did.
+        //If all of the files have no pending changes, return []
+        //Otherwise, we assume some error occurred so let that be thrown.
+        if (executionResult.exitCode !== 0) {
+            //Remove any entries for which there were no pending changes
+            lines = lines.filter(e => !e.startsWith("No pending changes were found for "));
+            if (executionResult.exitCode === 100 && lines.length === 0) {
+                //All of the files had no pending changes, return []
+                return [];
+            } else if (executionResult.exitCode !== 1) {
+                //Otherwise, some other error occurred, let that be thrown.
+                CommandHelper.ProcessErrors(this.GetArguments().GetCommand(), executionResult);
+            }
+        }
 
         let filesUndone: string[] = [];
-        if (!executionResult.stdout) {
-            return filesUndone;
-        }
-        const lines: string[] = CommandHelper.SplitIntoLines(executionResult.stdout, false, true /*filterEmptyLines*/);
-
         let path: string = "";
         for (let index: number = 0; index < lines.length; index++) {
             let line: string = lines[index];

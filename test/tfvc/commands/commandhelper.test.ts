@@ -21,6 +21,20 @@ describe("Tfvc-CommandHelper", function() {
         assert.equal(lines[5], "");
     });
 
+    it("should verify SplitIntoLines - undefined input", function() {
+        let text: string;
+        let lines: string[] = CommandHelper.SplitIntoLines(text);
+        assert.isDefined(lines);
+        assert.equal(lines.length, 0);
+    });
+
+    it("should verify SplitIntoLines - empty input", function() {
+        let text: string = "";
+        let lines: string[] = CommandHelper.SplitIntoLines(text);
+        assert.isDefined(lines);
+        assert.equal(lines.length, 0);
+    });
+
     it("should verify SplitIntoLines - trim WARNings", function() {
         let text: string = "WARN 1\nWARN 2\nwarning\none\ntwo\r\n\n";
         let lines: string[] = CommandHelper.SplitIntoLines(text);
@@ -46,7 +60,7 @@ describe("Tfvc-CommandHelper", function() {
     });
 
     it("should verify SplitIntoLines - filter empty lines", function() {
-        let text: string = "zero\n\none\ntwo\r\n";
+        let text: string = "zero\n      \none\ntwo\r\n"; //ensure there's a line with just spaces too
         let lines: string[] = CommandHelper.SplitIntoLines(text, false, true);
         assert.equal(lines.length, 3);
         assert.equal(lines[0], "zero");
