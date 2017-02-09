@@ -148,4 +148,4 @@ gulp.task('package', ['publishall'], function (cb) {
   });
 });
 
-gulp.task('default', ['package']);
+gulp.task('default', ['publishall']);
