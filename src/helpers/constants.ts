@@ -15,8 +15,6 @@ export class Constants {
 export class CommandNames {
     static CommandPrefix: string = Constants.ExtensionName + ".";
     static GetPullRequests: string = CommandNames.CommandPrefix + "GetPullRequests";
-    static Login: string = CommandNames.CommandPrefix + "Login";
-    static Logout: string = CommandNames.CommandPrefix + "Logout";
     static OpenBlamePage: string = CommandNames.CommandPrefix + "OpenBlamePage";
     static OpenBuildSummaryPage: string = CommandNames.CommandPrefix + "OpenBuildSummaryPage";
     static OpenFileHistory: string = CommandNames.CommandPrefix + "OpenFileHistory";

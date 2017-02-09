@@ -25,8 +25,6 @@ export async function activate(context: ExtensionContext) {
         .catch(err => console.error(err));
 
     context.subscriptions.push(commands.registerCommand(CommandNames.GetPullRequests, () => _extensionManager.Team.GetMyPullRequests()));
-    context.subscriptions.push(commands.registerCommand(CommandNames.Login, () => _extensionManager.Team.Signin()));
-    context.subscriptions.push(commands.registerCommand(CommandNames.Logout, () => _extensionManager.Team.Signout()));
     context.subscriptions.push(commands.registerCommand(CommandNames.Signin, () => _extensionManager.Team.Signin()));
     context.subscriptions.push(commands.registerCommand(CommandNames.Signout, () => _extensionManager.Team.Signout()));
     context.subscriptions.push(commands.registerCommand(CommandNames.OpenBlamePage, () => _extensionManager.Team.OpenBlamePage()));

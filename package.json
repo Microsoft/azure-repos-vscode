@@ -80,67 +80,73 @@
     "commands": [
       {
         "command": "team.OpenNewTask",
-        "title": "team create task"
+        "title": "Create Task",
+        "category": "Team"
       },
       {
         "command": "team.OpenNewBug",
-        "title": "team create bug"
+        "title": "Create Bug",
+        "category": "Team"
       },
       {
         "command": "team.OpenFileHistory",
-        "title": "team view history"
+        "title": "View History",
+        "category": "Team"
       },
       {
         "command": "team.OpenBlamePage",
-        "title": "team view blame"
+        "title": "View Blame",
+        "category": "Team"
       },
       {
         "command": "team.OpenNewPullRequest",
-        "title": "team create pull request"
+        "title": "Create Pull Request",
+        "category": "Team"
       },
       {
         "command": "team.OpenNewWorkItem",
-        "title": "team create work item"
+        "title": "Create Work Item",
+        "category": "Team"
       },
       {
         "command": "team.GetPullRequests",
-        "title": "team view pull requests"
+        "title": "View Pull Requests",
+        "category": "Team"
       },
       {
         "command": "team.OpenBuildSummaryPage",
-        "title": "team view build summary"
+        "title": "View Build summary",
+        "category": "Team"
       },
       {
         "command": "team.OpenTeamSite",
-        "title": "team view website"
+        "title": "View Website",
+        "category": "Team"
       },
       {
         "command": "team.ViewWorkItems",
-        "title": "team view work items"
+        "title": "View Work Items",
+        "category": "Team"
       },
       {
         "command": "team.ViewWorkItemQueries",
-        "title": "team view work item queries"
+        "title": "View Work Item Queries",
+        "category": "Team"
       },
       {
         "command": "team.SendFeedback",
-        "title": "team send feedback"
-      },
-      {
-        "command": "team.Login",
-        "title": "team login"
-      },
-      {
-        "command": "team.Logout",
-        "title": "team logout"
+        "title": "Send Feedback",
+        "category": "Team"
       },
       {
         "command": "team.Signin",
-        "title": "team signin"
+        "title": "Signin",
+        "category": "Team"
       },
       {
         "command": "team.Signout",
-        "title": "team signout"
+        "title": "Signout",
+        "category": "Team"
       },
       {
         "command": "tfvc.Undo",

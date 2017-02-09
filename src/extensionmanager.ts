@@ -169,7 +169,7 @@ export class ExtensionManager  {
             displayError = util.format(Strings.NoAccessTokenLearnMoreRunSignin, this._serverContext.RepoInfo.Account);
         }
         Logger.LogError(error);
-        this.setErrorStatus(error, CommandNames.Login, false);
+        this.setErrorStatus(error, CommandNames.Signin, false);
         VsCodeUtils.ShowErrorMessageWithOptions(displayError, messageItem).then((item) => {
             if (item) {
                 Utils.OpenUrl(item.url);
@@ -253,7 +253,7 @@ export class ExtensionManager  {
                                 Logger.LogObject(settings);
                                 this.logDebugInformation();
                             } catch (err) {
-                                this.setErrorStatus(Utils.GetMessageForStatusCode(err, err.message), (err.statusCode === 401 ? CommandNames.Login : undefined), false);
+                                this.setErrorStatus(Utils.GetMessageForStatusCode(err, err.message), (err.statusCode === 401 ? CommandNames.Signin : undefined), false);
                                 this.ReportError(Utils.GetMessageForStatusCode(err, err.message, "Failed to get results with accountClient: "), err);
                             }
                         } catch (err) {
@@ -263,13 +263,13 @@ export class ExtensionManager  {
                                 this.setErrorStatus(Strings.UnsupportedServerVersion, undefined, false);
                                 Logger.LogError(Strings.UnsupportedServerVersion);
                             } else {
-                                this.setErrorStatus(Utils.GetMessageForStatusCode(err, err.message), (err.statusCode === 401 ? CommandNames.Login : undefined), false);
+                                this.setErrorStatus(Utils.GetMessageForStatusCode(err, err.message), (err.statusCode === 401 ? CommandNames.Signin : undefined), false);
                                 this.ReportError(Utils.GetMessageForStatusCode(err, err.message, "Failed call with repositoryClient: "), err);
                             }
                         }
                     }
                 }).fail((reason) => {
-                    this.setErrorStatus(Utils.GetMessageForStatusCode(reason, reason.message), (reason.statusCode === 401 ? CommandNames.Login : undefined), false);
+                    this.setErrorStatus(Utils.GetMessageForStatusCode(reason, reason.message), (reason.statusCode === 401 ? CommandNames.Signin : undefined), false);
                     //If we can't get a requestHandler, report the error via the feedbackclient
                     this._feedbackClient.ReportError(Utils.GetMessageForStatusCode(reason, reason.message, "Failed to get a credential handler"), reason);
                 });
