@@ -20,11 +20,11 @@ var fs = require("fs");
 export class Status implements ITfvcCommand<IPendingChange[]> {
     private _serverContext: TeamServerContext;
     private _localPaths: string[];
-    private _ignoreFolers: boolean;
+    private _ignoreFolders: boolean;
 
     public constructor(serverContext: TeamServerContext, ignoreFolders: boolean, localPaths?: string[]) {
         this._serverContext = serverContext;
-        this._ignoreFolers = ignoreFolders;
+        this._ignoreFolders = ignoreFolders;
         this._localPaths = localPaths;
     }
 
@@ -73,14 +73,14 @@ export class Status implements ITfvcCommand<IPendingChange[]> {
             const pending: any = json.status.pendingchanges[0].pendingchange;
             if (pending) {
                 for (let i = 0; i < pending.length; i++) {
-                    this.add(changes, this.convert(pending[i].$, false), this._ignoreFolers);
+                    this.add(changes, this.convert(pending[i].$, false), this._ignoreFolders);
                 }
             }
             // next, get all the candidate pending changes
             const candidate: any = json.status.candidatependingchanges[0].pendingchange;
             if (candidate) {
                 for (let i = 0; i < candidate.length; i++) {
-                    this.add(changes, this.convert(candidate[i].$, false), this._ignoreFolers);
+                    this.add(changes, this.convert(candidate[i].$, false), this._ignoreFolders);
                 }
             }
         }
