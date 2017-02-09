@@ -39,6 +39,7 @@ export class CommandNames {
 export class TfvcCommandNames {
     static CommandPrefix: string = "tfvc.";
     static Status: string = TfvcCommandNames.CommandPrefix + "Status";
+    static Undo: string = TfvcCommandNames.CommandPrefix + "Undo";
 }
 
 export class SettingNames {
@@ -90,6 +91,7 @@ export class TfvcTelemetryEvents {
     static OpenRepositoryHistory: string = TfvcTelemetryEvents.TelemetryPrefix + "openrepohistory";
     static Status: string = TfvcTelemetryEvents.TelemetryPrefix + "status";
     static StartUp: string = TfvcTelemetryEvents.TelemetryPrefix + "startup";
+    static Undo: string = TfvcTelemetryEvents.TelemetryPrefix + "undo";
 }
 
 export class WellKnownRepositoryTypes {

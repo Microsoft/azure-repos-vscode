@@ -47,4 +47,5 @@ export async function activate(context: ExtensionContext) {
 
     // TFVC Commands
     context.subscriptions.push(commands.registerCommand(TfvcCommandNames.Status, () => _extensionManager.Tfvc.TfvcStatus()));
+    context.subscriptions.push(commands.registerCommand(TfvcCommandNames.Undo, () => _extensionManager.Tfvc.TfvcUndo()));
 }

@@ -145,6 +145,10 @@
       {
         "command": "tfvc.Status",
         "title": "TFVC: Status"
+      },
+      {
+        "command": "tfvc.Undo",
+        "title": "TFVC: Undo"
       }
     ]
   },

@@ -14,6 +14,7 @@ import { FindWorkspace } from "./commands/findworkspace";
 import { Status } from "./commands/status";
 import { GetInfo } from "./commands/getinfo";
 import { GetFileContent } from "./commands/getfilecontent";
+import { Undo } from "./commands/undo";
 
 var _ = require("underscore");
 
@@ -71,6 +72,12 @@ export class Repository {
         Logger.LogDebug(`TFVC Repository.GetStatus`);
         return this.RunCommand<IPendingChange[]>(
             new Status(this._serverContext, ignoreFiles === undefined ? true : ignoreFiles));
+    }
+
+    public async Undo(itemPaths: string[]): Promise<string[]> {
+        Logger.LogDebug(`TFVC Repository.Undo`);
+        return this.RunCommand<string[]>(
+            new Undo(this._serverContext, itemPaths));
     }
 
     public async CheckVersion(): Promise<string> {

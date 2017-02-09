@@ -5,7 +5,7 @@
 "use strict";
 
 import url = require("url");
-import { window, workspace } from "vscode";
+import { TextEditor, window, workspace } from "vscode";
 import { RepositoryType } from "../contexts/repositorycontext";
 import { TfvcContext } from "../contexts/tfvccontext";
 import { ExtensionManager } from "../extensionmanager";
@@ -42,6 +42,29 @@ export class TfvcExtension  {
             const chosenItem: IPendingChange = await UIHelper.ChoosePendingChange(await this._repo.GetStatus());
             if (chosenItem) {
                 window.showTextDocument(await workspace.openTextDocument(chosenItem.localItem));
+            }
+        } catch (err) {
+            this._manager.DisplayErrorMessage(err.message);
+        }
+    }
+
+    /**
+     * This command runs an undo command on the currently open file in the VSCode workspace folder and 
+     * editor.  If the undo command applies to the file, the pending changes will be undone.  The 
+     * file system watcher will update the UI soon thereafter.  No results are displayed to the user.
+     */
+    public async TfvcUndo(): Promise<void> {
+        if (!this._manager.EnsureInitialized(RepositoryType.TFVC)) {
+            this._manager.DisplayErrorMessage();
+            return;
+        }
+
+        try {
+            this._manager.Telemetry.SendEvent(TfvcTelemetryEvents.Undo);
+            //TODO: When calling from UI, UI will need to call repository.Undo([filePath]);
+            let editor: TextEditor = window.activeTextEditor;
+            if (editor) {
+                await this._repo.Undo([editor.document.fileName]);
             }
         } catch (err) {
             this._manager.DisplayErrorMessage(err.message);
