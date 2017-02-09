@@ -77,7 +77,7 @@ export class CommandHelper {
         return "\n";
     }
 
-    public static SplitIntoLines(stdout: string, skipWarnings?: boolean): string[] {
+    public static SplitIntoLines(stdout: string, skipWarnings?: boolean, filterEmptyLines?: boolean): string[] {
         let lines: string[] = stdout.replace(/\r\n/g, "\n").split("\n");
         skipWarnings = skipWarnings === undefined ? true : skipWarnings;
 
@@ -88,6 +88,9 @@ export class CommandHelper {
                 index++;
             }
             lines = lines.splice(index);
+        }
+        if (filterEmptyLines) {
+            lines = lines.filter(e => e !== "");
         }
         return lines;
     }

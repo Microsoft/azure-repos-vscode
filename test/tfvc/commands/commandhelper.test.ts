@@ -45,6 +45,28 @@ describe("Tfvc-CommandHelper", function() {
         assert.equal(lines[6], "");
     });
 
+    it("should verify SplitIntoLines - filter empty lines", function() {
+        let text: string = "zero\n\none\ntwo\r\n";
+        let lines: string[] = CommandHelper.SplitIntoLines(text, false, true);
+        assert.equal(lines.length, 3);
+        assert.equal(lines[0], "zero");
+        assert.equal(lines[1], "one");
+        assert.equal(lines[2], "two");
+    });
+
+    it("should verify SplitIntoLines - leave empty lines", function() {
+        let text: string = "one\ntwo\n\nthree\nfour\n\n";
+        let lines: string[] = CommandHelper.SplitIntoLines(text);
+        assert.equal(lines.length, 7);
+        assert.equal(lines[0], "one");
+        assert.equal(lines[1], "two");
+        assert.equal(lines[2], "");
+        assert.equal(lines[3], "three");
+        assert.equal(lines[4], "four");
+        assert.equal(lines[5], "");
+        assert.equal(lines[6], "");
+    });
+
     it("should verify TrimToXml", async function() {
         let text: string = "WARN 1\nWARN 2\nwarning\n<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<status>\r\n</status>\n\n";
         let xml: string = CommandHelper.TrimToXml(text);
