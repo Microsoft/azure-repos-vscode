@@ -16,6 +16,7 @@ import { TfvcErrorCodes } from "./tfvcerror";
 import { Repository } from "./repository";
 import { UIHelper } from "./uihelper";
 import { IItemInfo, IPendingChange } from "./interfaces";
+import { TfvcOutput } from "./tfvcoutput";
 
 export class TfvcExtension  {
     private _tfvc: Tfvc;
@@ -24,6 +25,30 @@ export class TfvcExtension  {
 
     constructor(manager: ExtensionManager) {
         this._manager = manager;
+    }
+
+    public async TfvcCheckin(): Promise<void> {
+        //
+    }
+
+    public async TfvcExclude(): Promise<void> {
+        //
+    }
+
+    public async TfvcExcludeAll(): Promise<void> {
+        //
+    }
+
+    public async TfvcInclude(): Promise<void> {
+        //
+    }
+
+    public async TfvcIncludeAll(): Promise<void> {
+        //
+    }
+
+    public async TfvcShowOutput(): Promise<void> {
+        TfvcOutput.Show();
     }
 
     /**

@@ -25,4 +25,10 @@ export class TfvcOutput {
             TfvcOutput._outputChannel.append(line + "\n");
         }
     }
+
+    public static Show() {
+        if (TfvcOutput._outputChannel) {
+            TfvcOutput._outputChannel.show();
+        }
+    }
 }

@@ -36,6 +36,74 @@
   ],
   "main": "./out/src/extension",
   "contributes": {
+    "menus": {
+      "scm/title": [
+        {
+          "command" : "tfvc.Checkin",
+          "group": "navigation@1",
+          "when": "scmProvider == tfvc"
+        },
+        {
+          "command" : "tfvc.Status",
+          "group": "navigation@2",
+          "when": "scmProvider == tfvc"
+        },
+        {
+          "command" : "tfvc.Undo",
+          "group": "1_sync",
+          "when": "scmProvider == tfvc"
+        },
+        {
+          "command" : "team.Signout",
+          "group": "2_publish",
+          "when": "scmProvider == tfvc"
+        },
+        {
+          "command" : "team.Signout",
+          "group": "3_commit",
+          "when": "scmProvider == tfvc"
+        },
+        {
+          "command" : "team.OpenNewWorkItem",
+          "group": "4_stage",
+          "when": "scmProvider == tfvc"
+        },
+        {
+          "command" : "tfvc.ShowOutput",
+          "group": "5_output",
+          "when": "scmProvider == tfvc"
+        }
+      ],
+      "scm/resourceGroup/context": [
+        {
+          "command": "tfvc.ExcludeAll",
+          "when": "scmProvider == tfvc && scmResourceGroup == included",
+          "group": "navigation"
+        },
+        {
+          "command": "tfvc.IncludeAll",
+          "when": "scmProvider == tfvc && scmResourceGroup == excluded",
+          "group": "navigation"
+        }
+      ],
+      "scm/resource/context": [
+        {
+          "command": "tfvc.Exclude",
+          "when": "scmProvider == tfvc && scmResourceGroup == included",
+          "group": "1_sync"
+        },
+        {
+          "command": "tfvc.Include",
+          "when": "scmProvider == tfvc && scmResourceGroup == excluded",
+          "group": "navigation"
+        },
+        {
+          "command": "tfvc.Include",
+          "when": "scmProvider == tfvc && scmResourceGroup == included",
+          "group": "navigation"
+        }
+      ]
+    },
     "configuration": {
       "type": "object",
       "title": "Team Services extension options",
@@ -149,13 +217,38 @@
         "category": "Team"
       },
       {
-        "command": "tfvc.Undo",
-        "title": "Undo",
+        "command": "tfvc.Checkin",
+        "title": "Checkin",
         "category": "TFVC",
         "icon": {
           "light": "resources/icons/light/check.svg",
           "dark": "resources/icons/dark/check.svg"
         }
+      },
+      {
+        "command": "tfvc.ExcludeAll",
+        "title": "Exclude All",
+        "category": "TFVC"
+      },
+      {
+        "command": "tfvc.Exclude",
+        "title": "Exclude",
+        "category": "TFVC"
+      },
+      {
+        "command": "tfvc.IncludeAll",
+        "title": "Include All",
+        "category": "TFVC"
+      },
+      {
+        "command": "tfvc.Include",
+        "title": "Include",
+        "category": "TFVC"
+      },
+      {
+        "command": "tfvc.ShowOutput",
+        "title": "Show TFVC Output",
+        "category": "TFVC"
       },
       {
         "command": "tfvc.Status",
@@ -165,6 +258,11 @@
           "light": "resources/icons/light/refresh.svg",
           "dark": "resources/icons/dark/refresh.svg"
         }
+      },
+      {
+        "command": "tfvc.Undo",
+        "title": "Undo",
+        "category": "TFVC"
       }
     ]
   },
