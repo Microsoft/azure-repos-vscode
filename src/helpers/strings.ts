@@ -64,6 +64,7 @@ export class Strings {
     static TfExecFailedError: string = "Execution of the TFVC command line failed unexpectedly.";
     static TfVersionWarning: string = "The installed version of the TF command line does not meet the minimum suggested version. You may run into errors or limitations with certain commands until you upgrade. Minimum suggested version: ";
     static TfNoPendingChanges: string = "There are no matching pending changes.";
+    static UndoChanges: string = "Undo Changes";
 
     // TFVC viewlet Strings
     static ExcludedGroupName: string = "Excluded changes";

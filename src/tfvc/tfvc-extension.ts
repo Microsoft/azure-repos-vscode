@@ -4,14 +4,17 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
+import * as path from "path";
 import url = require("url");
-import { TextEditor, window, workspace } from "vscode";
+import { Uri, window, workspace } from "vscode";
 import { RepositoryType } from "../contexts/repositorycontext";
 import { TfvcContext } from "../contexts/tfvccontext";
 import { ExtensionManager } from "../extensionmanager";
 import { TfvcTelemetryEvents } from "../helpers/constants";
+import { Strings } from "../helpers/strings";
 import { Utils } from "../helpers/utils";
 import { Tfvc } from "./tfvc";
+import { TfvcSCMProvider } from "./tfvcscmprovider";
 import { TfvcErrorCodes } from "./tfvcerror";
 import { Repository } from "./repository";
 import { UIHelper } from "./uihelper";
@@ -78,18 +81,32 @@ export class TfvcExtension  {
      * editor.  If the undo command applies to the file, the pending changes will be undone.  The 
      * file system watcher will update the UI soon thereafter.  No results are displayed to the user.
      */
-    public async TfvcUndo(): Promise<void> {
+    public async TfvcUndo(uri?: Uri): Promise<void> {
         if (!this._manager.EnsureInitialized(RepositoryType.TFVC)) {
             this._manager.DisplayErrorMessage();
             return;
         }
 
         try {
-            this._manager.Telemetry.SendEvent(TfvcTelemetryEvents.Undo);
-            //TODO: When calling from UI, UI will need to call repository.Undo([filePath]);
-            let editor: TextEditor = window.activeTextEditor;
-            if (editor) {
-                await this._repo.Undo([editor.document.fileName]);
+            //When calling from UI, we have the uri of the resource from which the command was invoked
+            let pathToUndo: string = TfvcSCMProvider.GetPathFromUri(uri);
+            if (!pathToUndo) {
+                //This is called from the command palette, so check for an open file in the editor
+                if (window.activeTextEditor) {
+                    pathToUndo = window.activeTextEditor.document.fileName;
+                }
+            }
+            if (pathToUndo) {
+                const basename: string = path.basename(pathToUndo);
+                const message: string = `Are you sure you want to undo changes in ${basename}?`;
+                //TODO: use Modal api once vscode.d.ts exposes it (currently proposed)
+                const pick: string = await window.showWarningMessage(message, /*{ modal: true },*/ Strings.UndoChanges);
+                if (pick !== Strings.UndoChanges) {
+                    return;
+                }
+
+                this._manager.Telemetry.SendEvent(TfvcTelemetryEvents.Undo);
+                await this._repo.Undo([pathToUndo]);
             }
         } catch (err) {
             this._manager.DisplayErrorMessage(err.message);

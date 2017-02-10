@@ -88,11 +88,6 @@
       ],
       "scm/resource/context": [
         {
-          "command": "tfvc.Exclude",
-          "when": "scmProvider == tfvc && scmResourceGroup == included",
-          "group": "1_sync"
-        },
-        {
           "command": "tfvc.Include",
           "when": "scmProvider == tfvc && scmResourceGroup == excluded",
           "group": "navigation"
@@ -101,6 +96,26 @@
           "command": "tfvc.Include",
           "when": "scmProvider == tfvc && scmResourceGroup == included",
           "group": "navigation"
+        },
+        {
+          "command": "tfvc.Exclude",
+          "when": "scmProvider == tfvc && scmResourceGroup == included",
+          "group": "1_sync"
+        },
+        {
+          "command": "tfvc.Undo",
+          "when": "scmProvider == tfvc",
+          "group": "inline@1"
+        },
+        {
+          "command": "tfvc.Include",
+          "when": "scmProvider == tfvc && scmResourceGroup == excluded",
+          "group": "inline@2"
+        },
+        {
+          "command": "tfvc.Exclude",
+          "when": "scmProvider == tfvc && scmResourceGroup == included",
+          "group": "inline@2"
         }
       ]
     },
@@ -233,7 +248,11 @@
       {
         "command": "tfvc.Exclude",
         "title": "Exclude",
-        "category": "TFVC"
+        "category": "TFVC",
+        "icon": {
+          "light": "resources/icons/light/unstage.svg",
+          "dark": "resources/icons/dark/unstage.svg"
+        }
       },
       {
         "command": "tfvc.IncludeAll",
@@ -243,7 +262,11 @@
       {
         "command": "tfvc.Include",
         "title": "Include",
-        "category": "TFVC"
+        "category": "TFVC",
+        "icon": {
+          "light": "resources/icons/light/stage.svg",
+          "dark": "resources/icons/dark/stage.svg"
+        }
       },
       {
         "command": "tfvc.ShowOutput",
@@ -262,7 +285,11 @@
       {
         "command": "tfvc.Undo",
         "title": "Undo",
-        "category": "TFVC"
+        "category": "TFVC",
+        "icon": {
+          "light": "resources/icons/light/clean.svg",
+          "dark": "resources/icons/dark/clean.svg"
+        }
       }
     ]
   },

@@ -4,7 +4,7 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import { commands, scm, Uri, Disposable, SCMProvider, SCMResourceGroup, Event, ProviderResult, workspace } from "vscode";
+import { commands, scm, Uri, Disposable, SCMProvider, SCMResource, SCMResourceGroup, Event, ProviderResult, workspace } from "vscode";
 import { Model } from "./scm/model";
 import { Status } from "./scm/status";
 import { Resource } from "./scm/resource";
@@ -173,4 +173,33 @@ export class TfvcSCMProvider implements SCMProvider {
 
         return "";
     }
+
+    private static ResolveTfvcURI(uri: Uri): SCMResource | SCMResourceGroup | undefined {
+        if (uri.authority !== TfvcSCMProvider.scmScheme) {
+            return;
+        }
+
+        return scm.getResourceFromURI(uri);
+    }
+
+    private static ResolveTfvcResource(uri: Uri): Resource | undefined {
+        const resource = TfvcSCMProvider.ResolveTfvcURI(uri);
+
+        if (!(resource instanceof Resource)) {
+            return;
+        }
+
+        return resource;
+    }
+
+    public static GetPathFromUri(uri: Uri): string | undefined {
+        if (uri) {
+            const resource = TfvcSCMProvider.ResolveTfvcResource(uri);
+            if (resource) {
+                return resource.uri.fsPath;
+            }
+        }
+        return undefined;
+    }
+
 }
