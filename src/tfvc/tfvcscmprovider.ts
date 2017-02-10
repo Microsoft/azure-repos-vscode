@@ -182,7 +182,7 @@ export class TfvcSCMProvider implements SCMProvider {
         return scm.getResourceFromURI(uri);
     }
 
-    private static ResolveTfvcResource(uri: Uri): Resource | undefined {
+    private static ResolveTfvcResource(uri: Uri): Resource {
         const resource = TfvcSCMProvider.ResolveTfvcURI(uri);
 
         if (!(resource instanceof Resource)) {
@@ -192,7 +192,7 @@ export class TfvcSCMProvider implements SCMProvider {
         return resource;
     }
 
-    public static GetPathFromUri(uri: Uri): string | undefined {
+    public static GetPathFromUri(uri: Uri): string {
         if (uri) {
             const resource = TfvcSCMProvider.ResolveTfvcResource(uri);
             if (resource) {
