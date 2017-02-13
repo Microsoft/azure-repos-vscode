@@ -42,6 +42,10 @@ export class TfvcSCMProvider implements SCMProvider {
     }
 
     /* Static helper methods */
+    public static ClearCheckinMessage(): void {
+        scm.inputBox.value = "";
+    }
+
     public static GetCheckinInfo(): ICheckinInfo {
         const tfvcProvider: TfvcSCMProvider = TfvcSCMProvider.instance;
         if (!tfvcProvider) {
@@ -74,6 +78,39 @@ export class TfvcSCMProvider implements SCMProvider {
             throw TfvcError.CreateUnknownError(err);
         }
     }
+
+    public static async Exclude(path: string): Promise<void> {
+        const tfvcProvider: TfvcSCMProvider = TfvcSCMProvider.instance;
+        if (!tfvcProvider) {
+            // We are not the active provider
+            Logger.LogDebug("Failed to GetCheckinInfo. TFVC is not the active provider.");
+            throw TfvcError.CreateInvalidStateError();
+        }
+
+        await tfvcProvider._model.Exclude(path);
+    };
+
+    public static async Refresh(): Promise<void> {
+        const tfvcProvider: TfvcSCMProvider = TfvcSCMProvider.instance;
+        if (!tfvcProvider) {
+            // We are not the active provider
+            Logger.LogDebug("Failed to GetCheckinInfo. TFVC is not the active provider.");
+            throw TfvcError.CreateInvalidStateError();
+        }
+
+        await tfvcProvider._model.Refresh();
+    };
+
+    public static async Unexclude(path: string): Promise<void> {
+        const tfvcProvider: TfvcSCMProvider = TfvcSCMProvider.instance;
+        if (!tfvcProvider) {
+            // We are not the active provider
+            Logger.LogDebug("Failed to GetCheckinInfo. TFVC is not the active provider.");
+            throw TfvcError.CreateInvalidStateError();
+        }
+
+        await tfvcProvider._model.Unexclude(path);
+    };
 
     /* Public methods */
 
@@ -224,14 +261,17 @@ export class TfvcSCMProvider implements SCMProvider {
         return scm.getResourceFromURI(uri);
     }
 
-    private static ResolveTfvcResource(uri: Uri): Resource {
-        const resource = TfvcSCMProvider.ResolveTfvcURI(uri);
+    public static ResolveTfvcResource(uri: Uri): Resource {
+        if (uri) {
+            const resource = TfvcSCMProvider.ResolveTfvcURI(uri);
 
-        if (!(resource instanceof Resource)) {
-            return;
+            if (!(resource instanceof Resource)) {
+                return undefined;
+            }
+
+            return resource;
         }
-
-        return resource;
+        return undefined;
     }
 
     public static GetPathFromUri(uri: Uri): string {

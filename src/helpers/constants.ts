@@ -41,6 +41,7 @@ export class TfvcCommandNames {
     static ExcludeAll: string = TfvcCommandNames.CommandPrefix + "ExcludeAll";
     static Include: string = TfvcCommandNames.CommandPrefix + "Include";
     static IncludeAll: string = TfvcCommandNames.CommandPrefix + "IncludeAll";
+    static Refresh: string = TfvcCommandNames.CommandPrefix + "Refresh";
     static ShowOutput: string = TfvcCommandNames.CommandPrefix + "ShowOutput";
     static Status: string = TfvcCommandNames.CommandPrefix + "Status";
     static Undo: string = TfvcCommandNames.CommandPrefix + "Undo";

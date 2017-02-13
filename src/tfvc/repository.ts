@@ -16,6 +16,7 @@ import { GetFileContent } from "./commands/getfilecontent";
 import { GetVersion } from "./commands/getversion";
 import { Status } from "./commands/status";
 import { Undo } from "./commands/undo";
+import { Add } from "./commands/add";
 
 var _ = require("underscore");
 
@@ -55,6 +56,12 @@ export class Repository {
         Logger.LogDebug(`TFVC Repository.Checkin`);
         return this.RunCommand<string>(
             new Checkin(this._serverContext, files, comment, workItemIds));
+    }
+
+    public async Add(itemPaths: string[]): Promise<string[]> {
+        Logger.LogDebug(`TFVC Repository.Add`);
+        return this.RunCommand<string[]>(
+            new Add(this._serverContext, itemPaths));
     }
 
     public async FindWorkspace(localPath: string): Promise<IWorkspace> {

@@ -14,6 +14,7 @@ import { TfvcTelemetryEvents } from "../helpers/constants";
 import { Strings } from "../helpers/strings";
 import { Utils } from "../helpers/utils";
 import { Tfvc } from "./tfvc";
+import { Resource } from "./scm/resource";
 import { TfvcSCMProvider } from "./tfvcscmprovider";
 import { TfvcErrorCodes } from "./tfvcerror";
 import { Repository } from "./repository";
@@ -48,25 +49,57 @@ export class TfvcExtension  {
             const changeset: string =
                 await this._repo.Checkin(checkinInfo.files, checkinInfo.comment, checkinInfo.workItemIds);
             TfvcOutput.AppendLine("Changeset " + changeset + " checked in.");
+            TfvcSCMProvider.ClearCheckinMessage();
         } catch (err) {
             this._manager.DisplayErrorMessage(err.message);
         }
     }
 
-    public async TfvcExclude(): Promise<void> {
-        //
+    public async TfvcExclude(uri?: Uri): Promise<void> {
+        if (!this._manager.EnsureInitialized(RepositoryType.TFVC)) {
+            this._manager.DisplayErrorMessage();
+            return;
+        }
+
+        if (uri) {
+            //Keep an in-memory list of items that were explicitly excluded. The list is not persisted at this time.
+            await TfvcSCMProvider.Exclude(TfvcSCMProvider.GetPathFromUri(uri));
+        }
     }
 
-    public async TfvcExcludeAll(): Promise<void> {
-        //
+    public async TfvcInclude(uri?: Uri): Promise<void> {
+        if (!this._manager.EnsureInitialized(RepositoryType.TFVC)) {
+            this._manager.DisplayErrorMessage();
+            return;
+        }
+
+        if (uri) {
+            let resource: Resource = TfvcSCMProvider.ResolveTfvcResource(uri);
+            let path: string = TfvcSCMProvider.GetPathFromUri(uri);
+
+            //At this point, an unversioned file could be a candidate file, so call Add.  Once it is added, it should be a Pending change.
+            if (!resource.IsVersioned) {
+                await this._repo.Add([path]);
+                //Even if adding a file, Unexclude it (it may have been excluded previously)
+            }
+
+            //Otherwise, ensure its not in the explicitly excluded list (if it's already there)
+            //Unexclude doesn't explicitly INclude.  It defers to the status of the individual item.
+            await TfvcSCMProvider.Unexclude(path);
+        }
     }
 
-    public async TfvcInclude(): Promise<void> {
-        //
-    }
+    public async TfvcRefresh(): Promise<void> {
+        if (!this._manager.EnsureInitialized(RepositoryType.TFVC)) {
+            this._manager.DisplayErrorMessage();
+            return;
+        }
 
-    public async TfvcIncludeAll(): Promise<void> {
-        //
+        try {
+            TfvcSCMProvider.Refresh();
+        } catch (err) {
+            this._manager.DisplayErrorMessage(err.message);
+        }
     }
 
     public async TfvcShowOutput(): Promise<void> {

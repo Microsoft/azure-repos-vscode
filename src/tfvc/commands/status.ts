@@ -79,7 +79,7 @@ export class Status implements ITfvcCommand<IPendingChange[]> {
             const candidate: any = json.status.candidatependingchanges[0].pendingchange;
             if (candidate) {
                 for (let i = 0; i < candidate.length; i++) {
-                    this.add(changes, this.convert(candidate[i].$, false), this._ignoreFolders);
+                    this.add(changes, this.convert(candidate[i].$, true), this._ignoreFolders);
                 }
             }
         }

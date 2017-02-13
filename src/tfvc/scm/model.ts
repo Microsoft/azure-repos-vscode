@@ -12,11 +12,14 @@ import { ResourceGroup, IncludedGroup, ExcludedGroup, MergeGroup } from "./resou
 import { IPendingChange } from "../interfaces";
 import { Status } from "./status";
 
+import * as _ from "underscore";
+
 export class Model {
     private _disposables: Disposable[] = [];
     private _repositoryRoot: string;
     private _repository: Repository;
     private _statusAlreadyInProgress: boolean;
+    private _explicitlyExcluded: string[] = [];
 
     private _onDidChange = new EventEmitter<SCMResourceGroup[]>();
     public get onDidChange(): Event<SCMResourceGroup[]> {
@@ -78,6 +81,30 @@ export class Model {
         });
     }
 
+    //Add the item to the explicitly excluded list.
+    public async Exclude(path: string): Promise<void> {
+        if (path) {
+            if (!_.contains(this._explicitlyExcluded, path)) {
+                this._explicitlyExcluded.push(path);
+                await this.update();
+            }
+        }
+    }
+
+    //Unexclude doesn't explicitly INclude.  It defers to the status of the individual item.
+    public async Unexclude(path: string): Promise<void>  {
+        if (path) {
+            if (_.contains(this._explicitlyExcluded, path)) {
+                this._explicitlyExcluded = _.without(this._explicitlyExcluded, path);
+                await this.update();
+            }
+        }
+    }
+
+    public async Refresh(): Promise<void>  {
+        await this.update();
+    }
+
     private async update(): Promise<void> {
         const changes: IPendingChange[] = await this._repository.GetStatus();
         const included: Resource[] = [];
@@ -90,7 +117,21 @@ export class Model {
             if (resource.HasStatus(Status.MERGE)) {
                 return merge.push(resource);
             } else {
-                return included.push(resource);
+                //If explicitly excluded, that has highest priority
+                if (_.contains(this._explicitlyExcluded, resource.uri.fsPath)) {
+                    return excluded.push(resource);
+                }
+                //Versioned changes should always be included
+                if (resource.IsVersioned) {
+                    return included.push(resource);
+                }
+                //Pending changes should be included
+                if (!resource.PendingChange.isCandidate) {
+                    return included.push(resource);
+                }
+                //Others:
+                //Candidate changes should be excluded
+                return excluded.push(resource);
             }
         });
 

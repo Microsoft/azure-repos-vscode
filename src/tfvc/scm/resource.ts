@@ -14,11 +14,13 @@ export class Resource implements SCMResource {
     private _uri: Uri;
     private _statuses: Status[];
     private _change: IPendingChange;
+    private _version: string;
 
     constructor(change: IPendingChange) {
         this._change = change;
         this._uri = Uri.file(change.localItem);
         this._statuses = GetStatuses(change.changeType);
+        this._version = change.version;
     }
 
     public get PendingChange(): IPendingChange { return this._change; }
@@ -27,6 +29,8 @@ export class Resource implements SCMResource {
     public HasStatus(status: Status): boolean {
         return this._statuses.findIndex(s => s === status) >= 0;
     }
+
+    get IsVersioned(): boolean { return this._version !== "0"; }
 
     /**
      * This method gets a vscode file uri that represents the server path and version that the local item is based on.

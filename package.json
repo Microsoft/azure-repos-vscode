@@ -44,7 +44,7 @@
           "when": "scmProvider == tfvc"
         },
         {
-          "command" : "tfvc.Status",
+          "command" : "tfvc.Refresh",
           "group": "navigation@2",
           "when": "scmProvider == tfvc"
         },
@@ -72,18 +72,6 @@
           "command" : "tfvc.ShowOutput",
           "group": "5_output",
           "when": "scmProvider == tfvc"
-        }
-      ],
-      "scm/resourceGroup/context": [
-        {
-          "command": "tfvc.ExcludeAll",
-          "when": "scmProvider == tfvc && scmResourceGroup == included",
-          "group": "navigation"
-        },
-        {
-          "command": "tfvc.IncludeAll",
-          "when": "scmProvider == tfvc && scmResourceGroup == excluded",
-          "group": "navigation"
         }
       ],
       "scm/resource/context": [
@@ -241,11 +229,6 @@
         }
       },
       {
-        "command": "tfvc.ExcludeAll",
-        "title": "Exclude All",
-        "category": "TFVC"
-      },
-      {
         "command": "tfvc.Exclude",
         "title": "Exclude",
         "category": "TFVC",
@@ -253,11 +236,6 @@
           "light": "resources/icons/light/unstage.svg",
           "dark": "resources/icons/dark/unstage.svg"
         }
-      },
-      {
-        "command": "tfvc.IncludeAll",
-        "title": "Include All",
-        "category": "TFVC"
       },
       {
         "command": "tfvc.Include",
@@ -274,8 +252,8 @@
         "category": "TFVC"
       },
       {
-        "command": "tfvc.Status",
-        "title": "Status",
+        "command": "tfvc.Refresh",
+        "title": "Refresh",
         "category": "TFVC",
         "icon": {
           "light": "resources/icons/light/refresh.svg",
