@@ -30,7 +30,7 @@ import * as path from "path";
  */
 export class TfvcSCMProvider implements SCMProvider {
     public static scmScheme: string = "tfvc";
-    public static instance: TfvcSCMProvider = undefined;
+    private static instance: TfvcSCMProvider = undefined;
 
     private _extensionManager: ExtensionManager;
     private _repoContext: TfvcContext;
@@ -47,12 +47,7 @@ export class TfvcSCMProvider implements SCMProvider {
     }
 
     public static GetCheckinInfo(): ICheckinInfo {
-        const tfvcProvider: TfvcSCMProvider = TfvcSCMProvider.instance;
-        if (!tfvcProvider) {
-            // We are not the active provider
-            Logger.LogDebug("Failed to GetCheckinInfo. TFVC is not the active provider.");
-            throw TfvcError.CreateInvalidStateError();
-        }
+        const tfvcProvider: TfvcSCMProvider = TfvcSCMProvider.GetProviderInstance();
 
         try {
             const files: string[] = [];
@@ -80,34 +75,19 @@ export class TfvcSCMProvider implements SCMProvider {
     }
 
     public static async Exclude(path: string): Promise<void> {
-        const tfvcProvider: TfvcSCMProvider = TfvcSCMProvider.instance;
-        if (!tfvcProvider) {
-            // We are not the active provider
-            Logger.LogDebug("Failed to GetCheckinInfo. TFVC is not the active provider.");
-            throw TfvcError.CreateInvalidStateError();
-        }
+        const tfvcProvider: TfvcSCMProvider = TfvcSCMProvider.GetProviderInstance();
 
         await tfvcProvider._model.Exclude(path);
     };
 
     public static async Refresh(): Promise<void> {
-        const tfvcProvider: TfvcSCMProvider = TfvcSCMProvider.instance;
-        if (!tfvcProvider) {
-            // We are not the active provider
-            Logger.LogDebug("Failed to GetCheckinInfo. TFVC is not the active provider.");
-            throw TfvcError.CreateInvalidStateError();
-        }
+        const tfvcProvider: TfvcSCMProvider = TfvcSCMProvider.GetProviderInstance();
 
         await tfvcProvider._model.Refresh();
     };
 
     public static async Unexclude(path: string): Promise<void> {
-        const tfvcProvider: TfvcSCMProvider = TfvcSCMProvider.instance;
-        if (!tfvcProvider) {
-            // We are not the active provider
-            Logger.LogDebug("Failed to GetCheckinInfo. TFVC is not the active provider.");
-            throw TfvcError.CreateInvalidStateError();
-        }
+        const tfvcProvider: TfvcSCMProvider = TfvcSCMProvider.GetProviderInstance();
 
         await tfvcProvider._model.Unexclude(path);
     };
@@ -284,4 +264,13 @@ export class TfvcSCMProvider implements SCMProvider {
         return undefined;
     }
 
+    private static GetProviderInstance(): TfvcSCMProvider {
+        const tfvcProvider: TfvcSCMProvider = TfvcSCMProvider.instance;
+        if (!tfvcProvider) {
+            // We are not the active provider
+            Logger.LogDebug("Failed to GetCheckinInfo. TFVC is not the active provider.");
+            throw TfvcError.CreateInvalidStateError();
+        }
+        return tfvcProvider;
+    }
 }

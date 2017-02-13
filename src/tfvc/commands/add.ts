@@ -55,7 +55,7 @@ export class Add implements ITfvcCommand<string[]> {
             let line: string = lines[index];
             if (this.isFilePath(line)) {
                 path = line;
-            } else if (line) {
+            } else {
                 let file: string = this.getFileFromLine(line);
                 filesAdded.push(this.getFilePath(path, file, ""));
             }

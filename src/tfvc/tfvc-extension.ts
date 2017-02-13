@@ -80,7 +80,7 @@ export class TfvcExtension  {
             //At this point, an unversioned file could be a candidate file, so call Add.  Once it is added, it should be a Pending change.
             if (!resource.IsVersioned) {
                 await this._repo.Add([path]);
-                //Even if adding a file, Unexclude it (it may have been excluded previously)
+                //Don't return after adding, we may still need to unexclude it (it may have been excluded previously)
             }
 
             //Otherwise, ensure its not in the explicitly excluded list (if it's already there)

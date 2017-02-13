@@ -84,8 +84,9 @@ export class Model {
     //Add the item to the explicitly excluded list.
     public async Exclude(path: string): Promise<void> {
         if (path) {
-            if (!_.contains(this._explicitlyExcluded, path)) {
-                this._explicitlyExcluded.push(path);
+            let normalizedPath: string = path.toLowerCase();
+            if (!_.contains(this._explicitlyExcluded, normalizedPath)) {
+                this._explicitlyExcluded.push(normalizedPath);
                 await this.update();
             }
         }
@@ -94,8 +95,9 @@ export class Model {
     //Unexclude doesn't explicitly INclude.  It defers to the status of the individual item.
     public async Unexclude(path: string): Promise<void>  {
         if (path) {
-            if (_.contains(this._explicitlyExcluded, path)) {
-                this._explicitlyExcluded = _.without(this._explicitlyExcluded, path);
+            let normalizedPath: string = path.toLowerCase();
+            if (_.contains(this._explicitlyExcluded, normalizedPath)) {
+                this._explicitlyExcluded = _.without(this._explicitlyExcluded, normalizedPath);
                 await this.update();
             }
         }
@@ -118,7 +120,7 @@ export class Model {
                 return merge.push(resource);
             } else {
                 //If explicitly excluded, that has highest priority
-                if (_.contains(this._explicitlyExcluded, resource.uri.fsPath)) {
+                if (_.contains(this._explicitlyExcluded, resource.uri.fsPath.toLowerCase())) {
                     return excluded.push(resource);
                 }
                 //Versioned changes should always be included

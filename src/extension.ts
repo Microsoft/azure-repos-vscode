@@ -46,21 +46,13 @@ export async function activate(context: ExtensionContext) {
     // TFVC Commands
     context.subscriptions.push(commands.registerCommand(TfvcCommandNames.Status, () => _extensionManager.Tfvc.TfvcStatus()));
     context.subscriptions.push(commands.registerCommand(TfvcCommandNames.Undo, (...args) => {
-            if (args) {
-                _extensionManager.Tfvc.TfvcUndo(args[0]);
-            } else {
-                _extensionManager.Tfvc.TfvcUndo();
-            }
+            _extensionManager.Tfvc.TfvcUndo(args ? args[0] : undefined);
         }));
     context.subscriptions.push(commands.registerCommand(TfvcCommandNames.Exclude, (...args) => {
-            if (args) {
-                _extensionManager.Tfvc.TfvcExclude(args[0]);
-            }
+            _extensionManager.Tfvc.TfvcExclude(args ? args[0] : undefined);
         }));
     context.subscriptions.push(commands.registerCommand(TfvcCommandNames.Include, (...args) => {
-            if (args) {
-                _extensionManager.Tfvc.TfvcInclude(args[0]);
-            }
+            _extensionManager.Tfvc.TfvcInclude(args ? args[0] : undefined);
         }));
     context.subscriptions.push(commands.registerCommand(TfvcCommandNames.Refresh, () => _extensionManager.Tfvc.TfvcRefresh()));
     context.subscriptions.push(commands.registerCommand(TfvcCommandNames.ShowOutput, () => _extensionManager.Tfvc.TfvcShowOutput()));
