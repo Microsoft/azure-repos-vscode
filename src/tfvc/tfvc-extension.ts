@@ -19,7 +19,7 @@ import { TfvcSCMProvider } from "./tfvcscmprovider";
 import { TfvcErrorCodes } from "./tfvcerror";
 import { Repository } from "./repository";
 import { UIHelper } from "./uihelper";
-import { ICheckinInfo, IItemInfo, IPendingChange } from "./interfaces";
+import { ICheckinInfo, IItemInfo, IPendingChange, ISyncResults } from "./interfaces";
 import { TfvcOutput } from "./tfvcoutput";
 
 export class TfvcExtension  {
@@ -123,6 +123,25 @@ export class TfvcExtension  {
             if (chosenItem) {
                 window.showTextDocument(await workspace.openTextDocument(chosenItem.localItem));
             }
+        } catch (err) {
+            this._manager.DisplayErrorMessage(err.message);
+        }
+    }
+
+    /**
+     * This command runs a 'tf get' command on the VSCode workspace folder and 
+     * displays the results to the user.
+     */
+    public async TfvcSync(): Promise<void> {
+        if (!this._manager.EnsureInitialized(RepositoryType.TFVC)) {
+            this._manager.DisplayErrorMessage();
+            return;
+        }
+
+        try {
+            this._manager.Telemetry.SendEvent(TfvcTelemetryEvents.Sync);
+            const results: ISyncResults = await this._repo.Sync([this._repo.Path], true);
+            await UIHelper.ShowSyncResults(results, results.hasConflicts || results.hasErrors, true);
         } catch (err) {
             this._manager.DisplayErrorMessage(err.message);
         }

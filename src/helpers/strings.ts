@@ -66,10 +66,19 @@ export class Strings {
     static TfNoPendingChanges: string = "There are no matching pending changes.";
     static UndoChanges: string = "Undo Changes";
     static NoChangesToCheckin: string = "There are no changes to checkin. Changes must be added to the 'Included' section to be checked in.";
+    static AllFilesUpToDate: string = "All files are up to date.";
 
     // TFVC viewlet Strings
     static ExcludedGroupName: string = "Excluded changes";
     static IncludedGroupName: string = "Included changes";
     static MergeGroupName: string = "Merge changes";
+
+    // TFVC Sync Types
+    static SyncTypeConflict: string = "Conflict";
+    static SyncTypeDeleted: string = "Deleted";
+    static SyncTypeError: string = "Error";
+    static SyncTypeNew: string = "New";
+    static SyncTypeUpdated: string = "Updated";
+    static SyncTypeWarning: string = "Warning";
 }
 /* tslint:enable:variable-name */

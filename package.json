@@ -49,8 +49,13 @@
           "when": "scmProvider == tfvc"
         },
         {
+          "command" : "tfvc.Sync",
+          "group": "1_sync@1",
+          "when": "scmProvider == tfvc"
+        },
+        {
           "command" : "tfvc.Undo",
-          "group": "1_sync",
+          "group": "1_sync@2",
           "when": "scmProvider == tfvc"
         },
         {
@@ -259,6 +264,11 @@
           "light": "resources/icons/light/refresh.svg",
           "dark": "resources/icons/dark/refresh.svg"
         }
+      },
+      {
+        "command": "tfvc.Sync",
+        "title": "Sync",
+        "category": "TFVC"
       },
       {
         "command": "tfvc.Undo",

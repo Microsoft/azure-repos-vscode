@@ -8,15 +8,16 @@ import { TeamServerContext} from "../contexts/servercontext";
 import { Logger } from "../helpers/logger";
 import { ITfvcCommand, IExecutionResult } from "./interfaces";
 import { Tfvc } from "./tfvc";
-import { IArgumentProvider, IItemInfo, IWorkspace, IPendingChange } from "./interfaces";
+import { IArgumentProvider, IItemInfo, IWorkspace, IPendingChange, ISyncResults } from "./interfaces";
+import { Add } from "./commands/add";
 import { Checkin } from "./commands/checkin";
 import { FindWorkspace } from "./commands/findworkspace";
 import { GetInfo } from "./commands/getinfo";
 import { GetFileContent } from "./commands/getfilecontent";
 import { GetVersion } from "./commands/getversion";
 import { Status } from "./commands/status";
+import { Sync } from "./commands/sync";
 import { Undo } from "./commands/undo";
-import { Add } from "./commands/add";
 
 var _ = require("underscore");
 
@@ -86,6 +87,12 @@ export class Repository {
         Logger.LogDebug(`TFVC Repository.GetStatus`);
         return this.RunCommand<IPendingChange[]>(
             new Status(this._serverContext, ignoreFiles === undefined ? true : ignoreFiles));
+    }
+
+    public async Sync(itemPaths: string[], recursive: boolean): Promise<ISyncResults> {
+        Logger.LogDebug(`TFVC Repository.Sync`);
+        return this.RunCommand<ISyncResults>(
+            new Sync(this._serverContext, itemPaths, recursive));
     }
 
     public async Undo(itemPaths: string[]): Promise<string[]> {

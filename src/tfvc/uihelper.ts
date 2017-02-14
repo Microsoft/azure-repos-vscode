@@ -6,7 +6,8 @@
 
 import { QuickPickItem, window, workspace } from "vscode";
 import { Strings } from "../helpers/strings";
-import { IPendingChange } from "./interfaces";
+import { IPendingChange, ISyncResults, ISyncItemResult, SyncType } from "./interfaces";
+import { TfvcOutput } from "./tfvcoutput";
 
 var path = require("path");
 
@@ -44,6 +45,65 @@ export class UIHelper {
             await window.showQuickPick(items);
         }
         return undefined;
+    }
+
+    /**
+     * This method displays the results of the sync command in the output window and optionally in the QuickPick window as well.
+     */
+    public static async ShowSyncResults(syncResults: ISyncResults, showPopup: boolean, onlyShowErrors) {
+        let items: QuickPickItem[] = [];
+        if (syncResults.itemResults.length === 0) {
+            TfvcOutput.AppendLine(Strings.AllFilesUpToDate);
+            items.push({
+                label: Strings.AllFilesUpToDate,
+                description: undefined,
+                detail: undefined
+            });
+        } else {
+            for (let i: number = 0; i < syncResults.itemResults.length; i++) {
+                let item: ISyncItemResult = syncResults.itemResults[i];
+                if (onlyShowErrors && !UIHelper.isSyncError(item.syncType)) {
+                    continue;
+                }
+                let type: string = this.GetDisplayTextForSyncType(item.syncType);
+                TfvcOutput.AppendLine(type + ": " + item.itemPath + " : " + item.message);
+                items.push({
+                    label: type,
+                    description: item.itemPath,
+                    detail: item.message
+                });
+            }
+        }
+        if (showPopup) {
+            await window.showQuickPick(items);
+        }
+    }
+
+    private static isSyncError(type: SyncType): boolean {
+        switch (type) {
+            case SyncType.Conflict:
+            case SyncType.Error:
+            case SyncType.Warning:
+                return true;
+            case SyncType.Deleted:
+            case SyncType.New:
+            case SyncType.Updated:
+                return false;
+            default:
+                return false;
+        }
+    }
+
+    public static GetDisplayTextForSyncType(type: SyncType): string {
+        switch (type) {
+            case SyncType.Conflict: return Strings.SyncTypeConflict;
+            case SyncType.Deleted: return Strings.SyncTypeDeleted;
+            case SyncType.Error: return Strings.SyncTypeError;
+            case SyncType.New: return Strings.SyncTypeNew;
+            case SyncType.Updated: return Strings.SyncTypeUpdated;
+            case SyncType.Warning: return Strings.SyncTypeWarning;
+            default: return Strings.SyncTypeUpdated;
+        }
     }
 
     public static GetFileName(change: IPendingChange) {

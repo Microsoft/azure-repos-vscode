@@ -44,6 +44,7 @@ export class TfvcCommandNames {
     static Refresh: string = TfvcCommandNames.CommandPrefix + "Refresh";
     static ShowOutput: string = TfvcCommandNames.CommandPrefix + "ShowOutput";
     static Status: string = TfvcCommandNames.CommandPrefix + "Status";
+    static Sync: string = TfvcCommandNames.CommandPrefix + "Sync";
     static Undo: string = TfvcCommandNames.CommandPrefix + "Undo";
 }
 
@@ -97,6 +98,7 @@ export class TfvcTelemetryEvents {
     static OpenRepositoryHistory: string = TfvcTelemetryEvents.TelemetryPrefix + "openrepohistory";
     static Status: string = TfvcTelemetryEvents.TelemetryPrefix + "status";
     static StartUp: string = TfvcTelemetryEvents.TelemetryPrefix + "startup";
+    static Sync: string = TfvcTelemetryEvents.TelemetryPrefix + "sync";
     static Undo: string = TfvcTelemetryEvents.TelemetryPrefix + "undo";
 }
 
