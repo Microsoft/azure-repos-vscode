@@ -61,6 +61,27 @@ export interface IPendingChange {
     isCandidate: boolean;
 }
 
+export enum SyncType {
+    Updated,
+    New,
+    Deleted,
+    Conflict,
+    Warning,
+    Error
+}
+
+export interface ISyncItemResult {
+    syncType: SyncType;
+    itemPath: string;
+    message?: string;
+}
+
+export interface ISyncResults {
+    hasErrors: boolean;
+    hasConflicts: boolean;
+    itemResults: ISyncItemResult[];
+}
+
 export interface IExecutionResult {
     exitCode: number;
     stdout: string;

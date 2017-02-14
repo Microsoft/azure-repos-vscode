@@ -4,7 +4,6 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import * as path from "path";
 import { TeamServerContext} from "../../contexts/servercontext";
 import { IArgumentProvider, IExecutionResult, ITfvcCommand } from "../interfaces";
 import { ArgumentBuilder } from "./argumentbuilder";
@@ -66,11 +65,11 @@ export class Undo implements ITfvcCommand<string[]> {
         let path: string = "";
         for (let index: number = 0; index < lines.length; index++) {
             let line: string = lines[index];
-            if (this.isFilePath(line)) {
+            if (CommandHelper.IsFilePath(line)) {
                 path = line;
             } else if (line) {
                 let file: string = this.getFileFromLine(line);
-                filesUndone.push(this.getFilePath(path, file, ""));
+                filesUndone.push(CommandHelper.GetFilePath(path, file));
             }
         }
         return filesUndone;
@@ -84,28 +83,4 @@ export class Undo implements ITfvcCommand<string[]> {
             return line.substring(idx + prefix.length);
         }
     }
-
-    //line could be '', 'file1.txt', 'folder1:', 'folder1\folder2:'
-    private isFilePath(line: string): boolean {
-        if (line && line.length > 0 && line.endsWith(":", line.length)) {
-            //'folder1:', 'folder1\folder2:'
-            return true;
-        }
-        return false;
-    }
-
-    //filePath could be 'folder1\folder2:'
-    private getFilePath(filePath: string, filename: string, pathRoot: string): string {
-        let folderPath: string = filePath;
-        //Remove any ending ':'
-        if (filePath && filePath.length > 0 && filePath.endsWith(":", filePath.length)) {
-            folderPath = filePath.slice(0, filePath.length - 1);
-        }
-        //If path isn't rooted, add in the root
-        if (!path.isAbsolute(folderPath) && pathRoot) {
-            folderPath = path.join(pathRoot, folderPath);
-        }
-        return path.join(folderPath, filename);
-    }
-
 }

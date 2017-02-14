@@ -4,6 +4,8 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
+import * as path from "path";
+
 import { parseString } from "xml2js";
 import { Logger } from "../../helpers/logger";
 import { Strings } from "../../helpers/strings";
@@ -146,5 +148,35 @@ export class CommandHelper {
             return name.replace(/\-/g, "").toLowerCase();
         }
         return name;
+    }
+
+    /**
+     * Returns true if the line is of the form...
+     * 'folder1:' or 'folder1\folder2:' or 'd:\folder1\folder2:'
+     */
+    public static IsFilePath(line: string): boolean {
+        if (line && line.length > 0 && line.endsWith(":", line.length)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Returns the full path of the file where...
+     * filePath could be 'folder1\folder2:'
+     * filename is something like 'file.txt'
+     * pathRoot is the root of any relative paths
+     */
+    public static GetFilePath(filePath: string, filename: string, pathRoot?: string): string {
+        let folderPath: string = filePath;
+        //Remove any ending ':'
+        if (filePath && filePath.length > 0 && filePath.endsWith(":", filePath.length)) {
+            folderPath = filePath.slice(0, filePath.length - 1);
+        }
+        //If path isn't rooted, add in the root
+        if (!path.isAbsolute(folderPath) && pathRoot) {
+            folderPath = path.join(pathRoot, folderPath);
+        }
+        return path.join(folderPath, filename);
     }
 }
