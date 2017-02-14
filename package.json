@@ -59,21 +59,6 @@
           "when": "scmProvider == tfvc"
         },
         {
-          "command" : "team.Signout",
-          "group": "2_publish",
-          "when": "scmProvider == tfvc"
-        },
-        {
-          "command" : "team.Signout",
-          "group": "3_commit",
-          "when": "scmProvider == tfvc"
-        },
-        {
-          "command" : "team.OpenNewWorkItem",
-          "group": "4_stage",
-          "when": "scmProvider == tfvc"
-        },
-        {
           "command" : "tfvc.ShowOutput",
           "group": "5_output",
           "when": "scmProvider == tfvc"
@@ -81,19 +66,29 @@
       ],
       "scm/resource/context": [
         {
-          "command": "tfvc.Include",
-          "when": "scmProvider == tfvc && scmResourceGroup == excluded",
-          "group": "navigation"
+          "command": "tfvc.OpenDiff",
+          "when": "scmProvider == tfvc",
+          "group": "navigation@1"
+        },
+        {
+          "command": "tfvc.OpenFile",
+          "when": "scmProvider == tfvc",
+          "group": "navigation@2"
+        },
+        {
+          "command": "tfvc.Undo",
+          "when": "scmProvider == tfvc",
+          "group": "1_modification@1"
         },
         {
           "command": "tfvc.Include",
-          "when": "scmProvider == tfvc && scmResourceGroup == included",
-          "group": "navigation"
+          "when": "scmProvider == tfvc && scmResourceGroup == excluded",
+          "group": "1_modification@2"
         },
         {
           "command": "tfvc.Exclude",
           "when": "scmProvider == tfvc && scmResourceGroup == included",
-          "group": "1_sync"
+          "group": "1_modification@2"
         },
         {
           "command": "tfvc.Undo",
@@ -125,6 +120,11 @@
           "type": "string",
           "default": "",
           "description": "Set the logging level for the extension (error, warn, info, verbose, debug)."
+        },
+        "team.pinnedQueries": {
+          "type": "array",
+          "default": [ { "account": "", "queryText": "", "queryPath": "" }],
+          "description": "Specify the account and either the queryText or queryPath of the query you'd like to monitor.  If specified, queryText is preferred over queryPath."
         },
         "team.pollingInterval": {
           "type": "number",
@@ -250,6 +250,16 @@
           "light": "resources/icons/light/stage.svg",
           "dark": "resources/icons/dark/stage.svg"
         }
+      },
+      {
+        "command": "tfvc.OpenDiff",
+        "title": "Open Diff",
+        "category": "TFVC"
+      },
+      {
+        "command": "tfvc.OpenFile",
+        "title": "Open File",
+        "category": "TFVC"
       },
       {
         "command": "tfvc.ShowOutput",

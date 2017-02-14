@@ -241,19 +241,6 @@ export class TfvcSCMProvider implements SCMProvider {
         return scm.getResourceFromURI(uri);
     }
 
-    public static ResolveTfvcResource(uri: Uri): Resource {
-        if (uri) {
-            const resource = TfvcSCMProvider.ResolveTfvcURI(uri);
-
-            if (!(resource instanceof Resource)) {
-                return undefined;
-            }
-
-            return resource;
-        }
-        return undefined;
-    }
-
     public static GetPathFromUri(uri: Uri): string {
         if (uri) {
             const resource = TfvcSCMProvider.ResolveTfvcResource(uri);
@@ -272,5 +259,23 @@ export class TfvcSCMProvider implements SCMProvider {
             throw TfvcError.CreateInvalidStateError();
         }
         return tfvcProvider;
+    }
+
+    public static OpenDiff(resource: Resource): Promise<void> {
+        TfvcSCMProvider.GetProviderInstance().open(resource);
+        return;
+    }
+
+    public static ResolveTfvcResource(uri: Uri): Resource {
+        if (uri) {
+            const resource = TfvcSCMProvider.ResolveTfvcURI(uri);
+
+            if (!(resource instanceof Resource)) {
+                return undefined;
+            }
+
+            return resource;
+        }
+        return undefined;
     }
 }

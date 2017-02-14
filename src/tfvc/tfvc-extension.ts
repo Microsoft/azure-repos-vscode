@@ -89,6 +89,38 @@ export class TfvcExtension  {
         }
     }
 
+    public async TfvcOpenDiff(uri?: Uri): Promise<void> {
+        if (!this._manager.EnsureInitialized(RepositoryType.TFVC)) {
+            this._manager.DisplayErrorMessage();
+            return;
+        }
+
+        try {
+            if (uri) {
+                let resource: Resource = TfvcSCMProvider.ResolveTfvcResource(uri);
+                TfvcSCMProvider.OpenDiff(resource);
+            }
+        } catch (err) {
+            this._manager.DisplayErrorMessage(err.message);
+        }
+    }
+
+    public async TfvcOpenFile(uri?: Uri): Promise<void> {
+        if (!this._manager.EnsureInitialized(RepositoryType.TFVC)) {
+            this._manager.DisplayErrorMessage();
+            return;
+        }
+
+        try {
+            if (uri) {
+                let path: string = TfvcSCMProvider.GetPathFromUri(uri);
+                await window.showTextDocument(await workspace.openTextDocument(path));
+            }
+        } catch (err) {
+            this._manager.DisplayErrorMessage(err.message);
+        }
+    }
+
     public async TfvcRefresh(): Promise<void> {
         if (!this._manager.EnsureInitialized(RepositoryType.TFVC)) {
             this._manager.DisplayErrorMessage();
