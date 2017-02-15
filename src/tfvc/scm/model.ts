@@ -5,12 +5,14 @@
 "use strict";
 
 import { Uri, EventEmitter, Event, SCMResourceGroup, Disposable, window } from "vscode";
+import { Telemetry } from "../../services/telemetry";
+import { TfvcTelemetryEvents } from "../../helpers/constants";
 import { Repository } from "../repository";
 import { filterEvent } from "../util";
 import { Resource } from "./resource";
 import { ResourceGroup, IncludedGroup, ExcludedGroup, ConflictsGroup } from "./resourcegroups";
 import { IConflict, IPendingChange } from "../interfaces";
-import { Status } from "./status";
+import { ConflictType, Status } from "./status";
 
 import * as _ from "underscore";
 import * as path from "path";
@@ -113,9 +115,14 @@ export class Model {
         const changes: IPendingChange[] = await this._repository.GetStatus();
         const foundConflicts: IConflict[] = await this._repository.FindConflicts();
 
-        //if (foundConflicts.find(c => c.type === ConflictType.NAME_AND_CONTENT || c.type === ConflictType.RENAME)) {
-        //    TODO: Send telemetry
-        //}
+        const conflict: IConflict = foundConflicts.find(c => c.type === ConflictType.NAME_AND_CONTENT || c.type === ConflictType.RENAME);
+        if (conflict) {
+            if (conflict.type === ConflictType.RENAME) {
+                Telemetry.SendEvent(TfvcTelemetryEvents.RenameConflict);
+            } else {
+                Telemetry.SendEvent(TfvcTelemetryEvents.NameAndContentConflict);
+            }
+        }
 
         const included: Resource[] = [];
         const excluded: Resource[] = [];

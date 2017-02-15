@@ -6,7 +6,6 @@
 
 import { StatusBarItem, window } from "vscode";
 import { GitPullRequest, PullRequestStatus} from "vso-node-api/interfaces/GitInterfaces";
-import { BaseClient } from "./baseclient";
 import { BaseQuickPickItem, VsCodeUtils } from "../helpers/vscodeutils";
 import { CommandNames, TelemetryEvents } from "../helpers/constants";
 import { Logger } from "../helpers/logger";
@@ -14,30 +13,28 @@ import { Strings } from "../helpers/strings";
 import { Utils } from "../helpers/utils";
 import { IRepositoryContext, RepositoryType } from "../contexts/repositorycontext";
 import { TeamServerContext} from "../contexts/servercontext";
-import { TelemetryService } from "../services/telemetry";
 import { GitVcService, PullRequestScore } from "../services/gitvc";
+import { Telemetry } from "../services/telemetry";
 
 var path = require("path");
 
-export class GitClient extends BaseClient {
+export class GitClient {
     private _serverContext: TeamServerContext;
     private _statusBarItem: StatusBarItem;
 
-    constructor(context: TeamServerContext, telemetryService: TelemetryService, statusBarItem: StatusBarItem) {
-        super(telemetryService);
-
+    constructor(context: TeamServerContext, statusBarItem: StatusBarItem) {
         this._serverContext = context;
         this._statusBarItem = statusBarItem;
     }
 
     //Initial method to display, select and navigate to my pull requests
     public async GetMyPullRequests(): Promise<void> {
-        this.ReportEvent(TelemetryEvents.ViewPullRequests);
+        Telemetry.SendEvent(TelemetryEvents.ViewPullRequests);
 
         try {
             let request: BaseQuickPickItem = await window.showQuickPick(this.getMyPullRequests(), { matchOnDescription: true, placeHolder: Strings.ChoosePullRequest });
             if (request) {
-                this.ReportEvent(TelemetryEvents.ViewPullRequest);
+                Telemetry.SendEvent(TelemetryEvents.ViewPullRequest);
                 let discUrl: string = undefined;
                 if (request.id !== undefined) {
                     discUrl = GitVcService.GetPullRequestDiscussionUrl(this._serverContext.RepoInfo.RepositoryUrl, request.id);
@@ -59,7 +56,7 @@ export class GitClient extends BaseClient {
 
         let editor = window.activeTextEditor;
         if (editor) {
-            this.ReportEvent(TelemetryEvents.OpenBlamePage);
+            Telemetry.SendEvent(TelemetryEvents.OpenBlamePage);
 
             //Get the relative file path we can use to create the url
             let relativePath: string = "\\" + path.relative(context.RepositoryParentFolder, editor.document.fileName);
@@ -83,12 +80,12 @@ export class GitClient extends BaseClient {
 
         let editor = window.activeTextEditor;
         if (!editor) {
-            this.ReportEvent(TelemetryEvents.OpenRepositoryHistory);
+            Telemetry.SendEvent(TelemetryEvents.OpenRepositoryHistory);
 
             historyUrl = GitVcService.GetRepositoryHistoryUrl(context.RemoteUrl, context.CurrentBranch);
             Logger.LogInfo("OpenRepoHistory: " + historyUrl);
         } else {
-            this.ReportEvent(TelemetryEvents.OpenFileHistory);
+            Telemetry.SendEvent(TelemetryEvents.OpenFileHistory);
 
             //Get the relative file path we can use to create the history url
             let relativePath: string = "\\" + path.relative(context.RepositoryParentFolder, editor.document.fileName);
@@ -103,7 +100,7 @@ export class GitClient extends BaseClient {
     }
 
     public OpenNewPullRequest(remoteUrl: string, currentBranch: string): void {
-        this.ReportEvent(TelemetryEvents.OpenNewPullRequest);
+        Telemetry.SendEvent(TelemetryEvents.OpenNewPullRequest);
 
         let url: string = GitVcService.GetCreatePullRequestUrl(remoteUrl, currentBranch);
         Logger.LogInfo("CreatePullRequestPage: " + url);
@@ -111,7 +108,7 @@ export class GitClient extends BaseClient {
     }
 
     public OpenPullRequestsPage(): void {
-        this.ReportEvent(TelemetryEvents.OpenPullRequestsPage);
+        Telemetry.SendEvent(TelemetryEvents.OpenPullRequestsPage);
 
         let url: string = GitVcService.GetPullRequestsUrl(this._serverContext.RepoInfo.RepositoryUrl);
         Logger.LogInfo("OpenPullRequestsPage: " + url);
@@ -205,10 +202,12 @@ export class GitClient extends BaseClient {
             }
         //If we aren't polling, we always log an error and, optionally, send telemetry
         } else {
+            let logMessage: string = logPrefix + msg;
             if (offline === true) {
-                Logger.LogError(logPrefix + msg);
+                Logger.LogError(logMessage);
             } else {
-                this.ReportError(logPrefix + msg);
+                Logger.LogError(logMessage);
+                Telemetry.SendException(logMessage);
             }
             VsCodeUtils.ShowErrorMessage(msg);
         }

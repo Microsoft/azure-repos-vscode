@@ -5,22 +5,17 @@
 "use strict";
 
 import { window } from "vscode";
-import { BaseClient } from "./baseclient";
+import { Logger } from "../helpers/logger";
 import { TelemetryEvents } from "../helpers/constants";
 import { Strings } from "../helpers/strings";
 import { Utils } from "../helpers/utils";
 import { BaseQuickPickItem } from "../helpers/vscodeutils";
-import { TelemetryService } from "../services/telemetry";
+import { Telemetry } from "../services/telemetry";
 
-export class FeedbackClient extends BaseClient {
+export class FeedbackClient {
 
-    constructor(telemetryService: TelemetryService) {
-        super(telemetryService);
-    }
-
-    //This event *will* honor whether Application Insights is enabled or not.
-    public SendEvent(telemetryId: string): void {
-        this.ReportEvent(telemetryId, undefined);
+    constructor() {
+        //
     }
 
     //This feedback will go no matter whether Application Insights is enabled or not.
@@ -51,13 +46,15 @@ export class FeedbackClient extends BaseClient {
                     providedEmail = email;
                 }
                 //This feedback will go no matter whether Application Insights is enabled or not.
-                this.ReportFeedback(choice.id, { "VSCode.Feedback.Comment" : value, "VSCode.Feedback.Email" : providedEmail} );
+                Telemetry.SendFeedback(choice.id, { "VSCode.Feedback.Comment" : value, "VSCode.Feedback.Email" : providedEmail} );
 
                 let disposable = window.setStatusBarMessage(Strings.ThanksForFeedback);
                 setInterval(() => disposable.dispose(), 1000 * 5);
             }
         } catch (err) {
-            this.ReportError(Utils.GetMessageForStatusCode(0, err.message, "Failed getting SendFeedback selection"));
+            let message: string = Utils.GetMessageForStatusCode(0, err.message, "Failed getting SendFeedback selection");
+            Logger.LogError(message);
+            Telemetry.SendException(message);
         }
     }
 }

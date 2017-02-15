@@ -98,8 +98,10 @@ export class TelemetryEvents {
 export class TfvcTelemetryEvents {
     static TelemetryPrefix: string = "tfvc/";
     static Checkin: string = TfvcTelemetryEvents.TelemetryPrefix + "checkin";
+    static NameAndContentConflict: string = TfvcTelemetryEvents.TelemetryPrefix + "nameandcontentconflict";
     static OpenFileHistory: string = TfvcTelemetryEvents.TelemetryPrefix + "openfilehistory";
     static OpenRepositoryHistory: string = TfvcTelemetryEvents.TelemetryPrefix + "openrepohistory";
+    static RenameConflict: string = TfvcTelemetryEvents.TelemetryPrefix + "renameconflict";
     static Status: string = TfvcTelemetryEvents.TelemetryPrefix + "status";
     static StartUp: string = TfvcTelemetryEvents.TelemetryPrefix + "startup";
     static Sync: string = TfvcTelemetryEvents.TelemetryPrefix + "sync";

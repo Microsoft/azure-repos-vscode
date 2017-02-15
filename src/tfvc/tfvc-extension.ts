@@ -13,6 +13,7 @@ import { ExtensionManager } from "../extensionmanager";
 import { TfvcTelemetryEvents } from "../helpers/constants";
 import { Strings } from "../helpers/strings";
 import { Utils } from "../helpers/utils";
+import { Telemetry } from "../services/telemetry";
 import { Tfvc } from "./tfvc";
 import { Resource } from "./scm/resource";
 import { TfvcSCMProvider } from "./tfvcscmprovider";
@@ -45,7 +46,7 @@ export class TfvcExtension  {
                 return;
             }
 
-            this._manager.Telemetry.SendEvent(TfvcTelemetryEvents.Checkin);
+            Telemetry.SendEvent(TfvcTelemetryEvents.Checkin);
             const changeset: string =
                 await this._repo.Checkin(checkinInfo.files, checkinInfo.comment, checkinInfo.workItemIds);
             TfvcOutput.AppendLine("Changeset " + changeset + " checked in.");
@@ -167,7 +168,7 @@ export class TfvcExtension  {
         }
 
         try {
-            this._manager.Telemetry.SendEvent(TfvcTelemetryEvents.Status);
+            Telemetry.SendEvent(TfvcTelemetryEvents.Status);
             const chosenItem: IPendingChange = await UIHelper.ChoosePendingChange(await this._repo.GetStatus());
             if (chosenItem) {
                 window.showTextDocument(await workspace.openTextDocument(chosenItem.localItem));
@@ -188,7 +189,7 @@ export class TfvcExtension  {
         }
 
         try {
-            this._manager.Telemetry.SendEvent(TfvcTelemetryEvents.Sync);
+            Telemetry.SendEvent(TfvcTelemetryEvents.Sync);
             const results: ISyncResults = await this._repo.Sync([this._repo.Path], true);
             await UIHelper.ShowSyncResults(results, results.hasConflicts || results.hasErrors, true);
         } catch (err) {
@@ -220,7 +221,7 @@ export class TfvcExtension  {
                 const basename: string = path.basename(pathToUndo);
                 const message: string = `Are you sure you want to undo changes in ${basename}?`;
                 if (await UIHelper.PromptForConfirmation(message, Strings.UndoChanges)) {
-                    this._manager.Telemetry.SendEvent(TfvcTelemetryEvents.Undo);
+                    Telemetry.SendEvent(TfvcTelemetryEvents.Undo);
                     await this._repo.Undo([pathToUndo]);
                 }
             }
@@ -255,7 +256,7 @@ export class TfvcExtension  {
             let itemInfos: IItemInfo[] = await this._repo.GetInfo([itemPath]);
             //With a single file, show that file's history
             if (itemInfos && itemInfos.length === 1) {
-                this._manager.Telemetry.SendEvent(TfvcTelemetryEvents.OpenFileHistory);
+                Telemetry.SendEvent(TfvcTelemetryEvents.OpenFileHistory);
                 let serverPath: string = itemInfos[0].serverItem;
                 let file: string = encodeURIComponent(serverPath);
                 Utils.OpenUrl(url.resolve(this._manager.RepoContext.RemoteUrl, "_versionControl?path=" + file + "&_a=history"));
@@ -299,7 +300,7 @@ export class TfvcExtension  {
     }
 
     private showRepositoryHistory(): void {
-        this._manager.Telemetry.SendEvent(TfvcTelemetryEvents.OpenRepositoryHistory);
+        Telemetry.SendEvent(TfvcTelemetryEvents.OpenRepositoryHistory);
         Utils.OpenUrl(url.resolve(this._manager.RepoContext.RemoteUrl, "_versionControl?_a=history"));
     }
 

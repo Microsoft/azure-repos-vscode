@@ -15,9 +15,10 @@ import { RepositoryType } from "./contexts/repositorycontext";
 import { BuildClient } from "./clients/buildclient";
 import { GitClient } from "./clients/gitclient";
 import { WitClient } from "./clients/witclient";
+import { Telemetry } from "./services/telemetry";
 import { ExtensionManager } from "./extensionmanager";
 
-var os = require("os");
+import * as os from "os";
 
 /* tslint:disable:no-unused-variable */
 import Q = require("q");
@@ -98,7 +99,7 @@ export class TeamExtension  {
             VsCodeUtils.ShowErrorMessageWithOptions(Strings.NoRepoInformation, messageItem).then((item) => {
                 if (item) {
                     Utils.OpenUrl(item.url);
-                    this._manager.ReportEvent(item.telemetryId);
+                    Telemetry.SendEvent(item.telemetryId);
                 }
             });
         }
@@ -212,7 +213,7 @@ export class TeamExtension  {
     //Opens the team project web site
     public OpenTeamProjectWebSite(): void {
         if (this._manager.EnsureInitialized(RepositoryType.ANY)) {
-            this._manager.ReportEvent(TelemetryEvents.OpenTeamSite);
+            Telemetry.SendEvent(TelemetryEvents.OpenTeamSite);
             Logger.LogInfo("OpenTeamProjectWebSite: " + this._manager.ServerContext.RepoInfo.TeamProjectUrl);
             Utils.OpenUrl(this._manager.ServerContext.RepoInfo.TeamProjectUrl);
         } else {
@@ -309,12 +310,12 @@ export class TeamExtension  {
     public InitializeClients(repoType: RepositoryType) {
         //We can initialize for any repo type (just skip _gitClient if not Git)
         this._pinnedQuerySettings = new PinnedQuerySettings(this._manager.ServerContext.RepoInfo.Account);
-        this._buildClient = new BuildClient(this._manager.ServerContext, this._manager.Telemetry, this._buildStatusBarItem);
+        this._buildClient = new BuildClient(this._manager.ServerContext, this._buildStatusBarItem);
         //Don't initialize the Git client if we aren't a Git repository
         if (repoType === RepositoryType.GIT) {
-            this._gitClient = new GitClient(this._manager.ServerContext, this._manager.Telemetry, this._pullRequestStatusBarItem);
+            this._gitClient = new GitClient(this._manager.ServerContext, this._pullRequestStatusBarItem);
         }
-        this._witClient = new WitClient(this._manager.ServerContext, this._manager.Telemetry, this._pinnedQuerySettings.PinnedQuery, this._pinnedQueryStatusBarItem);
+        this._witClient = new WitClient(this._manager.ServerContext, this._pinnedQuerySettings.PinnedQuery, this._pinnedQueryStatusBarItem);
         this.refreshPollingItems();
         this.startPolling();
     }

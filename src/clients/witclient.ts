@@ -6,26 +6,23 @@
 
 import { StatusBarItem, window } from "vscode";
 import { QueryHierarchyItem, WorkItemType } from "vso-node-api/interfaces/WorkItemTrackingInterfaces";
-import { BaseClient } from "./baseclient";
 import { Logger } from "../helpers/logger";
 import { SimpleWorkItem, WorkItemTrackingService } from "../services/workitemtracking";
+import { Telemetry } from "../services/telemetry";
 import { TeamServerContext} from "../contexts/servercontext";
 import { BaseQuickPickItem, VsCodeUtils, WorkItemQueryQuickPickItem } from "../helpers/vscodeutils";
 import { CommandNames, TelemetryEvents, WitQueries, WitTypes } from "../helpers/constants";
 import { Strings } from "../helpers/strings";
 import { Utils } from "../helpers/utils";
-import { TelemetryService } from "../services/telemetry";
 import { IPinnedQuery } from "../helpers/settings";
 
-export class WitClient extends BaseClient {
+export class WitClient {
     private _serverContext: TeamServerContext;
     private _statusBarItem: StatusBarItem;
     private _pinnedQuery: IPinnedQuery;
     private _myQueriesFolder: string;
 
-    constructor(context: TeamServerContext, telemetryService: TelemetryService, pinnedQuery: IPinnedQuery, statusBarItem: StatusBarItem) {
-        super(telemetryService);
-
+    constructor(context: TeamServerContext, pinnedQuery: IPinnedQuery, statusBarItem: StatusBarItem) {
         this._serverContext = context;
         this._statusBarItem = statusBarItem;
         this._pinnedQuery = pinnedQuery;
@@ -43,10 +40,10 @@ export class WitClient extends BaseClient {
     //Creates a new work item based on a single line of selected text
     public async CreateNewWorkItem(taskTitle: string): Promise<void> {
         try {
-            this.ReportEvent(TelemetryEvents.OpenNewWorkItem);
+            Telemetry.SendEvent(TelemetryEvents.OpenNewWorkItem);
             let selectedType: BaseQuickPickItem = await window.showQuickPick(await this.getWorkItemTypes(), { matchOnDescription: true, placeHolder: Strings.ChooseWorkItemType });
             if (selectedType) {
-                this.ReportEvent(TelemetryEvents.OpenNewWorkItem);
+                Telemetry.SendEvent(TelemetryEvents.OpenNewWorkItem);
 
                 Logger.LogInfo("Selected work item type is " + selectedType.label);
                 let newItemUrl: string = WorkItemTrackingService.GetNewWorkItemUrl(this._serverContext.RepoInfo.TeamProjectUrl, selectedType.label, taskTitle, this.getUserName(this._serverContext));
@@ -63,10 +60,10 @@ export class WitClient extends BaseClient {
     //If a work item is chosen, it is opened in the web browser.
     public async ShowMyWorkItemQueries(): Promise<void> {
         try {
-            this.ReportEvent(TelemetryEvents.ShowMyWorkItemQueries);
+            Telemetry.SendEvent(TelemetryEvents.ShowMyWorkItemQueries);
             let query: WorkItemQueryQuickPickItem = await window.showQuickPick(await this.getMyWorkItemQueries(), { matchOnDescription: false, placeHolder: Strings.ChooseWorkItemQuery });
             if (query) {
-                this.ReportEvent(TelemetryEvents.ViewWorkItems);
+                Telemetry.SendEvent(TelemetryEvents.ViewWorkItems);
                 Logger.LogInfo("Selected query is " + query.label);
                 Logger.LogInfo("Getting work items for query...");
 
@@ -74,10 +71,10 @@ export class WitClient extends BaseClient {
                 if (workItem) {
                     let url: string = undefined;
                     if (workItem.id === undefined) {
-                        this.ReportEvent(TelemetryEvents.OpenAdditionalQueryResults);
+                        Telemetry.SendEvent(TelemetryEvents.OpenAdditionalQueryResults);
                         url = WorkItemTrackingService.GetMyQueryResultsUrl(this._serverContext.RepoInfo.TeamProjectUrl, this._myQueriesFolder, query.label);
                     } else {
-                        this.ReportEvent(TelemetryEvents.ViewWorkItem);
+                        Telemetry.SendEvent(TelemetryEvents.ViewWorkItem);
                         url = WorkItemTrackingService.GetEditWorkItemUrl(this._serverContext.RepoInfo.TeamProjectUrl, workItem.id);
                     }
                     Logger.LogInfo("Work Item Url: " + url);
@@ -90,7 +87,7 @@ export class WitClient extends BaseClient {
     }
 
     public async ShowPinnedQueryWorkItems(): Promise<void> {
-        this.ReportEvent(TelemetryEvents.ViewPinnedQueryWorkItems);
+        Telemetry.SendEvent(TelemetryEvents.ViewPinnedQueryWorkItems);
 
         try {
             let queryText: string = await this.getPinnedQueryText();
@@ -101,7 +98,7 @@ export class WitClient extends BaseClient {
     }
 
     public async ShowMyWorkItems(): Promise<void> {
-        this.ReportEvent(TelemetryEvents.ViewMyWorkItems);
+        Telemetry.SendEvent(TelemetryEvents.ViewMyWorkItems);
 
         try {
             await this.showWorkItems(WitQueries.MyWorkItems);
@@ -116,10 +113,10 @@ export class WitClient extends BaseClient {
         if (workItem) {
             let url: string = undefined;
             if (workItem.id === undefined) {
-                this.ReportEvent(TelemetryEvents.OpenAdditionalQueryResults);
+                Telemetry.SendEvent(TelemetryEvents.OpenAdditionalQueryResults);
                 url = WorkItemTrackingService.GetWorkItemsBaseUrl(this._serverContext.RepoInfo.TeamProjectUrl);
             } else {
-                this.ReportEvent(TelemetryEvents.ViewWorkItem);
+                Telemetry.SendEvent(TelemetryEvents.ViewWorkItem);
                 url = WorkItemTrackingService.GetEditWorkItemUrl(this._serverContext.RepoInfo.TeamProjectUrl, workItem.id);
             }
             Logger.LogInfo("Work Item Url: " + url);
@@ -254,10 +251,12 @@ export class WitClient extends BaseClient {
             }
         //If we aren't polling, we always log an error and, optionally, send telemetry
         } else {
+            let logMessage: string = logPrefix + msg;
             if (offline === true) {
-                Logger.LogError(logPrefix + msg);
+                Logger.LogError(logMessage);
             } else {
-                this.ReportError(logPrefix + msg);
+                Logger.LogError(logMessage);
+                Telemetry.SendException(logMessage);
             }
             VsCodeUtils.ShowErrorMessage(msg);
         }
@@ -266,10 +265,10 @@ export class WitClient extends BaseClient {
     private logTelemetryForWorkItem(wit: string): void {
         switch (wit) {
             case WitTypes.Bug:
-                this.ReportEvent(TelemetryEvents.OpenNewBug);
+                Telemetry.SendEvent(TelemetryEvents.OpenNewBug);
                 break;
             case WitTypes.Task:
-                this.ReportEvent(TelemetryEvents.OpenNewTask);
+                Telemetry.SendEvent(TelemetryEvents.OpenNewTask);
                 break;
             default:
                 break;

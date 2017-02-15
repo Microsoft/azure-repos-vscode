@@ -6,25 +6,22 @@
 
 import { StatusBarItem } from "vscode";
 import { Build, BuildBadge, BuildResult, BuildStatus } from "vso-node-api/interfaces/BuildInterfaces";
-import { BaseClient } from "./baseclient";
 import { Logger } from "../helpers/logger";
 import { BuildService } from "../services/build";
+import { Telemetry } from "../services/telemetry";
 import { TeamServerContext} from "../contexts/servercontext";
 import { CommandNames, TelemetryEvents, WellKnownRepositoryTypes } from "../helpers/constants";
 import { Strings } from "../helpers/strings";
 import { Utils } from "../helpers/utils";
 import { VsCodeUtils } from "../helpers/vscodeutils";
-import { TelemetryService } from "../services/telemetry";
 import { IRepositoryContext, RepositoryType } from "../contexts/repositorycontext";
 
-export class BuildClient extends BaseClient {
+export class BuildClient {
     private _serverContext: TeamServerContext;
     private _statusBarItem: StatusBarItem;
     private _buildSummaryUrl: string;
 
-    constructor(context: TeamServerContext, telemetryService: TelemetryService, statusBarItem: StatusBarItem) {
-        super(telemetryService);
-
+    constructor(context: TeamServerContext, statusBarItem: StatusBarItem) {
         this._serverContext = context;
         this._statusBarItem = statusBarItem;
     }
@@ -107,7 +104,7 @@ export class BuildClient extends BaseClient {
     }
 
     public OpenBuildSummaryPage(): void {
-        this.ReportEvent(TelemetryEvents.OpenBuildSummaryPage);
+        Telemetry.SendEvent(TelemetryEvents.OpenBuildSummaryPage);
         let url: string = this._buildSummaryUrl;
         if (url === undefined) {
             Logger.LogInfo("No build summary available, using build definitions url.");
@@ -140,10 +137,12 @@ export class BuildClient extends BaseClient {
             }
         //If we aren't polling, we always log an error and, optionally, send telemetry
         } else {
+            let logMessage: string = logPrefix + msg;
             if (offline === true) {
-                Logger.LogError(logPrefix + msg);
+                Logger.LogError(logMessage);
             } else {
-                this.ReportError(logPrefix + msg);
+                Logger.LogError(logMessage);
+                Telemetry.SendException(logMessage);
             }
             VsCodeUtils.ShowErrorMessage(msg);
         }

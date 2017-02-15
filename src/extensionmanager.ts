@@ -15,7 +15,7 @@ import { UrlMessageItem, VsCodeUtils } from "./helpers/vscodeutils";
 import { RepositoryContextFactory } from "./contexts/repocontextfactory";
 import { IRepositoryContext, RepositoryType } from "./contexts/repositorycontext";
 import { TeamServerContext} from "./contexts/servercontext";
-import { TelemetryService } from "./services/telemetry";
+import { Telemetry } from "./services/telemetry";
 import { TeamServicesApi } from "./clients/teamservicesclient";
 import { FeedbackClient } from "./clients/feedbackclient";
 import { RepositoryInfoClient } from "./clients/repositoryinfoclient";
@@ -35,7 +35,6 @@ import Q = require("q");
 export class ExtensionManager  {
     private _teamServicesStatusBarItem: StatusBarItem;
     private _errorMessage: string;
-    private _telemetry: TelemetryService;
     private _feedbackClient: FeedbackClient;
     private _serverContext: TeamServerContext;
     private _repoContext: IRepositoryContext;
@@ -74,10 +73,6 @@ export class ExtensionManager  {
 
     public get Settings(): Settings {
         return this._settings;
-    }
-
-    public get Telemetry(): TelemetryService {
-        return this._telemetry;
     }
 
     public get Team(): TeamExtension {
@@ -148,11 +143,7 @@ export class ExtensionManager  {
             //Don't log exceptions for Unauthorized, Offline or Proxy scenarios
             return;
         }
-        this._telemetry.SendException(fullMessage);
-    }
-
-    public ReportEvent(event: string) {
-        this._feedbackClient.SendEvent(event);
+        Telemetry.SendException(fullMessage);
     }
 
     private displayNoCredentialsMessage(): void {
@@ -173,7 +164,7 @@ export class ExtensionManager  {
         VsCodeUtils.ShowErrorMessageWithOptions(displayError, messageItem).then((item) => {
             if (item) {
                 Utils.OpenUrl(item.url);
-                this._feedbackClient.SendEvent(item.telemetryId);
+                Telemetry.SendEvent(item.telemetryId);
             }
         });
     }
@@ -204,7 +195,8 @@ export class ExtensionManager  {
                 RepositoryContextFactory.UpdateRepositoryContext(this._repoContext, this._serverContext);
 
                 //We need to be able to send feedback even if we aren't authenticated with the server
-                this._feedbackClient = new FeedbackClient(new TelemetryService(this._settings));
+                Telemetry.Initialize(this._settings); //We don't have the serverContext just yet
+                this._feedbackClient = new FeedbackClient();
 
                 this._credentialManager = new CredentialManager();
                 let accountSettings = new AccountSettings(this._serverContext.RepoInfo.Account);
@@ -215,8 +207,7 @@ export class ExtensionManager  {
                         return;
                     } else {
                         this._serverContext.CredentialInfo = creds;
-                        this._telemetry = new TelemetryService(this._settings, this._serverContext);
-                        this._feedbackClient = new FeedbackClient(this._telemetry);
+                        Telemetry.Initialize(this._settings, this._serverContext); //Re-initialize the telemetry with the server context information
                         Logger.LogDebug("Started ApplicationInsights telemetry");
 
                         //Set up the client we need to talk to the server for more repository information
@@ -243,7 +234,8 @@ export class ExtensionManager  {
                                 this._serverContext.UserInfo = new UserInfo(settings.authenticatedUser.id,
                                                                             settings.authenticatedUser.providerDisplayName,
                                                                             settings.authenticatedUser.customDisplayName);
-                                this._telemetry.Update(this._serverContext.RepoInfo.CollectionId, this._serverContext.UserInfo.Id);
+                                //Finally, update Telemetry with the user's specific collection id and user id
+                                Telemetry.Update(this._serverContext.RepoInfo.CollectionId, this._serverContext.UserInfo.Id);
 
                                 this.initializeStatusBars();
                                 await this.initializeClients(this._repoContext.Type);
@@ -271,7 +263,9 @@ export class ExtensionManager  {
                 }).fail((reason) => {
                     this.setErrorStatus(Utils.GetMessageForStatusCode(reason, reason.message), (reason.statusCode === 401 ? CommandNames.Signin : undefined), false);
                     //If we can't get a requestHandler, report the error via the feedbackclient
-                    this._feedbackClient.ReportError(Utils.GetMessageForStatusCode(reason, reason.message, "Failed to get a credential handler"), reason);
+                    let message: string = Utils.GetMessageForStatusCode(reason, reason.message, "Failed to get a credential handler");
+                    Logger.LogError(message);
+                    Telemetry.SendException(message);
                 });
             }
         } catch (err) {
@@ -293,7 +287,7 @@ export class ExtensionManager  {
             event = TelemetryEvents.ExternalRepository;
         }
 
-        this._telemetry.SendEvent(event);
+        Telemetry.SendEvent(event);
     }
 
     //Determines which Tfvc errors to display in the status bar ui
