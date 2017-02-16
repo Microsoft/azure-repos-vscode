@@ -274,7 +274,7 @@ export class TeamExtension  {
     public async AssociateWorkItems(): Promise<void> {
         if (this._manager.EnsureInitialized(RepositoryType.ANY)) {
             Telemetry.SendEvent(TelemetryEvents.AssociateWorkItems);
-            let workitems: string[] = await this._manager.Team.ChooseWorkItems();
+            let workitems: string[] = await this.ChooseWorkItems();
             for (let i: number = 0; i < workitems.length; i++) {
                 // Append the string to end of the message
                 // Note: we are prefixing the message with a space so that the # char is not in the first column
