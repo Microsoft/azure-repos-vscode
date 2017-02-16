@@ -21,14 +21,19 @@ var fs = require("fs");
 
 export class Tfvc {
     private _tfvcPath: string;
+    private _proxy: string;
 
     public constructor(localPath?: string) {
         Logger.LogDebug(`TFVC Creating Tfvc object with localPath='${localPath}'`);
+        // Get Proxy from settings
+        const settings = new TfvcSettings();
+        this._proxy = settings.Proxy;
+        Logger.LogDebug(`Using TFS proxy: ${this._proxy}`);
+
         if (localPath !== undefined) {
             this._tfvcPath = localPath;
         } else {
             // get the location from settings
-            const settings = new TfvcSettings();
             this._tfvcPath = settings.Location;
             Logger.LogDebug(`TFVC Retrieved from settings; localPath='${this._tfvcPath}'`);
             if (!this._tfvcPath) {
@@ -109,6 +114,10 @@ export class Tfvc {
         }
 
         options.env = _.assign({}, process.env, options.env || {});
+
+        if (this._proxy) {
+            args.AddProxySwitch(this._proxy);
+        }
 
         Logger.LogDebug(`TFVC: tf ${args.GetArgumentsForDisplay()}`);
         if (options.log !== false) {

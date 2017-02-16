@@ -4,26 +4,19 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import { commands, Disposable, ExtensionContext } from "vscode";
+import { commands, ExtensionContext } from "vscode";
 import { CommandNames, TfvcCommandNames } from "./helpers/constants";
 import { ExtensionManager } from "./extensionmanager";
-import { TfvcSCMProvider } from "./tfvc/tfvcscmprovider";
 import { AutoResolveType } from "./tfvc/interfaces";
 
 let _extensionManager: ExtensionManager;
-let _scmProvider: TfvcSCMProvider;
 
 export async function activate(context: ExtensionContext) {
     // Construct the extension manager that handles Team and Tfvc commands
     _extensionManager = new ExtensionManager();
     await _extensionManager.Initialize();
-
-    // Initialize the SCM provider for TFVC
-    const disposables: Disposable[] = [];
-    context.subscriptions.push(new Disposable(() => Disposable.from(...disposables).dispose()));
-    _scmProvider = new TfvcSCMProvider(_extensionManager);
-    _scmProvider.Initialize(disposables)
-        .catch(err => console.error(err));
+    // Register the ext manager for disposal
+    context.subscriptions.push(_extensionManager);
 
     context.subscriptions.push(commands.registerCommand(CommandNames.AssociateWorkItems, () => _extensionManager.Team.AssociateWorkItems()));
     context.subscriptions.push(commands.registerCommand(CommandNames.GetPullRequests, () => _extensionManager.Team.GetMyPullRequests()));

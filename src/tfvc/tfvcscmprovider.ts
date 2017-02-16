@@ -31,9 +31,9 @@ export class TfvcSCMProvider implements SCMProvider {
     private static instance: TfvcSCMProvider = undefined;
 
     private _extensionManager: ExtensionManager;
-    private _repoContext: TfvcContext;
     private _model: Model;
     private _disposables: Disposable[] = [];
+    private _tempDisposables: Disposable[] = [];
 
     constructor(extensionManager: ExtensionManager) {
         this._extensionManager = extensionManager;
@@ -112,7 +112,22 @@ export class TfvcSCMProvider implements SCMProvider {
 
     /* Public methods */
 
-    public async Initialize(disposables: Disposable[]): Promise<void> {
+    public async Initialize(): Promise<void> {
+        await TfvcOutput.CreateChannel(this._disposables);
+        await this.setup();
+
+        // Now that everything is setup, we can register the provider and set up our singleton instance
+        // This registration can only happen once
+        TfvcSCMProvider.instance = this;
+        this._disposables.push(scm.registerSCMProvider(TfvcSCMProvider.scmScheme, this));
+    }
+
+    public async Reinitialize(): Promise<void> {
+        this.cleanup();
+        await this.setup();
+    }
+
+    private async setup(): Promise<void> {
         const rootPath = workspace.rootPath;
         if (!rootPath) {
             // no root means no need for an scm provider
@@ -127,35 +142,29 @@ export class TfvcSCMProvider implements SCMProvider {
             return;
         }
 
-        this._repoContext = <TfvcContext>this._extensionManager.RepoContext;
+        let repoContext: TfvcContext = <TfvcContext>this._extensionManager.RepoContext;
         const fsWatcher = workspace.createFileSystemWatcher("**");
         const onWorkspaceChange = anyEvent(fsWatcher.onDidChange, fsWatcher.onDidCreate, fsWatcher.onDidDelete);
         const onTfvcChange = filterEvent(onWorkspaceChange, uri => /^\$tf\//.test(workspace.asRelativePath(uri)));
-        this._model = new Model(this._repoContext.RepoFolder, this._repoContext.TfvcRepository, onWorkspaceChange);
+        this._model = new Model(repoContext.RepoFolder, repoContext.TfvcRepository, onWorkspaceChange);
 
         let version: string = "unknown";
         try {
-            version = await this._repoContext.TfvcRepository.CheckVersion();
+            version = await repoContext.TfvcRepository.CheckVersion();
         } catch (err) {
             this._extensionManager.DisplayWarningMessage(err.message);
         }
-        await TfvcOutput.CreateChannel(disposables);
-        TfvcOutput.AppendLine("Using TFVC command line: " + this._repoContext.Tfvc.Location + " (" + version + ")");
+        TfvcOutput.AppendLine("Using TFVC command line: " + repoContext.Tfvc.Location + " (" + version + ")");
 
         const commitHoverProvider = new CommitHoverProvider(this._model);
-        const contentProvider = new TfvcContentProvider(this._repoContext.TfvcRepository, rootPath, onTfvcChange);
+        const contentProvider = new TfvcContentProvider(repoContext.TfvcRepository, rootPath, onTfvcChange);
         //const checkoutStatusBar = new CheckoutStatusBar(model);
         //const syncStatusBar = new SyncStatusBar(model);
         //const autoFetcher = new AutoFetcher(model);
         //const mergeDecorator = new MergeDecorator(model);
 
-        // Now that everything is setup, we can register the provider and set up our singleton instance
-        TfvcSCMProvider.instance = this;
-        scm.registerSCMProvider(TfvcSCMProvider.scmScheme, this);
-
-        disposables.push(
+        this._tempDisposables.push(
             commitHoverProvider,
-            this,
             contentProvider,
             fsWatcher
             //checkoutStatusBar,
@@ -163,6 +172,20 @@ export class TfvcSCMProvider implements SCMProvider {
             //autoFetcher,
             //mergeDecorator
         );
+    }
+
+    private cleanup() {
+        // dispose all the temporary items
+        if (this._tempDisposables) {
+            this._tempDisposables.forEach(d => d.dispose());
+            this._tempDisposables = [];
+        }
+
+        // dispose of the model
+        if (this._model) {
+            this._model.dispose();
+            this._model = undefined;
+        }
     }
 
     /* Implement SCMProvider interface */
@@ -210,8 +233,12 @@ export class TfvcSCMProvider implements SCMProvider {
     }
 
     dispose(): void {
-        this._disposables.forEach(d => d.dispose());
-        this._disposables = [];
+        TfvcSCMProvider.instance = undefined;
+        this.cleanup();
+        if (this._disposables) {
+            this._disposables.forEach(d => d.dispose());
+            this._disposables = [];
+        }
     }
 
     /**

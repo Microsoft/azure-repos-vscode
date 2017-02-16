@@ -4,7 +4,7 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import { FileSystemWatcher, StatusBarAlignment, StatusBarItem, window, workspace } from "vscode";
+import { Disposable, FileSystemWatcher, StatusBarAlignment, StatusBarItem, window, workspace } from "vscode";
 import { AccountSettings, Settings } from "./helpers/settings";
 import { CommandNames, Constants, TelemetryEvents, TfvcTelemetryEvents } from "./helpers/constants";
 import { CredentialManager } from "./helpers/credentialmanager";
@@ -24,6 +24,7 @@ import { CredentialInfo } from "./info/credentialinfo";
 import { TeamExtension } from "./team-extension";
 import { TfvcExtension } from "./tfvc/tfvc-extension";
 import { TfvcErrorCodes } from "./tfvc/tfvcerror";
+import { TfvcSCMProvider } from "./tfvc/tfvcscmprovider";
 
 var path = require("path");
 var util = require("util");
@@ -32,7 +33,7 @@ var util = require("util");
 import Q = require("q");
 /* tslint:enable:no-unused-variable */
 
-export class ExtensionManager  {
+export class ExtensionManager implements Disposable {
     private _teamServicesStatusBarItem: StatusBarItem;
     private _errorMessage: string;
     private _feedbackClient: FeedbackClient;
@@ -42,6 +43,7 @@ export class ExtensionManager  {
     private _credentialManager : CredentialManager;
     private _teamExtension: TeamExtension;
     private _tfvcExtension: TfvcExtension;
+    private _scmProvider: TfvcSCMProvider;
 
     public async Initialize(): Promise<void> {
         await this.setupFileSystemWatcherOnConfig();
@@ -85,7 +87,7 @@ export class ExtensionManager  {
 
     //Meant to reinitialize the extension when coming back online
     public Reinitialize(): void {
-        this.dispose();
+        this.cleanup();
         this.initializeExtension();
     }
 
@@ -268,6 +270,15 @@ export class ExtensionManager  {
                     Telemetry.SendException(message);
                 });
             }
+
+            // Now that everything else is ready, create the SCM provider
+            if (!this._scmProvider) {
+                this._scmProvider = new TfvcSCMProvider(this);
+                await this._scmProvider.Initialize();
+            } else {
+                await this._scmProvider.Reinitialize();
+            }
+
         } catch (err) {
             Logger.LogError(err.message);
             //For now, don't report these errors via the _feedbackClient
@@ -439,7 +450,7 @@ export class ExtensionManager  {
         }
     }
 
-    public dispose() {
+    private cleanup() {
         if (this._teamServicesStatusBarItem) {
             this._teamServicesStatusBarItem.dispose();
             this._teamServicesStatusBarItem = undefined;
@@ -451,6 +462,14 @@ export class ExtensionManager  {
         if (this._tfvcExtension) {
             this._tfvcExtension.dispose();
             this._tfvcExtension = undefined;
+        }
+    }
+
+    public dispose() {
+        this.cleanup();
+        if (this._scmProvider) {
+            this._scmProvider.dispose();
+            this._scmProvider = undefined;
         }
     }
 }

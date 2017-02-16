@@ -112,6 +112,10 @@ export class ArgumentBuilder implements IArgumentProvider {
         return this.ToString();
     }
 
+    public AddProxySwitch(proxy: string) {
+        this.AddSwitchWithValue("proxy", proxy, false);
+    }
+
     /* IArgumentProvider Implementation - END */
 
 }

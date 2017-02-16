@@ -17,7 +17,7 @@ import { ConflictType, GetStatuses, Status } from "./status";
 import * as _ from "underscore";
 import * as path from "path";
 
-export class Model {
+export class Model implements Disposable {
     private _disposables: Disposable[] = [];
     private _repositoryRoot: string;
     private _repository: Repository;
@@ -40,6 +40,13 @@ export class Model {
         const onNonGitChange = filterEvent(onWorkspaceChange, uri => !/\/\.tf\//.test(uri.fsPath));
         onNonGitChange(this.onFileSystemChange, this, this._disposables);
         this.status();
+    }
+
+    public dispose() {
+        if (this._disposables) {
+            this._disposables.forEach(d => d.dispose());
+            this._disposables = [];
+        }
     }
 
     public get ConflictsGroup(): ConflictsGroup { return this._conflictsGroup; }
