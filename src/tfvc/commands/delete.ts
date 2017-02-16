@@ -34,13 +34,36 @@ export class Delete implements ITfvcCommand<string[]> {
         return {};
     }
 
-    //Delete returns either 0 (success) or 100 (failure).  IF we fail, simply throw.
-    public async ParseOutput(executionResult: IExecutionResult): Promise<string[]> {
-        let lines: string[] = CommandHelper.SplitIntoLines(executionResult.stdout, false, true /*filterEmptyLines*/);
+    /* Delete returns either 0 (success) or 100 (failure).  IF we fail, simply throw.
 
-        if (executionResult.exitCode === 100) {
-            CommandHelper.ProcessErrors(this.GetArguments().GetCommand(), executionResult, true);
-        }
+        Sample output:
+        //Single file
+        tf.cmd delete folder1\folder2\file2.txt
+        folder1\folder2:
+        file2.txt
+
+        //Multiple files in a folder
+        tf.cmd delete folder2
+        folder2:
+        file2.txt
+        newfile.txt
+        folder2
+
+        //Deleting a file that doesn't exist
+        tf.cmd delete file2.txt
+        The item C:\repos\Tfvc.L2VSCodeExtension.RC\folder1\file2.txt could not be found in your workspace, or you do not have permission to access it.
+        No arguments matched any files to delete.
+
+        //Deleting a file with existing pending changes
+        tf.cmd delete file2.txt
+        TF203069: $/L2.VSCodeExtension.RC/folder1/folder2/file2.txt could not be deleted because that change conflicts with one or more other pending *snip*
+        No arguments matched any files to delete.
+    */
+
+    public async ParseOutput(executionResult: IExecutionResult): Promise<string[]> {
+        CommandHelper.ProcessErrors(this.GetArguments().GetCommand(), executionResult, true);
+
+        let lines: string[] = CommandHelper.SplitIntoLines(executionResult.stdout, false, true /*filterEmptyLines*/);
 
         let filesUndone: string[] = [];
         let path: string = "";

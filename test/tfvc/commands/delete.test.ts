@@ -6,7 +6,6 @@
 
 import { assert } from "chai";
 import * as path from "path";
-import { Strings } from "../../../src/helpers/strings";
 import { Delete } from "../../../src/tfvc/commands/delete";
 import { TfvcError } from "../../../src/tfvc/tfvcerror";
 import { IExecutionResult } from "../../../src/tfvc/interfaces";
@@ -186,7 +185,7 @@ describe("Tfvc-DeleteCommand", function() {
         } catch (err) {
             assert.equal(err.exitCode, 42);
             assert.equal(err.tfvcCommand, "delete");
-            assert.equal(err.message.indexOf(Strings.TfExecFailedError), 0);
+            assert.equal(err.message.indexOf("Something bad this way comes."), 0);
             assert.equal(err.stdout.indexOf("Something bad this way comes."), 0);
         }
     });
