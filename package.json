@@ -39,6 +39,10 @@
     "menus": {
       "scm/title": [
         {
+          "command" : "team.AssociateWorkItems",
+          "group": "3_commit@4"
+        },
+        {
           "command" : "tfvc.Checkin",
           "group": "navigation@1",
           "when": "scmProvider == tfvc"
@@ -63,11 +67,7 @@
           "group": "3_commit@3",
           "when": "scmProvider == tfvc"
         },
-        {
-          "command" : "tfvc.AssociateWorkItems",
-          "group": "3_commit@4",
-          "when": "scmProvider == tfvc"
-        },
+
         {
           "command" : "tfvc.ShowOutput",
           "group": "5_output",
@@ -185,6 +185,11 @@
     },
     "commands": [
       {
+        "command": "team.AssociateWorkItems",
+        "title": "Associate Work Items",
+        "category": "TFVC"
+      },
+      {
         "command": "team.OpenNewTask",
         "title": "Create Task",
         "category": "Team"
@@ -253,11 +258,6 @@
         "command": "team.Signout",
         "title": "Signout",
         "category": "Team"
-      },
-      {
-        "command": "tfvc.AssociateWorkItems",
-        "title": "Associate Work Items",
-        "category": "TFVC"
       },
       {
         "command": "tfvc.Checkin",

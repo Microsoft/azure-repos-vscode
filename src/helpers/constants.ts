@@ -14,6 +14,7 @@ export class Constants {
 
 export class CommandNames {
     static CommandPrefix: string = Constants.ExtensionName + ".";
+    static AssociateWorkItems: string = CommandNames.CommandPrefix + "AssociateWorkItems";
     static GetPullRequests: string = CommandNames.CommandPrefix + "GetPullRequests";
     static OpenBlamePage: string = CommandNames.CommandPrefix + "OpenBlamePage";
     static OpenBuildSummaryPage: string = CommandNames.CommandPrefix + "OpenBuildSummaryPage";
@@ -36,7 +37,6 @@ export class CommandNames {
 
 export class TfvcCommandNames {
     static CommandPrefix: string = "tfvc.";
-    static AssociateWorkItems: string = TfvcCommandNames.CommandPrefix + "AssociateWorkItems";
     static Checkin: string = TfvcCommandNames.CommandPrefix + "Checkin";
     static Exclude: string = TfvcCommandNames.CommandPrefix + "Exclude";
     static ExcludeAll: string = TfvcCommandNames.CommandPrefix + "ExcludeAll";
@@ -70,6 +70,7 @@ export class SettingNames {
 
 export class TelemetryEvents {
     static TelemetryPrefix: string = Constants.ExtensionName + "/";
+    static AssociateWorkItems: string = TelemetryEvents.TelemetryPrefix + "associateworkitems";
     static ExternalRepository: string = TelemetryEvents.TelemetryPrefix + "externalrepo";
     static OpenAdditionalQueryResults: string = TelemetryEvents.TelemetryPrefix + "openaddlqueryresults";
     static OpenBlamePage: string = TelemetryEvents.TelemetryPrefix + "openblame";

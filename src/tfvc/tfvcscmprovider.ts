@@ -44,15 +44,6 @@ export class TfvcSCMProvider implements SCMProvider {
         scm.inputBox.value = "";
     }
 
-    public static AppendToCheckinMessage(line: string): void {
-        const previousMessage = scm.inputBox.value;
-        if (previousMessage) {
-            scm.inputBox.value = previousMessage + "\n" + line;
-        } else {
-            scm.inputBox.value = line;
-        }
-    }
-
     public static GetCheckinInfo(): ICheckinInfo {
         const tfvcProvider: TfvcSCMProvider = TfvcSCMProvider.GetProviderInstance();
 

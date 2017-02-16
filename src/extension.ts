@@ -25,6 +25,7 @@ export async function activate(context: ExtensionContext) {
     _scmProvider.Initialize(disposables)
         .catch(err => console.error(err));
 
+    context.subscriptions.push(commands.registerCommand(CommandNames.AssociateWorkItems, () => _extensionManager.Team.AssociateWorkItems()));
     context.subscriptions.push(commands.registerCommand(CommandNames.GetPullRequests, () => _extensionManager.Team.GetMyPullRequests()));
     context.subscriptions.push(commands.registerCommand(CommandNames.Signin, () => _extensionManager.Team.Signin()));
     context.subscriptions.push(commands.registerCommand(CommandNames.Signout, () => _extensionManager.Team.Signout()));
@@ -71,5 +72,4 @@ export async function activate(context: ExtensionContext) {
         }));
     context.subscriptions.push(commands.registerCommand(TfvcCommandNames.Checkin, () => _extensionManager.Tfvc.Checkin()));
     context.subscriptions.push(commands.registerCommand(TfvcCommandNames.Sync, () => _extensionManager.Tfvc.Sync()));
-    context.subscriptions.push(commands.registerCommand(TfvcCommandNames.AssociateWorkItems, () => _extensionManager.Tfvc.AssociateWorkItems()));
 }

@@ -4,7 +4,7 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import { StatusBarAlignment, StatusBarItem, window } from "vscode";
+import { scm, StatusBarAlignment, StatusBarItem, window } from "vscode";
 import { PinnedQuerySettings } from "./helpers/settings";
 import { CommandNames, Constants, TelemetryEvents, WitTypes } from "./helpers/constants";
 import { Logger } from "./helpers/logger";
@@ -268,6 +268,30 @@ export class TeamExtension  {
             this._witClient.ShowMyWorkItemQueries();
         } else {
             this._manager.DisplayErrorMessage();
+        }
+    }
+
+    public async AssociateWorkItems(): Promise<void> {
+        if (this._manager.EnsureInitialized(RepositoryType.ANY)) {
+            Telemetry.SendEvent(TelemetryEvents.AssociateWorkItems);
+            let workitems: string[] = await this._manager.Team.ChooseWorkItems();
+            for (let i: number = 0; i < workitems.length; i++) {
+                // Append the string to end of the message
+                // Note: we are prefixing the message with a space so that the # char is not in the first column
+                //       This helps in case the user ends up editing the comment from the Git command line
+                this.appendToCheckinMessage(" " + workitems[i]);
+            }
+        } else {
+            this._manager.DisplayErrorMessage();
+        }
+    }
+
+    private appendToCheckinMessage(line: string): void {
+        const previousMessage = scm.inputBox.value;
+        if (previousMessage) {
+            scm.inputBox.value = previousMessage + "\n" + line;
+        } else {
+            scm.inputBox.value = line;
         }
     }
 
