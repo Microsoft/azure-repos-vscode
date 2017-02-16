@@ -57,6 +57,8 @@ export class CommandHelper {
                 message = Strings.TfInitializeFailureError;
             } else if (/There is no working folder mapping/i.test(result.stderr)) {
                 tfvcErrorCode = TfvcErrorCodes.FileNotInMappings;
+            } else if (/could not be found in your workspace, or you do not have permission to access it./i.test(result.stderr)) {
+                tfvcErrorCode = TfvcErrorCodes.FileNotInWorkspace;
             } else if (showFirstError) {
                 message = result.stderr ? result.stderr : result.stdout;
             }

@@ -63,6 +63,9 @@ export async function activate(context: ExtensionContext) {
             _extensionManager.Tfvc.OpenFile(args ? args[0] : undefined);
         }));
     context.subscriptions.push(commands.registerCommand(TfvcCommandNames.Refresh, () => _extensionManager.Tfvc.Refresh()));
+    context.subscriptions.push(commands.registerCommand(TfvcCommandNames.Rename, (...args) => {
+            _extensionManager.Tfvc.Rename(args ? args[0] : undefined);
+        }));
     context.subscriptions.push(commands.registerCommand(TfvcCommandNames.ShowOutput, () => _extensionManager.Tfvc.ShowOutput()));
     context.subscriptions.push(commands.registerCommand(TfvcCommandNames.ResolveKeepYours, (...args) => {
             _extensionManager.Tfvc.Resolve(args ? args[0] : undefined, AutoResolveType.KeepYours);

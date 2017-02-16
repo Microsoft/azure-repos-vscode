@@ -37,6 +37,13 @@
   "main": "./out/src/extension",
   "contributes": {
     "menus": {
+      "explorer/context": [
+        {
+          "command" : "tfvc.Rename",
+          "group": "9_cutcopypaste",
+          "when": "scmProvider == tfvc"
+        }
+      ],
       "scm/title": [
         {
           "command" : "team.AssociateWorkItems",
@@ -294,6 +301,11 @@
       {
         "command": "tfvc.OpenFile",
         "title": "Open File",
+        "category": "TFVC"
+      },
+      {
+        "command": "tfvc.Rename",
+        "title": "Rename (TFVC)",
         "category": "TFVC"
       },
       {

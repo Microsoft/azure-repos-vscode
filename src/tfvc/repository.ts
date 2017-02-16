@@ -17,6 +17,7 @@ import { FindWorkspace } from "./commands/findworkspace";
 import { GetInfo } from "./commands/getinfo";
 import { GetFileContent } from "./commands/getfilecontent";
 import { GetVersion } from "./commands/getversion";
+import { Rename } from "./commands/rename";
 import { ResolveConflicts } from "./commands/resolveconflicts";
 import { Status } from "./commands/status";
 import { Sync } from "./commands/sync";
@@ -102,6 +103,12 @@ export class Repository {
         Logger.LogDebug(`TFVC Repository.GetStatus`);
         return this.RunCommand<IPendingChange[]>(
             new Status(this._serverContext, ignoreFiles === undefined ? true : ignoreFiles));
+    }
+
+    public async Rename(sourcePath: string, destinationPath: string): Promise<string> {
+        Logger.LogDebug(`TFVC Repository.Rename`);
+        return this.RunCommand<string>(
+            new Rename(this._serverContext, sourcePath, destinationPath));
     }
 
     public async ResolveConflicts(itemPaths: string[], autoResolveType: AutoResolveType): Promise<IConflict[]> {

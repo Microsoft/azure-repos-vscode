@@ -102,6 +102,36 @@ export class TfvcExtension  {
         });
     }
 
+    /**
+     * This command runs a rename command on the selected file.
+     */
+    public async Rename(uri?: Uri): Promise<void> {
+        this.displayErrors(async () => {
+            if (uri) {
+                let basename: string = path.basename(uri.fsPath);
+                let newFilename: string = await window.showInputBox({ value: basename, prompt: Strings.RenamePrompt, placeHolder: undefined, password: false });
+                if (newFilename && newFilename !== basename) {
+                    let dirName: string = path.dirname(uri.fsPath);
+                    let destination: string = path.join(dirName, newFilename);
+
+                    try {
+                        //We decided not to send telemetry on file operations
+                        await this._repo.Rename(uri.fsPath, destination);
+                    } catch (err) {
+                        //Provide a better error message if the file to be renamed isn't in the workspace (e.g., it's a new file)
+                        if (err.tfvcErrorCode && err.tfvcErrorCode === TfvcErrorCodes.FileNotInWorkspace) {
+                            this._manager.DisplayErrorMessage(`Cannot rename ${basename} as it is not in your workspace.`);
+                        } else {
+                            throw err;
+                        }
+                    }
+                }
+            } else {
+                this._manager.DisplayWarningMessage(Strings.CommandRequiresExplorerContext);
+            }
+        });
+    }
+
     public async Resolve(uri: Uri, autoResolveType: AutoResolveType): Promise<void> {
         this.displayErrors(async () => {
             if (uri) {
@@ -167,7 +197,7 @@ export class TfvcExtension  {
             }
             if (pathToUndo) {
                 const basename: string = path.basename(pathToUndo);
-                const message: string = `Are you sure you want to undo changes in ${basename}?`;
+                const message: string = `Are you sure you want to undo changes to ${basename}?`;
                 if (await UIHelper.PromptForConfirmation(message, Strings.UndoChanges)) {
                     //We decided not to send telemetry on file operations
                     await this._repo.Undo([pathToUndo]);

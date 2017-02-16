@@ -68,6 +68,8 @@ export class Strings {
     static NoChangesToCheckin: string = "There are no changes to checkin. Changes must be added to the 'Included' section to be checked in.";
     static AllFilesUpToDate: string = "All files are up to date.";
     static CommandRequiresFileContext: string = "This command requires a file context and can only be executed from the TFVC viewlet window.";
+    static CommandRequiresExplorerContext: string = "This command requires a file context and can only be executed from the Explorer window.";
+    static RenamePrompt: string = "Provide the new name for the file.";
 
     // TFVC viewlet Strings
     static ExcludedGroupName: string = "Excluded changes";
