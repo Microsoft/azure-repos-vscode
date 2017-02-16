@@ -12,7 +12,7 @@ import { filterEvent } from "../util";
 import { Resource } from "./resource";
 import { ResourceGroup, IncludedGroup, ExcludedGroup, ConflictsGroup } from "./resourcegroups";
 import { IConflict, IPendingChange } from "../interfaces";
-import { ConflictType, Status } from "./status";
+import { ConflictType, GetStatuses, Status } from "./status";
 
 import * as _ from "underscore";
 import * as path from "path";
@@ -113,6 +113,10 @@ export class Model {
 
     private async update(): Promise<void> {
         const changes: IPendingChange[] = await this._repository.GetStatus();
+
+        //Check for any pending deletes and run 'tf delete' on each
+        await this.processDeletes(changes);
+
         const foundConflicts: IConflict[] = await this._repository.FindConflicts();
 
         const conflict: IConflict = foundConflicts.find(c => c.type === ConflictType.NAME_AND_CONTENT || c.type === ConflictType.RENAME);
@@ -174,5 +178,21 @@ export class Model {
             result = change.localItem.toLowerCase() === path2.toLowerCase();
         }
         return result;
+    }
+
+    //When files are deleted in the VS Code Explorer, they are marked as Deleted but as candidate changes
+    //So we are looking for those and then running the Delete command on each.
+    private async processDeletes(changes: IPendingChange[]): Promise<void> {
+        let deleteCandidatePaths: string[] = [];
+        for (let index: number = 0; index < changes.length; index++) {
+            let change: IPendingChange = changes[index];
+            if (change.isCandidate && GetStatuses(change.changeType).find((e) => e === Status.DELETE)) {
+                deleteCandidatePaths.push(change.localItem);
+            }
+        }
+        if (deleteCandidatePaths && deleteCandidatePaths.length > 0) {
+            //We decided not to send telemetry on file operations
+            await this._repository.Delete(deleteCandidatePaths);
+        }
     }
 }

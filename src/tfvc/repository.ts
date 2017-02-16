@@ -11,6 +11,7 @@ import { Tfvc } from "./tfvc";
 import { AutoResolveType, IArgumentProvider, IConflict, IItemInfo, IPendingChange, ISyncResults, IWorkspace } from "./interfaces";
 import { Add } from "./commands/add";
 import { Checkin } from "./commands/checkin";
+import { Delete } from "./commands/delete";
 import { FindConflicts } from "./commands/findconflicts";
 import { FindWorkspace } from "./commands/findworkspace";
 import { GetInfo } from "./commands/getinfo";
@@ -65,6 +66,12 @@ export class Repository {
         Logger.LogDebug(`TFVC Repository.Checkin`);
         return this.RunCommand<string>(
             new Checkin(this._serverContext, files, comment, workItemIds));
+    }
+
+    public async Delete(itemPaths: string[]): Promise<string[]> {
+        Logger.LogDebug(`TFVC Repository.Delete`);
+        return this.RunCommand<string[]>(
+            new Delete(this._serverContext, itemPaths));
     }
 
     public async FindConflicts(itemPath?: string): Promise<IConflict[]> {

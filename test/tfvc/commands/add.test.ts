@@ -84,8 +84,27 @@ describe("Tfvc-AddCommand", function() {
             stderr: undefined
         };
 
-        let filesUndone: string[] = await cmd.ParseOutput(executionResult);
-        assert.equal(filesUndone.length, 0);
+        let filesAdded: string[] = await cmd.ParseOutput(executionResult);
+        assert.equal(filesAdded.length, 0);
+    });
+
+    it("should verify parse output - single empty folder - no errors", async function() {
+        let localPaths: string[] = ["empty-folder"];
+        let cmd: Add = new Add(undefined, localPaths);
+        let executionResult: IExecutionResult = {
+            exitCode: 0,
+            stdout: "empty-folder:\n" +
+                    "empty-folder\n",
+            stderr: undefined
+        };
+
+        let filesAdded: string[] = await cmd.ParseOutput(executionResult);
+        assert.equal(filesAdded.length, 1);
+        //In this case, the CLC returns:
+        //empty-folder:
+        //empty-folder
+        //So we will have to return empty-folder\empty-folder.  Not ideal but let's ensure we're getting that.
+        assert.equal(filesAdded[0], path.join(localPaths[0], localPaths[0]));
     });
 
     it("should verify parse output - single folder+file - no errors", async function() {
@@ -98,9 +117,9 @@ describe("Tfvc-AddCommand", function() {
             stderr: undefined
         };
 
-        let filesUndone: string[] = await cmd.ParseOutput(executionResult);
-        assert.equal(filesUndone.length, 1);
-        assert.equal(filesUndone[0], localPaths[0]);
+        let filesAdded: string[] = await cmd.ParseOutput(executionResult);
+        assert.equal(filesAdded.length, 1);
+        assert.equal(filesAdded[0], localPaths[0]);
     });
 
     it("should verify parse output - single subfolder+file - no errors", async function() {
@@ -113,9 +132,9 @@ describe("Tfvc-AddCommand", function() {
             stderr: undefined
         };
 
-        let filesUndone: string[] = await cmd.ParseOutput(executionResult);
-        assert.equal(filesUndone.length, 1);
-        assert.equal(filesUndone[0], localPaths[0]);
+        let filesAdded: string[] = await cmd.ParseOutput(executionResult);
+        assert.equal(filesAdded.length, 1);
+        assert.equal(filesAdded[0], localPaths[0]);
     });
 
     it("should verify parse output - single folder+file - spaces - no errors", async function() {
@@ -128,9 +147,9 @@ describe("Tfvc-AddCommand", function() {
             stderr: undefined
         };
 
-        let filesUndone: string[] = await cmd.ParseOutput(executionResult);
-        assert.equal(filesUndone.length, 1);
-        assert.equal(filesUndone[0], localPaths[0]);
+        let filesAdded: string[] = await cmd.ParseOutput(executionResult);
+        assert.equal(filesAdded.length, 1);
+        assert.equal(filesAdded[0], localPaths[0]);
     });
 
     it("should verify parse output - error exit code, stdout", async function() {

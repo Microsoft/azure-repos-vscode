@@ -66,6 +66,7 @@ export class TfvcExtension  {
 
                 //At this point, an unversioned file could be a candidate file, so call Add.  Once it is added, it should be a Pending change.
                 if (!resource.IsVersioned) {
+                    //We decided not to send telemetry on file operations
                     await this._repo.Add([path]);
                     //Don't return after adding, we may still need to unexclude it (it may have been excluded previously)
                 }
@@ -168,7 +169,7 @@ export class TfvcExtension  {
                 const basename: string = path.basename(pathToUndo);
                 const message: string = `Are you sure you want to undo changes in ${basename}?`;
                 if (await UIHelper.PromptForConfirmation(message, Strings.UndoChanges)) {
-                    Telemetry.SendEvent(TfvcTelemetryEvents.Undo);
+                    //We decided not to send telemetry on file operations
                     await this._repo.Undo([pathToUndo]);
                 }
             }
