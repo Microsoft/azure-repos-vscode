@@ -187,7 +187,7 @@
       {
         "command": "team.AssociateWorkItems",
         "title": "Associate Work Items",
-        "category": "TFVC"
+        "category": "Team"
       },
       {
         "command": "team.OpenNewTask",
