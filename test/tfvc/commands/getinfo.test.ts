@@ -55,6 +55,12 @@ describe("Tfvc-GetInfoCommand", function() {
         assert.throws(() => new GetInfo(undefined, undefined), TfvcError, /Argument is required/);
     });
 
+    it("should verify GetOptions", function() {
+        let localPaths: string[] = ["/path/to/workspace"];
+        let cmd: GetInfo = new GetInfo(undefined, localPaths);
+        assert.deepEqual(cmd.GetOptions(), {});
+    });
+
     it("should verify arguments", function() {
         let localPaths: string[] = ["/path/to/workspace"];
         let cmd: GetInfo = new GetInfo(undefined, localPaths);

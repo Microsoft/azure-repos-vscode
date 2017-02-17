@@ -63,6 +63,12 @@ describe("Tfvc-UndoCommand", function() {
         assert.throws(() => new Undo(undefined, undefined), TfvcError, /Argument is required/);
     });
 
+    it("should verify GetOptions", function() {
+        let localPaths: string[] = ["/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/README.md"];
+        let cmd: Undo = new Undo(context, localPaths);
+        assert.deepEqual(cmd.GetOptions(), {});
+    });
+
     it("should verify arguments", function() {
         let localPaths: string[] = ["/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/README.md"];
         let cmd: Undo = new Undo(undefined, localPaths);

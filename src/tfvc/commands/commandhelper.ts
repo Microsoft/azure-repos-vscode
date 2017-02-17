@@ -32,12 +32,15 @@ export class CommandHelper {
     }
 
     public static HasError(result: IExecutionResult, errorPattern: string): boolean {
-        return new RegExp(errorPattern, "i").test(result.stderr);
+        if (result && result.stderr && errorPattern) {
+            return new RegExp(errorPattern, "i").test(result.stderr);
+        }
+        return false;
     }
 
     public static ProcessErrors(command: string, result: IExecutionResult, showFirstError?: boolean): void {
         if (result.exitCode) {
-            let tfvcErrorCode: string = null;
+            let tfvcErrorCode: string = TfvcErrorCodes.UnknownError;
             let message: string;
 
             if (/Authentication failed/.test(result.stderr)) {
@@ -182,9 +185,18 @@ export class CommandHelper {
             folderPath = filePath.slice(0, filePath.length - 1);
         }
         //If path isn't rooted, add in the root
-        if (!path.isAbsolute(folderPath) && pathRoot) {
+        if (folderPath && !path.isAbsolute(folderPath) && pathRoot) {
             folderPath = path.join(pathRoot, folderPath);
+        } else if (!folderPath && pathRoot) {
+            folderPath = pathRoot;
         }
-        return path.join(folderPath, filename);
+
+        if (folderPath && filename) {
+            return path.join(folderPath, filename);
+        } else if (filename) {
+            return filename;
+        } else {
+            return folderPath;
+        }
     }
 }

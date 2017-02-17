@@ -55,6 +55,12 @@ describe("Tfvc-CheckinCommand", function() {
         assert.throws(() => new Checkin(undefined, undefined), TfvcError, /Argument is required/);
     });
 
+    it("should verify GetOptions", function() {
+        let files: string[] = ["/path/to/workspace/file.txt"];
+        let cmd: Checkin = new Checkin(undefined, files);
+        assert.deepEqual(cmd.GetOptions(), {});
+    });
+
     it("should verify arguments", function() {
         let files: string[] = ["/path/to/workspace/file.txt"];
         let cmd: Checkin = new Checkin(undefined, files);

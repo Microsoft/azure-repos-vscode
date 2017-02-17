@@ -25,6 +25,12 @@ describe("Tfvc-FindWorkspaceCommand", function() {
         assert.throws(() => new FindWorkspace(undefined), TfvcError, /Argument is required/);
     });
 
+    it("should verify GetOptions", function() {
+        let localPath: string = "/path/to/workspace";
+        let cmd: FindWorkspace = new FindWorkspace(localPath);
+        assert.deepEqual(cmd.GetOptions(), { cwd: "/path/to/workspace" });
+    });
+
     it("should verify arguments", function() {
         let localPath: string = "/path/to/workspace";
         let cmd: FindWorkspace = new FindWorkspace(localPath);

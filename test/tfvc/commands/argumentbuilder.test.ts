@@ -87,5 +87,8 @@ describe("Tfvc-ArgumentBuilder", function() {
         assert.equal(args.length, 4);
         // GetArgumentsForDisplay
         assert.equal(argProvider.GetArgumentsForDisplay(), "mycmd -noprompt -collection:" + collectionUrl + " ********");
+        // AddProxySwitch
+        argProvider.AddProxySwitch("TFSProxy");
+        assert.equal(argProvider.GetArgumentsForDisplay(), "mycmd -noprompt -collection:" + collectionUrl + " ******** -proxy:TFSProxy");
     });
 });

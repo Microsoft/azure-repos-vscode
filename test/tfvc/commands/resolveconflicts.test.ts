@@ -56,6 +56,12 @@ describe("Tfvc-ResolveConflictsCommand", function() {
         assert.throws(() => new ResolveConflicts(undefined, undefined, undefined), TfvcError, /Argument is required/);
     });
 
+    it("should verify GetOptions", function() {
+        let localPaths: string[] = ["/usr/alias/repo1/file.txt"];
+        let cmd: ResolveConflicts = new ResolveConflicts(undefined, localPaths, AutoResolveType.KeepYours);
+        assert.deepEqual(cmd.GetOptions(), {});
+    });
+
     it("should verify arguments", function() {
         let localPaths: string[] = ["/usr/alias/repo1/file.txt"];
         let cmd: ResolveConflicts = new ResolveConflicts(undefined, localPaths, AutoResolveType.KeepYours);

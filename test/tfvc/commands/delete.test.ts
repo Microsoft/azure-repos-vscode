@@ -60,6 +60,12 @@ describe("Tfvc-DeleteCommand", function() {
         assert.throws(() => new Delete(undefined, undefined), TfvcError, /Argument is required/);
     });
 
+    it("should verify GetOptions", function() {
+        let localPaths: string[] = ["/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/README.md"];
+        let cmd: Delete = new Delete(undefined, localPaths);
+        assert.deepEqual(cmd.GetOptions(), {});
+    });
+
     it("should verify arguments", function() {
         let localPaths: string[] = ["/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/README.md"];
         let cmd: Delete = new Delete(undefined, localPaths);

@@ -56,6 +56,12 @@ describe("Tfvc-FindConflictsCommand", function() {
         assert.throws(() => new FindConflicts(undefined, undefined), TfvcError, /Argument is required/);
     });
 
+    it("should verify GetOptions", function() {
+        let localPath: string = "/usr/alias/repo1";
+        let cmd: FindConflicts = new FindConflicts(undefined, localPath);
+        assert.deepEqual(cmd.GetOptions(), {});
+    });
+
     it("should verify arguments", function() {
         let localPath: string = "/usr/alias/repo1";
         let cmd: FindConflicts = new FindConflicts(undefined, localPath);
@@ -94,11 +100,13 @@ describe("Tfvc-FindConflictsCommand", function() {
                     "nameChange.txt: The item name has changed\n" +
                     "nameAndContentChange.txt: The item name and content have changed\n" +
                     "contentChange2.txt: The item content has changed\n" +
-                    "deleted.txt: The item has already been deleted"
+                    "deleted.txt: The item has already been deleted\n" +
+                    "branchEdit.txt: The source and target both have changes\n" +
+                    "branchDelete.txt: The item has been deleted in the target branch"
         };
 
         let results: IConflict[] = await cmd.ParseOutput(executionResult);
-        assert.equal(results.length, 6);
+        assert.equal(results.length, 8);
         assert.equal(results[0].localPath, "contentChange.txt");
         assert.equal(results[0].type, ConflictType.CONTENT);
         assert.equal(results[1].localPath, "addConflict.txt");
@@ -111,6 +119,10 @@ describe("Tfvc-FindConflictsCommand", function() {
         assert.equal(results[4].type, ConflictType.CONTENT);
         assert.equal(results[5].localPath, "deleted.txt");
         assert.equal(results[5].type, ConflictType.DELETE);
+        assert.equal(results[6].localPath, "branchEdit.txt");
+        assert.equal(results[6].type, ConflictType.MERGE);
+        assert.equal(results[7].localPath, "branchDelete.txt");
+        assert.equal(results[7].type, ConflictType.DELETE_TARGET);
     });
 
     it("should verify parse output - errors - exit code 100", async function() {

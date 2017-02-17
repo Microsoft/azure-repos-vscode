@@ -56,6 +56,12 @@ describe("Tfvc-SyncCommand", function() {
         assert.throws(() => new Sync(undefined, undefined, false), TfvcError, /Argument is required/);
     });
 
+    it("should verify GetOptions", function() {
+        let localPaths: string[] = ["/usr/alias/repo1"];
+        let cmd: Sync = new Sync(undefined, localPaths, false);
+        assert.deepEqual(cmd.GetOptions(), {});
+    });
+
     it("should verify arguments", function() {
         let localPaths: string[] = ["/usr/alias/repo1"];
         let cmd: Sync = new Sync(undefined, localPaths, false);
