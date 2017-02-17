@@ -16,13 +16,11 @@ export class Utils {
 
     //gitDir provided for unit testing purposes
     public static FindGitFolder(startingPath: string, gitDir?: string): string {
-        if (!fs.existsSync(startingPath)) { return null; }
+        if (!fs.existsSync(startingPath)) { return undefined; }
 
         let gitPath: string;
         let lastPath: string;
         let currentPath: string = startingPath;
-
-        if (!currentPath) { currentPath = process.cwd(); }
 
         do {
             gitPath = path.join(currentPath, gitDir || ".git");
@@ -35,7 +33,7 @@ export class Utils {
             currentPath = path.resolve(currentPath, "..");
         } while (lastPath !== currentPath);
 
-        return null;
+        return undefined;
     }
 
     //Returns the icon string to use for a particular BuildResult

@@ -9,17 +9,7 @@ const path = require("path");
 
 import { RepositoryType } from "../../src/contexts/repositorycontext";
 import { ExternalContext }  from "../../src/contexts/externalcontext";
-import { ISettings }  from "../../src/helpers/settings";
-
-//Used to test the ExternalContext class
-class SettingsMock implements ISettings {
-    /* tslint:disable:variable-name */
-    constructor(public AppInsightsEnabled: boolean, public AppInsightsKey: string, public LoggingLevel: string,
-                public PollingInterval: number, public RemoteUrl: string, public TeamProject: string, public BuildDefinitionId: number) {
-        //nothing to do
-    }
-    /* tslint:enable:variable-name */
-}
+import { SettingsMock }  from "./contexthelper";
 
 describe("ExternalContext", function() {
     let TEST_REPOS_FOLDER: string = "testrepos";

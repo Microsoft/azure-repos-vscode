@@ -10,6 +10,7 @@ import { getNtlmHandler } from "vso-node-api/WebApi";
 import { Constants } from "../helpers/constants";
 
 export class CredentialInfo {
+    private _domain: string;
     private _username: string;
     private _password: string;
     private _credentialHandler: IRequestHandler;
@@ -23,7 +24,8 @@ export class CredentialInfo {
             // NTLM (we don't support Basic auth)
             this._username = username;
             this._password = password;
-            this._credentialHandler = getNtlmHandler(this._username, this._password, domain, workstation);
+            this._domain = domain;
+            this._credentialHandler = getNtlmHandler(this._username, this._password, this._domain, workstation);
         } else {
             // Personal Access Token
             this._username = Constants.OAuth;
@@ -35,8 +37,13 @@ export class CredentialInfo {
     public get CredentialHandler() : IRequestHandler {
         return this._credentialHandler;
     }
-    public set CredentialHandler(handler : IRequestHandler)  {
+
+    public set CredentialHandler(handler : IRequestHandler) {
         this._credentialHandler = handler;
+    }
+
+    public get Domain(): string {
+        return this._domain;
     }
 
     public get Username(): string {

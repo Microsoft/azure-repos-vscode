@@ -8,6 +8,8 @@ import { assert } from "chai";
 const path = require("path");
 
 import { GitContext }  from "../../src/contexts/gitcontext";
+import { RepositoryType } from "../../src/contexts/repositorycontext";
+import { SettingsMock } from "./contexthelper";
 
 describe("GitContext", function() {
     let TEST_REPOS_FOLDER: string = "testrepos";
@@ -24,6 +26,7 @@ describe("GitContext", function() {
         assert.equal(gc.CurrentBranch, undefined);
         assert.equal(gc.RemoteUrl, undefined);
         assert.equal(gc.RepositoryParentFolder, undefined);
+        assert.equal(gc.Type, RepositoryType.GIT);
     });
 
     it("should verify undefined values for invalid GitContext path", function() {
@@ -33,6 +36,13 @@ describe("GitContext", function() {
         assert.equal(gc.CurrentBranch, undefined);
         assert.equal(gc.RemoteUrl, undefined);
         assert.equal(gc.RepositoryParentFolder, undefined);
+        assert.equal(gc.Type, RepositoryType.GIT);
+    });
+
+    it("should verify initialize returns true", async function() {
+        let gc: GitContext = new GitContext(__dirname);
+        let mock: SettingsMock = new SettingsMock(false, undefined, undefined, 1, "https://xplatalm.visualstudio.com", "L2.VSCodeExtension.RC", undefined);
+        assert.isTrue(await gc.Initialize(mock));
     });
 
     it("should verify repository with an empty origin remote", function() {
@@ -48,6 +58,7 @@ describe("GitContext", function() {
         assert.equal(gc.RemoteUrl, undefined);
         assert.equal(gc.RepositoryParentFolder, path.join(__dirname, TEST_REPOS_FOLDER, repoName));
         assert.equal(gc.RepoFolder, repoPath);
+        assert.equal(gc.Type, RepositoryType.GIT);
     });
 
     it("should verify GitHub origin remote", function() {
@@ -63,6 +74,7 @@ describe("GitContext", function() {
         assert.equal(gc.RemoteUrl, undefined);
         assert.equal(gc.RepositoryParentFolder, path.join(__dirname, TEST_REPOS_FOLDER, repoName));
         assert.equal(gc.RepoFolder, repoPath);
+        assert.equal(gc.Type, RepositoryType.GIT);
     });
 
     it("should verify TeamServices origin remote", function() {
@@ -79,6 +91,7 @@ describe("GitContext", function() {
         assert.equal(gc.RepositoryParentFolder, path.join(__dirname, TEST_REPOS_FOLDER, repoName));
         assert.equal(gc.RepoFolder, repoPath);
         assert.isUndefined(gc.TeamProjectName); //For Git repositories, teamproject comes from vsts/info (not remoteUrl)
+        assert.equal(gc.Type, RepositoryType.GIT);
     });
 
     it("should verify TeamServices origin remote cloned with ssh", function() {
@@ -95,6 +108,7 @@ describe("GitContext", function() {
         assert.equal(gc.RemoteUrl, "https://account.visualstudio.com/DefaultCollection/_git/repository");
         assert.equal(gc.RepositoryParentFolder, path.join(__dirname, TEST_REPOS_FOLDER, repoName));
         assert.equal(gc.RepoFolder, repoPath);
+        assert.equal(gc.Type, RepositoryType.GIT);
     });
 
     it("should verify TeamFoundationServer origin remote", function() {
@@ -110,6 +124,7 @@ describe("GitContext", function() {
         assert.equal(gc.RemoteUrl, "http://devmachine:8080/tfs/DefaultCollection/_git/GitAgile");
         assert.equal(gc.RepositoryParentFolder, path.join(__dirname, TEST_REPOS_FOLDER, repoName));
         assert.equal(gc.RepoFolder, repoPath);
+        assert.equal(gc.Type, RepositoryType.GIT);
     });
 
     it("should verify TeamFoundationServer origin remote cloned with ssh", function() {
@@ -127,6 +142,7 @@ describe("GitContext", function() {
         assert.equal(gc.RemoteUrl, "ssh://devmachine:22/tfs/DefaultCollection/_git/GitJava");
         assert.equal(gc.RepositoryParentFolder, path.join(__dirname, TEST_REPOS_FOLDER, repoName));
         assert.equal(gc.RepoFolder, repoPath);
+        assert.equal(gc.Type, RepositoryType.GIT);
     });
 
 });

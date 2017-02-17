@@ -39,7 +39,7 @@ export class GitContext implements IRepositoryContext {
                 this._gitFolder = Utils.FindGitFolder(rootPath);
             }
 
-            if (this._gitFolder != null) {
+            if (this._gitFolder !== undefined) {
                 // With parse-git-config, cwd is the directory containing the path, .git/config, you want to sync
                 this._gitParentFolder = path.dirname(this._gitFolder);
                 let syncObj: any = { cwd: this._gitParentFolder };

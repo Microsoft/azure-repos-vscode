@@ -41,6 +41,8 @@ describe("Utils", function() {
         assert.isTrue(Utils.IsUnauthorized(reason));
         let reason2 = { statusCode: 401 };
         assert.isTrue(Utils.IsUnauthorized(reason2));
+        //If no reason, isUnauthorized should be false
+        assert.isFalse(Utils.IsUnauthorized(undefined));
     });
 
     it("should verify GetMessageForStatusCode with 401", function() {
@@ -65,6 +67,36 @@ describe("Utils", function() {
         let reason = { code: "EAI_AGAIN" };
         let message: string = Utils.GetMessageForStatusCode(reason);
         assert.equal(message, Strings.StatusCodeOffline);
+    });
+
+    it("should verify GetMessageForStatusCode for proxy - ECONNRESET", function() {
+        let reason = { code: "ECONNRESET" };
+        process.env.HTTP_PROXY = "vsts-vscode unit tests";
+        let message: string = Utils.GetMessageForStatusCode(reason);
+        process.env.HTTP_PROXY = "";
+        assert.equal(message, Strings.ProxyUnreachable);
+    });
+
+    it("should verify GetMessageForStatusCode for proxy - ECONNREFUSED", function() {
+        let reason = { code: "ECONNREFUSED" };
+        process.env.HTTP_PROXY = "vsts-vscode unit tests";
+        let message: string = Utils.GetMessageForStatusCode(reason);
+        process.env.HTTP_PROXY = "";
+        assert.equal(message, Strings.ProxyUnreachable);
+    });
+
+    it("should verify GetMessageForStatusCode for no proxy - ECONNRESET", function() {
+        let reason = { code: "ECONNRESET" };
+        process.env.HTTP_PROXY = "";
+        let message: string = Utils.GetMessageForStatusCode(reason, "default message");
+        assert.equal(message, "default message");
+    });
+
+    it("should verify GetMessageForStatusCode for no proxy - ECONNREFUSED", function() {
+        let reason = { code: "ECONNREFUSED" };
+        process.env.HTTP_PROXY = "";
+        let message: string = Utils.GetMessageForStatusCode(reason, "default message");
+        assert.equal(message, "default message");
     });
 
     it("should verify GetMessageForStatusCode for 404", function() {
@@ -93,6 +125,13 @@ describe("Utils", function() {
         assert.equal(actualRepoPath, path.join(__dirname, TEST_REPOS_FOLDER, repoName, DOT_GIT_FOLDER));
     });
 
+    it("should verify FindGitFolder with no found .git folder", function() {
+        let repoPath: string = __dirname;
+        //We need use DOT_GIT_FOLDER here since the test resides in a .git repository
+        let actualRepoPath: string = Utils.FindGitFolder(repoPath, DOT_GIT_FOLDER);
+        assert.isUndefined(actualRepoPath);
+    });
+
     it("should verify GetBuildResultIcon with all values", function() {
         expect(Utils.GetBuildResultIcon(BuildResult.Succeeded)).to.equal("octicon-check");
         expect(Utils.GetBuildResultIcon(BuildResult.Canceled)).to.equal("octicon-alert");
@@ -109,9 +148,11 @@ describe("Utils", function() {
             process.env.HTTP_PROXY = "vsts-vscode unit tests";
             assert.isTrue(Utils.IsProxyEnabled());
             process.env.HTTP_PROXY = "";
+            assert.isFalse(Utils.IsProxyEnabled());
             process.env.HTTPS_PROXY = "vsts-vscode unit tests";
             assert.isTrue(Utils.IsProxyEnabled());
             process.env.HTTPS_PROXY = "";
+            assert.isFalse(Utils.IsProxyEnabled());
         } finally {
             if (httpProxy) {
                 process.env.HTTP_PROXY = httpProxy;
@@ -134,6 +175,18 @@ describe("Utils", function() {
             assert.isTrue(Utils.IsProxyIssue(reason3));
             let reason4 = { statusCode: "ECONNREFUSED" };
             assert.isTrue(Utils.IsProxyIssue(reason4));
+            //With proxy enabled, an undefined message should be false
+            assert.isFalse(Utils.IsProxyIssue(undefined));
+            process.env.HTTP_PROXY = "";
+            //With proxy not set, the following should not be proxy issues
+            reason = { code: "ECONNRESET" };
+            assert.isFalse(Utils.IsProxyIssue(reason));
+            reason2 = { statusCode: "ECONNRESET" };
+            assert.isFalse(Utils.IsProxyIssue(reason2));
+            reason3 = { code: "ECONNREFUSED" };
+            assert.isFalse(Utils.IsProxyIssue(reason3));
+            reason4 = { statusCode: "ECONNREFUSED" };
+            assert.isFalse(Utils.IsProxyIssue(reason4));
         } finally {
             if (httpProxy) {
                 process.env.HTTP_PROXY = httpProxy;

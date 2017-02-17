@@ -27,6 +27,11 @@ export class TestSettings {
         return (token || "undefined-password");
     }
 
+    //Returns just any old token (doesn't have to be an env var)
+    public static SettingsPassword() : string {
+        return "kegnf4wasx3n5nwdj5lkutvjavtbbfblygsxcggvpphpmfwvjjov";
+    }
+
     public static Account() : string {
         let account : string = process.env.MSVSTS_TEAM_ACCOUNT;
         return (account || "undefined-account");
