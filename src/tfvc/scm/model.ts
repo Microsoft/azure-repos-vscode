@@ -123,7 +123,7 @@ export class Model implements Disposable {
         let foundConflicts: IConflict[] = [];
 
         // Without any server context we can't run delete or resolve commands
-        if (!this._repository.HasContext) {
+        if (this._repository.HasContext) {
             // Check for any pending deletes and run 'tf delete' on each
             await this.processDeletes(changes);
 
