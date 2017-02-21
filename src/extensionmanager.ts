@@ -356,7 +356,7 @@ export class ExtensionManager implements Disposable {
         }
         Logger.SetLoggingLevel(loggingLevel);
         if (rootPath !== undefined) {
-            Logger.SetLogPath(rootPath);
+            Logger.LogPath = rootPath;
             Logger.LogInfo("*** FOLDER: " + rootPath + " ***");
         } else {
             Logger.LogInfo("*** Folder not opened ***");

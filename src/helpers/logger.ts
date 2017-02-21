@@ -76,10 +76,18 @@ export class Logger {
         //When displaying messages, don't add timestamp or our severity level prefix
     }
 
-    public static SetLogPath(path: string) : void {
+    public static get LogPath(): string {
+        return Logger.logPath;
+    }
+
+    public static set LogPath(path: string) {
         if (path !== undefined) {
             Logger.logPath = path;
         }
+    }
+
+    public static get LoggingLevel(): LoggingLevel {
+        return Logger.loggingLevel;
     }
 
     public static SetLoggingLevel(level: string): void {
@@ -111,6 +119,9 @@ export class Logger {
     }
 
     //Returns string representation of now()
+    public static get Now() : string {
+        return Logger.getNow();
+    }
     private static getNow(): string {
         let now: Date = new Date();
         let strDateTime: string = [[Logger.addZero(now.getHours()), Logger.addZero(now.getMinutes()), Logger.addZero(now.getSeconds())].join(":"),
@@ -127,7 +138,7 @@ export class Logger {
     }
 }
 
-enum LoggingLevel {
+export enum LoggingLevel {
     Error = 0,
     Warn = 1,
     Info = 2,
