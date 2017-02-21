@@ -49,6 +49,10 @@ export class Repository {
         this._env.TF_ADDITIONAL_JAVA_ARGS = "-Duser.country=US -Duser.language=en";
     }
 
+    public get HasContext(): boolean {
+        return this._serverContext != null && this._serverContext.CredentialInfo != null;
+    }
+
     public get Tfvc(): Tfvc {
         return this._tfvc;
     }

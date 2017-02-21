@@ -120,11 +120,16 @@ export class Model implements Disposable {
 
     private async update(): Promise<void> {
         const changes: IPendingChange[] = await this._repository.GetStatus();
+        let foundConflicts: IConflict[] = [];
 
-        //Check for any pending deletes and run 'tf delete' on each
-        await this.processDeletes(changes);
+        // Without any server context we can't run delete or resolve commands
+        if (!this._repository.HasContext) {
+            // Check for any pending deletes and run 'tf delete' on each
+            await this.processDeletes(changes);
 
-        const foundConflicts: IConflict[] = await this._repository.FindConflicts();
+            // Get the list of conflicts
+            foundConflicts = await this._repository.FindConflicts();
+        }
 
         const conflict: IConflict = foundConflicts.find(c => c.type === ConflictType.NAME_AND_CONTENT || c.type === ConflictType.RENAME);
         if (conflict) {

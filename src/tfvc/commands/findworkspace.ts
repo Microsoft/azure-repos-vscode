@@ -23,7 +23,9 @@ export class FindWorkspace implements ITfvcCommand<IWorkspace> {
     }
 
     public GetArguments(): IArgumentProvider {
-        return new ArgumentBuilder("workfold");
+        // Due to a bug in the CLC this command "requires" the login switch although the creds are never used
+        return new ArgumentBuilder("workfold")
+            .AddSwitchWithValue("login", "fake,fake", true);
     }
 
     public GetOptions(): any {
