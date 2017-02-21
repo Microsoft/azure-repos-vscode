@@ -35,7 +35,7 @@ describe("Tfvc-FindWorkspaceCommand", function() {
         let localPath: string = "/path/to/workspace";
         let cmd: FindWorkspace = new FindWorkspace(localPath);
 
-        assert.equal(cmd.GetArguments().GetArgumentsForDisplay(), "workfold -noprompt");
+        assert.equal(cmd.GetArguments().GetArgumentsForDisplay(), "workfold -noprompt ********");
     });
 
     it("should verify working folder", function() {
