@@ -58,4 +58,16 @@ export class GetFileContent implements ITfvcCommand<string> {
         const lines: string[] = CommandHelper.SplitIntoLines(executionResult.stdout);
         return lines.join(CommandHelper.GetNewLineCharacter(executionResult.stdout));
     }
+
+    public GetExeArguments(): IArgumentProvider {
+        return this.GetArguments();
+    }
+
+    public GetExeOptions(): any {
+        return this.GetOptions();
+    }
+
+    public async ParseExeOutput(executionResult: IExecutionResult): Promise<string> {
+        return this.ParseOutput(executionResult);
+    }
 }

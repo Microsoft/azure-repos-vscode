@@ -75,6 +75,18 @@ export class Undo implements ITfvcCommand<string[]> {
         return filesUndone;
     }
 
+    public GetExeArguments(): IArgumentProvider {
+        return this.GetArguments();
+    }
+
+    public GetExeOptions(): any {
+        return this.GetOptions();
+    }
+
+    public async ParseExeOutput(executionResult: IExecutionResult): Promise<string[]> {
+        return this.ParseOutput(executionResult);
+    }
+
     //line could be 'Undoing edit: file1.txt', 'Undoing add: file1.txt'
     private getFileFromLine(line: string): string {
         const prefix: string = ": "; //"Undoing edit: ", "Undoing add: ", etc.

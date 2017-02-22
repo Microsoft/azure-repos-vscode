@@ -147,10 +147,19 @@ export class Repository {
     }
 
     public async RunCommand<T>(cmd: ITfvcCommand<T>): Promise<T> {
-        const result: IExecutionResult = await this.exec(cmd.GetArguments(), cmd.GetOptions());
-        // We will call ParseOutput to give the command a chance to handle any specific errors itself.
-        const output: T = await cmd.ParseOutput(result);
-        return output;
+        if (this._tfvc.isExe) {
+            //This is the tf.exe path
+            const result: IExecutionResult = await this.exec(cmd.GetExeArguments(), cmd.GetExeOptions());
+            // We will call ParseExeOutput to give the command a chance to handle any specific errors itself.
+            const output: T = await cmd.ParseExeOutput(result);
+            return output;
+        } else {
+            //This is the CLC path
+            const result: IExecutionResult = await this.exec(cmd.GetArguments(), cmd.GetOptions());
+            // We will call ParseOutput to give the command a chance to handle any specific errors itself.
+            const output: T = await cmd.ParseOutput(result);
+            return output;
+        }
     }
 
     private async exec(args: IArgumentProvider, options: any = {}): Promise<IExecutionResult> {

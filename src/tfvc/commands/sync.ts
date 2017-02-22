@@ -90,6 +90,18 @@ export class Sync implements ITfvcCommand<ISyncResults> {
         }
     }
 
+    public GetExeArguments(): IArgumentProvider {
+        return this.GetArguments();
+    }
+
+    public GetExeOptions(): any {
+        return this.GetOptions();
+    }
+
+    public async ParseExeOutput(executionResult: IExecutionResult): Promise<ISyncResults> {
+        return this.ParseOutput(executionResult);
+    }
+
     private getItemResults(stdout: string): ISyncItemResult[] {
         let itemResults: ISyncItemResult[] = [];
         let folderPath: string = "";

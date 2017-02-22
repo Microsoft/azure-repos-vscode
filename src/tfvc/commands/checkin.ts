@@ -85,4 +85,16 @@ export class Checkin implements ITfvcCommand<string> {
             return CommandHelper.GetChangesetNumber(executionResult.stdout);
         }
     }
+
+    public GetExeArguments(): IArgumentProvider {
+        return this.GetArguments();
+    }
+
+    public GetExeOptions(): any {
+        return this.GetOptions();
+    }
+
+    public ParseExeOutput(executionResult: IExecutionResult): Promise<string> {
+        return this.ParseOutput(executionResult);
+    }
 }

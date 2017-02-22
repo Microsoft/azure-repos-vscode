@@ -80,4 +80,17 @@ export class FindConflicts implements ITfvcCommand<IConflict[]> {
 
         return conflicts;
     }
+
+    public GetExeArguments(): IArgumentProvider {
+        return this.GetArguments();
+    }
+
+    public GetExeOptions(): any {
+        return this.GetOptions();
+    }
+
+    public async ParseExeOutput(executionResult: IExecutionResult): Promise<IConflict[]> {
+        return this.ParseOutput(executionResult);
+    }
+
 }

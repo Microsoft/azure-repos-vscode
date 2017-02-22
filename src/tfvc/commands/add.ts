@@ -62,6 +62,18 @@ export class Add implements ITfvcCommand<string[]> {
         return filesAdded;
     }
 
+    public GetExeArguments(): IArgumentProvider {
+        return this.GetArguments();
+    }
+
+    public GetExeOptions(): any {
+        return this.GetOptions();
+    }
+
+    public async ParseExeOutput(executionResult: IExecutionResult): Promise<string[]> {
+        return this.ParseOutput(executionResult);
+    }
+
     private getFileFromLine(line: string): string {
         //There's no prefix on the filename line for the Add command
         return line;

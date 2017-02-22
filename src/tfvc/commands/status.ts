@@ -86,6 +86,29 @@ export class Status implements ITfvcCommand<IPendingChange[]> {
         return changes;
     }
 
+    public GetExeArguments(): IArgumentProvider {
+        //return this.GetArguments();
+        const builder: ArgumentBuilder = new ArgumentBuilder("status", this._serverContext)
+            .AddSwitchWithValue("format", "detailed", false)
+            .AddSwitch("recursive");
+
+        if (this._localPaths && this._localPaths.length > 0) {
+            for (let i = 0; i < this._localPaths.length; i++) {
+                builder.Add(this._localPaths[i]);
+            }
+        }
+
+        return builder;
+    }
+
+    public GetExeOptions(): any {
+        return this.GetOptions();
+    }
+
+    public async ParseExeOutput(executionResult: IExecutionResult): Promise<IPendingChange[]> {
+        return this.ParseOutput(executionResult);
+    }
+
     private add(changes: IPendingChange[], newChange: IPendingChange, ignoreFolders: boolean) {
         // Deleted files won't exist, but we still include them in the results
         if (ignoreFolders && fs.existsSync(newChange.localItem)) {

@@ -17,11 +17,14 @@ import { TfvcVersion } from "./tfvcversion";
 import { TfvcOutput } from "./tfvcoutput";
 
 var _ = require("underscore");
-var fs = require("fs");
+import * as fs from "fs";
+import * as path from "path";
 
 export class Tfvc {
     private _tfvcPath: string;
     private _proxy: string;
+    private _isExe: boolean = false;
+    private _minVersion: string = "14.0.4";  //Minimum CLC version
 
     public constructor(localPath?: string) {
         Logger.LogDebug(`TFVC Creating Tfvc object with localPath='${localPath}'`);
@@ -49,13 +52,17 @@ export class Tfvc {
         let exists: boolean = fs.existsSync(this._tfvcPath);
         if (exists) {
             // if it exists, check to ensure that it's a file and not a folder
-            const stats: any = fs.lstatSync(this._tfvcPath);
+            const stats: fs.Stats = fs.lstatSync(this._tfvcPath);
             if (!stats || !stats.isFile()) {
                 Logger.LogWarning(`TFVC ${this._tfvcPath} exists but isn't a file.`);
                 throw new TfvcError({
                     message: Strings.TfMissingError + this._tfvcPath,
                     tfvcErrorCode: TfvcErrorCodes.TfvcNotFound
                 });
+            }
+            this._isExe = path.extname(this._tfvcPath) === ".exe";
+            if (this._isExe) {
+                this._minVersion = "14.102.25619.0";  //Minimum tf.exe version
             }
         } else {
             Logger.LogWarning(`TFVC ${this._tfvcPath} does not exist.`);
@@ -66,6 +73,7 @@ export class Tfvc {
         }
     }
 
+    public get isExe(): boolean { return this._isExe; }
     public get Location(): string { return this._tfvcPath; }
 
     /**
@@ -80,10 +88,10 @@ export class Tfvc {
         }
 
         // check the version of TFVC command line
-        const minVersion: TfvcVersion = TfvcVersion.FromString("14.0.4");
+        const minVersion: TfvcVersion = TfvcVersion.FromString(this._minVersion);
         const curVersion: TfvcVersion = TfvcVersion.FromString(version);
         if (TfvcVersion.Compare(curVersion, minVersion) < 0) {
-            Logger.LogWarning(`TFVC ${version} is less that the min version of 14.0.4.`);
+            Logger.LogWarning(`TFVC ${version} is less that the min version of ${this._minVersion}.`);
             throw new TfvcError({
                 message: Strings.TfVersionWarning + minVersion.ToString(),
                 tfvcErrorCode: TfvcErrorCodes.TfvcMinVersionWarning

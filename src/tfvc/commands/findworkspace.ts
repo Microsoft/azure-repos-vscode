@@ -71,7 +71,8 @@ export class FindWorkspace implements ITfvcCommand<IWorkspace> {
                 continue;
             }
 
-            if (line.startsWith("Workspace:")) {
+            //CLC returns 'Workspace:', tf.exe returns 'Workspace :'
+            if (line.startsWith("Workspace:") || line.startsWith("Workspace :")) {
                 workspaceName = this.getValue(line);
             } else if (line.startsWith("Collection:")) {
                 collectionUrl = this.getValue(line);
@@ -86,6 +87,9 @@ export class FindWorkspace implements ITfvcCommand<IWorkspace> {
                 }
             }
         }
+        if (mappings.length === 0) {
+            throw new Error("Could not find a workspace with mappings.  Perhaps the wrong version of TF is being used with the selected folder?");
+        }
 
         const workspace: IWorkspace = {
             name: workspaceName,
@@ -95,6 +99,18 @@ export class FindWorkspace implements ITfvcCommand<IWorkspace> {
         };
 
         return workspace;
+    }
+
+    public GetExeArguments(): IArgumentProvider {
+        return this.GetArguments();
+    }
+
+    public GetExeOptions(): any {
+        return this.GetOptions();
+    }
+
+    public async ParseExeOutput(executionResult: IExecutionResult): Promise<IWorkspace> {
+        return this.ParseOutput(executionResult);
     }
 
     /**

@@ -123,6 +123,9 @@ export interface IArgumentProvider {
 
 export interface ITfvcCommand<T> {
     GetArguments(): IArgumentProvider;
+    GetExeArguments(): IArgumentProvider;
     GetOptions(): any;
+    GetExeOptions(): any;
     ParseOutput(executionResult: IExecutionResult): Promise<T>;
+    ParseExeOutput(executionResult: IExecutionResult): Promise<T>;
 }

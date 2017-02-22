@@ -99,6 +99,18 @@ export class GetInfo implements ITfvcCommand<IItemInfo[]> {
         return itemInfos;
     }
 
+    public GetExeArguments(): IArgumentProvider {
+        return this.GetArguments();
+    }
+
+    public GetExeOptions(): any {
+        return this.GetOptions();
+    }
+
+    public async ParseExeOutput(executionResult: IExecutionResult): Promise<IItemInfo[]> {
+        return this.ParseOutput(executionResult);
+    }
+
     private getPropertyName(name: string): string {
         switch (name) {
             case "server path": return "serverItem";
