@@ -106,6 +106,7 @@ export class Status implements ITfvcCommand<IPendingChange[]> {
     }
 
     public async ParseExeOutput(executionResult: IExecutionResult): Promise<IPendingChange[]> {
+        //TODO: Parse this with format:detailed
         return this.ParseOutput(executionResult);
     }
 

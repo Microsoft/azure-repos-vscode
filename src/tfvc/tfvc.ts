@@ -62,7 +62,7 @@ export class Tfvc {
             }
             this._isExe = path.extname(this._tfvcPath) === ".exe";
             if (this._isExe) {
-                this._minVersion = "14.102.25619.0";  //Minimum tf.exe version
+                this._minVersion = "14.102.0";  //Minimum tf.exe version
             }
         } else {
             Logger.LogWarning(`TFVC ${this._tfvcPath} does not exist.`);

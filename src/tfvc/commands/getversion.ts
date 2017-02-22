@@ -44,6 +44,7 @@ export class GetVersion implements ITfvcCommand<string> {
         return this.GetOptions();
     }
 
+    //TODO: Refactor this with ParseOutput (pass in just the line and the regex?)
     public async ParseExeOutput(executionResult: IExecutionResult): Promise<string> {
         // Throw if any errors are found in stderr or if exitcode is not 0
         CommandHelper.ProcessErrors(this.GetArguments().GetCommand(), executionResult);
