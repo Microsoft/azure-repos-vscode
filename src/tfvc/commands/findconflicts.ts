@@ -51,6 +51,7 @@ export class FindConflicts implements ITfvcCommand<IConflict[]> {
             CommandHelper.ProcessErrors(this.GetArguments().GetCommand(), executionResult);
         }
 
+        // TODO EXE: conflict messages are different so add || exe error below to each branch
         let conflicts: IConflict[] = [];
         const lines: string[] = CommandHelper.SplitIntoLines(executionResult.stderr, false, true);
         for (let i: number = 0; i < lines.length; i++) {

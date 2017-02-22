@@ -45,6 +45,7 @@ export class GetFileContent implements ITfvcCommand<string> {
     }
 
     public async ParseOutput(executionResult: IExecutionResult): Promise<string> {
+        // TODO EXE: check error messages and WARNings
         // Check for "The specified file does not exist at the specified version" and write out empty string
         if (this._ignoreFileNotFound && CommandHelper.HasError(executionResult, "The specified file does not exist at the specified version")) {
             // The file doesn't exist, but the ignore flag is set, so we will simply return an emtpy string
@@ -60,7 +61,12 @@ export class GetFileContent implements ITfvcCommand<string> {
     }
 
     public GetExeArguments(): IArgumentProvider {
-        return this.GetArguments();
+        let builder: ArgumentBuilder = new ArgumentBuilder("view", this._serverContext)
+            .Add(this._localPath);
+        if (this._versionSpec) {
+            builder.AddSwitchWithValue("version", this._versionSpec.toString(), false);
+        }
+        return builder;
     }
 
     public GetExeOptions(): any {

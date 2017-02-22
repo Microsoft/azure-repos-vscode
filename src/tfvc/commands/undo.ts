@@ -42,6 +42,7 @@ export class Undo implements ITfvcCommand<string[]> {
     public async ParseOutput(executionResult: IExecutionResult): Promise<string[]> {
         let lines: string[] = CommandHelper.SplitIntoLines(executionResult.stdout, false, true /*filterEmptyLines*/);
 
+        //TODO EXE: verify these are all true for the EXE
         //If we didn't succeed without any issues, we have a bit of work to do.
         //'tf undo' can return a non-zero exit code when:
         //  * Some of the files have no pending changes (exitCode === 1)

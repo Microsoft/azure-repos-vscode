@@ -71,7 +71,8 @@ export class Sync implements ITfvcCommand<ISyncResults> {
             CommandHelper.ProcessErrors(this.GetArguments().GetCommand(), executionResult);
         }
 
-        if (/All files up to date/i.test(executionResult.stdout)) {
+        // Check for up to date message (slightly different in EXE and CLC)
+        if (/All files( are)? up to date/i.test(executionResult.stdout)) {
             // There was nothing to download so return an empty result
             return {
                 hasConflicts: false,
@@ -156,13 +157,24 @@ export class Sync implements ITfvcCommand<ISyncResults> {
                 message: line.slice(dashIndex + 1).trim()
             };
         } else {
-            // This must be an error. Usually of the form "filename - message"
-            let dashIndex = line.lastIndexOf("-");
-            newResult = {
-                syncType: SyncType.Error,
-                itemPath: CommandHelper.GetFilePath(folderPath, line.slice(0, dashIndex).trim()),
-                message: line.slice(dashIndex + 1).trim()
-            };
+            // This must be an error. Usually of the form "filename - message" or "filename cannot be deleted reason"
+            let index = line.lastIndexOf("-");
+            if (index >= 0) {
+                newResult = {
+                    syncType: SyncType.Error,
+                    itemPath: CommandHelper.GetFilePath(folderPath, line.slice(0, index).trim()),
+                    message: line.slice(index + 1).trim()
+                };
+            } else {
+                index = line.indexOf("cannot be deleted");
+                if (index >= 0) {
+                    newResult = {
+                        syncType: SyncType.Error,
+                        itemPath: CommandHelper.GetFilePath(folderPath, line.slice(0, index).trim()),
+                        message: line.trim()
+                    };
+                }
+            }
         }
 
         return newResult;
@@ -174,6 +186,7 @@ export class Sync implements ITfvcCommand<ISyncResults> {
      * Warning - Unable to refresh testHereRename.txt because you have a pending edit.
      * Conflict TestAdd.txt - Unable to perform the get operation because you have a conflicting edit
      * new4.txt - Unable to perform the get operation because you have a conflicting rename (to be moved from D:\tmp\folder\new5.txt)
+     * D:\tmp\vscodeBugBash\folder1 cannot be deleted because it is not empty.
      */
     private getErrorMessages(stderr: string): ISyncItemResult[] {
         let errorMessages: ISyncItemResult[] = [];

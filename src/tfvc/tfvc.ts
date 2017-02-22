@@ -123,7 +123,8 @@ export class Tfvc {
 
         options.env = _.assign({}, process.env, options.env || {});
 
-        if (this._proxy) {
+        // TODO EXE: do we want to handle proxies or not for the EXE?
+        if (this._proxy && !this._isExe) {
             args.AddProxySwitch(this._proxy);
         }
 

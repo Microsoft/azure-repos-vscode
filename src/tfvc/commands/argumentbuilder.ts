@@ -28,15 +28,6 @@ export class ArgumentBuilder implements IArgumentProvider {
             if (serverContext.CredentialInfo) {
                 this.AddSwitchWithValue("login", serverContext.CredentialInfo.Username + "," + serverContext.CredentialInfo.Password, true);
             }
-            //TODO add proxy
-            /*
-            if (useProxyIfAvailable) {
-                final String proxyURI = WorkspaceHelper.getProxyServer(collectionURI);
-                if (StringUtils.isNotEmpty(proxyURI)) {
-                    builder.addSwitch("proxy", proxyURI);
-                }
-            }
-            */
         }
     }
 

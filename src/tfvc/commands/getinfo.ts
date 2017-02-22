@@ -34,7 +34,7 @@ export class GetInfo implements ITfvcCommand<IItemInfo[]> {
     }
 
     /**
-     * Example of output
+     * Example of output (Exactly the same for tf.cmd and tf.exe)
      * Local information:
      * Local path:  D:\tmp\TFVC_1\build.xml
      * Server path: $/TFVC_1/build.xml
