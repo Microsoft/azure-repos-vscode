@@ -84,7 +84,7 @@ export class Undo implements ITfvcCommand<string[]> {
     }
 
     public async ParseExeOutput(executionResult: IExecutionResult): Promise<string[]> {
-        return this.ParseOutput(executionResult);
+        return await this.ParseOutput(executionResult);
     }
 
     //line could be 'Undoing edit: file1.txt', 'Undoing add: file1.txt'
