@@ -63,7 +63,8 @@ export class Add implements ITfvcCommand<string[]> {
     }
 
     public GetExeArguments(): IArgumentProvider {
-        return this.GetArguments();
+        return new ArgumentBuilder("add", this._serverContext, true /* skipCollectionOption */)
+            .AddAll(this._itemPaths);
     }
 
     public GetExeOptions(): any {

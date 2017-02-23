@@ -15,7 +15,7 @@ export class ArgumentBuilder implements IArgumentProvider {
     private _arguments: string[] = [];
     private _secretArgumentIndexes: number[] = [];
 
-    public constructor(command: string, serverContext?: TeamServerContext) {
+    public constructor(command: string, serverContext?: TeamServerContext, skipCollectionOption?: boolean) {
         if (!command) {
             throw TfvcError.CreateArgumentMissingError("command");
         }
@@ -23,8 +23,10 @@ export class ArgumentBuilder implements IArgumentProvider {
         this.AddSwitch("noprompt");
 
         if (serverContext && serverContext.RepoInfo && serverContext.RepoInfo.CollectionUrl) {
-            //TODO decode URI since CLC does not expect encoded collection urls
-            this.AddSwitchWithValue("collection", serverContext.RepoInfo.CollectionUrl, false);
+            if (!skipCollectionOption) {
+                //TODO decode URI since CLC does not expect encoded collection urls
+                this.AddSwitchWithValue("collection", serverContext.RepoInfo.CollectionUrl, false);
+            }
             if (serverContext.CredentialInfo) {
                 this.AddSwitchWithValue("login", serverContext.CredentialInfo.Username + "," + serverContext.CredentialInfo.Password, true);
             }

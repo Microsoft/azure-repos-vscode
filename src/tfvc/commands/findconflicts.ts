@@ -86,7 +86,11 @@ export class FindConflicts implements ITfvcCommand<IConflict[]> {
     }
 
     public GetExeArguments(): IArgumentProvider {
-        return this.GetArguments();
+        const builder: ArgumentBuilder = new ArgumentBuilder("resolve", this._serverContext, true /* skipCollectionOption */)
+            .Add(this._itemPath)
+            .AddSwitch("recursive")
+            .AddSwitch("preview");
+        return builder;
     }
 
     public GetExeOptions(): any {

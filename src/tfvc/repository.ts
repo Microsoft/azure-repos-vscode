@@ -50,7 +50,7 @@ export class Repository {
     }
 
     public get HasContext(): boolean {
-        return this._serverContext !== undefined && this._serverContext.CredentialInfo !== undefined;
+        return this._serverContext !== undefined && this._serverContext.CredentialInfo !== undefined && this._serverContext.RepoInfo.CollectionUrl !== undefined;
     }
 
     public get Tfvc(): Tfvc {
