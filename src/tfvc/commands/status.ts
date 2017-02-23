@@ -105,9 +105,108 @@ export class Status implements ITfvcCommand<IPendingChange[]> {
         return this.GetOptions();
     }
 
+    /*
+    Parses the output of the status command when formatted as detailed
+    SAMPLE
+    $/jeyou/README.md;C19
+    User       : Jeff Young (TFS)
+    Date       : Wednesday, February 22, 2017 1:47:26 PM
+    Lock       : none
+    Change     : edit
+    Workspace  : jeyou-dev00-tfexe-OnPrem
+    Local item : [JEYOU-DEV00] C:\repos\TfExe.Tfvc.L2VSCodeExtension.RC.TFS\README.md
+    File type  : utf-8
+
+    -------------------------------------------------------------------------------------------------------------------------------------------------------------
+    Detected Changes:
+    -------------------------------------------------------------------------------------------------------------------------------------------------------------
+    $/jeyou/therightstuff.txt
+    User       : Jeff Young (TFS)
+    Date       : Wednesday, February 22, 2017 11:48:34 AM
+    Lock       : none
+    Change     : add
+    Workspace  : jeyou-dev00-tfexe-OnPrem
+    Local item : [JEYOU-DEV00] C:\repos\TfExe.Tfvc.L2VSCodeExtension.RC.TFS\therightstuff.txt
+
+    1 change(s), 0 detected change(s)
+    */
     public async ParseExeOutput(executionResult: IExecutionResult): Promise<IPendingChange[]> {
-        //TODO: Parse this with format:detailed
-        return this.ParseOutput(executionResult);
+        // Throw if any errors are found in stderr or if exitcode is not 0
+        CommandHelper.ProcessErrors(this.GetArguments().GetCommand(), executionResult);
+
+        let changes: IPendingChange[] = [];
+        if (!executionResult.stdout) {
+            return changes;
+        }
+
+        const lines: string[] = CommandHelper.SplitIntoLines(executionResult.stdout, true, false); //leave empty lines
+        let detectedChanges: boolean = false;
+        let curChange: IPendingChange;
+        for (let i: number = 0; i < lines.length; i++) {
+            const line: string = lines[i];
+            if (line.indexOf(" detected change(s)") > 0) {
+                //This tells us we're done
+                break;
+            }
+
+            if (!line || line.trim().length === 0) {
+                //If we have a curChange, we're finished with it
+                if (curChange !== undefined) {
+                    changes.push(curChange);
+                    curChange = undefined;
+                }
+                continue;
+            }
+
+            if (line.indexOf("--------") === 0 || line.toLowerCase().startsWith("detected changes: ")) {
+                //Starting Detected Changes...
+                detectedChanges = true;
+                continue;
+            }
+
+            if (line.startsWith("$/")) {
+                //$/jeyou/README.md;C19  //versioned
+                //$/jeyou/README.md  //isCandidate
+                let parts: string[] = line.split(";C");
+
+                curChange = { changeType: undefined, computer: undefined, date: undefined, localItem: undefined,
+                            sourceItem: undefined, lock: undefined, owner: undefined,
+                            serverItem: (parts && parts.length >= 1 ? parts[0] : undefined),
+                            version: (parts && parts.length === 2 ? parts[1] : "0"),
+                            workspace: undefined, isCandidate: detectedChanges };
+            } else {
+                // Add the property to the current item
+                const colonPos: number = line.indexOf(":");
+                if (colonPos > 0) {
+                    const propertyName = this.getPropertyName(line.slice(0, colonPos).trim().toLowerCase());
+                    if (propertyName) {
+                        let propertyValue: string = colonPos + 1 < line.length ? line.slice(colonPos + 1).trim() : "";
+                        if (propertyName.toLowerCase() === "localitem") {
+                            //Local item : [JEYOU-DEV00] C:\repos\TfExe.Tfvc.L2VSCodeExtension.RC.TFS\README.md
+                            let parts: string[] = propertyValue.split("] ");
+                            curChange["computer"] = parts[0].substr(1); //pop off the beginning [
+                            propertyValue = parts[1];
+                        }
+                        curChange[propertyName] = propertyValue;
+                    }
+                }
+            }
+        }
+
+        return changes;
+    }
+
+    private getPropertyName(name: string): string {
+        switch (name) {
+            case "local item": return "localItem";
+            case "source item": return "sourceItem";
+            case "user": return "owner"; //TODO: I don't think this is accurate
+            case "date": return "date";
+            case "lock": return "lock";
+            case "change": return "changeType";
+            case "workspace": return "workspace";
+        }
+        return undefined;
     }
 
     private add(changes: IPendingChange[], newChange: IPendingChange, ignoreFolders: boolean) {
@@ -140,4 +239,5 @@ export class Status implements ITfvcCommand<IPendingChange[]> {
             isCandidate: isCandidate
         };
     }
+
 }

@@ -373,6 +373,11 @@ describe("Tfvc-CommandHelper", function() {
         assert.equal(CommandHelper.TrimToXml(""), "");
     });
 
+    it("should verify ParseXml - undefined input", async function() {
+        let xml: any = await CommandHelper.ParseXml(undefined);
+        assert.isUndefined(xml);
+    });
+
     it("should verify ParseXml", async function() {
         let text: string = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<one attr1=\"35\" attr2=\"two\"><child1 attr1=\"44\" attr2=\"55\" attr3=\"three\"/><child2>child two</child2>\r\n</one>\n\n";
         let xml: any = await CommandHelper.ParseXml(text);

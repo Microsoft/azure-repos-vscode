@@ -126,6 +126,10 @@ export class CommandHelper {
     }
 
     public static async ParseXml(xml: string): Promise<any> {
+        if (!xml) {
+            return;
+        }
+
         return new Promise<any>((resolve, reject) => {
             parseString(
                 xml,

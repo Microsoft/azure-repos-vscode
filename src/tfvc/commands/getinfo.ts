@@ -61,14 +61,11 @@ export class GetInfo implements ITfvcCommand<IItemInfo[]> {
             return itemInfos;
         }
 
-        const lines: string[] = CommandHelper.SplitIntoLines(executionResult.stdout);
+        const lines: string[] = CommandHelper.SplitIntoLines(executionResult.stdout, true, true);
         let curMode: string = ""; // "" is local mode, "server" is server mode
         let curItem: IItemInfo;
         for (let i: number = 0; i < lines.length; i++) {
             const line: string = lines[i];
-            if (!line || line.trim().length === 0) {
-                continue;
-            }
             if (line.toLowerCase().startsWith("local information:")) {
                 // We are starting a new Info section for the next item.
                 // So, finish off any in progress item and start a new one.
@@ -84,7 +81,7 @@ export class GetInfo implements ITfvcCommand<IItemInfo[]> {
                 // Add the property to the current item
                 const colonPos: number = line.indexOf(":");
                 if (colonPos > 0) {
-                    const propertyName = this.getPropertyName(curMode + line.slice(0, colonPos).trim().toLowerCase());
+                    const propertyName: string = this.getPropertyName(curMode + line.slice(0, colonPos).trim().toLowerCase());
                     if (propertyName) {
                         const propertyValue = colonPos + 1 < line.length ? line.slice(colonPos + 1).trim() : "";
                         curItem[propertyName] = propertyValue;
