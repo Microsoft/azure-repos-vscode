@@ -67,6 +67,12 @@ describe("Tfvc-AddCommand", function() {
         assert.deepEqual(cmd.GetOptions(), {});
     });
 
+    it("should verify GetExeOptions", function() {
+        let localPaths: string[] = ["/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/README.md"];
+        let cmd: Add = new Add(undefined, localPaths);
+        assert.deepEqual(cmd.GetExeOptions(), {});
+    });
+
     it("should verify arguments", function() {
         let localPaths: string[] = ["/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/README.md"];
         let cmd: Add = new Add(undefined, localPaths);
@@ -74,11 +80,25 @@ describe("Tfvc-AddCommand", function() {
         assert.equal(cmd.GetArguments().GetArgumentsForDisplay(), "add -noprompt " + localPaths[0]);
     });
 
+    it("should verify Exe arguments", function() {
+        let localPaths: string[] = ["/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/README.md"];
+        let cmd: Add = new Add(undefined, localPaths);
+
+        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "add -noprompt " + localPaths[0]);
+    });
+
     it("should verify arguments with context", function() {
         let localPaths: string[] = ["/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/README.md"];
         let cmd: Add = new Add(context, localPaths);
 
         assert.equal(cmd.GetArguments().GetArgumentsForDisplay(), "add -noprompt -collection:" + collectionUrl + " ******** " + localPaths[0]);
+    });
+
+    it("should verify Exe arguments with context", function() {
+        let localPaths: string[] = ["/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/README.md"];
+        let cmd: Add = new Add(context, localPaths);
+
+        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "add -noprompt ******** " + localPaths[0]);
     });
 
     it("should verify parse output - no files to add", async function() {
@@ -173,8 +193,8 @@ describe("Tfvc-AddCommand", function() {
         } catch (err) {
             assert.equal(err.exitCode, 42);
             assert.equal(err.tfvcCommand, "add");
-            assert.equal(err.message.indexOf(Strings.TfExecFailedError), 0);
-            assert.equal(err.stdout.indexOf("Something bad this way comes."), 0);
+            assert.isTrue(err.message.startsWith(Strings.TfExecFailedError));
+            assert.isTrue(err.stdout.startsWith("Something bad this way comes."));
         }
     });
 
@@ -193,9 +213,125 @@ describe("Tfvc-AddCommand", function() {
         } catch (err) {
             assert.equal(err.exitCode, 42);
             assert.equal(err.tfvcCommand, "add");
-            assert.equal(err.message.indexOf(Strings.TfExecFailedError), 0);
-            assert.equal(err.stderr.indexOf("Something bad this way comes."), 0);
+            assert.isTrue(err.message.startsWith(Strings.TfExecFailedError));
+            assert.isTrue(err.stderr.startsWith("Something bad this way comes."));
         }
     });
 
+    /// Verify ParseExeOutput values (for tf.exe)
+    it("should verify parse Exe output - no files to add", async function() {
+        let localPaths: string[] = ["/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/file-does-not-exist.md"];
+        let cmd: Add = new Add(undefined, localPaths);
+        //This return value is different for tf.exe than the CLC
+        let executionResult: IExecutionResult = {
+            exitCode: 1,
+            stdout: "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/file-does-not-exist.md: No file matches.",
+            stderr: undefined
+        };
+
+        let filesAdded: string[] = await cmd.ParseExeOutput(executionResult);
+        assert.equal(filesAdded.length, 0);
+    });
+
+    it("should verify parse Exe output - single empty folder - no errors", async function() {
+        let localPaths: string[] = ["empty-folder"];
+        let cmd: Add = new Add(undefined, localPaths);
+        //This return value is different for tf.exe than the CLC
+        let executionResult: IExecutionResult = {
+            exitCode: 0,
+            stdout: "empty-folder\n",
+            stderr: undefined
+        };
+
+        let filesAdded: string[] = await cmd.ParseExeOutput(executionResult);
+        assert.equal(filesAdded.length, 1);
+        //In this case, the EXE returns (this differs from the CLC):
+        //empty-folder
+        assert.equal(filesAdded[0], localPaths[0]);
+    });
+
+    it("should verify parse Exe output - single folder+file - no errors", async function() {
+        let localPaths: string[] = [path.join("folder1", "file1.txt")];
+        let cmd: Add = new Add(undefined, localPaths);
+        let executionResult: IExecutionResult = {
+            exitCode: 0,
+            stdout: "folder1:\n" +
+                    "file1.txt\n",
+            stderr: undefined
+        };
+
+        let filesAdded: string[] = await cmd.ParseExeOutput(executionResult);
+        assert.equal(filesAdded.length, 1);
+        assert.equal(filesAdded[0], localPaths[0]);
+    });
+
+    it("should verify parse Exe output - single subfolder+file - no errors", async function() {
+        let localPaths: string[] = [path.join("folder1", "folder2", "file2.txt")];
+        let cmd: Add = new Add(undefined, localPaths);
+        let executionResult: IExecutionResult = {
+            exitCode: 0,
+            stdout: path.join("folder1", "folder2") + ":\n" +
+                    "file2.txt\n",
+            stderr: undefined
+        };
+
+        let filesAdded: string[] = await cmd.ParseExeOutput(executionResult);
+        assert.equal(filesAdded.length, 1);
+        assert.equal(filesAdded[0], localPaths[0]);
+    });
+
+    it("should verify parse Exe output - single folder+file - spaces - no errors", async function() {
+        let localPaths: string[] = [path.join("fold er1", "file1.txt")];
+        let cmd: Add = new Add(undefined, localPaths);
+        let executionResult: IExecutionResult = {
+            exitCode: 0,
+            stdout: "fold er1:\n" +
+                    "file1.txt\n",
+            stderr: undefined
+        };
+
+        let filesAdded: string[] = await cmd.ParseExeOutput(executionResult);
+        assert.equal(filesAdded.length, 1);
+        assert.equal(filesAdded[0], localPaths[0]);
+    });
+
+    it("should verify parse Exe output - error exit code, stdout", async function() {
+        let noChangesPaths: string[] = [path.join("folder1", "file1.txt"), path.join("folder2", "file2.txt")];
+        let localPaths: string[] = noChangesPaths;
+        let cmd: Add = new Add(undefined, localPaths);
+        let executionResult: IExecutionResult = {
+            exitCode: 42,
+            stdout: "Something bad this way comes.",
+            stderr: undefined
+        };
+
+        try {
+            await cmd.ParseExeOutput(executionResult);
+        } catch (err) {
+            assert.equal(err.exitCode, 42);
+            assert.equal(err.tfvcCommand, "add");
+            assert.isTrue(err.message.startsWith(Strings.TfExecFailedError));
+            assert.isTrue(err.stdout.startsWith("Something bad this way comes."));
+        }
+    });
+
+    it("should verify parse Exe output - error exit code, stderr", async function() {
+        let noChangesPaths: string[] = [path.join("folder1", "file1.txt"), path.join("folder2", "file2.txt")];
+        let localPaths: string[] = noChangesPaths;
+        let cmd: Add = new Add(undefined, localPaths);
+        let executionResult: IExecutionResult = {
+            exitCode: 42,
+            stdout: undefined,
+            stderr: "Something bad this way comes."
+        };
+
+        try {
+            await cmd.ParseExeOutput(executionResult);
+        } catch (err) {
+            assert.equal(err.exitCode, 42);
+            assert.equal(err.tfvcCommand, "add");
+            assert.isTrue(err.message.startsWith(Strings.TfExecFailedError));
+            assert.isTrue(err.stderr.startsWith("Something bad this way comes."));
+        }
+    });
 });

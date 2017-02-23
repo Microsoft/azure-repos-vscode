@@ -40,13 +40,17 @@ export class Add implements ITfvcCommand<string[]> {
      * file2.java
      */
     public async ParseOutput(executionResult: IExecutionResult): Promise<string[]> {
-        // Throw if any errors are found in stderr or if exitcode is not 0
-        CommandHelper.ProcessErrors(this.GetArguments().GetCommand(), executionResult);
+        // Any exit code other than 0 or 1 means that something went wrong, so simply throw the error
+        if (executionResult.exitCode !== 0 && executionResult.exitCode !== 1) {
+            CommandHelper.ProcessErrors(this.GetArguments().GetCommand(), executionResult);
+        }
 
         let lines: string[] = CommandHelper.SplitIntoLines(executionResult.stdout, false, true /*filterEmptyLines*/);
 
         //Remove any lines indicating that there were no files to add (e.g., calling add on files that don't exist)
-        lines = lines.filter(e => !e.startsWith("No arguments matched any files to add."));
+        lines = lines.filter(e => !e.startsWith("No arguments matched any files to add."));  //CLC
+        //Ex. /usr/alias/repos/Tfvc.L2VSCodeExtension.RC/file-does-not-exist.md: No file matches.
+        lines = lines.filter(e => !e.endsWith(" No file matches."));  //tf.exe
 
         let filesAdded: string[] = [];
         let path: string = "";
@@ -72,7 +76,7 @@ export class Add implements ITfvcCommand<string[]> {
     }
 
     public async ParseExeOutput(executionResult: IExecutionResult): Promise<string[]> {
-        return this.ParseOutput(executionResult);
+        return await this.ParseOutput(executionResult);
     }
 
     private getFileFromLine(line: string): string {

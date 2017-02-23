@@ -94,7 +94,7 @@ export class Checkin implements ITfvcCommand<string> {
         return this.GetOptions();
     }
 
-    public ParseExeOutput(executionResult: IExecutionResult): Promise<string> {
-        return this.ParseOutput(executionResult);
+    public async ParseExeOutput(executionResult: IExecutionResult): Promise<string> {
+        return await this.ParseOutput(executionResult);
     }
 }

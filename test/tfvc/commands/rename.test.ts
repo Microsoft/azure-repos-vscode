@@ -176,8 +176,8 @@ describe("Tfvc-RenameCommand", function() {
         } catch (err) {
             assert.equal(err.exitCode, 42);
             assert.equal(err.tfvcCommand, "rename");
-            assert.equal(err.message.indexOf(Strings.TfExecFailedError), 0);
-            assert.equal(err.stdout.indexOf("Something bad this way comes."), 0);
+            assert.isTrue(err.message.startsWith(Strings.TfExecFailedError));
+            assert.isTrue(err.stdout.startsWith("Something bad this way comes."));
         }
     });
 

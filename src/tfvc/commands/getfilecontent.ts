@@ -22,7 +22,7 @@ export class GetFileContent implements ITfvcCommand<string> {
     private _versionSpec: string;
     private _ignoreFileNotFound: boolean;
 
-    public constructor(serverContext: TeamServerContext, localPath: string, versionSpec: string, ignoreFileNotFound: boolean) {
+    public constructor(serverContext: TeamServerContext, localPath: string, versionSpec?: string, ignoreFileNotFound?: boolean) {
         CommandHelper.RequireStringArgument(localPath, "localPath");
 
         this._serverContext = serverContext;
@@ -35,7 +35,7 @@ export class GetFileContent implements ITfvcCommand<string> {
         let builder: ArgumentBuilder = new ArgumentBuilder("print", this._serverContext)
             .Add(this._localPath);
         if (this._versionSpec) {
-            builder.AddSwitchWithValue("version", this._versionSpec.toString(), false);
+            builder.AddSwitchWithValue("version", this._versionSpec, false);
         }
         return builder;
     }
@@ -66,7 +66,7 @@ export class GetFileContent implements ITfvcCommand<string> {
         let builder: ArgumentBuilder = new ArgumentBuilder("view", this._serverContext)
             .Add(this._localPath);
         if (this._versionSpec) {
-            builder.AddSwitchWithValue("version", this._versionSpec.toString(), false);
+            builder.AddSwitchWithValue("version", this._versionSpec, false);
         }
         return builder;
     }
@@ -76,6 +76,6 @@ export class GetFileContent implements ITfvcCommand<string> {
     }
 
     public async ParseExeOutput(executionResult: IExecutionResult): Promise<string> {
-        return this.ParseOutput(executionResult);
+        return await this.ParseOutput(executionResult);
     }
 }

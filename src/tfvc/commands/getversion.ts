@@ -24,16 +24,8 @@ export class GetVersion implements ITfvcCommand<string> {
     }
 
     public async ParseOutput(executionResult: IExecutionResult): Promise<string> {
-        // Throw if any errors are found in stderr or if exitcode is not 0
-        CommandHelper.ProcessErrors(this.GetArguments().GetCommand(), executionResult);
-
-        const lines: string[] = CommandHelper.SplitIntoLines(executionResult.stdout);
-        // Find just the version number and return it. Ex. Team Explorer Everywhere Command Line Client (Version 14.0.3.201603291047)
-        if (lines && lines.length > 0) {
-            return lines[0].replace(/(.*\(version )([\.\d]*)(\).*)/i, "$2");
-        } else {
-            return "";
-        }
+        //Ex. Team Explorer Everywhere Command Line Client (Version 14.0.3.201603291047)
+        return await this.getVersion(executionResult, /(.*\(version )([\.\d]*)(\).*)/i);
     }
 
     public GetExeArguments(): IArgumentProvider {
@@ -44,15 +36,19 @@ export class GetVersion implements ITfvcCommand<string> {
         return this.GetOptions();
     }
 
-    //TODO: Refactor this with ParseOutput (pass in just the line and the regex?)
     public async ParseExeOutput(executionResult: IExecutionResult): Promise<string> {
+        //Ex. Microsoft (R) TF - Team Foundation Version Control Tool, Version 14.102.25619.0
+        return await this.getVersion(executionResult, /(.*version )([\.\d]*)(.*)/i);
+    }
+
+    private async getVersion(executionResult: IExecutionResult, expression: RegExp): Promise<string> {
         // Throw if any errors are found in stderr or if exitcode is not 0
         CommandHelper.ProcessErrors(this.GetArguments().GetCommand(), executionResult);
 
         const lines: string[] = CommandHelper.SplitIntoLines(executionResult.stdout);
         // Find just the version number and return it. Ex. Microsoft (R) TF - Team Foundation Version Control Tool, Version 14.102.25619.0
         if (lines && lines.length > 0) {
-            let value: string = lines[0].replace(/(.*version )([\.\d]*)(.*)/i, "$2");
+            let value: string = lines[0].replace(expression, "$2");
             return value;
         } else {
             return "";

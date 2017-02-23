@@ -61,11 +61,24 @@ describe("Tfvc-CheckinCommand", function() {
         assert.deepEqual(cmd.GetOptions(), {});
     });
 
+    it("should verify GetExeOptions", function() {
+        let files: string[] = ["/path/to/workspace/file.txt"];
+        let cmd: Checkin = new Checkin(undefined, files);
+        assert.deepEqual(cmd.GetExeOptions(), {});
+    });
+
     it("should verify arguments", function() {
         let files: string[] = ["/path/to/workspace/file.txt"];
         let cmd: Checkin = new Checkin(undefined, files);
 
         assert.equal(cmd.GetArguments().GetArgumentsForDisplay(), "checkin -noprompt " + files[0]);
+    });
+
+    it("should verify Exe arguments", function() {
+        let files: string[] = ["/path/to/workspace/file.txt"];
+        let cmd: Checkin = new Checkin(undefined, files);
+
+        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "checkin -noprompt " + files[0]);
     });
 
     it("should verify arguments with context", function() {
@@ -75,11 +88,25 @@ describe("Tfvc-CheckinCommand", function() {
         assert.equal(cmd.GetArguments().GetArgumentsForDisplay(), "checkin -noprompt -collection:" + collectionUrl + " ******** " + files[0]);
     });
 
+    it("should verify Exe arguments with context", function() {
+        let files: string[] = ["/path/to/workspace/file.txt"];
+        let cmd: Checkin = new Checkin(context, files);
+
+        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "checkin -noprompt -collection:" + collectionUrl + " ******** " + files[0]);
+    });
+
     it("should verify arguments with workitems", function() {
         let files: string[] = ["/path/to/workspace/file.txt"];
         let cmd: Checkin = new Checkin(context, files, undefined, [1, 2, 3]);
 
         assert.equal(cmd.GetArguments().GetArgumentsForDisplay(), "checkin -noprompt -collection:" + collectionUrl + " ******** " + files[0] + " -associate:1,2,3");
+    });
+
+    it("should verify Exe arguments with workitems", function() {
+        let files: string[] = ["/path/to/workspace/file.txt"];
+        let cmd: Checkin = new Checkin(context, files, undefined, [1, 2, 3]);
+
+        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "checkin -noprompt -collection:" + collectionUrl + " ******** " + files[0] + " -associate:1,2,3");
     });
 
     it("should verify arguments with comment", function() {
@@ -89,11 +116,25 @@ describe("Tfvc-CheckinCommand", function() {
         assert.equal(cmd.GetArguments().GetArgumentsForDisplay(), "checkin -noprompt -collection:" + collectionUrl + " ******** " + files[0] + " -comment:a comment that has multiple lines");
     });
 
+    it("should verify Exe arguments with comment", function() {
+        let files: string[] = ["/path/to/workspace/file.txt"];
+        let cmd: Checkin = new Checkin(context, files, "a comment\nthat has\r\nmultiple lines");
+
+        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "checkin -noprompt -collection:" + collectionUrl + " ******** " + files[0] + " -comment:a comment that has multiple lines");
+    });
+
     it("should verify arguments with all params", function() {
         let files: string[] = ["/path/to/workspace/file.txt"];
         let cmd: Checkin = new Checkin(context, files, "a comment", [1, 2, 3]);
 
         assert.equal(cmd.GetArguments().GetArgumentsForDisplay(), "checkin -noprompt -collection:" + collectionUrl + " ******** " + files[0] + " -comment:a comment -associate:1,2,3");
+    });
+
+    it("should verify Exe arguments with all params", function() {
+        let files: string[] = ["/path/to/workspace/file.txt"];
+        let cmd: Checkin = new Checkin(context, files, "a comment", [1, 2, 3]);
+
+        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "checkin -noprompt -collection:" + collectionUrl + " ******** " + files[0] + " -comment:a comment -associate:1,2,3");
     });
 
     it("should verify parse output - no output", async function() {
@@ -143,6 +184,62 @@ describe("Tfvc-CheckinCommand", function() {
 
         try {
             await cmd.ParseOutput(executionResult);
+        } catch (err) {
+            assert.equal(err.exitCode, 100);
+            assert.equal(err.tfvcCommand, "checkin");
+        }
+    });
+
+//
+//
+//
+    it("should verify parse Exe output - no output", async function() {
+        let files: string[] = ["/path/to/workspace/file.txt"];
+        let cmd: Checkin = new Checkin(undefined, files);
+        let executionResult: IExecutionResult = {
+            exitCode: 0,
+            stdout: undefined,
+            stderr: undefined
+        };
+
+        let result: string = await cmd.ParseExeOutput(executionResult);
+        assert.equal(result, "");
+    });
+
+    it("should verify parse Exe output - no errors", async function() {
+        let files: string[] = ["/path/to/workspace/file.txt"];
+        let cmd: Checkin = new Checkin(undefined, files);
+        let executionResult: IExecutionResult = {
+            exitCode: 0,
+            stdout: "/Users/leantk/tfvc-tfs/tfsTest_01/addFold:\n" +
+                    "Checking in edit: testHere.txt\n" +
+                    "\n" +
+                    "/Users/leantk/tfvc-tfs/tfsTest_01:\n" +
+                    "Checking in edit: test3.txt\n" +
+                    "Checking in edit: TestAdd.txt\n" +
+                    "\n" +
+                    "Changeset #23 checked in.\n",
+            stderr: undefined
+        };
+
+        let result: string = await cmd.ParseExeOutput(executionResult);
+        assert.equal(result, "23");
+    });
+
+    it("should verify parse Exe output - with error", async function() {
+        let files: string[] = ["/path/to/workspace/file.txt"];
+        let cmd: Checkin = new Checkin(undefined, files);
+        let executionResult: IExecutionResult = {
+            exitCode: 100,
+            stdout: "/Users/leantk/tfvc-tfs/tfsTest_01:\n" +
+                    "Checking in edit: test3.txt\n" +
+                    "Checking in edit: TestAdd.txt\n" +
+                    "No files checked in.\n",
+            stderr: "A resolvable conflict was flagged by the server: No files checked in due to conflicting changes.  Resolve the conflicts and try the check-in again.\n"
+        };
+
+        try {
+            await cmd.ParseExeOutput(executionResult);
         } catch (err) {
             assert.equal(err.exitCode, 100);
             assert.equal(err.tfvcCommand, "checkin");
