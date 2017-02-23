@@ -108,7 +108,7 @@ export class Sync implements ITfvcCommand<ISyncResults> {
     }
 
     public async ParseExeOutput(executionResult: IExecutionResult): Promise<ISyncResults> {
-        return this.ParseOutput(executionResult);
+        return await this.ParseOutput(executionResult);
     }
 
     private getItemResults(stdout: string): ISyncItemResult[] {
@@ -177,7 +177,7 @@ export class Sync implements ITfvcCommand<ISyncResults> {
                 index = line.indexOf("cannot be deleted");
                 if (index >= 0) {
                     newResult = {
-                        syncType: SyncType.Error,
+                        syncType: SyncType.Warning,
                         itemPath: CommandHelper.GetFilePath(folderPath, line.slice(0, index).trim()),
                         message: line.trim()
                     };
