@@ -79,6 +79,6 @@ export class ResolveConflicts implements ITfvcCommand<IConflict[]> {
     }
 
     public async ParseExeOutput(executionResult: IExecutionResult): Promise<IConflict[]> {
-        return this.ParseOutput(executionResult);
+        return await this.ParseOutput(executionResult);
     }
 }
