@@ -42,7 +42,6 @@ export class Undo implements ITfvcCommand<string[]> {
     public async ParseOutput(executionResult: IExecutionResult): Promise<string[]> {
         let lines: string[] = CommandHelper.SplitIntoLines(executionResult.stdout, false, true /*filterEmptyLines*/);
 
-        //TODO EXE: verify these are all true for the EXE
         //If we didn't succeed without any issues, we have a bit of work to do.
         //'tf undo' can return a non-zero exit code when:
         //  * Some of the files have no pending changes (exitCode === 1)
@@ -52,7 +51,7 @@ export class Undo implements ITfvcCommand<string[]> {
         //Otherwise, we assume some error occurred so let that be thrown.
         if (executionResult.exitCode !== 0) {
             //Remove any entries for which there were no pending changes
-            lines = lines.filter(e => !e.startsWith("No pending changes were found for "));
+            lines = lines.filter(e => !e.startsWith("No pending changes "));
             if (executionResult.exitCode === 100 && lines.length === 0) {
                 //All of the files had no pending changes, return []
                 return [];

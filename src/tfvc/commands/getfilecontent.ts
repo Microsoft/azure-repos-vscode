@@ -45,9 +45,11 @@ export class GetFileContent implements ITfvcCommand<string> {
     }
 
     public async ParseOutput(executionResult: IExecutionResult): Promise<string> {
-        // TODO EXE: check error messages and WARNings
-        // Check for "The specified file does not exist at the specified version" and write out empty string
-        if (this._ignoreFileNotFound && CommandHelper.HasError(executionResult, "The specified file does not exist at the specified version")) {
+        // Check for "The specified file does not exist at the specified version" (or "No file matches" in case of the EXE) 
+        // and write out empty string
+        if (this._ignoreFileNotFound &&
+            (CommandHelper.HasError(executionResult, "The specified file does not exist at the specified version") ||
+             CommandHelper.HasError(executionResult, "No file matches"))) {
             // The file doesn't exist, but the ignore flag is set, so we will simply return an emtpy string
             return "";
         }

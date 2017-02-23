@@ -123,7 +123,8 @@ export class Tfvc {
 
         options.env = _.assign({}, process.env, options.env || {});
 
-        // TODO EXE: do we want to handle proxies or not for the EXE?
+        // TODO: do we want to handle proxies or not for the EXE? for tf.exe the user could simply setup the proxy at the command line.
+        //       tf.exe remembers the proxy settings and uses them as it needs to.
         if (this._proxy && !this._isExe) {
             args.AddProxySwitch(this._proxy);
         }

@@ -51,7 +51,6 @@ export class FindConflicts implements ITfvcCommand<IConflict[]> {
             CommandHelper.ProcessErrors(this.GetArguments().GetCommand(), executionResult);
         }
 
-        // TODO EXE: conflict messages are different so add || exe error below to each branch
         let conflicts: IConflict[] = [];
         const lines: string[] = CommandHelper.SplitIntoLines(executionResult.stderr, false, true);
         for (let i: number = 0; i < lines.length; i++) {
@@ -60,16 +59,20 @@ export class FindConflicts implements ITfvcCommand<IConflict[]> {
             if (colonIndex >= 0) {
                 const localPath: string = line.slice(0, colonIndex);
                 let type: ConflictType = ConflictType.CONTENT;
-                if (line.endsWith("The item name and content have changed")) {
+                if (/You have a conflicting pending change/i.test(line)) {
+                    // This is the ambiguous response given by the EXE.
+                    // We will assume it is both a name and content change for now.
                     type = ConflictType.NAME_AND_CONTENT;
-                } else if (line.endsWith("The item name has changed")) {
+                } else if (/The item name and content have changed/i.test(line)) {
+                    type = ConflictType.NAME_AND_CONTENT;
+                } else if (/The item name has changed/i.test(line)) {
                     type = ConflictType.RENAME;
-                } else if (line.endsWith("The source and target both have changes")) {
+                } else if (/The source and target both have changes/i.test(line)) {
                     type = ConflictType.MERGE;
-                } else if (line.endsWith("The item has already been deleted") ||
-                           line.endsWith("The item has been deleted in the source branch")) {
+                } else if (/The item has already been deleted/i.test(line) ||
+                           /The item has been deleted in the source branch/i.test(line)) {
                     type = ConflictType.DELETE;
-                } else if (line.endsWith("The item has been deleted in the target branch")) {
+                } else if (/The item has been deleted in the target branch/i.test(line)) {
                     type = ConflictType.DELETE_TARGET;
                 }
                 conflicts.push({
