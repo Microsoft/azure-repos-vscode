@@ -158,7 +158,7 @@ export class Status implements ITfvcCommand<IPendingChange[]> {
                 continue;
             }
 
-            if (line.indexOf("--------") === 0 || line.toLowerCase().startsWith("detected changes: ")) {
+            if (line.startsWith("--------") || line.toLowerCase().startsWith("detected changes: ")) {
                 //Starting Detected Changes...
                 detectedChanges = true;
                 continue;
