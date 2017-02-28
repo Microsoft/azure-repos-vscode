@@ -61,7 +61,8 @@ gulp.task('build', ['copyresources'], function () {
     let tsProject = typescript.createProject('./tsconfig.json');
     let tsResult = tsProject.src()
         .pipe(sourcemaps.init())
-        .pipe(tsProject());
+        .pipe(tsProject())
+        .on('error', errorHandler);
 
     return tsResult.js
         .pipe(sourcemaps.write('.', {
