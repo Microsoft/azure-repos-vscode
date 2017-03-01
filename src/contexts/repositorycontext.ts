@@ -32,7 +32,4 @@ export interface IRepositoryContext {
 
     //TFVC-specific values
     TeamProjectName: string;
-
-    // implements disposable
-    dispose();
 }

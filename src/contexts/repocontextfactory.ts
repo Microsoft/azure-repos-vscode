@@ -10,6 +10,7 @@ import { TfvcContext } from "../contexts/tfvccontext";
 import { TeamServerContext } from "../contexts/servercontext";
 import { ExternalContext } from "../contexts/externalcontext";
 import { Settings } from "../helpers/settings";
+import { Tfvc } from "../tfvc/tfvc";
 
 export class RepositoryContextFactory {
 
@@ -50,7 +51,7 @@ export class RepositoryContextFactory {
     public static UpdateRepositoryContext(currentRepo: IRepositoryContext, serverContext: TeamServerContext): IRepositoryContext {
         if (currentRepo && currentRepo instanceof TfvcContext) {
             let context: TfvcContext = <TfvcContext>currentRepo;
-            context.TfvcRepository = context.Tfvc.Open(serverContext, context.RepoFolder);
+            context.TfvcRepository = Tfvc.CreateRepository(serverContext, context.RepoFolder);
         }
         return currentRepo;
     }

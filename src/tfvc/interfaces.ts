@@ -8,8 +8,9 @@ import { ConflictType } from "./scm/status";
 
 export interface ITfvc {
     path: string;
-    version: string;
-    url: string;
+    minVersion: string;
+    proxy: string;
+    isExe: boolean;
 }
 
 export interface IItemInfo {

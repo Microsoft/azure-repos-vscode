@@ -14,7 +14,6 @@ import { TfvcTelemetryEvents } from "../helpers/constants";
 import { Strings } from "../helpers/strings";
 import { Utils } from "../helpers/utils";
 import { Telemetry } from "../services/telemetry";
-import { Tfvc } from "./tfvc";
 import { Resource } from "./scm/resource";
 import { TfvcSCMProvider } from "./tfvcscmprovider";
 import { TfvcErrorCodes } from "./tfvcerror";
@@ -24,7 +23,6 @@ import { AutoResolveType, ICheckinInfo, IItemInfo, IPendingChange, ISyncResults 
 import { TfvcOutput } from "./tfvcoutput";
 
 export class TfvcExtension  {
-    private _tfvc: Tfvc;
     private _repo: Repository;
     private _manager: ExtensionManager;
 
@@ -271,7 +269,6 @@ export class TfvcExtension  {
         }
 
         const tfvcContext: TfvcContext = <TfvcContext>this._manager.RepoContext;
-        this._tfvc = tfvcContext.Tfvc;
         this._repo = tfvcContext.TfvcRepository;
     }
 

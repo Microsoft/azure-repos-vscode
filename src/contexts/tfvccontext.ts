@@ -20,7 +20,6 @@ export class TfvcContext implements IRepositoryContext {
     private _isTeamServicesUrl: boolean = false;
     private _isTeamFoundationServer: boolean = false;
     private _teamProjectName: string;
-    private _tfvc: Tfvc;
     private _repo: Repository;
     private _tfvcWorkspace: IWorkspace;
 
@@ -28,18 +27,10 @@ export class TfvcContext implements IRepositoryContext {
         this._tfvcFolder = rootPath;
     }
 
-    public dispose() {
-        if (this._tfvc) {
-            this._tfvc.dispose();
-            this._tfvc = undefined;
-        }
-    }
-
     //Need to call tf.cmd to get TFVC information (and constructors can't be async)
     public async Initialize(settings: ISettings): Promise<boolean> {
         Logger.LogDebug(`Looking for TFVC repository at ${this._tfvcFolder}`);
-        this._tfvc = new Tfvc();
-        this._repo = this._tfvc.Open(undefined, this._tfvcFolder);
+        this._repo = Tfvc.CreateRepository(undefined, this._tfvcFolder);
         this._tfvcWorkspace = await this._repo.FindWorkspace(this._tfvcFolder);
         this._tfvcRemoteUrl = this._tfvcWorkspace.server;
         this._isTeamServicesUrl = RepoUtils.IsTeamFoundationServicesRepo(this._tfvcRemoteUrl);
@@ -52,10 +43,6 @@ export class TfvcContext implements IRepositoryContext {
     // Tfvc implementation
     public get TeamProjectName(): string {
         return this._teamProjectName;
-    }
-
-    public get Tfvc(): Tfvc {
-        return this._tfvc;
     }
 
     public get TfvcRepository(): Repository {

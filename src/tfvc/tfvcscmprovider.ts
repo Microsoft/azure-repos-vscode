@@ -156,7 +156,7 @@ export class TfvcSCMProvider implements SCMProvider {
         } catch (err) {
             this._extensionManager.DisplayWarningMessage(err.message);
         }
-        TfvcOutput.AppendLine("Using TFVC command line: " + repoContext.Tfvc.Location + " (" + version + ")");
+        TfvcOutput.AppendLine("Using TFVC command line: " + repoContext.TfvcRepository.TfvcLocation + " (" + version + ")");
 
         const commitHoverProvider = new CommitHoverProvider(this._model);
         const contentProvider = new TfvcContentProvider(repoContext.TfvcRepository, rootPath, onTfvcChange);

@@ -461,10 +461,6 @@ export class ExtensionManager implements Disposable {
             this._tfvcExtension.dispose();
             this._tfvcExtension = undefined;
         }
-        if (this._repoContext) {
-            this._repoContext.dispose();
-            this._repoContext = undefined;
-        }
     }
 
     public dispose() {
