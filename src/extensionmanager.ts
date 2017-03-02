@@ -53,6 +53,8 @@ export class ExtensionManager implements Disposable {
         // Add the event listener for settings changes, then re-initialized the extension
         if (workspace) {
             workspace.onDidChangeConfiguration(() => {
+                Logger.LogDebug("Reinitializing due to onDidChangeConfiguration");
+                //FUTURE: Check to see if we really need to do the re-initialization
                 this.Reinitialize();
             });
         }
@@ -391,7 +393,7 @@ export class ExtensionManager implements Disposable {
         }
     }
 
-    private notifyBranchChanged(currentBranch: string) {
+    private notifyBranchChanged(currentBranch: string) : void {
         this._teamExtension.NotifyBranchChanged(currentBranch);
         //this._tfvcExtension.NotifyBranchChanged(currentBranch);
     }
