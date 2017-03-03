@@ -108,9 +108,10 @@ export class WitClient {
     }
 
     public async ChooseWorkItems(): Promise<string[]> {
-        Logger.LogInfo("Getting work items...");
+        Logger.LogInfo("Getting work items to choose from...");
+        let query: string = await this.getPinnedQueryText(); //gets either MyWorkItems, queryText or wiql of queryPath of PinnedQuery
         // TODO: There isn't a way to do a multi select pick list right now, but when there is we should change this to use it.
-        let workItem: BaseQuickPickItem = await window.showQuickPick(await this.getMyWorkItems(this._serverContext.RepoInfo.TeamProject, WitQueries.MyWorkItems), { matchOnDescription: true, placeHolder: Strings.ChooseWorkItem });
+        let workItem: BaseQuickPickItem = await window.showQuickPick(await this.getMyWorkItems(this._serverContext.RepoInfo.TeamProject, query), { matchOnDescription: true, placeHolder: Strings.ChooseWorkItem });
         if (workItem) {
             return ["#" + workItem.id + " - " + workItem.description];
         } else {
