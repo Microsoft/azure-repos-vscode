@@ -65,6 +65,7 @@ export class PinnedQuerySettings extends BaseSettings {
     }
 }
 
+//FUTURE: The AccountSettings class can be remove in VNEXT (documentation was removed in 1.104; Aug 2016)
 export class AccountSettings extends BaseSettings {
     private _teamServicesPersonalAccessToken: string;
 

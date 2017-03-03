@@ -21,6 +21,7 @@ export class Strings {
     static NoTfvcBuildsFound: string = "No builds were found for this repository. Click to view your team project's build definitions page.";
     static NoRepoInformation: string = "No Team Services or Team Foundation Server repository configuration was found.  Ensure you've opened a folder that contains a repository.";
     static NoSourceFileForBlame: string = "A source file must be opened to show blame information.";
+    static FoundTokenInSettings: string = "A PAT was found in your VS Code settings.  It will be ignored and you should remove it.  You may then need to run the 'team signin' command.";
 
     static SendAFrown: string = "Send a Frown";
     static SendASmile: string = "Send a Smile";

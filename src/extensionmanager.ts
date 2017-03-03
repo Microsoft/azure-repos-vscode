@@ -45,6 +45,7 @@ export class ExtensionManager implements Disposable {
     private _teamExtension: TeamExtension;
     private _tfvcExtension: TfvcExtension;
     private _scmProvider: TfvcSCMProvider;
+    private _showNagMessage: boolean = true;
 
     public async Initialize(): Promise<void> {
         await this.setupFileSystemWatcherOnConfig();
@@ -89,9 +90,9 @@ export class ExtensionManager implements Disposable {
     }
 
     //Meant to reinitialize the extension when coming back online
-    public Reinitialize(): void {
+    public Reinitialize(signingOut?: boolean): void {
         this.cleanup();
-        this.initializeExtension();
+        this.initializeExtension(signingOut);
     }
 
     public EnsureInitialized(expectedType: RepositoryType): boolean {
@@ -174,7 +175,7 @@ export class ExtensionManager implements Disposable {
         });
     }
 
-    private async initializeExtension() : Promise<void> {
+    private async initializeExtension(signingOut?: boolean) : Promise<void> {
         //Don't initialize if we don't have a workspace
         if (!workspace || !workspace.rootPath) {
             return;
@@ -203,10 +204,19 @@ export class ExtensionManager implements Disposable {
                 this._feedbackClient = new FeedbackClient();
                 this._credentialManager = new CredentialManager();
                 let accountSettings = new AccountSettings(this._serverContext.RepoInfo.Account);
+                //FUTURE: The nag message, accountSettings.TeamServicesPersonalAccessToken and signingOut flag can be remove in VNEXT (documentation was removed in 1.104; Aug 2016)
+                if (!accountSettings.TeamServicesPersonalAccessToken && !signingOut && this._showNagMessage) {
+                    this._showNagMessage = false;  //show message only at start of VS Code (not during re-initialization)
+                    Logger.LogDebug("Found a token in settings.json");
+                    Telemetry.SendEvent(TelemetryEvents.TokenInSettings);
+                    VsCodeUtils.ShowWarningMessage(Strings.FoundTokenInSettings);
+                }
 
-                this._credentialManager.GetCredentials(this._serverContext, accountSettings.TeamServicesPersonalAccessToken).then(async (creds: CredentialInfo) => {
+                this._credentialManager.GetCredentials(this._serverContext, undefined).then(async (creds: CredentialInfo) => {
                     if (!creds || !creds.CredentialHandler) {
-                        this.displayNoCredentialsMessage();
+                        if (!signingOut) {
+                            this.displayNoCredentialsMessage();
+                        }
                         return;
                     } else {
                         this._serverContext.CredentialInfo = creds;

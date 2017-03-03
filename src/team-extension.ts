@@ -112,7 +112,7 @@ export class TeamExtension  {
         if (this._manager.ServerContext !== undefined && this._manager.ServerContext.RepoInfo !== undefined && this._manager.ServerContext.RepoInfo.IsTeamFoundation === true) {
             this._manager.CredentialManager.RemoveCredentials(this._manager.ServerContext.RepoInfo.Host).then(() => {
                 Logger.LogInfo("Signout: Removed credentials for host '" + this._manager.ServerContext.RepoInfo.Host + "'");
-                this._manager.Reinitialize();
+                this._manager.Reinitialize(true);
             }).catch((reason) => {
                 let msg: string = Strings.UnableToRemoveCredentials + this._manager.ServerContext.RepoInfo.Host;
                 this._manager.ReportError(msg, reason, true);
