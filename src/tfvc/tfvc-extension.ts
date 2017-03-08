@@ -210,12 +210,6 @@ export class TfvcExtension  {
             async () => {
                 //When calling from UI, we have the uri of the resource from which the command was invoked
                 let pathToUndo: string = TfvcSCMProvider.GetPathFromUri(uri);
-                if (!pathToUndo) {
-                    //This is called from the command palette, so check for an open file in the editor
-                    if (window.activeTextEditor) {
-                        pathToUndo = window.activeTextEditor.document.fileName;
-                    }
-                }
                 if (pathToUndo) {
                     const basename: string = path.basename(pathToUndo);
                     const message: string = `Are you sure you want to undo changes to ${basename}?`;
