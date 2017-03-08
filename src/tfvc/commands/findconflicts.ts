@@ -59,7 +59,8 @@ export class FindConflicts implements ITfvcCommand<IConflict[]> {
             if (colonIndex >= 0) {
                 const localPath: string = line.slice(0, colonIndex);
                 let type: ConflictType = ConflictType.CONTENT;
-                if (/You have a conflicting pending change/i.test(line)) {
+                if (/You have a conflicting pending change/i.test(line) ||
+                    /A newer version exists on the server/i.test(line)) {
                     // This is the ambiguous response given by the EXE.
                     // We will assume it is both a name and content change for now.
                     type = ConflictType.NAME_AND_CONTENT;
@@ -70,7 +71,8 @@ export class FindConflicts implements ITfvcCommand<IConflict[]> {
                 } else if (/The source and target both have changes/i.test(line)) {
                     type = ConflictType.MERGE;
                 } else if (/The item has already been deleted/i.test(line) ||
-                           /The item has been deleted in the source branch/i.test(line)) {
+                           /The item has been deleted in the source branch/i.test(line) ||
+                           /The item has been deleted from the server/i.test(line)) {
                     type = ConflictType.DELETE;
                 } else if (/The item has been deleted in the target branch/i.test(line)) {
                     type = ConflictType.DELETE_TARGET;

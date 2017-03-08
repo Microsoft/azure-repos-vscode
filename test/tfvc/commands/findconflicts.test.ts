@@ -184,39 +184,18 @@ describe("Tfvc-FindConflictsCommand", function() {
         let localPath: string = "/usr/alias/repo1";
         let cmd: FindConflicts = new FindConflicts(undefined, localPath);
         let executionResult: IExecutionResult = {
-            exitCode: 0,
+            exitCode: 1,
             stdout: "",
-            stderr: "contentChange.txt: The item content has changed\n" +
-                    "addConflict.txt: Another item with the same name exists on the server\n" +
-                    "nameChange.txt: The item name has changed\n" +
-                    "nameAndContentChange.txt: The item name and content have changed\n" +
-                    "anotherNameAndContentChange.txt: You have a conflicting pending change\n" +
-                    "contentChange2.txt: The item content has changed\n" +
-                    "deleted.txt: The item has already been deleted\n" +
-                    "branchEdit.txt: The source and target both have changes\n" +
-                    "branchDelete.txt: The item has been deleted in the target branch"
+            stderr: "folder1\\anothernewfile2.txt: A newer version exists on the server.\n" +
+                    "folder1\\anothernewfile4.txt: The item has been deleted from the server.\n"
         };
 
         let results: IConflict[] = await cmd.ParseExeOutput(executionResult);
-        assert.equal(results.length, 9);
-        assert.equal(results[0].localPath, "contentChange.txt");
-        assert.equal(results[0].type, ConflictType.CONTENT);
-        assert.equal(results[1].localPath, "addConflict.txt");
-        assert.equal(results[1].type, ConflictType.CONTENT);
-        assert.equal(results[2].localPath, "nameChange.txt");
-        assert.equal(results[2].type, ConflictType.RENAME);
-        assert.equal(results[3].localPath, "nameAndContentChange.txt");
-        assert.equal(results[3].type, ConflictType.NAME_AND_CONTENT);
-        assert.equal(results[4].localPath, "anotherNameAndContentChange.txt");
-        assert.equal(results[4].type, ConflictType.NAME_AND_CONTENT);
-        assert.equal(results[5].localPath, "contentChange2.txt");
-        assert.equal(results[5].type, ConflictType.CONTENT);
-        assert.equal(results[6].localPath, "deleted.txt");
-        assert.equal(results[6].type, ConflictType.DELETE);
-        assert.equal(results[7].localPath, "branchEdit.txt");
-        assert.equal(results[7].type, ConflictType.MERGE);
-        assert.equal(results[8].localPath, "branchDelete.txt");
-        assert.equal(results[8].type, ConflictType.DELETE_TARGET);
+        assert.equal(results.length, 2);
+        assert.equal(results[0].localPath, "folder1\\anothernewfile2.txt");
+        assert.equal(results[0].type, ConflictType.NAME_AND_CONTENT);
+        assert.equal(results[1].localPath, "folder1\\anothernewfile4.txt");
+        assert.equal(results[1].type, ConflictType.DELETE);
     });
 
     it("should verify parse Exe output - errors - exit code 100", async function() {
