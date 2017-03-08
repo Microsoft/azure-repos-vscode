@@ -16,7 +16,7 @@ export class Telemetry {
     private static _appInsightsClient: Client;
     private static _serverContext: TeamServerContext;
     private static _telemetryEnabled: boolean = true;
-    private static _extensionVersion: string = "1.113.0";
+    private static _extensionVersion: string = "1.115.0";
     private static _collectionId: string = "UNKNOWN"; //The collectionId can be updated later
     //Default to a new uuid in case the extension fails before being initialized
     private static _userId: string = uuid.v1(); //The userId can be updated later
