@@ -13,6 +13,7 @@ import { ExtensionManager } from "../extensionmanager";
 import { TfvcTelemetryEvents } from "../helpers/constants";
 import { Strings } from "../helpers/strings";
 import { Utils } from "../helpers/utils";
+import { VsCodeUtils } from "../helpers/vscodeutils";
 import { Telemetry } from "../services/telemetry";
 import { Resource } from "./scm/resource";
 import { TfvcSCMProvider } from "./tfvcscmprovider";
@@ -31,121 +32,137 @@ export class TfvcExtension  {
     }
 
     public async Checkin(): Promise<void> {
-        this.displayErrors(async () => {
-            // get the checkin info from the SCM viewlet
-            const checkinInfo: ICheckinInfo = TfvcSCMProvider.GetCheckinInfo();
-            if (!checkinInfo) {
-                window.showInformationMessage(Strings.NoChangesToCheckin);
-                return;
-            }
+        this.displayErrors(
+            async () => {
+                // get the checkin info from the SCM viewlet
+                const checkinInfo: ICheckinInfo = TfvcSCMProvider.GetCheckinInfo();
+                if (!checkinInfo) {
+                    window.showInformationMessage(Strings.NoChangesToCheckin);
+                    return;
+                }
 
-            Telemetry.SendEvent(TfvcTelemetryEvents.Checkin);
-            const changeset: string =
-                await this._repo.Checkin(checkinInfo.files, checkinInfo.comment, checkinInfo.workItemIds);
-            TfvcOutput.AppendLine("Changeset " + changeset + " checked in.");
-            TfvcSCMProvider.ClearCheckinMessage();
-            TfvcSCMProvider.Refresh();
-        });
+                Telemetry.SendEvent(TfvcTelemetryEvents.Checkin);
+                const changeset: string =
+                    await this._repo.Checkin(checkinInfo.files, checkinInfo.comment, checkinInfo.workItemIds);
+                TfvcOutput.AppendLine("Changeset " + changeset + " checked in.");
+                TfvcSCMProvider.ClearCheckinMessage();
+                TfvcSCMProvider.Refresh();
+            },
+            "Checkin");
     }
 
     public async Exclude(uri?: Uri): Promise<void> {
-        this.displayErrors(async () => {
-        if (uri) {
-            //Keep an in-memory list of items that were explicitly excluded. The list is not persisted at this time.
-            await TfvcSCMProvider.Exclude(TfvcSCMProvider.GetPathFromUri(uri));
-        }
-        });
+        this.displayErrors(
+            async () => {
+                if (uri) {
+                    //Keep an in-memory list of items that were explicitly excluded. The list is not persisted at this time.
+                    await TfvcSCMProvider.Exclude(TfvcSCMProvider.GetPathFromUri(uri));
+                }
+            },
+            "Exclude");
     }
 
     public async Include(uri?: Uri): Promise<void> {
-        this.displayErrors(async () => {
-            if (uri) {
-                let resource: Resource = TfvcSCMProvider.ResolveTfvcResource(uri);
-                let path: string = TfvcSCMProvider.GetPathFromUri(uri);
+        this.displayErrors(
+            async () => {
+                if (uri) {
+                    let resource: Resource = TfvcSCMProvider.ResolveTfvcResource(uri);
+                    let path: string = TfvcSCMProvider.GetPathFromUri(uri);
 
-                //At this point, an unversioned file could be a candidate file, so call Add.  Once it is added, it should be a Pending change.
-                if (!resource.IsVersioned) {
-                    //We decided not to send telemetry on file operations
-                    await this._repo.Add([path]);
-                    //Don't return after adding, we may still need to unexclude it (it may have been excluded previously)
+                    //At this point, an unversioned file could be a candidate file, so call Add.  Once it is added, it should be a Pending change.
+                    if (!resource.IsVersioned) {
+                        //We decided not to send telemetry on file operations
+                        await this._repo.Add([path]);
+                        //Don't return after adding, we may still need to unexclude it (it may have been excluded previously)
+                    }
+
+                    //Otherwise, ensure its not in the explicitly excluded list (if it's already there)
+                    //Unexclude doesn't explicitly INclude.  It defers to the status of the individual item.
+                    await TfvcSCMProvider.Unexclude(path);
                 }
-
-                //Otherwise, ensure its not in the explicitly excluded list (if it's already there)
-                //Unexclude doesn't explicitly INclude.  It defers to the status of the individual item.
-                await TfvcSCMProvider.Unexclude(path);
-            }
-        });
+            },
+            "Include");
     }
 
     public async OpenDiff(uri?: Uri): Promise<void> {
-        this.displayErrors(async () => {
-            if (uri) {
-                let resource: Resource = TfvcSCMProvider.ResolveTfvcResource(uri);
-                TfvcSCMProvider.OpenDiff(resource);
-            }
-        });
+        this.displayErrors(
+            async () => {
+                if (uri) {
+                    let resource: Resource = TfvcSCMProvider.ResolveTfvcResource(uri);
+                    TfvcSCMProvider.OpenDiff(resource);
+                }
+            },
+            "OpenDiff");
     }
 
     public async OpenFile(uri?: Uri): Promise<void> {
-        this.displayErrors(async () => {
-            if (uri) {
-                let path: string = TfvcSCMProvider.GetPathFromUri(uri);
-                await window.showTextDocument(await workspace.openTextDocument(path));
-            }
-        });
+        this.displayErrors(
+            async () => {
+                if (uri) {
+                    let path: string = TfvcSCMProvider.GetPathFromUri(uri);
+                    await window.showTextDocument(await workspace.openTextDocument(path));
+                }
+            },
+            "OpenFile");
     }
 
     public async Refresh(): Promise<void> {
-        this.displayErrors(async () => {
-            TfvcSCMProvider.Refresh();
-        });
+        this.displayErrors(
+            async () => {
+                TfvcSCMProvider.Refresh();
+            },
+            "Refresh");
     }
 
     /**
      * This command runs a rename command on the selected file.
      */
     public async Rename(uri?: Uri): Promise<void> {
-        this.displayErrors(async () => {
-            if (uri) {
-                let basename: string = path.basename(uri.fsPath);
-                let newFilename: string = await window.showInputBox({ value: basename, prompt: Strings.RenamePrompt, placeHolder: undefined, password: false });
-                if (newFilename && newFilename !== basename) {
-                    let dirName: string = path.dirname(uri.fsPath);
-                    let destination: string = path.join(dirName, newFilename);
+        this.displayErrors(
+            async () => {
+                if (uri) {
+                    let basename: string = path.basename(uri.fsPath);
+                    let newFilename: string = await window.showInputBox({ value: basename, prompt: Strings.RenamePrompt, placeHolder: undefined, password: false });
+                    if (newFilename && newFilename !== basename) {
+                        let dirName: string = path.dirname(uri.fsPath);
+                        let destination: string = path.join(dirName, newFilename);
 
-                    try {
-                        //We decided not to send telemetry on file operations
-                        await this._repo.Rename(uri.fsPath, destination);
-                    } catch (err) {
-                        //Provide a better error message if the file to be renamed isn't in the workspace (e.g., it's a new file)
-                        if (err.tfvcErrorCode && err.tfvcErrorCode === TfvcErrorCodes.FileNotInWorkspace) {
-                            this._manager.DisplayErrorMessage(`Cannot rename ${basename} as it is not in your workspace.`);
-                        } else {
-                            throw err;
+                        try {
+                            //We decided not to send telemetry on file operations
+                            await this._repo.Rename(uri.fsPath, destination);
+                        } catch (err) {
+                            //Provide a better error message if the file to be renamed isn't in the workspace (e.g., it's a new file)
+                            if (err.tfvcErrorCode && err.tfvcErrorCode === TfvcErrorCodes.FileNotInWorkspace) {
+                                this._manager.DisplayErrorMessage(`Cannot rename ${basename} as it is not in your workspace.`);
+                            } else {
+                                throw err;
+                            }
                         }
                     }
+                } else {
+                    this._manager.DisplayWarningMessage(Strings.CommandRequiresExplorerContext);
                 }
-            } else {
-                this._manager.DisplayWarningMessage(Strings.CommandRequiresExplorerContext);
-            }
-        });
+            },
+            "Rename");
     }
 
     public async Resolve(uri: Uri, autoResolveType: AutoResolveType): Promise<void> {
-        this.displayErrors(async () => {
-            if (uri) {
-                let localPath: string = TfvcSCMProvider.GetPathFromUri(uri);
-                const resolveTypeString: string = UIHelper.GetDisplayTextForAutoResolveType(autoResolveType);
-                const basename: string = path.basename(localPath);
-                const message: string = `Are you sure you want to resolve changes in ${basename} as ${resolveTypeString}?`;
-                if (await UIHelper.PromptForConfirmation(message, resolveTypeString)) {
-                    await this._repo.ResolveConflicts([localPath], autoResolveType);
-                    TfvcSCMProvider.Refresh();
+        this.displayErrors(
+            async () => {
+                if (uri) {
+                    let localPath: string = TfvcSCMProvider.GetPathFromUri(uri);
+                    const resolveTypeString: string = UIHelper.GetDisplayTextForAutoResolveType(autoResolveType);
+                    const basename: string = path.basename(localPath);
+                    const message: string = `Are you sure you want to resolve changes in ${basename} as ${resolveTypeString}?`;
+                    if (await UIHelper.PromptForConfirmation(message, resolveTypeString)) {
+                        await this._repo.ResolveConflicts([localPath], autoResolveType);
+                        TfvcSCMProvider.Refresh();
+                    }
+                } else {
+                    this._manager.DisplayWarningMessage(Strings.CommandRequiresFileContext);
                 }
-            } else {
-                this._manager.DisplayWarningMessage(Strings.CommandRequiresFileContext);
-            }
-        });
+            },
+            "Resolve");
     }
 
     public async ShowOutput(): Promise<void> {
@@ -158,13 +175,15 @@ export class TfvcExtension  {
      * open the file in the editor.
      */
     public async Status(): Promise<void> {
-        this.displayErrors(async () => {
-            Telemetry.SendEvent(TfvcTelemetryEvents.Status);
-            const chosenItem: IPendingChange = await UIHelper.ChoosePendingChange(await this._repo.GetStatus());
-            if (chosenItem) {
-                window.showTextDocument(await workspace.openTextDocument(chosenItem.localItem));
-            }
-        });
+        this.displayErrors(
+            async () => {
+                Telemetry.SendEvent(TfvcTelemetryEvents.Status);
+                const chosenItem: IPendingChange = await UIHelper.ChoosePendingChange(await this._repo.GetStatus());
+                if (chosenItem) {
+                    window.showTextDocument(await workspace.openTextDocument(chosenItem.localItem));
+                }
+            },
+            "Status");
     }
 
     /**
@@ -172,11 +191,13 @@ export class TfvcExtension  {
      * displays the results to the user.
      */
     public async Sync(): Promise<void> {
-        this.displayErrors(async () => {
-            Telemetry.SendEvent(TfvcTelemetryEvents.Sync);
-            const results: ISyncResults = await this._repo.Sync([this._repo.Path], true);
-            await UIHelper.ShowSyncResults(results, results.hasConflicts || results.hasErrors, true);
-        });
+        this.displayErrors(
+            async () => {
+                Telemetry.SendEvent(TfvcTelemetryEvents.Sync);
+                const results: ISyncResults = await this._repo.Sync([this._repo.Path], true);
+                await UIHelper.ShowSyncResults(results, results.hasConflicts || results.hasErrors, true);
+            },
+            "Sync");
     }
 
     /**
@@ -185,24 +206,26 @@ export class TfvcExtension  {
      * file system watcher will update the UI soon thereafter.  No results are displayed to the user.
      */
     public async Undo(uri?: Uri): Promise<void> {
-        this.displayErrors(async () => {
-            //When calling from UI, we have the uri of the resource from which the command was invoked
-            let pathToUndo: string = TfvcSCMProvider.GetPathFromUri(uri);
-            if (!pathToUndo) {
-                //This is called from the command palette, so check for an open file in the editor
-                if (window.activeTextEditor) {
-                    pathToUndo = window.activeTextEditor.document.fileName;
+        this.displayErrors(
+            async () => {
+                //When calling from UI, we have the uri of the resource from which the command was invoked
+                let pathToUndo: string = TfvcSCMProvider.GetPathFromUri(uri);
+                if (!pathToUndo) {
+                    //This is called from the command palette, so check for an open file in the editor
+                    if (window.activeTextEditor) {
+                        pathToUndo = window.activeTextEditor.document.fileName;
+                    }
                 }
-            }
-            if (pathToUndo) {
-                const basename: string = path.basename(pathToUndo);
-                const message: string = `Are you sure you want to undo changes to ${basename}?`;
-                if (await UIHelper.PromptForConfirmation(message, Strings.UndoChanges)) {
-                    //We decided not to send telemetry on file operations
-                    await this._repo.Undo([pathToUndo]);
+                if (pathToUndo) {
+                    const basename: string = path.basename(pathToUndo);
+                    const message: string = `Are you sure you want to undo changes to ${basename}?`;
+                    if (await UIHelper.PromptForConfirmation(message, Strings.UndoChanges)) {
+                        //We decided not to send telemetry on file operations
+                        await this._repo.Undo([pathToUndo]);
+                    }
                 }
-            }
-        });
+            },
+            "Undo");
     }
 
     /**
@@ -250,15 +273,16 @@ export class TfvcExtension  {
         }
     }
 
-    private async displayErrors(funcToTry: () => Promise<void>): Promise<void> {
+    private async displayErrors(funcToTry: (prefix) => Promise<void>, prefix: string): Promise<void> {
         if (!this._manager.EnsureInitialized(RepositoryType.TFVC)) {
             this._manager.DisplayErrorMessage();
             return;
         }
 
         try {
-            await funcToTry();
+            await funcToTry(prefix);
         } catch (err) {
+            TfvcOutput.AppendLine(VsCodeUtils.FormatMessage(`[${prefix}] ${err.message}`));
             this._manager.DisplayErrorMessage(err.message);
         }
     }
