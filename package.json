@@ -46,10 +46,6 @@
       ],
       "scm/title": [
         {
-            "command" : "team.AssociateWorkItems",
-            "group": "3_commit@4"
-        },
-        {
           "command" : "tfvc.Checkin",
           "group": "navigation@1",
           "when": "scmProvider == tfvc"
@@ -65,16 +61,14 @@
           "when": "scmProvider == tfvc"
         },
         {
-          "command" : "tfvc.Undo",
-          "group": "1_sync@2",
+          "command" : "tfvc.Checkin",
+          "group": "3_commit@1",
           "when": "scmProvider == tfvc"
         },
         {
-          "command" : "tfvc.Checkin",
-          "group": "3_commit@3",
-          "when": "scmProvider == tfvc"
+            "command" : "team.AssociateWorkItems",
+            "group": "3_commit@2"
         },
-
         {
           "command" : "tfvc.ShowOutput",
           "group": "5_output",
@@ -95,17 +89,17 @@
         {
           "command": "tfvc.Undo",
           "when": "scmProvider == tfvc && scmResourceGroup != conflicts",
-          "group": "1_modification@1"
+          "group": "3_commit@1"
         },
         {
           "command": "tfvc.Include",
           "when": "scmProvider == tfvc && scmResourceGroup == excluded",
-          "group": "1_modification@2"
+          "group": "1_modification@1"
         },
         {
           "command": "tfvc.Exclude",
           "when": "scmProvider == tfvc && scmResourceGroup == included",
-          "group": "1_modification@2"
+          "group": "1_modification@1"
         },
         {
           "command": "tfvc.ResolveTakeTheirs",
@@ -124,7 +118,7 @@
         },
         {
           "command": "tfvc.Undo",
-          "when": "scmProvider == tfvc && scmResourceGroup != conflicts",
+          "when": "scmProvider == tfvc",
           "group": "inline@1"
         },
         {
@@ -136,11 +130,6 @@
           "command": "tfvc.Exclude",
           "when": "scmProvider == tfvc && scmResourceGroup == included",
           "group": "inline@2"
-        },
-        {
-          "command": "tfvc.Undo",
-          "when": "scmProvider == tfvc && scmResourceGroup == conflicts",
-          "group": "inline@1"
         },
         {
           "command": "tfvc.ResolveTakeTheirs",
