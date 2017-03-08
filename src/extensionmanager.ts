@@ -120,7 +120,7 @@ export class ExtensionManager implements Disposable {
     public DisplayErrorMessage(message?: string) {
         let msg: string = message ? message : this._errorMessage;
         if (msg) {
-            VsCodeUtils.ShowErrorMessage(message ? message : this._errorMessage);
+            VsCodeUtils.ShowErrorMessage(msg);
         }
     }
 
