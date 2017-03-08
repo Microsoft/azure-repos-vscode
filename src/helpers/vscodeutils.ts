@@ -46,8 +46,16 @@ export class VsCodeUtils {
         return value;
     }
 
+    public static FormatMessage(message: string) : string {
+        if (message) {
+            //Replace newlines with spaces
+            return message.replace(/\r\n/g, " ").replace(/\n/g, " ");
+        }
+        return message;
+    }
+
     public static ShowErrorMessage(message: string) {
-        window.showErrorMessage("(" + Constants.ExtensionName + ") " + message);
+        window.showErrorMessage("(" + Constants.ExtensionName + ") " + VsCodeUtils.FormatMessage(message));
     }
 
     //Allow ability to show additional buttons with the message and return any chosen one via Promise
@@ -57,7 +65,7 @@ export class VsCodeUtils {
         promiseToReturn = deferred.promise;
 
         //Use the typescript spread operator to pass the rest parameter to showErrorMessage
-        window.showErrorMessage("(" + Constants.ExtensionName + ") " + message, ...urlMessageItem).then((item) => {
+        window.showErrorMessage("(" + Constants.ExtensionName + ") " + VsCodeUtils.FormatMessage(message), ...urlMessageItem).then((item) => {
             if (item) {
                 deferred.resolve(item);
             } else {
@@ -69,6 +77,6 @@ export class VsCodeUtils {
     }
 
     public static ShowWarningMessage(message: string) {
-        window.showWarningMessage("(" + Constants.ExtensionName + ") " + message);
+        window.showWarningMessage("(" + Constants.ExtensionName + ") " + VsCodeUtils.FormatMessage(message));
     }
 }
