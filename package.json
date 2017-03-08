@@ -46,6 +46,10 @@
       ],
       "scm/title": [
         {
+            "command" : "team.AssociateWorkItems",
+            "group": "3_commit@4"
+        },
+        {
           "command" : "tfvc.Checkin",
           "group": "navigation@1",
           "when": "scmProvider == tfvc"
@@ -115,6 +119,11 @@
         },
         {
           "command": "tfvc.Undo",
+          "when": "scmProvider == tfvc && scmResourceGroup == conflicts",
+          "group": "9_cutcopypaste"
+        },
+        {
+          "command": "tfvc.Undo",
           "when": "scmProvider == tfvc && scmResourceGroup != conflicts",
           "group": "inline@1"
         },
@@ -129,14 +138,19 @@
           "group": "inline@2"
         },
         {
-          "command": "tfvc.ResolveTakeTheirs",
+          "command": "tfvc.Undo",
           "when": "scmProvider == tfvc && scmResourceGroup == conflicts",
           "group": "inline@1"
         },
         {
-          "command": "tfvc.ResolveKeepYours",
+          "command": "tfvc.ResolveTakeTheirs",
           "when": "scmProvider == tfvc && scmResourceGroup == conflicts",
           "group": "inline@2"
+        },
+        {
+          "command": "tfvc.ResolveKeepYours",
+          "when": "scmProvider == tfvc && scmResourceGroup == conflicts",
+          "group": "inline@3"
         }
       ]
     },
@@ -192,6 +206,11 @@
       }
     },
     "commands": [
+      {
+        "command": "team.AssociateWorkItems",
+        "title": "Associate Work Items",
+        "category": "Team"
+      },
       {
         "command": "team.OpenNewTask",
         "title": "Create Task",
