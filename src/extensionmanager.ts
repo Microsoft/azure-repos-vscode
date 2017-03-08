@@ -205,7 +205,7 @@ export class ExtensionManager implements Disposable {
                 this._credentialManager = new CredentialManager();
                 let accountSettings = new AccountSettings(this._serverContext.RepoInfo.Account);
                 //FUTURE: The nag message, accountSettings.TeamServicesPersonalAccessToken and signingOut flag can be remove in VNEXT (documentation was removed in 1.104; Aug 2016)
-                if (!accountSettings.TeamServicesPersonalAccessToken && !signingOut && this._showNagMessage) {
+                if (accountSettings.TeamServicesPersonalAccessToken && !signingOut && this._showNagMessage) {
                     this._showNagMessage = false;  //show message only at start of VS Code (not during re-initialization)
                     Logger.LogDebug("Found a token in settings.json");
                     Telemetry.SendEvent(TelemetryEvents.TokenInSettings);
