@@ -49,7 +49,7 @@ export class VsCodeUtils {
     public static FormatMessage(message: string) : string {
         if (message) {
             //Replace newlines with spaces
-            return message.replace(/\r\n/g, " ").replace(/\n/g, " ");
+            return message.replace(/\r\n/g, " ").replace(/\n/g, " ").trim();
         }
         return message;
     }
