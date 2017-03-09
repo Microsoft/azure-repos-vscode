@@ -4,6 +4,7 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
+import { Constants } from "../helpers/constants";
 import { Settings } from "../helpers/settings";
 import { TeamServerContext } from "../contexts/servercontext";
 
@@ -16,7 +17,6 @@ export class Telemetry {
     private static _appInsightsClient: Client;
     private static _serverContext: TeamServerContext;
     private static _telemetryEnabled: boolean = true;
-    private static _extensionVersion: string = "1.115.0";
     private static _collectionId: string = "UNKNOWN"; //The collectionId can be updated later
     //Default to a new uuid in case the extension fails before being initialized
     private static _userId: string = uuid.v1(); //The userId can be updated later
@@ -107,7 +107,7 @@ export class Telemetry {
             "VSTS.Core.Machine.OS.Type" : os.type(),
             "VSTS.Core.Machine.OS.Release" : os.release(),
             "VSTS.Core.User.Id" : Telemetry._userId,
-            "Plugin.Version" : Telemetry._extensionVersion
+            "Plugin.Version" : Constants.ExtensionVersion
         };
 
         //Set the userid on the AI context so that we can get user counts in the telemetry
