@@ -277,6 +277,10 @@ export class TfvcExtension  {
             await funcToTry(prefix);
         } catch (err) {
             TfvcOutput.AppendLine(VsCodeUtils.FormatMessage(`[${prefix}] ${err.message}`));
+            //If we also have text in err.stdout, provide that to the output channel
+            if (err.stdout) { //TODO: perhaps just for 'Checkin'? Or the CLC?
+                TfvcOutput.AppendLine(VsCodeUtils.FormatMessage(`[${prefix}] ${err.stdout}`));
+            }
             this._manager.DisplayErrorMessage(err.message);
         }
     }
