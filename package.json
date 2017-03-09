@@ -37,6 +37,60 @@
   "main": "./out/src/extension",
   "contributes": {
     "menus": {
+      "commandPalette": [
+        {
+          "command": "team.OpenBlamePage",
+          "when": "scmProvider != tfvc"
+        },
+        {
+          "command": "tfvc.Undo",
+          "when": "false"
+        },
+        {
+          "command": "tfvc.ResolveTakeTheirs",
+          "when": "false"
+        },
+        {
+          "command": "tfvc.ResolveKeepYours",
+          "when": "false"
+        },
+        {
+          "command": "tfvc.Include",
+          "when": "false"
+        },
+        {
+          "command": "tfvc.Exclude",
+          "when": "false"
+        },
+        {
+          "command": "tfvc.Checkin",
+          "when": "false"
+        },
+        {
+          "command": "tfvc.Rename",
+          "when": "false"
+        },
+        {
+          "command": "tfvc.OpenFile",
+          "when": "false"
+        },
+        {
+          "command": "tfvc.OpenDiff",
+          "when": "false"
+        },
+        {
+          "command": "tfvc.Refresh",
+          "when": "scmProvider == tfvc"
+        },
+        {
+          "command": "tfvc.ShowOutput",
+          "when": "scmProvider == tfvc"
+        },
+        {
+          "command": "tfvc.Sync",
+          "when": "scmProvider == tfvc"
+        }
+      ],
       "explorer/context": [
         {
           "command" : "tfvc.Rename",
