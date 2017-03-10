@@ -59,7 +59,8 @@ export class ResolveConflicts implements ITfvcCommand<IConflict[]> {
             if (startIndex >= 0 && endIndex > startIndex) {
                 conflicts.push({
                     localPath: line.slice(startIndex + "Resolved ".length, endIndex),
-                    type: ConflictType.RESOLVED
+                    type: ConflictType.RESOLVED,
+                    message: line
                 });
             }
         }

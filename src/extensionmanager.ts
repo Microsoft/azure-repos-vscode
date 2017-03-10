@@ -11,7 +11,7 @@ import { CredentialManager } from "./helpers/credentialmanager";
 import { Logger } from "./helpers/logger";
 import { Strings } from "./helpers/strings";
 import { Utils } from "./helpers/utils";
-import { UrlMessageItem, VsCodeUtils } from "./helpers/vscodeutils";
+import { ButtonMessageItem, VsCodeUtils } from "./helpers/vscodeutils";
 import { RepositoryContextFactory } from "./contexts/repocontextfactory";
 import { IRepositoryContext, RepositoryType } from "./contexts/repositorycontext";
 import { TeamServerContext} from "./contexts/servercontext";
@@ -155,7 +155,7 @@ export class ExtensionManager implements Disposable {
     private displayNoCredentialsMessage(): void {
         let error: string = Strings.NoTeamServerCredentialsRunSignin;
         let displayError: string = Strings.NoTeamServerCredentialsRunSignin;
-        let messageItem: UrlMessageItem = undefined;
+        let messageItem: ButtonMessageItem = undefined;
         if (this._serverContext.RepoInfo.IsTeamServices === true) {
             messageItem = { title : Strings.LearnMore,
                             url : Constants.TokenLearnMoreUrl,

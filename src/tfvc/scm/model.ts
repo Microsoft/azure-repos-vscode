@@ -13,6 +13,7 @@ import { Resource } from "./resource";
 import { ResourceGroup, IncludedGroup, ExcludedGroup, ConflictsGroup } from "./resourcegroups";
 import { IConflict, IPendingChange } from "../interfaces";
 import { ConflictType, GetStatuses, Status } from "./status";
+import { TfvcOutput } from "../tfvcoutput";
 
 import * as _ from "underscore";
 import * as path from "path";
@@ -129,6 +130,11 @@ export class Model implements Disposable {
             // Get the list of conflicts
             //TODO: Optimize out this call unless it is needed. This call takes over 4 times longer than the status call and is unecessary most of the time.
             foundConflicts = await this._repository.FindConflicts();
+            foundConflicts.forEach(conflict => {
+                if (conflict.message) {
+                    TfvcOutput.AppendLine(`[Resolve] ${conflict.message}`);
+                }
+            });
         }
 
         const conflict: IConflict = foundConflicts.find(c => c.type === ConflictType.NAME_AND_CONTENT || c.type === ConflictType.RENAME);

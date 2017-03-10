@@ -6,14 +6,14 @@
 
 import * as path from "path";
 import url = require("url");
-import { Uri, window, workspace } from "vscode";
+import { commands, Uri, window, workspace } from "vscode";
 import { RepositoryType } from "../contexts/repositorycontext";
 import { TfvcContext } from "../contexts/tfvccontext";
 import { ExtensionManager } from "../extensionmanager";
-import { TfvcTelemetryEvents } from "../helpers/constants";
+import { TfvcCommandNames, TfvcTelemetryEvents } from "../helpers/constants";
 import { Strings } from "../helpers/strings";
 import { Utils } from "../helpers/utils";
-import { VsCodeUtils } from "../helpers/vscodeutils";
+import { ButtonMessageItem, VsCodeUtils } from "../helpers/vscodeutils";
 import { Telemetry } from "../services/telemetry";
 import { Resource } from "./scm/resource";
 import { TfvcSCMProvider } from "./tfvcscmprovider";
@@ -281,7 +281,12 @@ export class TfvcExtension  {
             if (err.stdout) { //TODO: perhaps just for 'Checkin'? Or the CLC?
                 TfvcOutput.AppendLine(VsCodeUtils.FormatMessage(`[${prefix}] ${err.stdout}`));
             }
-            this._manager.DisplayErrorMessage(err.message);
+            let messageItem : ButtonMessageItem = { title : Strings.ShowTfvcOutput, command: TfvcCommandNames.ShowOutput };
+            VsCodeUtils.ShowErrorMessageWithOptions(err.message, messageItem).then((item) => {
+                if (item) {
+                    commands.executeCommand<void>(item.command);
+                }
+            });
         }
     }
 

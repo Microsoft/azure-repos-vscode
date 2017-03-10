@@ -79,7 +79,8 @@ export class FindConflicts implements ITfvcCommand<IConflict[]> {
                 }
                 conflicts.push({
                     localPath: localPath,
-                    type: type
+                    type: type,
+                    message: line
                 });
             }
         }

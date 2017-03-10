@@ -19,10 +19,11 @@ export class WorkItemQueryQuickPickItem extends BaseQuickPickItem {
     wiql: string;
 }
 
-export class UrlMessageItem implements MessageItem {
+export class ButtonMessageItem implements MessageItem {
     title: string;
-    url: string;
-    telemetryId: string;
+    url?: string;
+    command?: string;
+    telemetryId?: string;
 }
 
 export class VsCodeUtils {
@@ -59,9 +60,9 @@ export class VsCodeUtils {
     }
 
     //Allow ability to show additional buttons with the message and return any chosen one via Promise
-    public static ShowErrorMessageWithOptions(message: string, ...urlMessageItem: UrlMessageItem[]) : Q.Promise<UrlMessageItem> {
-        let promiseToReturn: Q.Promise<UrlMessageItem>;
-        let deferred = Q.defer<UrlMessageItem>();
+    public static ShowErrorMessageWithOptions(message: string, ...urlMessageItem: ButtonMessageItem[]) : Q.Promise<ButtonMessageItem> {
+        let promiseToReturn: Q.Promise<ButtonMessageItem>;
+        let deferred = Q.defer<ButtonMessageItem>();
         promiseToReturn = deferred.promise;
 
         //Use the typescript spread operator to pass the rest parameter to showErrorMessage

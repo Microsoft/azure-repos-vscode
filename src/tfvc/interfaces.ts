@@ -88,6 +88,7 @@ export interface ISyncResults {
 export interface IConflict {
     localPath: string;
     type: ConflictType;
+    message: string;
 }
 
 export enum AutoResolveType {

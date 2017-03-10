@@ -10,7 +10,7 @@ import { CommandNames, Constants, TelemetryEvents, WitTypes } from "./helpers/co
 import { Logger } from "./helpers/logger";
 import { Strings } from "./helpers/strings";
 import { Utils } from "./helpers/utils";
-import { UrlMessageItem, VsCodeUtils } from "./helpers/vscodeutils";
+import { ButtonMessageItem, VsCodeUtils } from "./helpers/vscodeutils";
 import { RepositoryType } from "./contexts/repositorycontext";
 import { BuildClient } from "./clients/buildclient";
 import { GitClient } from "./clients/gitclient";
@@ -95,7 +95,7 @@ export class TeamExtension  {
                 }
             }
         } else {
-            let messageItem : UrlMessageItem = { title : Strings.LearnMore,
+            let messageItem : ButtonMessageItem = { title : Strings.LearnMore,
                                 url : Constants.ReadmeLearnMoreUrl,
                                 telemetryId: TelemetryEvents.ReadmeLearnMoreClick };
             VsCodeUtils.ShowErrorMessageWithOptions(Strings.NoRepoInformation, messageItem).then((item) => {
