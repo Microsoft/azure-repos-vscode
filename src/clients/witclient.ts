@@ -10,21 +10,19 @@ import { Logger } from "../helpers/logger";
 import { SimpleWorkItem, WorkItemTrackingService } from "../services/workitemtracking";
 import { Telemetry } from "../services/telemetry";
 import { TeamServerContext} from "../contexts/servercontext";
-import { BaseQuickPickItem, VsCodeUtils, WorkItemQueryQuickPickItem } from "../helpers/vscodeutils";
-import { CommandNames, TelemetryEvents, WitQueries, WitTypes } from "../helpers/constants";
+import { BaseQuickPickItem, WorkItemQueryQuickPickItem } from "../helpers/vscodeutils";
+import { TelemetryEvents, WitQueries, WitTypes } from "../helpers/constants";
 import { Strings } from "../helpers/strings";
 import { Utils } from "../helpers/utils";
 import { IPinnedQuery } from "../helpers/settings";
+import { BaseClient } from "./baseclient";
 
-export class WitClient {
-    private _serverContext: TeamServerContext;
-    private _statusBarItem: StatusBarItem;
+export class WitClient extends BaseClient {
     private _pinnedQuery: IPinnedQuery;
     private _myQueriesFolder: string;
 
     constructor(context: TeamServerContext, pinnedQuery: IPinnedQuery, statusBarItem: StatusBarItem) {
-        this._serverContext = context;
-        this._statusBarItem = statusBarItem;
+        super(context, statusBarItem);
         this._pinnedQuery = pinnedQuery;
     }
 
@@ -51,7 +49,7 @@ export class WitClient {
                 Utils.OpenUrl(newItemUrl);
             }
         } catch (err) {
-            this.handleError(err, "Error creating new work item");
+            this.handleError(err, WitClient.GetOfflinePinnedQueryStatusText(), false, "Error creating new work item");
         }
     }
 
@@ -82,7 +80,7 @@ export class WitClient {
                 }
             }
         } catch (err) {
-            this.handleError(err, "Error showing work item queries");
+            this.handleError(err, WitClient.GetOfflinePinnedQueryStatusText(), false, "Error showing work item queries");
         }
     }
 
@@ -93,7 +91,7 @@ export class WitClient {
             let queryText: string = await this.getPinnedQueryText();
             await this.showWorkItems(queryText);
         } catch (err) {
-            this.handleError(err, "Error showing pinned query work items");
+            this.handleError(err, WitClient.GetOfflinePinnedQueryStatusText(), false, "Error showing pinned query work items");
         }
     }
 
@@ -103,7 +101,7 @@ export class WitClient {
         try {
             await this.showWorkItems(WitQueries.MyWorkItems);
         } catch (err) {
-            this.handleError(err, "Error showing my work items");
+            this.handleError(err, WitClient.GetOfflinePinnedQueryStatusText(), false, "Error showing my work items");
         }
     }
 
@@ -144,7 +142,7 @@ export class WitClient {
             let svc: WorkItemTrackingService = new WorkItemTrackingService(this._serverContext);
             return svc.GetQueryResultCount(this._serverContext.RepoInfo.TeamProject, queryText);
         } catch (err) {
-            this.handleError(err, "Error getting pinned query result count");
+            this.handleError(err, WitClient.GetOfflinePinnedQueryStatusText(), false, "Error getting pinned query result count");
         }
     }
 
@@ -240,40 +238,6 @@ export class WitClient {
         return workItemTypes;
     }
 
-    private handleError(reason: any, infoMessage?: string, polling?: boolean) : void {
-        let offline: boolean = Utils.IsOffline(reason);
-        let msg: string = Utils.GetMessageForStatusCode(reason, reason.message);
-        let logPrefix: string = (infoMessage === undefined) ? "" : infoMessage + " ";
-
-        //When polling, we never display an error, we only log it (no telemetry either)
-        if (polling === true) {
-            Logger.LogError(logPrefix + msg);
-            if (offline === true) {
-                if (this._statusBarItem !== undefined) {
-                    this._statusBarItem.text = WitClient.GetOfflinePinnedQueryStatusText();
-                    this._statusBarItem.tooltip = Strings.StatusCodeOffline + " " + Strings.ClickToRetryConnection;
-                    this._statusBarItem.command = CommandNames.RefreshPollingStatus;
-                }
-            } else {
-                //Could happen if PAT doesn't have proper permissions
-                if (this._statusBarItem !== undefined) {
-                    this._statusBarItem.text = WitClient.GetOfflinePinnedQueryStatusText();
-                    this._statusBarItem.tooltip = msg;
-                }
-            }
-        //If we aren't polling, we always log an error and, optionally, send telemetry
-        } else {
-            let logMessage: string = logPrefix + msg;
-            if (offline === true) {
-                Logger.LogError(logMessage);
-            } else {
-                Logger.LogError(logMessage);
-                Telemetry.SendException(logMessage);
-            }
-            VsCodeUtils.ShowErrorMessage(msg);
-        }
-    }
-
     private logTelemetryForWorkItem(wit: string): void {
         switch (wit) {
             case WitTypes.Bug:
@@ -292,7 +256,7 @@ export class WitClient {
             this._statusBarItem.tooltip = Strings.ViewYourPinnedQuery;
             this._statusBarItem.text = WitClient.GetPinnedQueryStatusText(items);
         }).catch((reason) => {
-            this.handleError(reason, "Failed to get pinned query count during polling", true);
+            this.handleError(reason, WitClient.GetOfflinePinnedQueryStatusText(), true, "Failed to get pinned query count during polling");
         });
     }
 

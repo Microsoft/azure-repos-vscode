@@ -15,16 +15,14 @@ import { IRepositoryContext, RepositoryType } from "../contexts/repositorycontex
 import { TeamServerContext} from "../contexts/servercontext";
 import { GitVcService, PullRequestScore } from "../services/gitvc";
 import { Telemetry } from "../services/telemetry";
+import { BaseClient } from "./baseclient";
 
-var path = require("path");
+import * as path from "path";
 
-export class GitClient {
-    private _serverContext: TeamServerContext;
-    private _statusBarItem: StatusBarItem;
+export class GitClient extends BaseClient {
 
     constructor(context: TeamServerContext, statusBarItem: StatusBarItem) {
-        this._serverContext = context;
-        this._statusBarItem = statusBarItem;
+        super(context, statusBarItem);
     }
 
     //Initial method to display, select and navigate to my pull requests
@@ -45,7 +43,7 @@ export class GitClient {
                 Utils.OpenUrl(discUrl);
             }
         } catch (err) {
-            this.handleError(err, "Error selecting pull request from QuickPick");
+            this.handleError(err, GitClient.GetOfflinePullRequestStatusText(), false, "Error selecting pull request from QuickPick");
         }
     }
 
@@ -122,7 +120,7 @@ export class GitClient {
             //Remove the default Strings.BrowseYourPullRequests item from the calculation
             this._statusBarItem.text = GitClient.GetPullRequestStatusText(requests.length - 1);
         } catch (err) {
-            this.handleError(err, "Attempting to poll my pull requests", true);
+            this.handleError(err, GitClient.GetOfflinePullRequestStatusText(), true, "Attempting to poll my pull requests");
         }
     }
 
@@ -177,40 +175,6 @@ export class GitClient {
         let scoreLabel: string = `$(icon ${scoreIcon}) `;
 
         return { label: scoreLabel + " (" + displayName + ") " + title, description: description, id: id };
-    }
-
-    private handleError(reason: any, infoMessage?: string, polling?: boolean) : void {
-        let offline: boolean = Utils.IsOffline(reason);
-        let msg: string = Utils.GetMessageForStatusCode(reason, reason.message);
-        let logPrefix: string = (infoMessage === undefined) ? "" : infoMessage + " ";
-
-        //When polling, we never display an error, we only log it (no telemetry either)
-        if (polling === true) {
-            Logger.LogError(logPrefix + msg);
-            if (offline === true) {
-                if (this._statusBarItem !== undefined) {
-                    this._statusBarItem.text = GitClient.GetOfflinePullRequestStatusText();
-                    this._statusBarItem.tooltip = Strings.StatusCodeOffline + " " + Strings.ClickToRetryConnection;
-                    this._statusBarItem.command = CommandNames.RefreshPollingStatus;
-                }
-            } else {
-                //Could happen if PAT doesn't have proper permissions
-                if (this._statusBarItem !== undefined) {
-                    this._statusBarItem.text = GitClient.GetOfflinePullRequestStatusText();
-                    this._statusBarItem.tooltip = msg;
-                }
-            }
-        //If we aren't polling, we always log an error and, optionally, send telemetry
-        } else {
-            let logMessage: string = logPrefix + msg;
-            if (offline === true) {
-                Logger.LogError(logMessage);
-            } else {
-                Logger.LogError(logMessage);
-                Telemetry.SendException(logMessage);
-            }
-            VsCodeUtils.ShowErrorMessage(msg);
-        }
     }
 
     public static GetOfflinePullRequestStatusText() : string {

@@ -110,6 +110,7 @@ gulp.task('test-coverage', function() {
         ,'!out/src/extension.js'
         ,'!out/src/extensionmanager.js'
         ,'!out/src/team-extension.js'
+        ,'!out/src/clients/baseclient.js'
         ,'!out/src/clients/buildclient.js'
         ,'!out/src/clients/coreapiclient.js'
         ,'!out/src/clients/feedbackclient.js'

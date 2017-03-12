@@ -13,17 +13,14 @@ import { TeamServerContext} from "../contexts/servercontext";
 import { CommandNames, TelemetryEvents, WellKnownRepositoryTypes } from "../helpers/constants";
 import { Strings } from "../helpers/strings";
 import { Utils } from "../helpers/utils";
-import { VsCodeUtils } from "../helpers/vscodeutils";
 import { IRepositoryContext, RepositoryType } from "../contexts/repositorycontext";
+import { BaseClient } from "./baseclient";
 
-export class BuildClient {
-    private _serverContext: TeamServerContext;
-    private _statusBarItem: StatusBarItem;
+export class BuildClient extends BaseClient {
     private _buildSummaryUrl: string;
 
     constructor(context: TeamServerContext, statusBarItem: StatusBarItem) {
-        this._serverContext = context;
-        this._statusBarItem = statusBarItem;
+        super(context, statusBarItem);
     }
 
     //Gets any available build status information and adds it to the status bar
@@ -69,7 +66,7 @@ export class BuildClient {
                 }
             }
         } catch (err) {
-            this.handleError(err, polling, "Failed to get current build status");
+            this.handleError(err, BuildClient.GetOfflineBuildStatusText(), polling, "Failed to get current build status");
         }
     }
 
@@ -112,40 +109,6 @@ export class BuildClient {
         }
         Logger.LogInfo("OpenBuildSummaryPage: " + url);
         Utils.OpenUrl(url);
-    }
-
-    private handleError(reason: any, polling: boolean, infoMessage?: string) : void {
-        let offline: boolean = Utils.IsOffline(reason);
-        let msg: string = Utils.GetMessageForStatusCode(reason, reason.message);
-        let logPrefix: string = (infoMessage === undefined) ? "" : infoMessage + " ";
-
-        //When polling, we never display an error, we only log it (no telemetry either)
-        if (polling === true) {
-            Logger.LogError(logPrefix + msg);
-            if (offline === true) {
-                if (this._statusBarItem !== undefined) {
-                    this._statusBarItem.text = BuildClient.GetOfflineBuildStatusText();
-                    this._statusBarItem.tooltip = Strings.StatusCodeOffline + " " + Strings.ClickToRetryConnection;
-                    this._statusBarItem.command = CommandNames.RefreshPollingStatus;
-                }
-            } else {
-                //Could happen if PAT doesn't have proper permissions
-                if (this._statusBarItem !== undefined) {
-                    this._statusBarItem.text = BuildClient.GetOfflineBuildStatusText();
-                    this._statusBarItem.tooltip = msg;
-                }
-            }
-        //If we aren't polling, we always log an error and, optionally, send telemetry
-        } else {
-            let logMessage: string = logPrefix + msg;
-            if (offline === true) {
-                Logger.LogError(logMessage);
-            } else {
-                Logger.LogError(logMessage);
-                Telemetry.SendException(logMessage);
-            }
-            VsCodeUtils.ShowErrorMessage(msg);
-        }
     }
 
     public static GetOfflineBuildStatusText() : string {
