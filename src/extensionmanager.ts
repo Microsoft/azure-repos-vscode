@@ -129,14 +129,14 @@ export class ExtensionManager implements Disposable {
     }
 
     //Logs an error to the logger and sends an exception to telemetry service
-    public ReportError(message: string, reason?: any, showToUser: boolean = false): void {
-        let fullMessage = reason ? message + " " + reason : message;
+    public ReportError(err: Error, message: string, showToUser: boolean = false): void {
+        let fullMessage = err ? message + " " + err : message;
 
         // Log the message
         Logger.LogError(fullMessage);
-        if (reason && reason.message) {
+        if (err && err.message) {
             // Log additional information for debugging purposes
-            Logger.LogDebug(reason.message);
+            Logger.LogDebug(err.message);
         }
 
         // Show just the message to the user if needed
@@ -145,11 +145,11 @@ export class ExtensionManager implements Disposable {
         }
 
         // Send it to telemetry
-        if (reason !== undefined && (Utils.IsUnauthorized(reason) || Utils.IsOffline(reason) || Utils.IsProxyIssue(reason))) {
+        if (err !== undefined && (Utils.IsUnauthorized(err) || Utils.IsOffline(err) || Utils.IsProxyIssue(err))) {
             //Don't log exceptions for Unauthorized, Offline or Proxy scenarios
             return;
         }
-        Telemetry.SendException(fullMessage);
+        Telemetry.SendException(err);
     }
 
     private displayNoCredentialsMessage(): void {
@@ -259,7 +259,7 @@ export class ExtensionManager implements Disposable {
                                 this.logDebugInformation();
                             } catch (err) {
                                 this.setErrorStatus(Utils.GetMessageForStatusCode(err, err.message), (err.statusCode === 401 ? CommandNames.Signin : undefined), false);
-                                this.ReportError(Utils.GetMessageForStatusCode(err, err.message, "Failed to get results with accountClient: "), err);
+                                this.ReportError(err, Utils.GetMessageForStatusCode(err, err.message, "Failed to get results with accountClient: "));
                             }
                         } catch (err) {
                             //TODO: With TFVC, creating a RepositoryInfo can throw (can't get project collection, can't get team project, etc.)
@@ -269,16 +269,16 @@ export class ExtensionManager implements Disposable {
                                 Logger.LogError(Strings.UnsupportedServerVersion);
                             } else {
                                 this.setErrorStatus(Utils.GetMessageForStatusCode(err, err.message), (err.statusCode === 401 ? CommandNames.Signin : undefined), false);
-                                this.ReportError(Utils.GetMessageForStatusCode(err, err.message, "Failed call with repositoryClient: "), err);
+                                this.ReportError(err, Utils.GetMessageForStatusCode(err, err.message, "Failed call with repositoryClient: "));
                             }
                         }
                     }
-                }).fail((reason) => {
-                    this.setErrorStatus(Utils.GetMessageForStatusCode(reason, reason.message), (reason.statusCode === 401 ? CommandNames.Signin : undefined), false);
+                }).fail((err) => {
+                    this.setErrorStatus(Utils.GetMessageForStatusCode(err, err.message), (err.statusCode === 401 ? CommandNames.Signin : undefined), false);
                     //If we can't get a requestHandler, report the error via the feedbackclient
-                    let message: string = Utils.GetMessageForStatusCode(reason, reason.message, "Failed to get a credential handler");
+                    let message: string = Utils.GetMessageForStatusCode(err, err.message, "Failed to get a credential handler");
                     Logger.LogError(message);
-                    Telemetry.SendException(message);
+                    Telemetry.SendException(err);
                 });
             }
 

@@ -66,11 +66,11 @@ export class Telemetry {
         Telemetry._appInsightsClient.trackEvent(event, properties);
     }
 
-    public static SendException(message: string, properties?: any): void {
+    public static SendException(err: Error, properties?: any): void {
         Telemetry.ensureInitialized();
 
         if (Telemetry._telemetryEnabled === true) {
-            Telemetry._appInsightsClient.trackException(new Error(message), properties);
+            Telemetry._appInsightsClient.trackException(err, properties);
         }
     }
 

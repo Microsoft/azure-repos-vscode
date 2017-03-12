@@ -54,7 +54,7 @@ export class FeedbackClient {
         } catch (err) {
             let message: string = Utils.GetMessageForStatusCode(0, err.message, "Failed getting SendFeedback selection");
             Logger.LogError(message);
-            Telemetry.SendException(message);
+            Telemetry.SendException(err);
         }
     }
 }

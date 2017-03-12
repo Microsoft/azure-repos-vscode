@@ -73,10 +73,10 @@ export class TeamExtension  {
                         this._manager.CredentialManager.StoreCredentials(this._manager.ServerContext.RepoInfo.Host, username, password).then(() => {
                             // We don't test the credentials to make sure they're good here.  Do so on the next command that's run.
                             this._manager.Reinitialize();
-                        }).catch((reason) => {
+                        }).catch((err) => {
                             // TODO: Should the message direct the user to open an issue?  send feedback?
                             let msg: string = Strings.UnableToStoreCredentials + this._manager.ServerContext.RepoInfo.Host;
-                            this._manager.ReportError(msg, reason, true);
+                            this._manager.ReportError(err, msg, true);
                         });
                     }
                 }
@@ -87,10 +87,10 @@ export class TeamExtension  {
                     Logger.LogInfo("Signin: Personal Access Token provided as authentication.");
                     this._manager.CredentialManager.StoreCredentials(this._manager.ServerContext.RepoInfo.Host, Constants.OAuth, token).then(() => {
                         this._manager.Reinitialize();
-                    }).catch((reason) => {
+                    }).catch((err) => {
                         // TODO: Should the message direct the user to open an issue?  send feedback?
                         let msg: string = Strings.UnableToStoreCredentials + this._manager.ServerContext.RepoInfo.Host;
-                        this._manager.ReportError(msg, reason, true);
+                        this._manager.ReportError(err, msg, true);
                     });
                 }
             }
@@ -113,9 +113,9 @@ export class TeamExtension  {
             this._manager.CredentialManager.RemoveCredentials(this._manager.ServerContext.RepoInfo.Host).then(() => {
                 Logger.LogInfo("Signout: Removed credentials for host '" + this._manager.ServerContext.RepoInfo.Host + "'");
                 this._manager.Reinitialize(true);
-            }).catch((reason) => {
+            }).catch((err) => {
                 let msg: string = Strings.UnableToRemoveCredentials + this._manager.ServerContext.RepoInfo.Host;
-                this._manager.ReportError(msg, reason, true);
+                this._manager.ReportError(err, msg, true);
             });
         } else {
             this._manager.DisplayErrorMessage(Strings.NoRepoInformation);
