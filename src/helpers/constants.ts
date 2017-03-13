@@ -93,6 +93,7 @@ export class TelemetryEvents {
     static StartUp: string = TelemetryEvents.TelemetryPrefix + "startup";
     static TokenLearnMoreClick: string = TelemetryEvents.TelemetryPrefix + "tokenlearnmoreclick";
     static TokenInSettings: string = TelemetryEvents.TelemetryPrefix + "tokeninsettings";
+    static UnsupportedServerVersion: string = TelemetryEvents.TelemetryPrefix + "unsupportedversion";
     static ViewPullRequest: string = TelemetryEvents.TelemetryPrefix + "viewpullrequest";
     static ViewPullRequests: string = TelemetryEvents.TelemetryPrefix + "viewpullrequests";
     static ViewMyWorkItems: string = TelemetryEvents.TelemetryPrefix + "viewmyworkitems";

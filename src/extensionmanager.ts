@@ -268,6 +268,7 @@ export class ExtensionManager implements Disposable {
                             if (this._serverContext.RepoInfo.IsTeamFoundationServer === true && err.statusCode === 404) {
                                 this.setErrorStatus(Strings.UnsupportedServerVersion, undefined, false);
                                 Logger.LogError(Strings.UnsupportedServerVersion);
+                                Telemetry.SendEvent(TelemetryEvents.UnsupportedServerVersion);
                             } else {
                                 this.setErrorStatus(Utils.GetMessageForStatusCode(err, err.message), (err.statusCode === 401 ? CommandNames.Signin : undefined), false);
                                 //Wrap err here to get a useful call stack
