@@ -259,7 +259,8 @@ export class ExtensionManager implements Disposable {
                                 this.logDebugInformation();
                             } catch (err) {
                                 this.setErrorStatus(Utils.GetMessageForStatusCode(err, err.message), (err.statusCode === 401 ? CommandNames.Signin : undefined), false);
-                                this.ReportError(err, Utils.GetMessageForStatusCode(err, err.message, "Failed to get results with accountClient: "));
+                                //Wrap err here to get a useful call stack
+                                this.ReportError(new Error(err), Utils.GetMessageForStatusCode(err, err.message, "Failed to get results with accountClient: "));
                             }
                         } catch (err) {
                             //TODO: With TFVC, creating a RepositoryInfo can throw (can't get project collection, can't get team project, etc.)
@@ -269,7 +270,8 @@ export class ExtensionManager implements Disposable {
                                 Logger.LogError(Strings.UnsupportedServerVersion);
                             } else {
                                 this.setErrorStatus(Utils.GetMessageForStatusCode(err, err.message), (err.statusCode === 401 ? CommandNames.Signin : undefined), false);
-                                this.ReportError(err, Utils.GetMessageForStatusCode(err, err.message, "Failed call with repositoryClient: "));
+                                //Wrap err here to get a useful call stack
+                                this.ReportError(new Error(err), Utils.GetMessageForStatusCode(err, err.message, "Failed call with repositoryClient: "));
                             }
                         }
                     }
