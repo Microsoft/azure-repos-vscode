@@ -255,8 +255,8 @@ export class WitClient extends BaseClient {
         this.GetPinnedQueryResultCount().then((items) => {
             this._statusBarItem.tooltip = Strings.ViewYourPinnedQuery;
             this._statusBarItem.text = WitClient.GetPinnedQueryStatusText(items);
-        }).catch((reason) => {
-            this.handleError(reason, WitClient.GetOfflinePinnedQueryStatusText(), true, "Failed to get pinned query count during polling");
+        }).catch((err) => {
+            this.handleError(err, WitClient.GetOfflinePinnedQueryStatusText(), true, "Failed to get pinned query count during polling");
         });
     }
 
