@@ -135,7 +135,6 @@ gulp.task('test-coverage', function() {
         ,'!out/src/tfvc/scm/decorationprovider.js'
         ,'!out/src/tfvc/scm/model.js'
         ,'!out/src/tfvc/scm/resource.js'
-        ,'!out/src/tfvc/scm/resourcegroups.js'
         ,'!out/src/tfvc/scm/tfvccontentprovider.js'
     ])
     .pipe(istanbul({includeUntested: true}))
