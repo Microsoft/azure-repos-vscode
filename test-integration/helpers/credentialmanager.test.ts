@@ -15,10 +15,10 @@ import { TeamServerContext } from "../../src/contexts/servercontext";
 import { Constants } from "../../src/helpers/constants";
 
 describe("CredentialManager-Integration", function() {
-    this.timeout(TestSettings.SuiteTimeout()); //http://mochajs.org/#timeouts
+    this.timeout(TestSettings.SuiteTimeout); //http://mochajs.org/#timeouts
 
     var credentialManager: CredentialManager = new CredentialManager();
-    var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl());
+    var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
 
     before(function() {
         //
@@ -29,17 +29,17 @@ describe("CredentialManager-Integration", function() {
     //afterEach(function() { });
     after(function() {
         //Ensure we're clean after each test (even if one failed)
-        return credentialManager.RemoveCredentials(TestSettings.Account());
+        return credentialManager.RemoveCredentials(TestSettings.Account);
     });
 
     it("should verify store, get, remove credentials for Team Services (no token in settings)", async function() {
         try {
-            await credentialManager.StoreCredentials(TestSettings.Account(), TestSettings.AccountUser(), TestSettings.Password());
+            await credentialManager.StoreCredentials(TestSettings.Account, TestSettings.AccountUser, TestSettings.Password);
             let credInfo: CredentialInfo = await credentialManager.GetCredentials(ctx, undefined);
             //For PATs, username stored with StoreCredentials doesn't matter (it's always returned as OAuth)
             assert.equal(credInfo.Username, Constants.OAuth);
-            assert.equal(credInfo.Password, TestSettings.Password());
-            await credentialManager.RemoveCredentials(TestSettings.Account());
+            assert.equal(credInfo.Password, TestSettings.Password);
+            await credentialManager.RemoveCredentials(TestSettings.Account);
             credInfo = await credentialManager.GetCredentials(ctx, undefined);
             //Ensure the creds we added get removed
             assert.isUndefined(credInfo);
@@ -51,11 +51,11 @@ describe("CredentialManager-Integration", function() {
     it("should verify get and remove credentials for Team Services (with token in settings)", async function() {
         try {
             //Test scenario where the requested credential is not in the credential store but we're passing the token (from settings)
-            let credInfo: CredentialInfo = await credentialManager.GetCredentials(ctx, TestSettings.SettingsPassword());
+            let credInfo: CredentialInfo = await credentialManager.GetCredentials(ctx, TestSettings.SettingsPassword);
             //For PATs, username stored with StoreCredentials doesn't matter (it's always returned as OAuth)
             assert.equal(credInfo.Username, Constants.OAuth);
-            assert.equal(credInfo.Password, TestSettings.SettingsPassword());
-            await credentialManager.RemoveCredentials(TestSettings.Account());
+            assert.equal(credInfo.Password, TestSettings.SettingsPassword);
+            await credentialManager.RemoveCredentials(TestSettings.Account);
             credInfo = await credentialManager.GetCredentials(ctx, undefined);
             //Ensure the creds we added get removed
             assert.isUndefined(credInfo);
@@ -67,13 +67,13 @@ describe("CredentialManager-Integration", function() {
     it("should verify store, get, remove credentials for Team Services (with token in settings)", async function() {
         try {
             //Test scenario where the requested credential is in the store but we're also passing the token (from settings)
-            await credentialManager.StoreCredentials(TestSettings.Account(), TestSettings.AccountUser(), TestSettings.Password());
-            let credInfo: CredentialInfo = await credentialManager.GetCredentials(ctx, TestSettings.SettingsPassword());
+            await credentialManager.StoreCredentials(TestSettings.Account, TestSettings.AccountUser, TestSettings.Password);
+            let credInfo: CredentialInfo = await credentialManager.GetCredentials(ctx, TestSettings.SettingsPassword);
             //For PATs, username stored with StoreCredentials doesn't matter (it's always returned as OAuth)
             assert.equal(credInfo.Username, Constants.OAuth);
             //We still expect to get the SettingsPassword and not Password
-            assert.equal(credInfo.Password, TestSettings.SettingsPassword());
-            await credentialManager.RemoveCredentials(TestSettings.Account());
+            assert.equal(credInfo.Password, TestSettings.SettingsPassword);
+            await credentialManager.RemoveCredentials(TestSettings.Account);
             credInfo = await credentialManager.GetCredentials(ctx, undefined);
             //Ensure the creds we added get removed
             assert.isUndefined(credInfo);

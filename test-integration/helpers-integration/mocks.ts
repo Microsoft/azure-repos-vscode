@@ -36,15 +36,15 @@ export class Mocks {
                 "remoteUrl":"undefined"
             }
         };
-        repositoryInfo.serverUrl = TestSettings.AccountUrl();
-        repositoryInfo.collection.name = TestSettings.CollectionName();
-        repositoryInfo.collection.url = TestSettings.AccountUrl() + "/_apis/projectCollections/" + TestSettings.CollectionGuid();
-        repositoryInfo.repository.id = TestSettings.RepositoryId();
-        repositoryInfo.repository.name = TestSettings.RepositoryName();
-        repositoryInfo.repository.url = TestSettings.AccountUrl() + "/DefaultCollection/_apis/git/repositories/" + TestSettings.RepositoryId();
-        repositoryInfo.repository.project.name = TestSettings.TeamProject();
-        repositoryInfo.repository.project.url = TestSettings.AccountUrl() + "/DefaultCollection/_apis/projects/" + + TestSettings.ProjectGuid();
-        repositoryInfo.repository.remoteUrl = TestSettings.RemoteRepositoryUrl();
+        repositoryInfo.serverUrl = TestSettings.AccountUrl;
+        repositoryInfo.collection.name = TestSettings.CollectionName;
+        repositoryInfo.collection.url = TestSettings.AccountUrl + "/_apis/projectCollections/" + TestSettings.CollectionGuid;
+        repositoryInfo.repository.id = TestSettings.RepositoryId;
+        repositoryInfo.repository.name = TestSettings.RepositoryName;
+        repositoryInfo.repository.url = TestSettings.AccountUrl + "/DefaultCollection/_apis/git/repositories/" + TestSettings.RepositoryId;
+        repositoryInfo.repository.project.name = TestSettings.TeamProject;
+        repositoryInfo.repository.project.url = TestSettings.AccountUrl + "/DefaultCollection/_apis/projects/" + + TestSettings.ProjectGuid;
+        repositoryInfo.repository.remoteUrl = TestSettings.RemoteRepositoryUrl;
 
         return new RepositoryInfo(repositoryInfo);
     }

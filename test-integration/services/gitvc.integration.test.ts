@@ -12,45 +12,47 @@ import { TestSettings } from "../helpers-integration/testsettings";
 import { GitPullRequest, GitRepository } from "vso-node-api/interfaces/GitInterfaces";
 
 import { CredentialManager } from "../../src/helpers/credentialmanager";
+import { UserAgentProvider } from "../../src/helpers/useragentprovider";
 import { TeamServerContext } from "../../src/contexts/servercontext";
 import { GitVcService, PullRequestScore }  from "../../src/services/gitvc";
 
 describe("GitVcService-Integration", function() {
-    this.timeout(TestSettings.SuiteTimeout());
+    this.timeout(TestSettings.SuiteTimeout);
 
     var credentialManager: CredentialManager = new CredentialManager();
-    var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl());
+    var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
 
     before(function() {
-        return credentialManager.StoreCredentials(TestSettings.Account(), TestSettings.AccountUser(), TestSettings.Password());
+        UserAgentProvider.VSCodeVersion = "0.0.0";
+        return credentialManager.StoreCredentials(TestSettings.Account, TestSettings.AccountUser, TestSettings.Password);
     });
     beforeEach(function() {
         return credentialManager.GetCredentials(ctx, undefined);
     });
     // afterEach(function() { });
     after(function() {
-        return credentialManager.RemoveCredentials(TestSettings.Account());
+        return credentialManager.RemoveCredentials(TestSettings.Account);
     });
 
     it("should verify GitVcService.GetRepositories", async function() {
-        this.timeout(TestSettings.TestTimeout()); //http://mochajs.org/#timeouts
+        this.timeout(TestSettings.TestTimeout); //http://mochajs.org/#timeouts
 
-        var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl());
+        var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
         ctx.CredentialHandler = CredentialManager.GetCredentialHandler();
         ctx.RepoInfo = Mocks.RepositoryInfo();
         ctx.UserInfo = undefined;
 
         let svc: GitVcService = new GitVcService(ctx);
-        let repos: GitRepository[] = await svc.GetRepositories(TestSettings.TeamProject());
+        let repos: GitRepository[] = await svc.GetRepositories(TestSettings.TeamProject);
         assert.isNotNull(repos, "repos was null when it shouldn't have been");
         //console.log(repos.length);
         expect(repos.length).to.equal(2);
     });
 
     it("should verify GitVcService.GetPullRequests", async function() {
-        this.timeout(TestSettings.TestTimeout()); //http://mochajs.org/#timeouts
+        this.timeout(TestSettings.TestTimeout); //http://mochajs.org/#timeouts
 
-        var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl());
+        var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
         ctx.CredentialHandler = CredentialManager.GetCredentialHandler();
         ctx.RepoInfo = Mocks.RepositoryInfo();
         ctx.UserInfo = undefined;
@@ -63,9 +65,9 @@ describe("GitVcService-Integration", function() {
     });
 
     it("should verify GitVcService.GetPullRequestScore", async function() {
-        this.timeout(TestSettings.TestTimeout()); //http://mochajs.org/#timeouts
+        this.timeout(TestSettings.TestTimeout); //http://mochajs.org/#timeouts
 
-        var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl());
+        var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
         ctx.CredentialHandler = CredentialManager.GetCredentialHandler();
         ctx.RepoInfo = Mocks.RepositoryInfo();
         ctx.UserInfo = undefined;

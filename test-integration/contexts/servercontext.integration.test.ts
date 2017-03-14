@@ -13,26 +13,26 @@ import { CredentialManager } from "../../src/helpers/credentialmanager";
 import { TeamServerContext } from "../../src/contexts/servercontext";
 
 describe("ServerContext-Integration", function() {
-    this.timeout(TestSettings.SuiteTimeout());
+    this.timeout(TestSettings.SuiteTimeout);
 
     var credentialManager: CredentialManager = new CredentialManager();
-    var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl());
+    var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
 
     before(function() {
-        return credentialManager.StoreCredentials(TestSettings.Account(), TestSettings.AccountUser(), TestSettings.Password());
+        return credentialManager.StoreCredentials(TestSettings.Account, TestSettings.AccountUser, TestSettings.Password);
     });
     beforeEach(function() {
         return credentialManager.GetCredentials(ctx, undefined);
     });
     // afterEach(function() { });
     after(function() {
-        return credentialManager.RemoveCredentials(TestSettings.Account());
+        return credentialManager.RemoveCredentials(TestSettings.Account);
     });
 
     it("should verify ServerContext CredentialHandler, UserInfo", function(done) {
-        this.timeout(TestSettings.TestTimeout()); //http://mochajs.org/#timeouts
+        this.timeout(TestSettings.TestTimeout); //http://mochajs.org/#timeouts
 
-        var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl());
+        var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
         ctx.CredentialHandler = CredentialManager.GetCredentialHandler();
         ctx.RepoInfo = Mocks.RepositoryInfo();
         ctx.UserInfo = undefined;
