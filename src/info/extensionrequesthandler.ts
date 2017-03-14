@@ -4,12 +4,11 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import { version } from "vscode";
 import { IHttpResponse, IRequestHandler } from "vso-node-api/interfaces/common/VsoBaseInterfaces";
 import { getBasicHandler } from "vso-node-api/WebApi";
 import { getNtlmHandler } from "vso-node-api/WebApi";
 import { Constants } from "../helpers/constants";
-import * as os from "os";
+import { UserAgentProvider } from "../helpers/useragentprovider";
 
 // This class creates an IRequestHandler so we can send our own custom user-agent string
 export class ExtensionRequestHandler implements IRequestHandler {
@@ -58,9 +57,8 @@ export class ExtensionRequestHandler implements IRequestHandler {
     public prepareRequest(options: any): void {
         this._credentialHandler.prepareRequest(options);
 
-        //TODO: Pass actual version of VSCode if it becomes available
-        // Example: VSTSVSCode/1.115.1 (VSCode/10.1.0; Windows_NT/10.0.10586; Node/6.5.0)
-        let userAgent: string = `${Constants.ExtensionUserAgentName}/${Constants.ExtensionVersion} (VSCode ${version}; ${os.type()} ${os.release()}; Node ${process.versions["node"]})`;
+        // Get user agent string from the UserAgentProvider (Example: VSTSVSCode/1.115.1 (VSCode/10.1.0; Windows_NT/10.0.10586; Node/6.5.0))
+        let userAgent: string = UserAgentProvider.UserAgent;
         options.headers["User-Agent"] = userAgent;
     }
 

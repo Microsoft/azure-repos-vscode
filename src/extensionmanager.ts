@@ -4,12 +4,13 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import { Disposable, FileSystemWatcher, StatusBarAlignment, StatusBarItem, window, workspace } from "vscode";
+import { Disposable, FileSystemWatcher, StatusBarAlignment, StatusBarItem, version, window, workspace } from "vscode";
 import { AccountSettings, Settings } from "./helpers/settings";
 import { CommandNames, Constants, TelemetryEvents, TfvcTelemetryEvents } from "./helpers/constants";
 import { CredentialManager } from "./helpers/credentialmanager";
 import { Logger } from "./helpers/logger";
 import { Strings } from "./helpers/strings";
+import { UserAgentProvider } from "./helpers/useragentprovider";
 import { Utils } from "./helpers/utils";
 import { ButtonMessageItem, VsCodeUtils } from "./helpers/vscodeutils";
 import { RepositoryContextFactory } from "./contexts/repocontextfactory";
@@ -180,6 +181,8 @@ export class ExtensionManager implements Disposable {
         if (!workspace || !workspace.rootPath) {
             return;
         }
+        //Set version of VSCode on the UserAgentProvider
+        UserAgentProvider.VSCodeVersion = version;
 
         // Create the extensions
         this._teamExtension = new TeamExtension(this);
