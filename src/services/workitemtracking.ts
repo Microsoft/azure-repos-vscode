@@ -64,8 +64,8 @@ export class WorkItemTrackingService {
         return filteredTypes;
     }
 
-    //Returns a Promise containing a SimpleWorkItem representing the work item specifid by teamProject and id
-    public async GetWorkItemById(teamProject: string, id: string): Promise<SimpleWorkItem> {
+    //Returns a Promise containing a SimpleWorkItem representing the work item specified by id
+    public async GetWorkItemById(id: string): Promise<SimpleWorkItem> {
         let workItem: WorkItem = await this._witApi.getWorkItem(parseInt(id), [WorkItemFields.Id, WorkItemFields.Title]);
         let result: SimpleWorkItem = new SimpleWorkItem();
         result.id = workItem.id.toString();

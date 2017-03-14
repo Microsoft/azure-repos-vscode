@@ -9,7 +9,7 @@ import { Strings } from "../helpers/strings";
 import { AutoResolveType, IPendingChange, ISyncResults, ISyncItemResult, SyncType } from "./interfaces";
 import { TfvcOutput } from "./tfvcoutput";
 
-var path = require("path");
+import * as path from "path";
 
 export class UIHelper {
     public static async ChoosePendingChange(changes: IPendingChange[]): Promise<IPendingChange> {
@@ -50,7 +50,7 @@ export class UIHelper {
     /**
      * This method displays the results of the sync command in the output window and optionally in the QuickPick window as well.
      */
-    public static async ShowSyncResults(syncResults: ISyncResults, showPopup: boolean, onlyShowErrors) {
+    public static async ShowSyncResults(syncResults: ISyncResults, showPopup: boolean, onlyShowErrors): Promise<void> {
         let items: QuickPickItem[] = [];
         if (syncResults.itemResults.length === 0) {
             TfvcOutput.AppendLine(Strings.AllFilesUpToDate);
@@ -118,16 +118,16 @@ export class UIHelper {
         }
     }
 
-    public static GetFileName(change: IPendingChange) {
+    public static GetFileName(change: IPendingChange): string {
         if (change && change.localItem) {
-            var filename = path.parse(change.localItem).base;
+            let filename: string = path.parse(change.localItem).base;
             return filename;
         }
 
         return "";
     }
 
-    public static GetRelativePath(change: IPendingChange) {
+    public static GetRelativePath(change: IPendingChange): string {
         if (change && change.localItem && workspace) {
             return workspace.asRelativePath(change.localItem);
         }

@@ -19,8 +19,8 @@ import { GitVcService, PullRequestScore }  from "../../src/services/gitvc";
 describe("GitVcService-Integration", function() {
     this.timeout(TestSettings.SuiteTimeout);
 
-    var credentialManager: CredentialManager = new CredentialManager();
-    var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
+    let credentialManager: CredentialManager = new CredentialManager();
+    let ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
 
     before(function() {
         UserAgentProvider.VSCodeVersion = "0.0.0";
@@ -37,7 +37,7 @@ describe("GitVcService-Integration", function() {
     it("should verify GitVcService.GetRepositories", async function() {
         this.timeout(TestSettings.TestTimeout); //http://mochajs.org/#timeouts
 
-        var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
+        let ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
         ctx.CredentialHandler = CredentialManager.GetCredentialHandler();
         ctx.RepoInfo = Mocks.RepositoryInfo();
         ctx.UserInfo = undefined;
@@ -52,7 +52,7 @@ describe("GitVcService-Integration", function() {
     it("should verify GitVcService.GetPullRequests", async function() {
         this.timeout(TestSettings.TestTimeout); //http://mochajs.org/#timeouts
 
-        var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
+        let ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
         ctx.CredentialHandler = CredentialManager.GetCredentialHandler();
         ctx.RepoInfo = Mocks.RepositoryInfo();
         ctx.UserInfo = undefined;
@@ -67,7 +67,7 @@ describe("GitVcService-Integration", function() {
     it("should verify GitVcService.GetPullRequestScore", async function() {
         this.timeout(TestSettings.TestTimeout); //http://mochajs.org/#timeouts
 
-        var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
+        let ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
         ctx.CredentialHandler = CredentialManager.GetCredentialHandler();
         ctx.RepoInfo = Mocks.RepositoryInfo();
         ctx.UserInfo = undefined;
@@ -79,8 +79,8 @@ describe("GitVcService-Integration", function() {
             totals.push({ "id" : request.pullRequestId, "score" : GitVcService.GetPullRequestScore(request) });
         });
         assert.equal(totals.length, 4);
-        for (var index = 0; index < totals.length; index++) {
-            var element = totals[index];
+        for (let index = 0; index < totals.length; index++) {
+            let element: any = totals[index];
             if (element.id === 5) { assert.equal(element.score, PullRequestScore.Succeeded); continue; }
             if (element.id === 4) { assert.equal(element.score, PullRequestScore.Waiting); continue; }
             if (element.id === 3) { assert.equal(element.score, PullRequestScore.Failed); continue; }

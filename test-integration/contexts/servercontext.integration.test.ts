@@ -15,8 +15,8 @@ import { TeamServerContext } from "../../src/contexts/servercontext";
 describe("ServerContext-Integration", function() {
     this.timeout(TestSettings.SuiteTimeout);
 
-    var credentialManager: CredentialManager = new CredentialManager();
-    var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
+    let credentialManager: CredentialManager = new CredentialManager();
+    let ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
 
     before(function() {
         return credentialManager.StoreCredentials(TestSettings.Account, TestSettings.AccountUser, TestSettings.Password);
@@ -32,7 +32,7 @@ describe("ServerContext-Integration", function() {
     it("should verify ServerContext CredentialHandler, UserInfo", function(done) {
         this.timeout(TestSettings.TestTimeout); //http://mochajs.org/#timeouts
 
-        var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
+        let ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
         ctx.CredentialHandler = CredentialManager.GetCredentialHandler();
         ctx.RepoInfo = Mocks.RepositoryInfo();
         ctx.UserInfo = undefined;

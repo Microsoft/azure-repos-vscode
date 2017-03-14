@@ -6,9 +6,8 @@
 
 import { Constants } from "./constants";
 
-import winston = require("winston");
-
-var path = require("path");
+import * as winston from "winston";
+import * as path from "path";
 
 export class Logger {
     private static initialized: boolean = false;

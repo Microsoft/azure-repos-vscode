@@ -18,7 +18,7 @@ import { TfvcOutput } from "./tfvcoutput";
 import { Telemetry } from "../services/telemetry";
 import { TfvcTelemetryEvents } from "../helpers/constants";
 
-var _ = require("underscore");
+import * as _ from "underscore";
 import * as fs from "fs";
 import * as path from "path";
 

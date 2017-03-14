@@ -17,8 +17,8 @@ import { TeamServicesApi } from "../../src/clients/teamservicesclient";
 describe("TeamServicesClient-Integration", function() {
     this.timeout(TestSettings.SuiteTimeout); //http://mochajs.org/#timeouts
 
-    var credentialManager: CredentialManager = new CredentialManager();
-    var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
+    let credentialManager: CredentialManager = new CredentialManager();
+    let ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
 
     before(function() {
         UserAgentProvider.VSCodeVersion = "0.0.0";

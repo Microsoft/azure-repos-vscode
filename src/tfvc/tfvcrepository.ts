@@ -23,7 +23,7 @@ import { Status } from "./commands/status";
 import { Sync } from "./commands/sync";
 import { Undo } from "./commands/undo";
 
-var _ = require("underscore");
+import * as _ from "underscore";
 
 /**
  * The Repository class allows you to perform TFVC commands on the workspace represented 

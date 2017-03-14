@@ -10,7 +10,7 @@ import { CredentialInfo } from "../info/credentialinfo";
 import { TeamServerContext } from "../contexts/servercontext";
 import { CredentialStore } from "../credentialstore/credentialstore";
 
-var Q = require("q");
+import * as Q from "q";
 
 export class CredentialManager {
     private static _credentialHandler: IRequestHandler;
@@ -27,7 +27,7 @@ export class CredentialManager {
     }
 
     public GetCredentials(context: TeamServerContext, teamServicesToken: string) : Q.Promise<CredentialInfo> {
-        let deferred: Q.Deferred<CredentialInfo> = Q.defer();
+        let deferred: Q.Deferred<CredentialInfo> = Q.defer<CredentialInfo>();
 
         this.getCredentials(context).then((credInfo: CredentialInfo) => {
             if (credInfo !== undefined) {
@@ -60,7 +60,7 @@ export class CredentialManager {
     }
 
     public RemoveCredentials(account: string) : Q.Promise<void> {
-        let deferred: Q.Deferred<void> = Q.defer();
+        let deferred: Q.Deferred<void> = Q.defer<void>();
 
         this._credentialStore.RemoveCredential(account).then(() => {
             deferred.resolve(undefined);
@@ -71,7 +71,7 @@ export class CredentialManager {
     }
 
     public StoreCredentials(account: string, username: string, password: string) : Q.Promise<void> {
-        let deferred: Q.Deferred<void> = Q.defer();
+        let deferred: Q.Deferred<void> = Q.defer<void>();
 
         this._credentialStore.SetCredential(account, username, password).then(() => {
             deferred.resolve(undefined);
@@ -82,7 +82,7 @@ export class CredentialManager {
     }
 
     private getCredentials(context:TeamServerContext) : Q.Promise<CredentialInfo> {
-        let deferred: Q.Deferred<CredentialInfo> = Q.defer();
+        let deferred: Q.Deferred<CredentialInfo> = Q.defer<CredentialInfo>();
 
         this._credentialStore.GetCredential(context.RepoInfo.Host).then((cred) => {
             if (cred !== undefined) {

@@ -9,7 +9,7 @@ import { IArgumentProvider, IExecutionResult, ITfvcCommand, IPendingChange } fro
 import { ArgumentBuilder } from "./argumentbuilder";
 import { CommandHelper } from "./commandhelper";
 
-var fs = require("fs");
+import * as fs from "fs";
 
 /**
  * This command returns the status of the workspace as a list of pending changes.

@@ -20,8 +20,8 @@ import { SimpleWorkItem, WorkItemTrackingService }  from "../../src/services/wor
 describe("WorkItemTrackingService-Integration", function() {
     this.timeout(TestSettings.SuiteTimeout);
 
-    var credentialManager: CredentialManager = new CredentialManager();
-    var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
+    let credentialManager: CredentialManager = new CredentialManager();
+    let ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
 
     before(function() {
         UserAgentProvider.VSCodeVersion = "0.0.0";
@@ -40,7 +40,7 @@ describe("WorkItemTrackingService-Integration", function() {
     it("should verify WorkItemTrackingService.CreateWorkItem", async function() {
         this.timeout(TestSettings.TestTimeout); //http://mochajs.org/#timeouts
 
-        var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
+        let ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
         ctx.CredentialHandler = CredentialManager.GetCredentialHandler();
         ctx.RepoInfo = Mocks.RepositoryInfo();
         ctx.UserInfo = undefined;
@@ -56,7 +56,7 @@ describe("WorkItemTrackingService-Integration", function() {
     it("should verify WorkItemTrackingService.GetWorkItems", async function() {
         this.timeout(TestSettings.TestTimeout); //http://mochajs.org/#timeouts
 
-        var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
+        let ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
         ctx.CredentialHandler = CredentialManager.GetCredentialHandler();
         ctx.RepoInfo = Mocks.RepositoryInfo();
         ctx.UserInfo = undefined;
@@ -70,7 +70,7 @@ describe("WorkItemTrackingService-Integration", function() {
     it("should verify WorkItemTrackingService.GetQueryResultCount", async function() {
         this.timeout(TestSettings.TestTimeout); //http://mochajs.org/#timeouts
 
-        var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
+        let ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
         ctx.CredentialHandler = CredentialManager.GetCredentialHandler();
         ctx.RepoInfo = Mocks.RepositoryInfo();
         ctx.UserInfo = undefined;
@@ -88,7 +88,7 @@ describe("WorkItemTrackingService-Integration", function() {
     it("should verify WorkItemTrackingService.GetWorkItemHierarchyItems", async function() {
         this.timeout(TestSettings.TestTimeout); //http://mochajs.org/#timeouts
 
-        var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
+        let ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
         ctx.CredentialHandler = CredentialManager.GetCredentialHandler();
         ctx.RepoInfo = Mocks.RepositoryInfo();
         ctx.UserInfo = undefined;
@@ -103,7 +103,7 @@ describe("WorkItemTrackingService-Integration", function() {
     it("should verify WorkItemTrackingService.GetWorkItemQuery", async function() {
         this.timeout(TestSettings.TestTimeout); //http://mochajs.org/#timeouts
 
-        var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
+        let ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
         ctx.CredentialHandler = CredentialManager.GetCredentialHandler();
         ctx.RepoInfo = Mocks.RepositoryInfo();
         ctx.UserInfo = undefined;
@@ -120,7 +120,7 @@ describe("WorkItemTrackingService-Integration", function() {
     it("should verify WorkItemTrackingService.GetWorkItemTypes", async function() {
         this.timeout(TestSettings.TestTimeout); //http://mochajs.org/#timeouts
 
-        var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
+        let ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
         ctx.CredentialHandler = CredentialManager.GetCredentialHandler();
         ctx.RepoInfo = Mocks.RepositoryInfo();
         ctx.UserInfo = undefined;
@@ -135,13 +135,13 @@ describe("WorkItemTrackingService-Integration", function() {
     it("should verify WorkItemTrackingService.GetWorkItemById", async function() {
         this.timeout(TestSettings.TestTimeout); //http://mochajs.org/#timeouts
 
-        var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
+        let ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
         ctx.CredentialHandler = CredentialManager.GetCredentialHandler();
         ctx.RepoInfo = Mocks.RepositoryInfo();
         ctx.UserInfo = undefined;
 
         let svc: WorkItemTrackingService = new WorkItemTrackingService(ctx);
-        let item: SimpleWorkItem = await svc.GetWorkItemById(TestSettings.TeamProject, TestSettings.WorkItemId.toString());
+        let item: SimpleWorkItem = await svc.GetWorkItemById(TestSettings.WorkItemId.toString());
         assert.isNotNull(item);
         //console.log(items.length);
         expect(item.id).to.equal(TestSettings.WorkItemId.toString());
@@ -150,7 +150,7 @@ describe("WorkItemTrackingService-Integration", function() {
     it("should verify WorkItemTrackingService.GetWorkItemQuery with a Link query", function(done) {
         this.timeout(TestSettings.TestTimeout); //http://mochajs.org/#timeouts
 
-        var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
+        let ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
         ctx.CredentialHandler = CredentialManager.GetCredentialHandler();
         ctx.RepoInfo = Mocks.RepositoryInfo();
         ctx.UserInfo = undefined;
@@ -177,7 +177,7 @@ describe("WorkItemTrackingService-Integration", function() {
     it("should verify WorkItemTrackingService.GetWorkItemQuery with maximum 200 results", function(done) {
         this.timeout(TestSettings.TestTimeout); //http://mochajs.org/#timeouts
 
-        var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
+        let ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
         ctx.CredentialHandler = CredentialManager.GetCredentialHandler();
         ctx.RepoInfo = Mocks.RepositoryInfo();
         ctx.UserInfo = undefined;

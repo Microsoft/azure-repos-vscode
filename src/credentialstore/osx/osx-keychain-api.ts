@@ -7,8 +7,11 @@
 import { Credential } from "../credential";
 import { ICredentialStore } from "../interfaces/icredentialstore";
 
-var Q = require("q");
+import * as Q from "q";
+
+/* tslint:disable:no-var-keyword */
 var osxkeychain = require("./osx-keychain");
+/* tslint:enable:no-var-keyword */
 
 /*
     Provides the ICredentialStore API on top of OSX keychain-based storage.
@@ -26,7 +29,7 @@ export class OsxKeychainApi implements ICredentialStore {
     }
 
     public GetCredential(service: string) : Q.Promise<Credential> {
-        let deferred: Q.Deferred<Credential> = Q.defer();
+        let deferred: Q.Deferred<Credential> = Q.defer<Credential>();
         let credential: Credential;
 
         // To get the credential, I must first list all of the credentials we previously
@@ -34,7 +37,7 @@ export class OsxKeychainApi implements ICredentialStore {
         this.listCredentials().then((credentials) => {
             // Spin through the returned credentials to ensure I got the one I want
             // based on passed in 'service'
-            for (var index = 0; index < credentials.length; index++) {
+            for (let index = 0; index < credentials.length; index++) {
                 if (credentials[index].Service === service) {
                     credential = credentials[index];
                     break;
@@ -61,7 +64,7 @@ export class OsxKeychainApi implements ICredentialStore {
     }
 
     public SetCredential(service: string, username: string, password: string) : Q.Promise<void> {
-        let deferred: Q.Deferred<void> = Q.defer();
+        let deferred: Q.Deferred<void> = Q.defer<void>();
 
         // I'm not supporting a description so pass "" for that parameter
         osxkeychain.set(username, service, "" /*description*/, password, function(err) {
@@ -75,7 +78,7 @@ export class OsxKeychainApi implements ICredentialStore {
     }
 
     public RemoveCredential(service: string) : Q.Promise<void> {
-        let deferred: Q.Deferred<void> = Q.defer();
+        let deferred: Q.Deferred<void> = Q.defer<void>();
 
         this.removeCredentials(service).then(() => {
             deferred.resolve(undefined);
@@ -87,7 +90,7 @@ export class OsxKeychainApi implements ICredentialStore {
     }
 
     public getCredentialByName(service: string, username: string) : Q.Promise<Credential> {
-        let deferred: Q.Deferred<Credential> = Q.defer();
+        let deferred: Q.Deferred<Credential> = Q.defer<Credential>();
         let credential: Credential;
 
         // To get the credential, I must first list all of the credentials we previously
@@ -95,7 +98,7 @@ export class OsxKeychainApi implements ICredentialStore {
         this.listCredentials().then((credentials) => {
             // Spin through the returned credentials to ensure I got the one I want
             // based on passed in 'service'
-            for (var index = 0; index < credentials.length; index++) {
+            for (let index = 0; index < credentials.length; index++) {
                 if (credentials[index].Service === service && credentials[index].Username === username) {
                     credential = credentials[index];
                     break;
@@ -122,7 +125,7 @@ export class OsxKeychainApi implements ICredentialStore {
     }
 
     public removeCredentialByName(service: string, username: string) : Q.Promise<void> {
-        let deferred: Q.Deferred<void> = Q.defer();
+        let deferred: Q.Deferred<void> = Q.defer<void>();
 
         // if username === "*", we need to remove all credentials for this service.
         if (username === "*") {
@@ -150,7 +153,7 @@ export class OsxKeychainApi implements ICredentialStore {
     }
 
     private removeCredentials(service: string): Q.Promise<void> {
-        let deferred: Q.Deferred<void> = Q.defer();
+        let deferred: Q.Deferred<void> = Q.defer<void>();
 
         // listCredentials will return all of the credentials for this prefix and service
         this.listCredentials(service).then((creds) => {
@@ -171,7 +174,7 @@ export class OsxKeychainApi implements ICredentialStore {
     }
 
     private listCredentials(service? : string) : Q.Promise<Array<Credential>> {
-        let deferred: Q.Deferred<Array<Credential>> = Q.defer();
+        let deferred: Q.Deferred<Array<Credential>> = Q.defer<Array<Credential>>();
         let credentials: Array<Credential> = [];
 
         let stream = osxkeychain.list();

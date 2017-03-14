@@ -20,8 +20,8 @@ import { WellKnownRepositoryTypes } from "../../src/helpers/constants";
 describe("BuildService-Integration", function() {
     this.timeout(TestSettings.SuiteTimeout);
 
-    var credentialManager: CredentialManager = new CredentialManager();
-    var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
+    let credentialManager: CredentialManager = new CredentialManager();
+    let ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
 
     before(function() {
         UserAgentProvider.VSCodeVersion = "0.0.0";
@@ -38,7 +38,7 @@ describe("BuildService-Integration", function() {
     it("should verify BuildService.GetBuildDefinitions", async function() {
         this.timeout(TestSettings.TestTimeout); //http://mochajs.org/#timeouts
 
-        var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
+        let ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
         ctx.CredentialHandler = CredentialManager.GetCredentialHandler();
         ctx.RepoInfo = Mocks.RepositoryInfo();
         ctx.UserInfo = undefined;
@@ -53,7 +53,7 @@ describe("BuildService-Integration", function() {
     it("should verify BuildService.GetBuildById", async function() {
         this.timeout(TestSettings.TestTimeout); //http://mochajs.org/#timeouts
 
-        var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
+        let ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
         ctx.CredentialHandler = CredentialManager.GetCredentialHandler();
         ctx.RepoInfo = Mocks.RepositoryInfo();
         ctx.UserInfo = undefined;
@@ -68,7 +68,7 @@ describe("BuildService-Integration", function() {
     it("should verify BuildService.GetBuilds", async function() {
         this.timeout(TestSettings.TestTimeout); //http://mochajs.org/#timeouts
 
-        var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
+        let ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
         ctx.CredentialHandler = CredentialManager.GetCredentialHandler();
         ctx.RepoInfo = Mocks.RepositoryInfo();
         ctx.UserInfo = undefined;
@@ -83,7 +83,7 @@ describe("BuildService-Integration", function() {
     it("should verify BuildService.GetBuildsByDefinitionId", async function() {
         this.timeout(TestSettings.TestTimeout); //http://mochajs.org/#timeouts
 
-        var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
+        let ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
         ctx.CredentialHandler = CredentialManager.GetCredentialHandler();
         ctx.RepoInfo = Mocks.RepositoryInfo();
         ctx.UserInfo = undefined;
@@ -98,7 +98,7 @@ describe("BuildService-Integration", function() {
     it("should verify BuildService.GetBuildBadge", async function() {
         this.timeout(TestSettings.TestTimeout); //http://mochajs.org/#timeouts
 
-        var ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
+        let ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
         ctx.CredentialHandler = CredentialManager.GetCredentialHandler();
         ctx.RepoInfo = Mocks.RepositoryInfo();
         ctx.UserInfo = undefined;

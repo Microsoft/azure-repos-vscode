@@ -7,8 +7,10 @@
 import { Credential } from "../credential";
 import { ICredentialStore } from "../interfaces/icredentialstore";
 
-var Q = require("q");
+import * as Q from "q";
+/* tslint:disable:no-var-keyword */
 var wincredstore = require("./win-credstore");
+/* tslint:enable:no-var-keyword */
 
 /*
     Provides the ICredentialStore API on top of Windows Credential Store-based storage.
@@ -25,7 +27,7 @@ export class WindowsCredentialStoreApi implements ICredentialStore {
     }
 
     public GetCredential(service: string) : Q.Promise<Credential> {
-        let deferred: Q.Deferred<Credential> = Q.defer();
+        let deferred: Q.Deferred<Credential> = Q.defer<Credential>();
         let credential: Credential;
 
         //TODO: Why not just have listCredentials send back the ones I want based on (optional) service?
@@ -48,7 +50,7 @@ export class WindowsCredentialStoreApi implements ICredentialStore {
     }
 
     public SetCredential(service: string, username: string, password: any) : Q.Promise<void> {
-        let deferred: Q.Deferred<void> = Q.defer();
+        let deferred: Q.Deferred<void> = Q.defer<void>();
         let targetName: string = this.createTargetName(service, username);
 
         // Here, `password` is either the password or pat
@@ -63,7 +65,7 @@ export class WindowsCredentialStoreApi implements ICredentialStore {
     }
 
     public RemoveCredential(service: string) : Q.Promise<void> {
-        let deferred: Q.Deferred<void> = Q.defer();
+        let deferred: Q.Deferred<void> = Q.defer<void>();
         let targetName: string = this.createTargetName(service, "*");
 
         wincredstore.remove(targetName, function(err) {
@@ -84,7 +86,7 @@ export class WindowsCredentialStoreApi implements ICredentialStore {
 
     // Adding for test purposes (to ensure a particular credential doesn't exist)
     public getCredentialByName(service: string, username: string) : Q.Promise<Credential> {
-        let deferred: Q.Deferred<Credential> = Q.defer();
+        let deferred: Q.Deferred<Credential> = Q.defer<Credential>();
         let credential: Credential;
 
         this.listCredentials().then((credentials) => {
@@ -106,7 +108,7 @@ export class WindowsCredentialStoreApi implements ICredentialStore {
     }
 
     public removeCredentialByName(service: string, username: string) : Q.Promise<void> {
-        let deferred: Q.Deferred<void> = Q.defer();
+        let deferred: Q.Deferred<void> = Q.defer<void>();
         let targetName: string = this.createTargetName(service, username);
 
         wincredstore.remove(targetName, function(err) {
@@ -139,7 +141,7 @@ export class WindowsCredentialStoreApi implements ICredentialStore {
     }
 
     private listCredentials() : Q.Promise<Array<any>> {
-        let deferred: Q.Deferred<Array<any>> = Q.defer();
+        let deferred: Q.Deferred<Array<any>> = Q.defer<Array<any>>();
         let credentials: Array<any> = [];
 
         let stream = wincredstore.list();

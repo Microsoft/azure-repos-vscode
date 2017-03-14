@@ -4,9 +4,9 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-var Q = require("q");
-var fs = require("fs");
-var path = require("path");
+import * as Q from "q";
+import * as fs from "fs";
+import * as path from "path";
 
 /*
     Provides storage of credentials in a file on the local file system.
@@ -36,7 +36,7 @@ export class FileTokenStorage {
         let err: any;
 
         try {
-            let content: string = fs.readFileSync(this._filename);
+            let content: string = fs.readFileSync(this._filename, {encoding: "utf8", flag: "r"});
             entries = JSON.parse(content);
             deferred.resolve(entries);
         } catch (ex) {
@@ -52,12 +52,12 @@ export class FileTokenStorage {
         return deferred.promise;
     }
 
-    public RemoveEntries(entriesToRemove: Array<any>, entriesToKeep: Array<any>) : Q.Promise<void> {
+    public RemoveEntries(entriesToKeep: Array<any> /*, entriesToRemove?: Array<any>*/) : Q.Promise<void> {
         return this.saveEntries(entriesToKeep);
     }
 
     private saveEntries(entries: Array<any>) : Q.Promise<void> {
-        let defer: Q.Deferred<void> = Q.defer();
+        let defer: Q.Deferred<void> = Q.defer<void>();
 
         let writeOptions = {
             encoding: "utf8",

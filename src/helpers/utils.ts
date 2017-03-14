@@ -7,10 +7,10 @@
 import { BuildResult } from "vso-node-api/interfaces/BuildInterfaces";
 import { Strings } from "./strings";
 
-var fs = require("fs");
-var path = require("path");
-var open = require("open");
-var opener = require("opener");
+import * as fs from "fs";
+import * as path from "path";
+import * as open from "open";
+import * as opener from "opener";
 
 export class Utils {
 

@@ -4,8 +4,8 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-var os = require("os");
-var Q = require("q");
+import * as os from "os";
+import * as Q from "q";
 
 import { LinuxFileApi } from "./linux/linux-file-api";
 import { OsxKeychainApi } from "./osx/osx-keychain-api";
@@ -72,7 +72,7 @@ export class CredentialStore implements ICredentialStore {
     }
 
     public SetCredential(service: string, username: string, password: any) : Q.Promise<void> {
-        let deferred: Q.Deferred<void> = Q.defer();
+        let deferred: Q.Deferred<void> = Q.defer<void>();
 
         // First, look to see if we have a credential for this service already.  If so, remove it
         // since we don't know if the user is changing the username or the password (or both) for
