@@ -4,6 +4,7 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
+import { version } from "vscode";
 import { IHttpResponse, IRequestHandler } from "vso-node-api/interfaces/common/VsoBaseInterfaces";
 import { getBasicHandler } from "vso-node-api/WebApi";
 import { getNtlmHandler } from "vso-node-api/WebApi";
@@ -58,8 +59,8 @@ export class ExtensionRequestHandler implements IRequestHandler {
         this._credentialHandler.prepareRequest(options);
 
         //TODO: Pass actual version of VSCode if it becomes available
-        // Example: VSTSVSCode/1.115.1 (VSCode/0.0.0; Windows_NT/10.0.10586; Node/6.5.0)
-        let userAgent: string = `${Constants.ExtensionUserAgentName}/${Constants.ExtensionVersion} (VSCode 0.0.0; ${os.type()} ${os.release()}; Node ${process.versions["node"]})`;
+        // Example: VSTSVSCode/1.115.1 (VSCode/10.1.0; Windows_NT/10.0.10586; Node/6.5.0)
+        let userAgent: string = `${Constants.ExtensionUserAgentName}/${Constants.ExtensionVersion} (VSCode ${version}; ${os.type()} ${os.release()}; Node ${process.versions["node"]})`;
         options.headers["User-Agent"] = userAgent;
     }
 
