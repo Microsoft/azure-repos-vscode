@@ -5,7 +5,6 @@
 "use strict";
 
 import { workspace, window, languages, Disposable, Uri, HoverProvider, Hover, TextEditor, Position, TextDocument, Range, TextEditorDecorationType, WorkspaceEdit } from "vscode";
-import { Model } from "./model";
 import { filterEvent } from "../util";
 
 const scmInputUri = Uri.parse("scm:input");
@@ -27,7 +26,7 @@ export class CommitHoverProvider implements HoverProvider {
     private editor: TextEditor;
     private visibleTextEditorsDisposable: Disposable;
 
-    constructor(private model: Model) {
+    constructor() {
         this.visibleTextEditorsDisposable = window.onDidChangeVisibleTextEditors(this.onVisibleTextEditors, this);
         this.onVisibleTextEditors(window.visibleTextEditors);
 
@@ -89,7 +88,7 @@ export class CommitHoverProvider implements HoverProvider {
     provideHover(document: TextDocument, position: Position): Hover | undefined {
         const [decoration] = this.diagnostics.filter(d => d.range.contains(position));
 
-        if (!decoration) {
+        if (!decoration || !document) {
             return;
         }
 

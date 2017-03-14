@@ -77,7 +77,7 @@ export class Model implements Disposable {
         }
     }
 
-    private onFileSystemChange(uri: Uri): void {
+    private onFileSystemChange(/*TODO: uri: Uri*/): void {
         this.status();
     }
 

@@ -28,12 +28,8 @@ import { TfvcExtension } from "./tfvc/tfvc-extension";
 import { TfvcErrorCodes } from "./tfvc/tfvcerror";
 import { TfvcSCMProvider } from "./tfvc/tfvcscmprovider";
 
-var path = require("path");
-var util = require("util");
-
-/* tslint:disable:no-unused-variable */
-import Q = require("q");
-/* tslint:enable:no-unused-variable */
+import * as path from "path";
+import * as util from "util";
 
 export class ExtensionManager implements Disposable {
     private _teamServicesStatusBarItem: StatusBarItem;
@@ -400,17 +396,17 @@ export class ExtensionManager implements Disposable {
         if (this._repoContext && this._repoContext.Type === RepositoryType.GIT) {
             let pattern: string = this._repoContext.RepoFolder + "/HEAD";
             let fsw:FileSystemWatcher = workspace.createFileSystemWatcher(pattern, true, false, true);
-            fsw.onDidChange(async (uri) => {
+            fsw.onDidChange(async (/*uri*/) => {
                 Logger.LogInfo("HEAD has changed, re-parsing RepoContext object");
                 this._repoContext = await RepositoryContextFactory.CreateRepositoryContext(workspace.rootPath, this._settings);
                 Logger.LogInfo("CurrentBranch is: " + this._repoContext.CurrentBranch);
-                this.notifyBranchChanged(this._repoContext.CurrentBranch);
+                this.notifyBranchChanged(/*this._repoContext.CurrentBranch*/);
             });
         }
     }
 
-    private notifyBranchChanged(currentBranch: string) : void {
-        this._teamExtension.NotifyBranchChanged(currentBranch);
+    private notifyBranchChanged(/*TODO: currentBranch: string*/) : void {
+        this._teamExtension.NotifyBranchChanged();
         //this._tfvcExtension.NotifyBranchChanged(currentBranch);
     }
 
@@ -425,7 +421,7 @@ export class ExtensionManager implements Disposable {
             let pattern: string = path.join(workspace.rootPath, ".git", "config");
             //We want to listen to file creation, change and delete events
             let fsw:FileSystemWatcher = workspace.createFileSystemWatcher(pattern, false, false, false);
-            fsw.onDidCreate((uri) => {
+            fsw.onDidCreate((/*uri*/) => {
                 //When a new local repo is initialized (e.g., git init), re-initialize the extension
                 Logger.LogInfo("config has been created, re-initializing the extension");
                 this.Reinitialize();
@@ -460,7 +456,7 @@ export class ExtensionManager implements Disposable {
                     }
                 }
             });
-            fsw.onDidDelete((uri) => {
+            fsw.onDidDelete((/*uri*/) => {
                 Logger.LogInfo("config has been deleted, re-initializing the extension");
                 this.Reinitialize();
             });

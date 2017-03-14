@@ -52,7 +52,7 @@ export class RepositoryInfoClient {
                 // If validation fails, we return false.
                 collectionName = repositoryInfo.Account;
                 serverUrl = `https://${repositoryInfo.Account}.visualstudio.com/`;
-                let valid: boolean = await this.validateTfvcCollectionUrl(serverUrl, this._handler);
+                let valid: boolean = await this.validateTfvcCollectionUrl(serverUrl);
                 if (!valid) {
                     let error: string = `Unable to validate the Team Services TFVC repository. Collection name: '${collectionName}', Url: '${serverUrl}'`;
                     Logger.LogDebug(error);
@@ -64,7 +64,7 @@ export class RepositoryInfoClient {
                 // A full Team Foundation Server collection url is required for the validate call to succeed.
                 // So we try the url given. If that fails, we assume it is a server Url and the collection is
                 // the defaultCollection. If that assumption fails we return false.
-                if (this.validateTfvcCollectionUrl(serverUrl, this._handler)) {
+                if (this.validateTfvcCollectionUrl(serverUrl)) {
                     let parts: string[] = this.splitTfvcCollectionUrl(serverUrl);
                     serverUrl = parts[0];
                     collectionName = parts[1];
@@ -72,7 +72,7 @@ export class RepositoryInfoClient {
                 } else {
                     Logger.LogDebug(`Unable to validate the TFS TFVC repository. Url: '${serverUrl}'  Attempting with DefaultCollection...`);
                     collectionName = "DefaultCollection";
-                    if (!this.validateTfvcCollectionUrl(url.resolve(serverUrl, collectionName), this._handler)) {
+                    if (!this.validateTfvcCollectionUrl(url.resolve(serverUrl, collectionName))) {
                         Logger.LogDebug(`Unable to validate the TFS TFVC repository with DefaultCollection.`);
                         throw new Error(Strings.UnableToValidateTfvcRepositoryWithDefaultCollection);
                     }
@@ -168,7 +168,7 @@ export class RepositoryInfoClient {
         return coreApiClient.GetTeamProject(remoteUrl, teamProjectName);
     }
 
-    private async validateTfvcCollectionUrl(serverUrl: string, handler: VsoBaseInterfaces.IRequestHandler): Promise<boolean> {
+    private async validateTfvcCollectionUrl(serverUrl: string): Promise<boolean> {
         try {
             let repositoryClient: TeamServicesApi = new TeamServicesApi(serverUrl, [this._handler]);
             await repositoryClient.validateTfvcCollectionUrl();

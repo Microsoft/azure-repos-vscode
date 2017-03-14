@@ -20,10 +20,6 @@ import { ExtensionManager } from "./extensionmanager";
 
 import * as os from "os";
 
-/* tslint:disable:no-unused-variable */
-import Q = require("q");
-/* tslint:enable:no-unused-variable */
-
 export class TeamExtension  {
     private _manager: ExtensionManager;
     private _buildStatusBarItem: StatusBarItem;
@@ -399,7 +395,7 @@ export class TeamExtension  {
         }
     }
 
-    public NotifyBranchChanged(currentBranch: string) : void {
+    public NotifyBranchChanged(/*TODO: currentBranch: string*/) : void {
         this.refreshPollingItems();
     }
 
