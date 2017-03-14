@@ -9,7 +9,6 @@ const path = require("path");
 
 import { GitContext }  from "../../src/contexts/gitcontext";
 import { RepositoryType } from "../../src/contexts/repositorycontext";
-import { SettingsMock } from "./contexthelper";
 
 describe("GitContext", function() {
     let TEST_REPOS_FOLDER: string = "testrepos";
@@ -41,8 +40,7 @@ describe("GitContext", function() {
 
     it("should verify initialize returns true", async function() {
         let gc: GitContext = new GitContext(__dirname);
-        let mock: SettingsMock = new SettingsMock(false, undefined, undefined, 1, "https://xplatalm.visualstudio.com", "L2.VSCodeExtension.RC", undefined);
-        assert.isTrue(await gc.Initialize(mock));
+        assert.isTrue(await gc.Initialize());
     });
 
     it("should verify repository with an empty origin remote", function() {

@@ -8,11 +8,10 @@ import url = require("url");
 import { Utils } from "../helpers/utils";
 import { RepoUtils } from "../helpers/repoutils";
 import { IRepositoryContext, RepositoryType } from "./repositorycontext";
-import { ISettings } from "../helpers/settings";
 
-var pgc = require("parse-git-config");
-var gri = require("git-repo-info");
-var path = require("path");
+import * as pgc from "parse-git-config";
+import * as gri from "git-repo-info";
+import * as path from "path";
 
 //Gets as much information as it can regarding the Git repository without calling the server (vsts/info)
 export class GitContext implements IRepositoryContext {
@@ -100,7 +99,7 @@ export class GitContext implements IRepositoryContext {
     }
 
     //constructor already initializes the GitContext
-    public async Initialize(settings: ISettings): Promise<boolean> {
+    public async Initialize(): Promise<boolean> {
         return true;
     }
 

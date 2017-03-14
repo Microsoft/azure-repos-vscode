@@ -10,7 +10,6 @@ import { TfvcRepository } from "../tfvc/tfvcrepository";
 import { IWorkspace } from "../tfvc/interfaces";
 import { RepoUtils } from "../helpers/repoutils";
 import { Logger } from "../helpers/logger";
-import { ISettings } from "../helpers/settings";
 
 export class TfvcContext implements IRepositoryContext {
     private _tfvcFolder: string;
@@ -28,7 +27,7 @@ export class TfvcContext implements IRepositoryContext {
     }
 
     //Need to call tf.cmd to get TFVC information (and constructors can't be async)
-    public async Initialize(settings: ISettings): Promise<boolean> {
+    public async Initialize(): Promise<boolean> {
         Logger.LogDebug(`Looking for TFVC repository at ${this._tfvcFolder}`);
         this._repo = TfCommandLineRunner.CreateRepository(undefined, this._tfvcFolder);
         this._tfvcWorkspace = await this._repo.FindWorkspace(this._tfvcFolder);
