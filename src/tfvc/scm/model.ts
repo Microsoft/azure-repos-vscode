@@ -58,9 +58,7 @@ export class Model implements Disposable {
         if (this._conflictsGroup.resources.length > 0) {
             result.push(this._conflictsGroup);
         }
-        if (this._includedGroup.resources.length > 0) {
-            result.push(this._includedGroup);
-        }
+        result.push(this._includedGroup);
         result.push(this._excludedGroup);
         return result;
     }
