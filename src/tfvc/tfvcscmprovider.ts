@@ -5,7 +5,8 @@
 "use strict";
 
 import { Logger } from "../helpers/logger";
-import { commands, scm, Uri, Disposable, SCMProvider, SCMResource, SCMResourceGroup, Event, EventEmitter, ProviderResult, workspace } from "vscode";
+import { TfvcCommandNames } from "../helpers/constants";
+import { CancellationToken, commands, scm, Uri, Disposable, SCMProvider, SCMResource, SCMResourceGroup, Event, EventEmitter, ProviderResult, workspace } from "vscode";
 import { CommitHoverProvider } from "./scm/commithoverprovider";
 import { Model } from "./scm/model";
 import { Status } from "./scm/status";
@@ -239,6 +240,11 @@ export class TfvcSCMProvider implements SCMProvider {
         }
 
         return uri.with({ scheme: TfvcSCMProvider.scmScheme });
+    }
+
+    acceptChanges(token: CancellationToken): ProviderResult<void> {
+        console.log("acceptChanges", token);
+        return commands.executeCommand<void>(TfvcCommandNames.Checkin);
     }
 
     dispose(): void {
