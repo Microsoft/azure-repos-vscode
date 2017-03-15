@@ -27,28 +27,7 @@ function errorHandler(err) {
     process.exit(1);
 }
 
-gulp.task('tslint-src', function () {
-    return gulp.src(['./src/**/*.ts'])
-        .pipe(tslint())
-        .pipe(tslint.report('prose', { emitError: true}))
-        .on('error', errorHandler);
-});
-
-gulp.task('tslint-test', function () {
-    return gulp.src(['./test/**/*.ts'])
-        .pipe(tslint())
-        .pipe(tslint.report('prose', { emitError: true}))
-        .on('error', errorHandler);
-});
-
-gulp.task('tslint-test-integration', function () {
-    return gulp.src(['./test-integration/**/*.ts'])
-        .pipe(tslint())
-        .pipe(tslint.report('prose', { emitError: true}))
-        .on('error', errorHandler);
-});
-
-gulp.task('clean', ['tslint-src', 'tslint-test', 'tslint-test-integration'], function (done) {
+gulp.task('clean', function (done) {
     return del(['out/**', '!out', '!out/src/credentialstore/linux', '!out/src/credentialstore/osx', '!out/src/credentialstore/win32'], done);
 });
 
@@ -75,7 +54,14 @@ gulp.task('build', ['copyresources'], function () {
         .pipe(gulp.dest('./out'));
 });
 
-gulp.task('publishbuild', ['build'], function () {
+gulp.task('tslint', ['build'], function () {
+    return gulp.src(['./src/**/*.ts', './test/**/*.ts', './test-integration/**/*.ts'])
+        .pipe(tslint())
+        .pipe(tslint.report('prose', { emitError: true}))
+        .on('error', errorHandler);
+});
+
+gulp.task('publishbuild', ['tslint'], function () {
     gulp.src(['./src/credentialstore/**/*.js'])
         .pipe(gulp.dest('./out/src/credentialstore'));
     gulp.src(['./src/credentialstore/bin/win32/*'])
