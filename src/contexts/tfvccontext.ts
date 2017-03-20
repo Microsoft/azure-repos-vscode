@@ -30,6 +30,9 @@ export class TfvcContext implements IRepositoryContext {
     public async Initialize(): Promise<boolean> {
         Logger.LogDebug(`Looking for TFVC repository at ${this._tfvcFolder}`);
         this._repo = TfCommandLineRunner.CreateRepository(undefined, this._tfvcFolder);
+        //Ensure we have an appropriate ENU version of tf executable
+        //The call will throw if we have tf configured properly but it isn't ENU
+        await this._repo.CheckVersion();
         this._tfvcWorkspace = await this._repo.FindWorkspace(this._tfvcFolder);
         this._tfvcRemoteUrl = this._tfvcWorkspace.server;
         this._isTeamServicesUrl = RepoUtils.IsTeamFoundationServicesRepo(this._tfvcRemoteUrl);

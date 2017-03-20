@@ -81,6 +81,7 @@ export class TfvcErrorCodes {
     public static get MissingArgument(): string { return "MissingArgument"; }
     public static get AuthenticationFailed(): string { return "AuthenticationFailed"; }
     public static get NotATfvcRepository(): string { return "NotATfvcRepository"; }
+    public static get NotAnEnuTfCommandLine(): string { return "NotAnEnuTfCommandLine"; }
     public static get TfvcLocationMissing(): string { return "TfvcLocationMissing"; }
     public static get TfvcNotFound(): string { return "TfvcNotFound"; }
     public static get TfvcMinVersionWarning(): string { return "TfvcMinVersionWarning"; }

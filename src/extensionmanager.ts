@@ -275,6 +275,14 @@ export class ExtensionManager implements Disposable {
                             }
                         }
                     }
+
+                    // Now that everything else is ready, create the SCM provider
+                    if (this._repoContext.Type === RepositoryType.TFVC && !this._scmProvider) {
+                        this._scmProvider = new TfvcSCMProvider(this);
+                        await this._scmProvider.Initialize();
+                    } else {
+                        await this._scmProvider.Reinitialize();
+                    }
                 }).fail((err) => {
                     this.setErrorStatus(Utils.GetMessageForStatusCode(err, err.message), (err.statusCode === 401 ? CommandNames.Signin : undefined), false);
                     //If we can't get a requestHandler, report the error via the feedbackclient
@@ -283,15 +291,6 @@ export class ExtensionManager implements Disposable {
                     Telemetry.SendException(err);
                 });
             }
-
-            // Now that everything else is ready, create the SCM provider
-            if (!this._scmProvider) {
-                this._scmProvider = new TfvcSCMProvider(this);
-                await this._scmProvider.Initialize();
-            } else {
-                await this._scmProvider.Reinitialize();
-            }
-
         } catch (err) {
             Logger.LogError(err.message);
             //For now, don't report these errors via the _feedbackClient
@@ -317,7 +316,8 @@ export class ExtensionManager implements Disposable {
     //Determines which Tfvc errors to display in the status bar ui
     private shouldDisplayTfvcError(errorCode: string): boolean {
         if (TfvcErrorCodes.TfvcMinVersionWarning === errorCode ||
-            TfvcErrorCodes.TfvcNotFound === errorCode) {
+            TfvcErrorCodes.TfvcNotFound === errorCode ||
+            TfvcErrorCodes.NotAnEnuTfCommandLine === errorCode) {
             return true;
         }
         return false;
@@ -383,6 +383,7 @@ export class ExtensionManager implements Disposable {
     private setErrorStatus(message: string, commandOnClick?: string, showRetryMessage?: boolean) {
         this._errorMessage = message;
         if (this._teamServicesStatusBarItem !== undefined) {
+            //TODO: Should the default command be to do nothing?  Or perhaps to display the message?
             this._teamServicesStatusBarItem.command = commandOnClick === undefined ? CommandNames.Reinitialize : commandOnClick;
             this._teamServicesStatusBarItem.text = "Team " + `$(icon octicon-stop)`;
             let message: string = this._errorMessage + (showRetryMessage !== undefined && showRetryMessage === true ? " " + Strings.ClickToRetryConnection : "") ;

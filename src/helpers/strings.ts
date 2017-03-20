@@ -58,6 +58,7 @@ export class Strings {
     static ChooseItemQuickPickPlaceHolder: string = "Choose a file to open it.";
     static NotAGitRepository: string = "The open folder is not a Git repository.  Please check the folder location and try again.";
     static NotATfvcRepository: string = "The open folder is not a TFVC repository.  Please check the folder location and try again.";
+    static NotAnEnuTfCommandLine: string = "It appears you have configured a non-English version of the TF executable.  Please ensure an English version is properly configured.";
     static TokenNotAllScopes: string = "The personal access token provided does not have All Scopes.  All Scopes is required for TFVC support.";
     static TfvcLocationMissingError: string = "The path to the TFVC command line was not found in the user settings. Please set this value (tfvc.location) and try again.";
     static TfMissingError: string = "Unable to find the TF executable at the expected location. Please verify the installation and location of TF. Expected path: ";

@@ -7,6 +7,8 @@
 import { IArgumentProvider, IExecutionResult, ITfvcCommand } from "../interfaces";
 import { ArgumentBuilder } from "./argumentbuilder";
 import { CommandHelper } from "./commandhelper";
+import { TfvcError, TfvcErrorCodes } from "../tfvcerror";
+import { Strings } from "../../helpers/strings";
 
 /**
  * This command calls the command line doing a simple call to get the help for the add command.
@@ -48,7 +50,17 @@ export class GetVersion implements ITfvcCommand<string> {
         const lines: string[] = CommandHelper.SplitIntoLines(executionResult.stdout);
         // Find just the version number and return it. Ex. Microsoft (R) TF - Team Foundation Version Control Tool, Version 14.102.25619.0
         if (lines && lines.length > 0) {
-            let value: string = lines[0].replace(expression, "$2");
+            let value: string = lines[0].replace(expression, "$2");  //Example: 14.111.1.201612142018
+            //Spanish example: "Microsoft (R) TF - Herramienta Control de versiones de Team Foundation, versi�n 14.102.25619.0"
+            let items: string[] = value.split(" ");
+            //Check to see if we got more than the version string; if so, assuming we aren't ENU
+            //Here, we were able to run tf but didn't get a version we can use.
+            if (items.length > 1) {
+                throw new TfvcError({
+                    message: Strings.NotAnEnuTfCommandLine,
+                    tfvcErrorCode: TfvcErrorCodes.NotAnEnuTfCommandLine
+                });
+            }
             return value;
         } else {
             return "";
