@@ -101,6 +101,26 @@ describe("Tfvc-FindWorkspaceCommand", function() {
         assert.equal(workspace.mappings.length, 1);
     });
 
+    it("should verify parse output - German - no 'workspace' and 'collection'", async function() {
+        let localPath: string = "/path/to/workspace";
+        let cmd: FindWorkspace = new FindWorkspace(localPath);
+        let executionResult: IExecutionResult = {
+            exitCode: 0,
+            stdout: "=====================================================================================================================================================\n" +
+                "Arbeitsbereich: DESKTOP-KI56MCL (Jeff Young (TFS))\n" +
+                "Sammlung      : http://java-tfs2015:8081/tfs/defaultcollection\n" +
+                "$/project1: /path",
+            stderr: undefined
+        };
+
+        try {
+            await cmd.ParseOutput(executionResult);
+        } catch (err) {
+            assert.isTrue(err.message.startsWith(Strings.NotAnEnuTfCommandLine));
+            assert.equal(err.tfvcErrorCode, TfvcErrorCodes.NotAnEnuTfCommandLine);
+        }
+    });
+
     it("should verify parse output - not a tf workspace", async function() {
         let localPath: string = "/path/to/workspace";
         let cmd: FindWorkspace = new FindWorkspace(localPath);
@@ -175,6 +195,26 @@ describe("Tfvc-FindWorkspaceCommand", function() {
         assert.equal(workspace.computer, undefined);
         assert.equal(workspace.owner, undefined);
         assert.equal(workspace.mappings.length, 1);
+    });
+
+    it("should verify parse EXE output - German - no 'workspace' and 'collection'", async function() {
+        let localPath: string = "/path/to/workspace";
+        let cmd: FindWorkspace = new FindWorkspace(localPath);
+        let executionResult: IExecutionResult = {
+            exitCode: 0,
+            stdout: "=====================================================================================================================================================\n" +
+                "Arbeitsbereich: DESKTOP-KI56MCL (Jeff Young (TFS))\n" +
+                "Sammlung      : http://java-tfs2015:8081/tfs/defaultcollection\n" +
+                "$/project1: /path",
+            stderr: undefined
+        };
+
+        try {
+            await cmd.ParseExeOutput(executionResult);
+        } catch (err) {
+            assert.isTrue(err.message.startsWith(Strings.NotAnEnuTfCommandLine));
+            assert.equal(err.tfvcErrorCode, TfvcErrorCodes.NotAnEnuTfCommandLine);
+        }
     });
 
     it("should verify parse EXE output - not a tf workspace", async function() {

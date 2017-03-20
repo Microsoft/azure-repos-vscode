@@ -95,6 +95,16 @@ export class FindWorkspace implements ITfvcCommand<IWorkspace> {
                 tfvcErrorCode: TfvcErrorCodes.NotATfvcRepository
              });
         }
+        //If there are mappings but no workspace name, the term 'workspace' couldn't be parsed. According to Bing
+        //translate, other than Klingon, no other supported language translates 'workspace' as 'workspace'.
+        //So if we determine there are mappings but can't get the workspace name, we assume it's a non-ENU
+        //tf executable. One example of this is German.
+        if (mappings.length > 0 && !workspaceName) {
+            throw new TfvcError( {
+                message: Strings.NotAnEnuTfCommandLine,
+                tfvcErrorCode: TfvcErrorCodes.NotAnEnuTfCommandLine
+             });
+        }
 
         const workspace: IWorkspace = {
             name: workspaceName,

@@ -51,11 +51,19 @@ export class GetVersion implements ITfvcCommand<string> {
         // Find just the version number and return it. Ex. Microsoft (R) TF - Team Foundation Version Control Tool, Version 14.102.25619.0
         if (lines && lines.length > 0) {
             let value: string = lines[0].replace(expression, "$2");  //Example: 14.111.1.201612142018
-            //Spanish example: "Microsoft (R) TF - Herramienta Control de versiones de Team Foundation, versi�n 14.102.25619.0"
+            //Spanish tf.exe example: "Microsoft (R) TF - Herramienta Control de versiones de Team Foundation, versi�n 14.102.25619.0"
+                //value = "Microsoft (R) TF - Herramienta Control de versiones de Team Foundation, versi�n 14.102.25619.0"
+            //French  tf.exe example: "Microsoft (R) TF�- Outil Team Foundation Version Control, version�14.102.25619.0"
+                //value = ""
+            //German  tf.exe example: "Microsoft (R) TF - Team Foundation-Versionskontrolltool, Version 14.102.25619.0"
+                //value = "14.102.25619.0"
+            //Check to see if we have either less or more than the version string. Less is the French case (and the like). More is
+            //the Spanish case (and the like). If we do, we assume that we are using a non-ENU tf executable. So if we get here,
+            //we were able to run tf but we might not have gotten the version fron an ENU tf. So even if we did get a version string,
+            //we will still need to check later if this version is from a non-ENU SKU.
             let items: string[] = value.split(" ");
-            //Check to see if we got more than the version string; if so, assuming we aren't ENU
-            //Here, we were able to run tf but didn't get a version we can use.
-            if (items.length > 1) {
+            if (!value || items.length > 1) {
+                //This error is an early-out in the cases of Spanish and French (which translate version).  German will continue normally.
                 throw new TfvcError({
                     message: Strings.NotAnEnuTfCommandLine,
                     tfvcErrorCode: TfvcErrorCodes.NotAnEnuTfCommandLine

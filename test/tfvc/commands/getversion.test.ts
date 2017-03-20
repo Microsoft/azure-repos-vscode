@@ -68,40 +68,6 @@ describe("Tfvc-GetVersionCommand", function() {
         assert.equal(version, "14.0.3.201603291047");
     });
 
-    it("should verify parse output - non-ENU version", async function() {
-        let cmd: GetVersion = new GetVersion();
-        let executionResult: IExecutionResult = {
-            exitCode: 0,
-            stdout: "Microsoft (R) TF - Herramienta Control de versiones de Team Foundation, versi�n 14.102.25619.0",
-            stderr: undefined
-        };
-
-        try {
-            await cmd.ParseOutput(executionResult);
-        } catch (err) {
-            //assert.equal(err.exitCode, 0);
-            //assert.equal(err.tfvcCommand, "add");
-            assert.equal(err.tfvcErrorCode, TfvcErrorCodes.NotAnEnuTfCommandLine);
-            assert.isTrue(err.message.startsWith(Strings.NotAnEnuTfCommandLine));
-        }
-    });
-
-    it("should verify parse EXE output - non-ENU version", async function() {
-        let cmd: GetVersion = new GetVersion();
-        let executionResult: IExecutionResult = {
-            exitCode: 0,
-            stdout: "Microsoft (R) TF - Herramienta Control de versiones de Team Foundation, versi�n 14.102.25619.0",
-            stderr: undefined
-        };
-
-        try {
-            await cmd.ParseExeOutput(executionResult);
-        } catch (err) {
-            assert.equal(err.tfvcErrorCode, TfvcErrorCodes.NotAnEnuTfCommandLine);
-            assert.isTrue(err.message.startsWith(Strings.NotAnEnuTfCommandLine));
-        }
-    });
-
     it("should verify parse EXE output - valid version", async function() {
         let cmd: GetVersion = new GetVersion();
         let executionResult: IExecutionResult = {
@@ -150,4 +116,47 @@ describe("Tfvc-GetVersionCommand", function() {
         }
     });
 
+    it("should verify parse EXE output - Spanish version", async function() {
+        let cmd: GetVersion = new GetVersion();
+        let executionResult: IExecutionResult = {
+            exitCode: 0,
+            stdout: "Microsoft (R) TF - Herramienta Control de versiones de Team Foundation, versi�n 14.102.25619.0",
+            stderr: undefined
+        };
+
+        try {
+            await cmd.ParseExeOutput(executionResult);
+        } catch (err) {
+            assert.equal(err.tfvcErrorCode, TfvcErrorCodes.NotAnEnuTfCommandLine);
+            assert.isTrue(err.message.startsWith(Strings.NotAnEnuTfCommandLine));
+        }
+    });
+
+    it("should verify parse EXE output - French version", async function() {
+        let cmd: GetVersion = new GetVersion();
+        let executionResult: IExecutionResult = {
+            exitCode: 0,
+            stdout: "Microsoft (R) TF�- Outil Team Foundation Version Control, version�14.102.25619.0",
+            stderr: undefined
+        };
+
+        try {
+            await cmd.ParseExeOutput(executionResult);
+        } catch (err) {
+            assert.equal(err.tfvcErrorCode, TfvcErrorCodes.NotAnEnuTfCommandLine);
+            assert.isTrue(err.message.startsWith(Strings.NotAnEnuTfCommandLine));
+        }
+    });
+
+    it("should verify parse EXE output - German version", async function() {
+        let cmd: GetVersion = new GetVersion();
+        let executionResult: IExecutionResult = {
+            exitCode: 0,
+            stdout: "Microsoft (R) TF - Team Foundation-Versionskontrolltool, Version 14.102.25619.0",
+            stderr: undefined
+        };
+
+        let version: string = await cmd.ParseExeOutput(executionResult);
+        assert.equal(version, "14.102.25619.0");
+    });
 });
