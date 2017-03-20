@@ -98,7 +98,7 @@ export class TfCommandLineRunner {
      * This method checks the version of the CLC against the minimum version that we expect.
      * It throws an error if the version does not meet or exceed the minimum.
      */
-    public static CheckVersion(tfvc: ITfCommandLine, version: string) {
+    public static CheckVersion(tfvc: ITfCommandLine, version: string): void {
         if (!version) {
             // If the version isn't set just return
             Logger.LogDebug(`TFVC CheckVersion called without a version.`);
