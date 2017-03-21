@@ -277,11 +277,13 @@ export class ExtensionManager implements Disposable {
                     }
 
                     // Now that everything else is ready, create the SCM provider
-                    if (this._repoContext.Type === RepositoryType.TFVC && !this._scmProvider) {
-                        this._scmProvider = new TfvcSCMProvider(this);
-                        await this._scmProvider.Initialize();
-                    } else {
-                        await this._scmProvider.Reinitialize();
+                    if (this._repoContext.Type === RepositoryType.TFVC) {
+                        if (!this._scmProvider) {
+                            this._scmProvider = new TfvcSCMProvider(this);
+                            await this._scmProvider.Initialize();
+                        } else {
+                            await this._scmProvider.Reinitialize();
+                        }
                     }
                 }).fail((err) => {
                     this.setErrorStatus(Utils.GetMessageForStatusCode(err, err.message), (err.statusCode === 401 ? CommandNames.Signin : undefined), false);
