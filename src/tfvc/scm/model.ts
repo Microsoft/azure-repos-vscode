@@ -4,7 +4,7 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import { Uri, EventEmitter, Event, SCMResourceGroup, Disposable, window } from "vscode";
+import { Uri, EventEmitter, Event, Disposable, window } from "vscode";
 import { Telemetry } from "../../services/telemetry";
 import { TfvcTelemetryEvents } from "../../helpers/constants";
 import { TfvcRepository } from "../tfvcrepository";
@@ -25,8 +25,8 @@ export class Model implements Disposable {
     private _statusAlreadyInProgress: boolean;
     private _explicitlyExcluded: string[] = [];
 
-    private _onDidChange = new EventEmitter<SCMResourceGroup[]>();
-    public get onDidChange(): Event<SCMResourceGroup[]> {
+    private _onDidChange = new EventEmitter<void>();
+    public get onDidChange(): Event<void> {
         return this._onDidChange.event;
     }
 
@@ -102,7 +102,7 @@ export class Model implements Disposable {
     }
 
     //Unexclude doesn't explicitly INclude.  It defers to the status of the individual item.
-    public async Unexclude(path: string): Promise<void>  {
+    public async Unexclude(path: string): Promise<void> {
         if (path) {
             let normalizedPath: string = path.toLowerCase();
             if (_.contains(this._explicitlyExcluded, normalizedPath)) {
@@ -112,7 +112,7 @@ export class Model implements Disposable {
         }
     }
 
-    public async Refresh(): Promise<void>  {
+    public async Refresh(): Promise<void> {
         await this.update();
     }
 
@@ -156,7 +156,7 @@ export class Model implements Disposable {
                 return conflicts.push(resource);
             } else {
                 //If explicitly excluded, that has highest priority
-                if (_.contains(this._explicitlyExcluded, resource.uri.fsPath.toLowerCase())) {
+                if (_.contains(this._explicitlyExcluded, resource.resourceUri.fsPath.toLowerCase())) {
                     return excluded.push(resource);
                 }
                 //Versioned changes should always be included
@@ -177,7 +177,7 @@ export class Model implements Disposable {
         this._includedGroup = new IncludedGroup(included);
         this._excludedGroup = new ExcludedGroup(excluded);
 
-        this._onDidChange.fire(this.Resources);
+        this._onDidChange.fire();
     }
 
     private conflictMatchesPendingChange(change: IPendingChange, conflict: IConflict): boolean {

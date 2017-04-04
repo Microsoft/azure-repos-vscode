@@ -6,14 +6,13 @@
 
 import { Logger } from "../helpers/logger";
 import { TfvcCommandNames } from "../helpers/constants";
-import { CancellationToken, commands, scm, Uri, Disposable, SCMProvider, SCMResource, SCMResourceGroup, Event, EventEmitter, ProviderResult, workspace } from "vscode";
+import { commands, scm, Uri, Disposable, SourceControl, SourceControlResourceGroup, Event, workspace } from "vscode";
 import { CommitHoverProvider } from "./scm/commithoverprovider";
 import { Model } from "./scm/model";
 import { Status } from "./scm/status";
 import { Resource } from "./scm/resource";
-import { ResourceGroup } from "./scm/resourcegroups";
 import { TfvcContext } from "../contexts/tfvccontext";
-import { anyEvent, filterEvent } from "./util";
+import { anyEvent, filterEvent, mapEvent } from "./util";
 import { ExtensionManager } from "../extensionmanager";
 import { RepositoryType } from "../contexts/repositorycontext";
 import { TfvcOutput } from "./tfvcoutput";
@@ -27,7 +26,7 @@ import { ICheckinInfo } from "./interfaces";
  *      F1 -> SCM: Enable SCM Preview
  *      F1 -> SCM: Switch SCM Provider -> Choose TFVC from the pick list
  */
-export class TfvcSCMProvider implements SCMProvider {
+export class TfvcSCMProvider {
     public static scmScheme: string = "tfvc";
     private static instance: TfvcSCMProvider = undefined;
 
@@ -35,6 +34,7 @@ export class TfvcSCMProvider implements SCMProvider {
     private _model: Model;
     private _disposables: Disposable[] = [];
     private _tempDisposables: Disposable[] = [];
+    private _sourceControl: SourceControl;
 
     constructor(extensionManager: ExtensionManager) {
         this._extensionManager = extensionManager;
@@ -113,6 +113,9 @@ export class TfvcSCMProvider implements SCMProvider {
 
     /* Public methods */
 
+    private conflictsGroup: SourceControlResourceGroup;
+    private includedGroup: SourceControlResourceGroup;
+    private excludedGroup: SourceControlResourceGroup;
     public async Initialize(): Promise<void> {
         await TfvcOutput.CreateChannel(this._disposables);
         await this.setup();
@@ -120,7 +123,29 @@ export class TfvcSCMProvider implements SCMProvider {
         // Now that everything is setup, we can register the provider and set up our singleton instance
         // This registration can only happen once
         TfvcSCMProvider.instance = this;
-        this._disposables.push(scm.registerSCMProvider(TfvcSCMProvider.scmScheme, this));
+        this._sourceControl = scm.createSourceControl(TfvcSCMProvider.scmScheme, "TFVC");
+        this._disposables.push(this._sourceControl);
+
+        this.conflictsGroup = this._sourceControl.createResourceGroup(this._model.ConflictsGroup.id, this._model.ConflictsGroup.label);
+        this.includedGroup = this._sourceControl.createResourceGroup(this._model.IncludedGroup.id, this._model.IncludedGroup.label);
+        this.excludedGroup = this._sourceControl.createResourceGroup(this._model.ExcludedGroup.id, this._model.ExcludedGroup.label);
+        this.conflictsGroup.hideWhenEmpty = true;
+
+        //Set the command to run when user accepts changes via Ctrl+Enter in input box.
+        this._sourceControl.acceptInputCommand = { command: TfvcCommandNames.Checkin, title: "Checkin" };
+
+        this._disposables.push(this.conflictsGroup);
+        this._disposables.push(this.includedGroup);
+        this._disposables.push(this.excludedGroup);
+
+        this._model.onDidChange(this.onDidModelChange, this);
+    }
+
+    private onDidModelChange(): void {
+        this.conflictsGroup.resourceStates = this._model.ConflictsGroup.resources;
+        this.includedGroup.resourceStates = this._model.IncludedGroup.resources;
+        this.excludedGroup.resourceStates = this._model.ExcludedGroup.resources;
+        this._sourceControl.count = this.count;
     }
 
     public async Reinitialize(): Promise<void> {
@@ -149,7 +174,7 @@ export class TfvcSCMProvider implements SCMProvider {
         const onTfvcChange = filterEvent(onWorkspaceChange, uri => /^\$tf\//.test(workspace.asRelativePath(uri)));
         this._model = new Model(repoContext.RepoFolder, repoContext.TfvcRepository, onWorkspaceChange);
         // Hook up the model change event to trigger our own event
-        this._model.onDidChange((groups: ResourceGroup[]) => this._onDidChange.fire(groups));
+        this._model.onDidChange(this.onDidModelChange, this);
 
         let version: string = "unknown";
         try {
@@ -194,57 +219,13 @@ export class TfvcSCMProvider implements SCMProvider {
         }
     }
 
-    /* Implement SCMProvider interface */
-
-    private _onDidChange = new EventEmitter<SCMResourceGroup[]>();
-    public get onDidChange(): Event<SCMResourceGroup[]> {
-        return this._onDidChange.event;
+    get onDidChange(): Event<this> {
+        return mapEvent(this._model.onDidChange, () => this);
     }
 
-    public get resources(): SCMResourceGroup[] { return this._model.Resources; }
-    public get label(): string { return "TFVC"; }
     public get count(): number {
         // TODO is this too simple? The Git provider does more
         return this._model.Resources.reduce((r, g) => r + g.resources.length, 0);
-    }
-
-    /**
-     * This is the default action when an resource is clicked in the viewlet.
-     * For ADD, AND UNDELETE just show the local file.
-     * For DELETE just show the server file.
-     * For EDIT AND RENAME show the diff window (server on left, local on right).
-     */
-    open(resource: Resource): ProviderResult<void> {
-        const left: Uri = this.getLeftResource(resource);
-        const right: Uri = this.getRightResource(resource);
-        const title: string = resource.GetTitle();
-
-        if (!left) {
-            if (!right) {
-                // TODO
-                console.error("oh no");
-                return;
-            }
-            return commands.executeCommand<void>("vscode.open", right);
-        }
-        return commands.executeCommand<void>("vscode.diff", left, right, title);
-    }
-
-    drag(resource: Resource, resourceGroup: ResourceGroup): void {
-        console.log("drag", resource, resourceGroup);
-    }
-
-    getOriginalResource(uri: Uri): Uri | undefined {
-        if (uri.scheme !== "file") {
-            return;
-        }
-
-        return uri.with({ scheme: TfvcSCMProvider.scmScheme });
-    }
-
-    acceptChanges(token: CancellationToken): ProviderResult<void> {
-        console.log("acceptChanges", token);
-        return commands.executeCommand<void>(TfvcCommandNames.Checkin);
     }
 
     dispose(): void {
@@ -259,7 +240,7 @@ export class TfvcSCMProvider implements SCMProvider {
     /**
      * Gets the uri for the previous version of the file.
      */
-    private getLeftResource(resource: Resource): Uri {
+    public static  GetLeftResource(resource: Resource): Uri {
         if (resource.HasStatus(Status.CONFLICT) ||
             resource.HasStatus(Status.EDIT) ||
             resource.HasStatus(Status.RENAME)) {
@@ -272,31 +253,13 @@ export class TfvcSCMProvider implements SCMProvider {
     /**
      * Gets the uri for the current version of the file (except for deleted files).
      */
-    private getRightResource(resource: Resource): Uri {
+    public static GetRightResource(resource: Resource): Uri {
         if (resource.HasStatus(Status.DELETE)) {
             return resource.GetServerUri();
         } else {
             // Adding the version spec query, because this eventually gets passed to getOriginalResource
-            return resource.uri.with({ query: `C${resource.PendingChange.version}` });
+            return resource.resourceUri.with({ query: `C${resource.PendingChange.version}` });
         }
-    }
-
-    private static ResolveTfvcURI(uri: Uri): SCMResource | SCMResourceGroup | undefined {
-        if (uri.authority !== TfvcSCMProvider.scmScheme) {
-            return;
-        }
-
-        return scm.getResourceFromURI(uri);
-    }
-
-    public static GetPathFromUri(uri: Uri): string {
-        if (uri) {
-            const resource = TfvcSCMProvider.ResolveTfvcResource(uri);
-            if (resource) {
-                return resource.uri.fsPath;
-            }
-        }
-        return undefined;
     }
 
     private static GetProviderInstance(): TfvcSCMProvider {
@@ -310,20 +273,8 @@ export class TfvcSCMProvider implements SCMProvider {
     }
 
     public static OpenDiff(resource: Resource): Promise<void> {
-        TfvcSCMProvider.GetProviderInstance().open(resource);
+        commands.executeCommand<void>(TfvcCommandNames.Open, resource);
         return;
     }
 
-    public static ResolveTfvcResource(uri: Uri): Resource {
-        if (uri) {
-            const resource = TfvcSCMProvider.ResolveTfvcURI(uri);
-
-            if (!(resource instanceof Resource)) {
-                return undefined;
-            }
-
-            return resource;
-        }
-        return undefined;
-    }
 }

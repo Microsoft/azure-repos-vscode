@@ -7,25 +7,11 @@
 import { assert } from "chai";
 
 import { Strings } from "../../../src/helpers/strings";
-import { ResourceGroup, ConflictsGroup, ExcludedGroup, IncludedGroup } from "../../../src/tfvc/scm/resourcegroups";
+import { ConflictsGroup, ExcludedGroup, IncludedGroup } from "../../../src/tfvc/scm/resourcegroups";
 
 describe("Tfvc-ResourceGroups", function() {
     beforeEach(function() {
         //
-    });
-
-    it("should verify ResourceGroup - constructor", function() {
-        let group = new ResourceGroup("123", "thelabel", []);
-        assert.equal(group.id, "123");
-        assert.equal(group.label, "thelabel");
-        assert.equal(group.resources.length, 0);
-    });
-
-    it("should verify ResourceGroup - with undefined", function() {
-        let group = new ResourceGroup(undefined, undefined, undefined);
-        assert.equal(group.id, undefined);
-        assert.equal(group.label, undefined);
-        assert.equal(group.resources, undefined);
     });
 
     it("should verify ConflictsGroup - constructor", function() {

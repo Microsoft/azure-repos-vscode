@@ -71,6 +71,10 @@
           "when": "false"
         },
         {
+          "command": "tfvc.Open",
+          "when": "false"
+        },
+        {
           "command": "tfvc.OpenFile",
           "when": "false"
         },
@@ -129,7 +133,7 @@
           "when": "scmProvider == tfvc"
         }
       ],
-      "scm/resource/context": [
+      "scm/resourceState/context": [
         {
           "command": "tfvc.OpenDiff",
           "when": "scmProvider == tfvc",
@@ -352,6 +356,11 @@
         }
       },
       {
+        "command": "tfvc.Open",
+        "title": "Open",
+        "category": "TFVC"
+      },
+      {
         "command": "tfvc.OpenDiff",
         "title": "Open Diff",
         "category": "TFVC"
@@ -425,12 +434,12 @@
     "gulp-istanbul": "^1.1.1",
     "gulp-mocha": "^3.0.1",
     "gulp-sourcemaps": "^2.4.0",
-    "gulp-tslint": "^3.2.0",
+    "gulp-tslint": "^7.1.0",
     "gulp-typescript": "^3.1.4",
     "gulp-util": "^3.0.7",
     "mocha-junit-reporter": "^1.12.0",
     "should": "^8.1.1",
-    "tslint": "^2.5.0",
+    "tslint": "^4.0.0",
     "typescript": "^2.1.5",
     "vscode": "^1.0.0",
     "vsts-task-lib": "^0.9.18",
