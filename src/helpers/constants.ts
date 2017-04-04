@@ -44,6 +44,7 @@ export class TfvcCommandNames {
     static ExcludeAll: string = TfvcCommandNames.CommandPrefix + "ExcludeAll";
     static Include: string = TfvcCommandNames.CommandPrefix + "Include";
     static IncludeAll: string = TfvcCommandNames.CommandPrefix + "IncludeAll";
+    static Open: string = TfvcCommandNames.CommandPrefix + "Open";
     static OpenDiff: string = TfvcCommandNames.CommandPrefix + "OpenDiff";
     static OpenFile: string = TfvcCommandNames.CommandPrefix + "OpenFile";
     static Refresh: string = TfvcCommandNames.CommandPrefix + "Refresh";

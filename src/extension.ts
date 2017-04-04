@@ -49,6 +49,10 @@ export async function activate(context: ExtensionContext) {
     context.subscriptions.push(commands.registerCommand(TfvcCommandNames.Include, (...args) => {
             _extensionManager.Tfvc.Include(args ? args[0] : undefined);
         }));
+    //Open is meant only to be used by the Tfvc source control provider
+    context.subscriptions.push(commands.registerCommand(TfvcCommandNames.Open, (...args) => {
+            _extensionManager.Tfvc.Open(args ? args[0] : undefined);
+        }));
     context.subscriptions.push(commands.registerCommand(TfvcCommandNames.OpenDiff, (...args) => {
             _extensionManager.Tfvc.OpenDiff(args ? args[0] : undefined);
         }));
