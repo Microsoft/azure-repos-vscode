@@ -390,7 +390,7 @@ export class TeamExtension  {
     //Sets up the interval to refresh polling items
     private startPolling(): void {
         if (!this._pollingTimer) {
-            this._initialTimer = setTimeout(() => this.refreshPollingItems(), 1000 * 8);
+            this._initialTimer = setTimeout(() => this.refreshPollingItems(), 1000 * 4);
             this._pollingTimer = setInterval(() => this.refreshPollingItems(), 1000 * 60 * this._manager.Settings.PollingInterval);
         }
     }
