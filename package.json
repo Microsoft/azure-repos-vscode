@@ -28,7 +28,7 @@
   "license": "SEE LICENSE IN LICENSE.txt",
   "homepage": "https://github.com/Microsoft/vsts-vscode/blob/master/README.md",
   "engines": {
-    "vscode": "^1.7.0"
+    "vscode": "^1.11.0"
   },
   "enableProposedApi": false,
   "activationEvents": [
