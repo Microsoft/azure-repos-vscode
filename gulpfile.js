@@ -56,8 +56,8 @@ gulp.task('build', ['copyresources'], function () {
 
 gulp.task('tslint', ['build'], function () {
     return gulp.src(['./src/**/*.ts', './test/**/*.ts', './test-integration/**/*.ts'])
-        .pipe(tslint())
-        .pipe(tslint.report('prose', { emitError: true}))
+        .pipe(tslint({ configuration: "tslint.json", formatter: "verbose" }))
+        .pipe(tslint.report({ emitError: true, summarizeFailureOutput: true }))
         .on('error', errorHandler);
 });
 

@@ -34,14 +34,18 @@ export class BuildService {
 
     //Returns the most recent 100 completed builds
     public async GetBuilds(teamProject: string): Promise<Build[]> {
+        /* tslint:disable:no-null-keyword */
         return await this._buildApi.getBuilds(teamProject, null, null, null, null, null, null, null, BuildStatus.Completed, null, null, null,
                                               100, null, 1, QueryDeletedOption.ExcludeDeleted, BuildQueryOrder.FinishTimeDescending);
+        /* tslint:enable:no-null-keyword */
     }
 
     //Returns the "latest" build for this definition
     public async GetBuildsByDefinitionId(teamProject: string, definitionId: number): Promise<Build[]> {
+        /* tslint:disable:no-null-keyword */
         return await this._buildApi.getBuilds(teamProject, [ definitionId ], null, null, null, null, null, null, null, null, null, null,
                                               1, null, 1, QueryDeletedOption.ExcludeDeleted, BuildQueryOrder.FinishTimeDescending);
+        /* tslint:enable:no-null-keyword */
     }
 
     //Construct the url to the individual build definition (completed view)

@@ -49,7 +49,7 @@ export class RepositoryInfo {
         }
 
         let purl = url.parse(repositoryUrl);
-        if (purl != null) {
+        if (purl) {
             this._host = purl.host;
             this._hostName = purl.hostname;
             this._path = purl.path;

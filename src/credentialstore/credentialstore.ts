@@ -15,7 +15,7 @@ import { Credential } from "./credential";
 
 /**
  * Implements a credential storage for Windows, Mac (darwin), or Linux.
- * 
+ *
  * Allows a single credential to be stored per service (that is, one username per service);
  */
 export class CredentialStore implements ICredentialStore {

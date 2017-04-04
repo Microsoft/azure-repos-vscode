@@ -12,7 +12,7 @@ import { CommandHelper } from "./commandhelper";
 
 /**
  * This command finds conflicts existing in the workspace by calling tf resolve -preview
- * 
+ *
  * tf resolve [itemspec]
  * [/auto:(AutoMerge|TakeTheirs|KeepYours|OverwriteLocal|DeleteConflict|KeepYoursRenameTheirs)]
  * [/preview] [(/overridetype:overridetype | /converttotype:converttype] [/recursive] [/newname:path] [/noprompt] [/login:username, [password]]

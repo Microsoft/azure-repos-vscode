@@ -45,7 +45,7 @@ export class RepositoryContextFactory {
 
     /**
      * This method allows the ExtensionManager the ability to update the repository context it obtained with the server context information
-     * it has. This provides one source for TFVC classes like Tfvc and Repository. 
+     * it has. This provides one source for TFVC classes like Tfvc and Repository.
      * This method doesn't do anything for other types of repository contexts.
      */
     public static UpdateRepositoryContext(currentRepo: IRepositoryContext, serverContext: TeamServerContext): IRepositoryContext {

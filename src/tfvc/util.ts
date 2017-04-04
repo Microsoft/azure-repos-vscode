@@ -3,6 +3,7 @@
 *  Licensed under the MIT License. See License.txt in the project root for license information.
 *--------------------------------------------------------------------------------------------*/
 "use strict";
+/* tslint:disable:no-null-keyword */
 
 import { Event } from "vscode";
 
@@ -60,3 +61,4 @@ export function once<T>(event: Event<T>): Event<T> {
 export function eventToPromise<T>(event: Event<T>): Promise<T> {
     return new Promise(c => once(event)(c));
 }
+/* tslint:enable:no-null-keyword */

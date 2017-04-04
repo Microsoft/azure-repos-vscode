@@ -45,7 +45,7 @@ export class GetFileContent implements ITfvcCommand<string> {
     }
 
     public async ParseOutput(executionResult: IExecutionResult): Promise<string> {
-        // Check for "The specified file does not exist at the specified version" (or "No file matches" in case of the EXE) 
+        // Check for "The specified file does not exist at the specified version" (or "No file matches" in case of the EXE)
         // and write out empty string
         if (this._ignoreFileNotFound &&
             (CommandHelper.HasError(executionResult, "The specified file does not exist at the specified version") ||

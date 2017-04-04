@@ -54,7 +54,7 @@ export class ArgumentBuilder implements IArgumentProvider {
     }
 
     public AddSwitch(switchName: string): ArgumentBuilder {
-        return this.AddSwitchWithValue(switchName, null, false);
+        return this.AddSwitchWithValue(switchName, undefined, false);
     }
 
     public AddSwitchWithValue(switchName: string, switchValue: string, isSecret: boolean): ArgumentBuilder {

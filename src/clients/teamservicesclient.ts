@@ -15,7 +15,9 @@ export class TeamServicesApi extends basem.ClientApiBase {
     public async getVstsInfo(): Promise<any> {
         //Create an instance of Promise since we're calling a function with the callback pattern but want to return a Promise
         let promise: Promise<any> = new Promise<any>((resolve, reject) => {
+            /* tslint:disable:no-null-keyword */
             this.restClient.getJson(this.vsoClient.resolveUrl("/vsts/info"), "", null, null, function(err: any, statusCode: number, obj: any) {
+            /* tslint:enable:no-null-keyword */
                 if (err) {
                     err.statusCode = statusCode;
                     reject(err);
@@ -31,7 +33,9 @@ export class TeamServicesApi extends basem.ClientApiBase {
     public async validateTfvcCollectionUrl(): Promise<any> {
         //Create an instance of Promise since we're calling a function with the callback pattern but want to return a Promise
         let promise: Promise<any> = new Promise<any>((resolve, reject) => {
+            /* tslint:disable:no-null-keyword */
             this.restClient.getJson(this.vsoClient.resolveUrl("_apis/tfvc/branches"), "", null, null, function(err: any, statusCode: number, obj: any) {
+            /* tslint:enable:no-null-keyword */
                 if (err) {
                     err.statusCode = statusCode;
                     reject(err);

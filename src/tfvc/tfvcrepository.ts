@@ -26,7 +26,7 @@ import { Undo } from "./commands/undo";
 import * as _ from "underscore";
 
 /**
- * The Repository class allows you to perform TFVC commands on the workspace represented 
+ * The Repository class allows you to perform TFVC commands on the workspace represented
  * by the repositoryRootFolder.
  */
 export class TfvcRepository {

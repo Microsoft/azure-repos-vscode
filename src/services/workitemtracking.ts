@@ -23,7 +23,9 @@ export class WorkItemTrackingService {
     //Returns a Promise containing the WorkItem that was created
     public async CreateWorkItem(context: TeamServerContext, itemType: string, taskTitle: string): Promise<WorkItem> {
         let newWorkItem = [{ op: "add", path: "/fields/" + WorkItemFields.Title, value: taskTitle }];
+        /* tslint:disable:no-null-keyword */
         return await this._witApi.createWorkItem(null, newWorkItem, context.RepoInfo.TeamProject, itemType, false, false);
+        /* tslint:enable:no-null-keyword */
     }
 
     //Returns a Promise containing an array of SimpleWorkItems based on the passed in wiql
@@ -100,10 +102,13 @@ export class WorkItemTrackingService {
             workItemIds = workItemIds.slice(0, WorkItemTrackingService.MaxResults);
         }
 
+        /* tslint:disable:no-null-keyword */
         let workItems: WorkItem[] = await this._witApi.getWorkItems(workItemIds,
                                                                     [WorkItemFields.Id, WorkItemFields.Title, WorkItemFields.WorkItemType],
                                                                     null,
                                                                     WorkItemExpand.None);
+        /* tslint:enable:no-null-keyword */
+
         //Keep original sort order that wiql specified
         for (let index = 0; index < workItemIds.length; index++) {
             let item: WorkItem = workItems.find(i => i.id === workItemIds[index]);

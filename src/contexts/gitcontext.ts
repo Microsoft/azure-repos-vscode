@@ -68,7 +68,7 @@ export class GitContext implements IRepositoryContext {
                 //All Team Services and TFS Git remote urls contain /_git/
                 if (RepoUtils.IsTeamFoundationGitRepo(this._gitOriginalRemoteUrl)) {
                     let purl = url.parse(this._gitOriginalRemoteUrl);
-                    if (purl != null) {
+                    if (purl) {
                         if (RepoUtils.IsTeamFoundationServicesRepo(this._gitOriginalRemoteUrl)) {
                             this._isTeamServicesUrl = true;
                             let splitHref = purl.href.split("@");

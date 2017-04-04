@@ -12,7 +12,7 @@ import { CommandHelper } from "./commandhelper";
 /**
  * This command gets the latest version of one or more files or folders
  * (we add the switch nosummary to make sure that errors only print once)
- * 
+ *
  * tf get [itemspec] [/version:versionspec] [/all] [/overwrite] [/force] [/remap]
  * [/recursive] [/preview] [/noautoresolve] [/noprompt]
  * [/login:username,[password]]
@@ -50,14 +50,14 @@ export class Sync implements ITfvcCommand<ISyncResults> {
      * D:\tmp\test:
      * Getting addFold
      * Getting addFold-branch
-     * 
+     *
      * D:\tmp\test\addFold-branch:
      * Getting testHereRename.txt
-     * 
+     *
      * D:\tmp\test\addFold:
      * Getting testHere3
      * Getting testHereRename7.txt
-     * 
+     *
      * D:\tmp\test:
      * Getting Rename2.txt
      * Getting test3.txt

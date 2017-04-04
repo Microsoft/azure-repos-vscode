@@ -14,7 +14,7 @@ export abstract class BaseSettings {
         let value = configuration.get<T>(name, undefined);
 
         // If user specified a value, use it
-        if (value !== undefined && value !== null) {
+        if (value) {
             return value;
         }
         return defaultValue;
@@ -42,7 +42,7 @@ export class PinnedQuerySettings extends BaseSettings {
         if (pinnedQueries !== undefined) {
             Logger.LogDebug("Found pinned queries in user configuration settings.");
             let global: IPinnedQuery = undefined;
-            for (var index = 0; index < pinnedQueries.length; index++) {
+            for (let index: number = 0; index < pinnedQueries.length; index++) {
                 let element = pinnedQueries[index];
                 if (element.account === account ||
                     element.account === account + ".visualstudio.com") {
@@ -80,7 +80,7 @@ export class AccountSettings extends BaseSettings {
         if (tokens !== undefined) {
             Logger.LogDebug("Found access tokens in user configuration settings.");
             let global: string = undefined;
-            for (var index = 0; index < tokens.length; index++) {
+            for (let index: number = 0; index < tokens.length; index++) {
                 let element: any = tokens[index];
                 if (element.account === account ||
                     element.account === account + ".visualstudio.com") {
