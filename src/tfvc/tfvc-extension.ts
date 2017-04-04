@@ -51,23 +51,22 @@ export class TfvcExtension  {
             "Checkin");
     }
 
-    public async Exclude(uri?: Uri): Promise<void> {
+    public async Exclude(resource?: Resource): Promise<void> {
         this.displayErrors(
             async () => {
-                if (uri) {
+                if (resource) {
                     //Keep an in-memory list of items that were explicitly excluded. The list is not persisted at this time.
-                    await TfvcSCMProvider.Exclude(TfvcSCMProvider.GetPathFromUri(uri));
+                    await TfvcSCMProvider.Exclude(resource.resourceUri.fsPath);
                 }
             },
             "Exclude");
     }
 
-    public async Include(uri?: Uri): Promise<void> {
+    public async Include(resource?: Resource): Promise<void> {
         this.displayErrors(
             async () => {
-                if (uri) {
-                    let resource: Resource = TfvcSCMProvider.ResolveTfvcResource(uri);
-                    let path: string = TfvcSCMProvider.GetPathFromUri(uri);
+                if (resource) {
+                    let path: string = resource.resourceUri.fsPath;
 
                     //At this point, an unversioned file could be a candidate file, so call Add.  Once it is added, it should be a Pending change.
                     if (!resource.IsVersioned) {
@@ -84,22 +83,49 @@ export class TfvcExtension  {
             "Include");
     }
 
-    public async OpenDiff(uri?: Uri): Promise<void> {
+    /**
+     * This is the default action when an resource is clicked in the viewlet.
+     * For ADD, AND UNDELETE just show the local file.
+     * For DELETE just show the server file.
+     * For EDIT AND RENAME show the diff window (server on left, local on right).
+     */
+    public async Open(resource?: Resource): Promise<void> {
         this.displayErrors(
             async () => {
-                if (uri) {
-                    let resource: Resource = TfvcSCMProvider.ResolveTfvcResource(uri);
+                if (resource) {
+                    const left: Uri = TfvcSCMProvider.GetLeftResource(resource);
+                    const right: Uri = TfvcSCMProvider.GetRightResource(resource);
+                    const title: string = resource.GetTitle();
+
+                    if (!left) {
+                        if (!right) {
+                            // TODO
+                            console.error("oh no");
+                            return;
+                        }
+                        return commands.executeCommand<void>("vscode.open", right);
+                    }
+                    return commands.executeCommand<void>("vscode.diff", left, right, title);
+                }
+            },
+            "Open");
+    }
+
+    public async OpenDiff(resource?: Resource): Promise<void> {
+        this.displayErrors(
+            async () => {
+                if (resource) {
                     TfvcSCMProvider.OpenDiff(resource);
                 }
             },
             "OpenDiff");
     }
 
-    public async OpenFile(uri?: Uri): Promise<void> {
+    public async OpenFile(resource?: Resource): Promise<void> {
         this.displayErrors(
             async () => {
-                if (uri) {
-                    let path: string = TfvcSCMProvider.GetPathFromUri(uri);
+                if (resource) {
+                    let path: string = resource.resourceUri.fsPath;
                     await window.showTextDocument(await workspace.openTextDocument(path));
                 }
             },
@@ -115,7 +141,7 @@ export class TfvcExtension  {
     }
 
     /**
-     * This command runs a rename command on the selected file.
+     * This command runs a rename command on the selected file.  It gets a Uri object from vscode.
      */
     public async Rename(uri?: Uri): Promise<void> {
         this.displayErrors(
@@ -146,11 +172,11 @@ export class TfvcExtension  {
             "Rename");
     }
 
-    public async Resolve(uri: Uri, autoResolveType: AutoResolveType): Promise<void> {
+    public async Resolve(resource: Resource, autoResolveType: AutoResolveType): Promise<void> {
         this.displayErrors(
             async () => {
-                if (uri) {
-                    let localPath: string = TfvcSCMProvider.GetPathFromUri(uri);
+                if (resource) {
+                    let localPath: string = resource.resourceUri.fsPath;
                     const resolveTypeString: string = UIHelper.GetDisplayTextForAutoResolveType(autoResolveType);
                     const basename: string = path.basename(localPath);
                     const message: string = `Are you sure you want to resolve changes in ${basename} as ${resolveTypeString}?`;
@@ -170,8 +196,8 @@ export class TfvcExtension  {
     }
 
     /**
-     * This command runs a status command on the VSCode workspace folder and 
-     * displays the results to the user. Selecting one of the files in the list will 
+     * This command runs a status command on the VSCode workspace folder and
+     * displays the results to the user. Selecting one of the files in the list will
      * open the file in the editor.
      */
     public async Status(): Promise<void> {
@@ -187,7 +213,7 @@ export class TfvcExtension  {
     }
 
     /**
-     * This command runs a 'tf get' command on the VSCode workspace folder and 
+     * This command runs a 'tf get' command on the VSCode workspace folder and
      * displays the results to the user.
      */
     public async Sync(): Promise<void> {
@@ -201,21 +227,23 @@ export class TfvcExtension  {
     }
 
     /**
-     * This command runs an undo command on the currently open file in the VSCode workspace folder and 
-     * editor.  If the undo command applies to the file, the pending changes will be undone.  The 
+     * This command runs an undo command on the currently open file in the VSCode workspace folder and
+     * editor.  If the undo command applies to the file, the pending changes will be undone.  The
      * file system watcher will update the UI soon thereafter.  No results are displayed to the user.
      */
-    public async Undo(uri?: Uri): Promise<void> {
+    public async Undo(resource?: Resource): Promise<void> {
         this.displayErrors(
             async () => {
-                //When calling from UI, we have the uri of the resource from which the command was invoked
-                let pathToUndo: string = TfvcSCMProvider.GetPathFromUri(uri);
-                if (pathToUndo) {
-                    const basename: string = path.basename(pathToUndo);
-                    const message: string = `Are you sure you want to undo changes to ${basename}?`;
-                    if (await UIHelper.PromptForConfirmation(message, Strings.UndoChanges)) {
-                        //We decided not to send telemetry on file operations
-                        await this._repo.Undo([pathToUndo]);
+                if (resource) {
+                    //When calling from UI, we have the uri of the resource from which the command was invoked
+                    let pathToUndo: string = resource.resourceUri.fsPath;
+                    if (pathToUndo) {
+                        const basename: string = path.basename(pathToUndo);
+                        const message: string = `Are you sure you want to undo changes to ${basename}?`;
+                        if (await UIHelper.PromptForConfirmation(message, Strings.UndoChanges)) {
+                            //We decided not to send telemetry on file operations
+                            await this._repo.Undo([pathToUndo]);
+                        }
                     }
                 }
             },
