@@ -4,6 +4,7 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
+import * as os from "os";
 import { BaseSettings } from "../helpers/settings";
 
 export class TfvcSettings extends BaseSettings {
@@ -14,6 +15,11 @@ export class TfvcSettings extends BaseSettings {
         super();
 
         this._location = this.readSetting<string>(SettingNames.Location, undefined);
+        // Support replacing leading ~/ on macOS and linux
+        if (this._location && this._location.startsWith("~") &&
+            (os.platform() === "darwin" || os.platform() === "linux")) {
+            this._location = this._location.replace(/^~(\/)/, `${os.homedir()}$1`);
+        }
         this._proxy = this.readSetting<string>(SettingNames.Proxy, undefined);
     }
 
