@@ -44,7 +44,8 @@ export class TfvcContentProvider {
         }
 
         // If path is a server path, we need to fix the format
-        if (path && path.startsWith("\\$\\")) {
+        // First option is Windows, second is Mac
+        if (path && (path.startsWith("\\$\\") || path.startsWith("/$/"))) {
             // convert "/$/proj/folder/file" to "$/proj/folder/file";
             path = uri.path.slice(1);
         }
