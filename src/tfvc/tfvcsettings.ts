@@ -16,7 +16,7 @@ export class TfvcSettings extends BaseSettings {
 
         this._location = this.readSetting<string>(SettingNames.Location, undefined);
         // Support replacing leading ~/ on macOS and linux
-        if (this._location && this._location.startsWith("~") &&
+        if (this._location && this._location.startsWith("~/") &&
             (os.platform() === "darwin" || os.platform() === "linux")) {
             this._location = this._location.replace(/^~(\/)/, `${os.homedir()}$1`);
         }
