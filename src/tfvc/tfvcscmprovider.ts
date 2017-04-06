@@ -172,7 +172,7 @@ export class TfvcSCMProvider {
         const onTfvcChange = filterEvent(onWorkspaceChange, uri => /^\$tf\//.test(workspace.asRelativePath(uri)));
         this._model = new Model(repoContext.RepoFolder, repoContext.TfvcRepository, onWorkspaceChange);
         // Hook up the model change event to trigger our own event
-        this._model.onDidChange(this.onDidModelChange, this);
+        this._disposables.push(this._model.onDidChange(this.onDidModelChange, this));
 
         let version: string = "unknown";
         try {
