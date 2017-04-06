@@ -39,6 +39,9 @@ export class Model implements Disposable {
         this._repository = repository;
         //filterEvent should return false if an event is to be filtered
         const onNonGitChange = filterEvent(onWorkspaceChange, (uri) => {
+            if (!uri || !uri.fsPath) {
+                return false;
+            }
             // Ignore files that aren't under this._repositoryRoot (e.g., settings.json)
             const isSubFolder: boolean = uri.fsPath.normalize().startsWith(path.normalize(this._repositoryRoot));
             // Ignore workspace changes that take place in the .tf or $tf folder (where path contains /.tf/ or \$tf\)
