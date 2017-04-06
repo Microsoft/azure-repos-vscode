@@ -14,7 +14,6 @@ import { CommandHelper } from "./commandhelper";
  * It returns a list of all files undone.
  * undo [/recursive] <itemSpec>...
  */
-//TODO: Add an Undo All?
 export class Undo implements ITfvcCommand<string[]> {
     private _serverContext: TeamServerContext;
     private _itemPaths: string[];
@@ -26,6 +25,12 @@ export class Undo implements ITfvcCommand<string[]> {
     }
 
     public GetArguments(): IArgumentProvider {
+        // If exactly 1 and it is our wildcard, undo all
+        if (this._itemPaths.length === 1 && this._itemPaths[0] === "*") {
+            return new ArgumentBuilder("undo", this._serverContext)
+                .Add(".")
+                .AddSwitch("recursive");
+        }
         return new ArgumentBuilder("undo", this._serverContext)
             .AddAll(this._itemPaths);
     }

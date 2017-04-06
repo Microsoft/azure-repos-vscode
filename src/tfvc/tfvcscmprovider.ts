@@ -93,10 +93,10 @@ export class TfvcSCMProvider {
         return ids;
     }
 
-    public static async Exclude(path: string): Promise<void> {
+    public static async Exclude(paths: string[]): Promise<void> {
         const tfvcProvider: TfvcSCMProvider = TfvcSCMProvider.GetProviderInstance();
 
-        await tfvcProvider._model.Exclude(path);
+        await tfvcProvider._model.Exclude(paths);
     };
 
     public static async Refresh(): Promise<void> {
@@ -105,10 +105,10 @@ export class TfvcSCMProvider {
         await tfvcProvider._model.Refresh();
     };
 
-    public static async Unexclude(path: string): Promise<void> {
+    public static async Unexclude(paths: string[]): Promise<void> {
         const tfvcProvider: TfvcSCMProvider = TfvcSCMProvider.GetProviderInstance();
 
-        await tfvcProvider._model.Unexclude(path);
+        await tfvcProvider._model.Unexclude(paths);
     };
 
     /* Public methods */

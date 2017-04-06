@@ -90,25 +90,29 @@ export class Model implements Disposable {
         });
     }
 
-    //Add the item to the explicitly excluded list.
-    public async Exclude(path: string): Promise<void> {
-        if (path) {
-            let normalizedPath: string = path.toLowerCase();
-            if (!_.contains(this._explicitlyExcluded, normalizedPath)) {
-                this._explicitlyExcluded.push(normalizedPath);
-                await this.update();
-            }
+    //Add the items to the explicitly excluded list.
+    public async Exclude(paths: string[]): Promise<void> {
+        if (paths && paths.length > 0) {
+            paths.forEach(path => {
+                let normalizedPath: string = path.toLowerCase();
+                if (!_.contains(this._explicitlyExcluded, normalizedPath)) {
+                    this._explicitlyExcluded.push(normalizedPath);
+                }
+            });
+            await this.update();
         }
     }
 
     //Unexclude doesn't explicitly INclude.  It defers to the status of the individual item.
-    public async Unexclude(path: string): Promise<void> {
-        if (path) {
-            let normalizedPath: string = path.toLowerCase();
-            if (_.contains(this._explicitlyExcluded, normalizedPath)) {
-                this._explicitlyExcluded = _.without(this._explicitlyExcluded, normalizedPath);
-                await this.update();
-            }
+    public async Unexclude(paths: string[]): Promise<void> {
+        if (paths && paths.length > 0) {
+            paths.forEach(path => {
+                let normalizedPath: string = path.toLowerCase();
+                if (_.contains(this._explicitlyExcluded, normalizedPath)) {
+                    this._explicitlyExcluded = _.without(this._explicitlyExcluded, normalizedPath);
+                }
+            });
+            await this.update();
         }
     }
 

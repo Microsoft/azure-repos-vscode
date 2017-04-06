@@ -119,13 +119,18 @@
           "when": "scmProvider == tfvc"
         },
         {
+          "command" : "team.AssociateWorkItems",
+          "group": "3_commit@1"
+        },
+        {
           "command" : "tfvc.Checkin",
-          "group": "3_commit@1",
+          "group": "3_commit@2",
           "when": "scmProvider == tfvc"
         },
         {
-            "command" : "team.AssociateWorkItems",
-            "group": "3_commit@2"
+          "command" : "tfvc.UndoAll",
+          "group": "3_commit@3",
+          "when": "scmProvider == tfvc"
         },
         {
           "command" : "tfvc.ShowOutput",
@@ -420,6 +425,11 @@
           "light": "resources/icons/light/clean.svg",
           "dark": "resources/icons/dark/clean.svg"
         }
+      },
+      {
+        "command": "tfvc.UndoAll",
+        "title": "Undo All",
+        "category": "TFVC"
       }
     ]
   },

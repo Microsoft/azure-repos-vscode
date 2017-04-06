@@ -51,33 +51,46 @@ export class TfvcExtension  {
             "Checkin");
     }
 
-    public async Exclude(resource?: Resource): Promise<void> {
+    public async Exclude(resources?: Resource[]): Promise<void> {
         this.displayErrors(
             async () => {
-                if (resource) {
+                if (resources) {
                     //Keep an in-memory list of items that were explicitly excluded. The list is not persisted at this time.
-                    await TfvcSCMProvider.Exclude(resource.resourceUri.fsPath);
+                    let paths: string[] = [];
+                    resources.forEach(resource => {
+                        paths.push(resource.resourceUri.fsPath);
+                    });
+                    await TfvcSCMProvider.Exclude(paths);
                 }
             },
             "Exclude");
     }
 
-    public async Include(resource?: Resource): Promise<void> {
+    public async Include(resources?: Resource[]): Promise<void> {
         this.displayErrors(
             async () => {
-                if (resource) {
-                    let path: string = resource.resourceUri.fsPath;
+                if (resources) {
+                    let pathsToUnexclude: string[] = [];
+                    let pathsToAdd: string[] = [];
+                    resources.forEach(resource => {
+                        let path: string = resource.resourceUri.fsPath;
+                        //Unexclude each file passed in
+                        pathsToUnexclude.push(path);
+                        //At this point, an unversioned file could be a candidate file, so call Add.
+                        //Once it is added, it should be a Pending change.
+                        if (!resource.IsVersioned) {
+                            pathsToAdd.push(path);
+                        }
+                    });
 
-                    //At this point, an unversioned file could be a candidate file, so call Add.  Once it is added, it should be a Pending change.
-                    if (!resource.IsVersioned) {
-                        //We decided not to send telemetry on file operations
-                        await this._repo.Add([path]);
-                        //Don't return after adding, we may still need to unexclude it (it may have been excluded previously)
+                    //If we need to add files, run a single Add with those files
+                    if (pathsToAdd.length > 0) {
+                        await this._repo.Add(pathsToAdd);
                     }
 
                     //Otherwise, ensure its not in the explicitly excluded list (if it's already there)
                     //Unexclude doesn't explicitly INclude.  It defers to the status of the individual item.
-                    await TfvcSCMProvider.Unexclude(path);
+                    await TfvcSCMProvider.Unexclude(pathsToUnexclude);
                 }
             },
             "Include");
@@ -231,23 +244,46 @@ export class TfvcExtension  {
      * editor.  If the undo command applies to the file, the pending changes will be undone.  The
      * file system watcher will update the UI soon thereafter.  No results are displayed to the user.
      */
-    public async Undo(resource?: Resource): Promise<void> {
+    public async Undo(resources?: Resource[]): Promise<void> {
         this.displayErrors(
             async () => {
-                if (resource) {
+                if (resources) {
+                    let pathsToUndo: string[] = [];
+                    resources.forEach(resource => {
+                        pathsToUndo.push(resource.resourceUri.fsPath);
+                    });
                     //When calling from UI, we have the uri of the resource from which the command was invoked
-                    let pathToUndo: string = resource.resourceUri.fsPath;
-                    if (pathToUndo) {
-                        const basename: string = path.basename(pathToUndo);
-                        const message: string = `Are you sure you want to undo changes to ${basename}?`;
+                    if (pathsToUndo.length > 0) {
+                        const basename: string = path.basename(pathsToUndo[0]);
+                        let message: string = `Are you sure you want to undo changes to ${basename}?`;
+                        if (pathsToUndo.length > 1) {
+                            message = `Are you sure you want to undo changes to ${pathsToUndo.length.toString()} files?`;
+                        }
                         if (await UIHelper.PromptForConfirmation(message, Strings.UndoChanges)) {
                             //We decided not to send telemetry on file operations
-                            await this._repo.Undo([pathToUndo]);
+                            await this._repo.Undo(pathsToUndo);
                         }
                     }
                 }
             },
             "Undo");
+    }
+
+    /**
+     * This command runs an undo command on all of the currently open files in the VSCode workspace folder
+     * If the undo command applies to the file, the pending changes will be undone.  The
+     * file system watcher will update the UI soon thereafter.  No results are displayed to the user.
+     */
+    public async UndoAll(): Promise<void> {
+        this.displayErrors(
+            async () => {
+                let message: string = `Are you sure you want to undo all changes?`;
+                if (await UIHelper.PromptForConfirmation(message, Strings.UndoChanges)) {
+                    //We decided not to send telemetry on file operations
+                    await this._repo.Undo(["*"]);
+                }
+            },
+            "UndoAll");
     }
 
     /**

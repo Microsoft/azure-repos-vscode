@@ -40,16 +40,19 @@ export async function activate(context: ExtensionContext) {
 
     // TFVC Commands
     context.subscriptions.push(commands.registerCommand(TfvcCommandNames.Status, () => _extensionManager.Tfvc.Status()));
+    context.subscriptions.push(commands.registerCommand(TfvcCommandNames.UndoAll, () => {
+            _extensionManager.Tfvc.UndoAll();
+        }));
     context.subscriptions.push(commands.registerCommand(TfvcCommandNames.Undo, (...args) => {
-            _extensionManager.Tfvc.Undo(args ? args[0] : undefined);
+            _extensionManager.Tfvc.Undo(args);
         }));
     context.subscriptions.push(commands.registerCommand(TfvcCommandNames.Exclude, (...args) => {
-            _extensionManager.Tfvc.Exclude(args ? args[0] : undefined);
+            _extensionManager.Tfvc.Exclude(args);
         }));
     context.subscriptions.push(commands.registerCommand(TfvcCommandNames.Include, (...args) => {
-            _extensionManager.Tfvc.Include(args ? args[0] : undefined);
+            _extensionManager.Tfvc.Include(args);
         }));
-    //Open is meant only to be used by the Tfvc source control provider
+    //Open is meant only to be used by the Tfvc source control provider when a user selects an item in the viewlet (restrict to one file)
     context.subscriptions.push(commands.registerCommand(TfvcCommandNames.Open, (...args) => {
             _extensionManager.Tfvc.Open(args ? args[0] : undefined);
         }));

@@ -89,6 +89,20 @@ describe("Tfvc-UndoCommand", function() {
         assert.equal(cmd.GetArguments().GetArgumentsForDisplay(), "undo -noprompt -collection:" + collectionUrl + " ******** " + localPaths[0]);
     });
 
+    it("should verify UndoAll arguments", function() {
+        let localPaths: string[] = ["*"];
+        let cmd: Undo = new Undo(undefined, localPaths);
+
+        assert.equal(cmd.GetArguments().GetArgumentsForDisplay(), "undo -noprompt . -recursive");
+    });
+
+    it("should verify UndoAll arguments with context", function() {
+        let localPaths: string[] = ["*"];
+        let cmd: Undo = new Undo(context, localPaths);
+
+        assert.equal(cmd.GetArguments().GetArgumentsForDisplay(), "undo -noprompt -collection:" + collectionUrl + " ******** . -recursive");
+    });
+
     it("should verify GetExeArguments", function() {
         let localPaths: string[] = ["/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/README.md"];
         let cmd: Undo = new Undo(undefined, localPaths);
@@ -101,6 +115,20 @@ describe("Tfvc-UndoCommand", function() {
         let cmd: Undo = new Undo(context, localPaths);
 
         assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "undo -noprompt -collection:" + collectionUrl + " ******** " + localPaths[0]);
+    });
+
+    it("should verify GetExeArguments UndoAll arguments", function() {
+        let localPaths: string[] = ["*"];
+        let cmd: Undo = new Undo(undefined, localPaths);
+
+        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "undo -noprompt . -recursive");
+    });
+
+    it("should verify GetExeArguments UndoAll arguments with context", function() {
+        let localPaths: string[] = ["*"];
+        let cmd: Undo = new Undo(context, localPaths);
+
+        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "undo -noprompt -collection:" + collectionUrl + " ******** . -recursive");
     });
 
     it("should verify parse output - no output", async function() {
@@ -142,6 +170,22 @@ describe("Tfvc-UndoCommand", function() {
         let filesUndone: string[] = await cmd.ParseOutput(executionResult);
         assert.equal(filesUndone.length, 1);
         assert.equal(filesUndone[0], "README.md");
+    });
+
+    it("should verify parse output - multiple file add - no errors", async function() {
+        let localPaths: string[] = ["README.md", "README2.md"];
+        let cmd: Undo = new Undo(undefined, localPaths);
+        let executionResult: IExecutionResult = {
+            exitCode: 0,
+            stdout: "Undoing add: README.md\n" +
+                    "Undoing add: README2.md\n",
+            stderr: undefined
+        };
+
+        let filesUndone: string[] = await cmd.ParseOutput(executionResult);
+        assert.equal(filesUndone.length, 2);
+        assert.equal(filesUndone[0], "README.md");
+        assert.equal(filesUndone[1], "README2.md");
     });
 
     it("should verify parse output - single folder+file edit - no errors", async function() {
@@ -304,6 +348,22 @@ describe("Tfvc-UndoCommand", function() {
         let filesUndone: string[] = await cmd.ParseExeOutput(executionResult);
         assert.equal(filesUndone.length, 1);
         assert.equal(filesUndone[0], "README.md");
+    });
+
+    it("should verify parse EXE output - multiple file add - no errors", async function() {
+        let localPaths: string[] = ["README.md", "README2.md"];
+        let cmd: Undo = new Undo(undefined, localPaths);
+        let executionResult: IExecutionResult = {
+            exitCode: 0,
+            stdout: "Undoing add: README.md\n" +
+                    "Undoing add: README2.md\n",
+            stderr: undefined
+        };
+
+        let filesUndone: string[] = await cmd.ParseExeOutput(executionResult);
+        assert.equal(filesUndone.length, 2);
+        assert.equal(filesUndone[0], "README.md");
+        assert.equal(filesUndone[1], "README2.md");
     });
 
     it("should verify parse EXE output - single folder+file edit - no errors", async function() {

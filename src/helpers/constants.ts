@@ -55,6 +55,7 @@ export class TfvcCommandNames {
     static Status: string = TfvcCommandNames.CommandPrefix + "Status";
     static Sync: string = TfvcCommandNames.CommandPrefix + "Sync";
     static Undo: string = TfvcCommandNames.CommandPrefix + "Undo";
+    static UndoAll: string = TfvcCommandNames.CommandPrefix + "UndoAll";
 }
 
 export class SettingNames {
