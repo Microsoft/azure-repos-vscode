@@ -137,8 +137,6 @@ export class TfvcSCMProvider {
         this._disposables.push(this.conflictsGroup);
         this._disposables.push(this.includedGroup);
         this._disposables.push(this.excludedGroup);
-
-        this._model.onDidChange(this.onDidModelChange, this);
     }
 
     private onDidModelChange(): void {
