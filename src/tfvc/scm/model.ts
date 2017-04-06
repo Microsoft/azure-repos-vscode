@@ -37,8 +37,16 @@ export class Model implements Disposable {
     public constructor(repositoryRoot: string, repository: TfvcRepository, onWorkspaceChange: Event<Uri>) {
         this._repositoryRoot = repositoryRoot;
         this._repository = repository;
-        // Ignore workspace changes that take place in the .tf or $tf folder (where path contains /.tf/ or \$tf\)
-        const onNonGitChange = filterEvent(onWorkspaceChange, uri => !/\/\.tf\//.test(uri.fsPath) && !/\\\$tf\\/.test(uri.fsPath));
+        //filterEvent should return false if an event is to be filtered
+        const onNonGitChange = filterEvent(onWorkspaceChange, (uri) => {
+            // Ignore files that aren't under this._repositoryRoot (e.g., settings.json)
+            const isSubFolder: boolean = uri.fsPath.normalize().startsWith(path.normalize(this._repositoryRoot));
+            // Ignore workspace changes that take place in the .tf or $tf folder (where path contains /.tf/ or \$tf\)
+            const isTfFolder: boolean = !/\/\.tf\//.test(uri.fsPath) && !/\\\$tf\\/.test(uri.fsPath);
+            // Attempt to ignore the team-extension.log file directly
+            const isLogFile: boolean = !(path.basename(uri.fsPath) === "team-extension.log");
+            return isSubFolder && isTfFolder && isLogFile;
+        });
         onNonGitChange(this.onFileSystemChange, this, this._disposables);
     }
 
