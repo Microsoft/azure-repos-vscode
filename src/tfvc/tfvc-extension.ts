@@ -54,7 +54,7 @@ export class TfvcExtension  {
     public async Exclude(resources?: Resource[]): Promise<void> {
         this.displayErrors(
             async () => {
-                if (resources) {
+                if (resources && resources.length > 0) {
                     //Keep an in-memory list of items that were explicitly excluded. The list is not persisted at this time.
                     let paths: string[] = [];
                     resources.forEach(resource => {
@@ -69,7 +69,7 @@ export class TfvcExtension  {
     public async Include(resources?: Resource[]): Promise<void> {
         this.displayErrors(
             async () => {
-                if (resources) {
+                if (resources && resources.length > 0) {
                     let pathsToUnexclude: string[] = [];
                     let pathsToAdd: string[] = [];
                     resources.forEach(resource => {
