@@ -20,6 +20,9 @@ export class TfvcSettings extends BaseSettings {
             (os.platform() === "darwin" || os.platform() === "linux")) {
             this._location = this._location.replace(/^~(\/)/, `${os.homedir()}$1`);
         }
+        if (this._location) {
+            this._location = this._location.trim();
+        }
         this._proxy = this.readSetting<string>(SettingNames.Proxy, undefined);
     }
 

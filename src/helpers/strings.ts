@@ -60,8 +60,8 @@ export class Strings {
     static NotATfvcRepository: string = "The open folder is not a TFVC repository.  Please check the folder location and try again.";
     static NotAnEnuTfCommandLine: string = "It appears you have configured a non-English version of the TF executable.  Please ensure an English version is properly configured.";
     static TokenNotAllScopes: string = "The personal access token provided does not have All Scopes.  All Scopes is required for TFVC support.";
-    static TfvcLocationMissingError: string = "The path to the TFVC command line was not found in the user settings. Please set this value (tfvc.location) and try again.";
-    static TfMissingError: string = "Unable to find the TF executable at the expected location. Please verify the installation and location of TF. Expected path: ";
+    static TfvcLocationMissingError: string = "The path to the TFVC command line (including filename) was not found in the user settings. Please set this value (tfvc.location) and try again.";
+    static TfMissingError: string = "Unable to find the TF executable. Please ensure TF is installed and the path specified contains the filename. Provided path: ";
     static TfInitializeFailureError: string = "Unable to initialize the TF executable. Please verify the installation of Java and ensure it is in the PATH.";
     static TfExecFailedError: string = "Execution of the TFVC command line failed unexpectedly.";
     static TfVersionWarning: string = "The installed version of the TF command line does not meet the minimum suggested version. You may run into errors or limitations with certain commands until you upgrade. Minimum suggested version: ";

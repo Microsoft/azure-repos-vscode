@@ -57,7 +57,7 @@ export class TeamExtension  {
     }
 
     public async Signin() {
-        // For Signin, we just need to verify _serverContext and don't want to set this._errorMessage
+        // For Signin, first we need to verify _serverContext
         if (this._manager.ServerContext !== undefined && this._manager.ServerContext.RepoInfo !== undefined && this._manager.ServerContext.RepoInfo.IsTeamFoundation === true) {
             if (this._manager.ServerContext.RepoInfo.IsTeamFoundationServer === true) {
                 let defaultUsername : string = this.getDefaultUsername();
@@ -91,15 +91,19 @@ export class TeamExtension  {
                 }
             }
         } else {
-            let messageItem : ButtonMessageItem = { title : Strings.LearnMore,
-                                url : Constants.ReadmeLearnMoreUrl,
-                                telemetryId: TelemetryEvents.ReadmeLearnMoreClick };
-            VsCodeUtils.ShowErrorMessageWithOptions(Strings.NoRepoInformation, messageItem).then((item) => {
-                if (item) {
-                    Utils.OpenUrl(item.url);
-                    Telemetry.SendEvent(item.telemetryId);
-                }
-            });
+            //If _manager has an error to display, display it and forgo the other. Otherwise, show the default error message.
+            let displayed: boolean = this._manager.DisplayErrorMessage();
+            if (!displayed) {
+                let messageItem : ButtonMessageItem = { title : Strings.LearnMore,
+                                    url : Constants.ReadmeLearnMoreUrl,
+                                    telemetryId: TelemetryEvents.ReadmeLearnMoreClick };
+                VsCodeUtils.ShowErrorMessageWithOptions(Strings.NoRepoInformation, messageItem).then((item) => {
+                    if (item) {
+                        Utils.OpenUrl(item.url);
+                        Telemetry.SendEvent(item.telemetryId);
+                    }
+                });
+            }
         }
     }
 

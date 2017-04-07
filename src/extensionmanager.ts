@@ -114,14 +114,17 @@ export class ExtensionManager implements Disposable {
         return true;
     }
 
-    public DisplayErrorMessage(message?: string) {
+    //Return value indicates whether a message was displayed
+    public DisplayErrorMessage(message?: string): boolean {
         let msg: string = message ? message : this._errorMessage;
         if (msg) {
             VsCodeUtils.ShowErrorMessage(msg);
+            return true;
         }
+        return false;
     }
 
-    public DisplayWarningMessage(message: string) {
+    public DisplayWarningMessage(message: string): void {
         VsCodeUtils.ShowWarningMessage(message);
     }
 
@@ -298,6 +301,8 @@ export class ExtensionManager implements Disposable {
             //For now, don't report these errors via the _feedbackClient
             if (!err.tfvcErrorCode || this.shouldDisplayTfvcError(err.tfvcErrorCode)) {
                 this.setErrorStatus(err.message, undefined, false);
+                //TODO: Perhaps show button with a link to more information on how to set the path to tf.cmd|tf.exe?
+                VsCodeUtils.ShowErrorMessage(err.message);
             }
         }
     }
