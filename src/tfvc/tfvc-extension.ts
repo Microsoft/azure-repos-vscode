@@ -57,7 +57,7 @@ export class TfvcExtension  {
                 if (resources && resources.length > 0) {
                     //Keep an in-memory list of items that were explicitly excluded. The list is not persisted at this time.
                     let paths: string[] = [];
-                    resources.forEach(resource => {
+                    resources.forEach((resource) => {
                         paths.push(resource.resourceUri.fsPath);
                     });
                     await TfvcSCMProvider.Exclude(paths);
@@ -72,7 +72,7 @@ export class TfvcExtension  {
                 if (resources && resources.length > 0) {
                     let pathsToUnexclude: string[] = [];
                     let pathsToAdd: string[] = [];
-                    resources.forEach(resource => {
+                    resources.forEach((resource) => {
                         let path: string = resource.resourceUri.fsPath;
                         //Unexclude each file passed in
                         pathsToUnexclude.push(path);
@@ -249,7 +249,7 @@ export class TfvcExtension  {
             async () => {
                 if (resources) {
                     let pathsToUndo: string[] = [];
-                    resources.forEach(resource => {
+                    resources.forEach((resource) => {
                         pathsToUndo.push(resource.resourceUri.fsPath);
                     });
                     //When calling from UI, we have the uri of the resource from which the command was invoked

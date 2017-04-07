@@ -60,7 +60,7 @@ export class TfvcContentProvider {
 
     dispose(): void {
         if (this._disposables) {
-            this._disposables.forEach(d => d.dispose());
+            this._disposables.forEach((d) => d.dispose());
             this._disposables = [];
         }
     }

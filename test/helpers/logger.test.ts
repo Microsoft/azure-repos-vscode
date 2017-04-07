@@ -5,7 +5,7 @@
 "use strict";
 
 import { assert } from "chai";
-import { Logger, LoggingLevel }  from "../../src/helpers/logger";
+import { Logger, LoggingLevel } from "../../src/helpers/logger";
 
 describe("Logger", function() {
 

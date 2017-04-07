@@ -135,7 +135,7 @@ export class GitClient extends BaseClient {
         let label: string = `$(icon ${icon}) `;
         requestItems.push({ label: label + Strings.BrowseYourPullRequests, description: undefined, id: undefined });
 
-        myPullRequests.forEach(pr => {
+        myPullRequests.forEach((pr) => {
             let score: PullRequestScore = GitVcService.GetPullRequestScore(pr);
             requestItems.push(this.getPullRequestLabel(pr.createdBy.displayName, pr.title, pr.description, pr.pullRequestId.toString(), score));
             requestIds.push(pr.pullRequestId);
@@ -145,7 +145,7 @@ export class GitClient extends BaseClient {
         Logger.LogInfo("Getting pull requests for which I'm a reviewer...");
         //Go get the active pull requests that I'm a reviewer for
         let myReviewPullRequests: GitPullRequest[] = await svc.GetPullRequests(this._serverContext.RepoInfo.RepositoryId, undefined, this._serverContext.UserInfo.Id, PullRequestStatus.Active);
-        myReviewPullRequests.forEach(pr => {
+        myReviewPullRequests.forEach((pr) => {
             let score: PullRequestScore = GitVcService.GetPullRequestScore(pr);
             if (requestIds.indexOf(pr.pullRequestId) < 0) {
                 requestItems.push(this.getPullRequestLabel(pr.createdBy.displayName, pr.title, pr.description, pr.pullRequestId.toString(), score));

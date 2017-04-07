@@ -84,8 +84,8 @@ export class Sync implements ITfvcCommand<ISyncResults> {
             const itemResults: ISyncItemResult[] = this.getItemResults(executionResult.stdout);
             const errorMessages: ISyncItemResult[] = this.getErrorMessages(executionResult.stderr);
             return {
-                hasConflicts: errorMessages.filter(err => err.syncType === SyncType.Conflict).length > 0,
-                hasErrors: errorMessages.filter(err => err.syncType !== SyncType.Conflict).length > 0,
+                hasConflicts: errorMessages.filter((err) => err.syncType === SyncType.Conflict).length > 0,
+                hasErrors: errorMessages.filter((err) => err.syncType !== SyncType.Conflict).length > 0,
                 itemResults: itemResults.concat(errorMessages)
             };
         }

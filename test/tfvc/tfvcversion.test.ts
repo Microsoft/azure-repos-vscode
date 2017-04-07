@@ -6,7 +6,7 @@
 
 import { assert } from "chai";
 
-import { TfvcVersion }  from "../../src/tfvc/tfvcversion";
+import { TfvcVersion } from "../../src/tfvc/tfvcversion";
 
 describe("Tfvc-Version", function() {
     beforeEach(function() {

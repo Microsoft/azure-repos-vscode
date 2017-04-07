@@ -6,8 +6,8 @@
 
 import { assert } from "chai";
 
-import { Strings }  from "../../src/helpers/strings";
-import { TfvcError, TfvcErrorCodes }  from "../../src/tfvc/tfvcerror";
+import { Strings } from "../../src/helpers/strings";
+import { TfvcError, TfvcErrorCodes } from "../../src/tfvc/tfvcerror";
 
 describe("Tfvc-Error", function() {
     beforeEach(function() {

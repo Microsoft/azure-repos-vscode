@@ -7,7 +7,7 @@
 import { assert } from "chai";
 const path = require("path");
 
-import { GitContext }  from "../../src/contexts/gitcontext";
+import { GitContext } from "../../src/contexts/gitcontext";
 import { RepositoryType } from "../../src/contexts/repositorycontext";
 
 describe("GitContext", function() {

@@ -6,7 +6,7 @@
 
 import { assert } from "chai";
 
-import { WorkItemFields, WorkItemTrackingService }  from "../../src/services/workitemtracking";
+import { WorkItemFields, WorkItemTrackingService } from "../../src/services/workitemtracking";
 
 describe("WorkItemTrackingService", function() {
 

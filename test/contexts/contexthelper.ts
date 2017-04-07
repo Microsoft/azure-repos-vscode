@@ -4,7 +4,7 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import { ISettings }  from "../../src/helpers/settings";
+import { ISettings } from "../../src/helpers/settings";
 
 //Used to test the GitContext, ExternalContext classes
 export class SettingsMock implements ISettings {

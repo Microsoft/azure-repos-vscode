@@ -169,7 +169,7 @@ export class TfvcSCMProvider {
         let repoContext: TfvcContext = <TfvcContext>this._extensionManager.RepoContext;
         const fsWatcher = workspace.createFileSystemWatcher("**");
         const onWorkspaceChange = anyEvent(fsWatcher.onDidChange, fsWatcher.onDidCreate, fsWatcher.onDidDelete);
-        const onTfvcChange = filterEvent(onWorkspaceChange, uri => /^\$tf\//.test(workspace.asRelativePath(uri)));
+        const onTfvcChange = filterEvent(onWorkspaceChange, (uri) => /^\$tf\//.test(workspace.asRelativePath(uri)));
         this._model = new Model(repoContext.RepoFolder, repoContext.TfvcRepository, onWorkspaceChange);
         // Hook up the model change event to trigger our own event
         this._disposables.push(this._model.onDidChange(this.onDidModelChange, this));
@@ -206,7 +206,7 @@ export class TfvcSCMProvider {
     private cleanup() {
         // dispose all the temporary items
         if (this._tempDisposables) {
-            this._tempDisposables.forEach(d => d.dispose());
+            this._tempDisposables.forEach((d) => d.dispose());
             this._tempDisposables = [];
         }
 
@@ -230,7 +230,7 @@ export class TfvcSCMProvider {
         TfvcSCMProvider.instance = undefined;
         this.cleanup();
         if (this._disposables) {
-            this._disposables.forEach(d => d.dispose());
+            this._disposables.forEach((d) => d.dispose());
             this._disposables = [];
         }
     }

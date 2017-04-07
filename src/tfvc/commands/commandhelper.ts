@@ -123,7 +123,7 @@ export class CommandHelper {
             lines = lines.splice(index);
         }
         if (filterEmptyLines) {
-            lines = lines.filter(e => e.trim() !== "");
+            lines = lines.filter((e) => e.trim() !== "");
         }
         return lines;
     }

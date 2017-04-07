@@ -37,7 +37,7 @@ export class Resource implements SourceControlResourceState {
     public get ConflictType(): ConflictType { return this._conflictType; }
 
     public HasStatus(status: Status): boolean {
-        return this._statuses.findIndex(s => s === status) >= 0;
+        return this._statuses.findIndex((s) => s === status) >= 0;
     }
 
     get IsVersioned(): boolean { return this._version !== "0"; }

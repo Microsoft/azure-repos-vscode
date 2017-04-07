@@ -48,9 +48,9 @@ export class Add implements ITfvcCommand<string[]> {
         let lines: string[] = CommandHelper.SplitIntoLines(executionResult.stdout, false, true /*filterEmptyLines*/);
 
         //Remove any lines indicating that there were no files to add (e.g., calling add on files that don't exist)
-        lines = lines.filter(e => !e.startsWith("No arguments matched any files to add."));  //CLC
+        lines = lines.filter((e) => !e.startsWith("No arguments matched any files to add."));  //CLC
         //Ex. /usr/alias/repos/Tfvc.L2VSCodeExtension.RC/file-does-not-exist.md: No file matches.
-        lines = lines.filter(e => !e.endsWith(" No file matches."));  //tf.exe
+        lines = lines.filter((e) => !e.endsWith(" No file matches."));  //tf.exe
 
         let filesAdded: string[] = [];
         let path: string = "";

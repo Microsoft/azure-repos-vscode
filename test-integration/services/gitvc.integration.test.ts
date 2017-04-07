@@ -6,15 +6,13 @@
 
 import { assert, expect } from "chai";
 
+import { GitPullRequest, GitRepository } from "vso-node-api/interfaces/GitInterfaces";
 import { Mocks } from "../helpers-integration/mocks";
 import { TestSettings } from "../helpers-integration/testsettings";
-
-import { GitPullRequest, GitRepository } from "vso-node-api/interfaces/GitInterfaces";
-
 import { CredentialManager } from "../../src/helpers/credentialmanager";
 import { UserAgentProvider } from "../../src/helpers/useragentprovider";
 import { TeamServerContext } from "../../src/contexts/servercontext";
-import { GitVcService, PullRequestScore }  from "../../src/services/gitvc";
+import { GitVcService, PullRequestScore } from "../../src/services/gitvc";
 
 describe("GitVcService-Integration", function() {
     this.timeout(TestSettings.SuiteTimeout);
@@ -75,7 +73,7 @@ describe("GitVcService-Integration", function() {
         let svc: GitVcService = new GitVcService(ctx);
         let requests: GitPullRequest[] = await svc.GetPullRequests(ctx.RepoInfo.RepositoryId);
         let totals = [];
-        requests.forEach(request => {
+        requests.forEach((request) => {
             totals.push({ "id" : request.pullRequestId, "score" : GitVcService.GetPullRequestScore(request) });
         });
         assert.equal(totals.length, 4);

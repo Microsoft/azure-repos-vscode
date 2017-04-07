@@ -16,7 +16,7 @@ export interface IDisposable {
 }
 
 export function dispose<T extends IDisposable>(disposables: T[]): T[] {
-    disposables.forEach(d => d.dispose());
+    disposables.forEach((d) => d.dispose());
     return [];
 }
 
@@ -29,15 +29,15 @@ export function combinedDisposable(disposables: IDisposable[]): IDisposable {
 }
 
 export function mapEvent<I, O>(event: Event<I>, map: (i: I) => O): Event<O> {
-    return (listener, thisArgs = null, disposables?) => event(i => listener.call(thisArgs, map(i)), null, disposables);
+    return (listener, thisArgs = null, disposables?) => event((i) => listener.call(thisArgs, map(i)), null, disposables);
 }
 
 export function filterEvent<T>(event: Event<T>, filter: (e: T) => boolean): Event<T> {
-    return (listener, thisArgs = null, disposables?) => event(e => filter(e) && listener.call(thisArgs, e), null, disposables);
+    return (listener, thisArgs = null, disposables?) => event((e) => filter(e) && listener.call(thisArgs, e), null, disposables);
 }
 
 export function anyEvent<T>(...events: Event<T>[]): Event<T> {
-    return (listener, thisArgs = null, disposables?) => combinedDisposable(events.map(event => event(i => listener.call(thisArgs, i), disposables)));
+    return (listener, thisArgs = null, disposables?) => combinedDisposable(events.map((event) => event((i) => listener.call(thisArgs, i), disposables)));
 }
 
 export function done<T>(promise: Promise<T>): Promise<void> {
@@ -47,7 +47,7 @@ export function done<T>(promise: Promise<T>): Promise<void> {
 export function once<T>(event: Event<T>): Event<T> {
     return (listener, thisArgs = null, disposables?) => {
         const result = event(
-            e => {
+            (e) => {
                 result.dispose();
                 return listener.call(thisArgs, e);
             },
@@ -59,6 +59,6 @@ export function once<T>(event: Event<T>): Event<T> {
 }
 
 export function eventToPromise<T>(event: Event<T>): Promise<T> {
-    return new Promise(c => once(event)(c));
+    return new Promise((c) => once(event)(c));
 }
 /* tslint:enable:no-null-keyword */

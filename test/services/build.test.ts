@@ -6,7 +6,7 @@
 
 import { assert } from "chai";
 
-import { BuildService }  from "../../src/services/build";
+import { BuildService } from "../../src/services/build";
 
 describe("BuildService", function() {
 

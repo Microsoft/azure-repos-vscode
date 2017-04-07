@@ -5,13 +5,16 @@
         "arguments",
         "statements"
     ],
+    "arrow-parens": true,
     "class-name": true,
     "curly": true,
     "eofline": true,
     "forin": true,
+    "import-spacing": true,
     "indent": [true, "spaces", 4],
     "label-position": true,
     "max-line-length": [false, 160],
+    "newline-before-return": false,
     "no-arg": true,
     "no-bitwise": true,
     "no-console": [true,
@@ -38,9 +41,15 @@
       "check-else",
       "check-whitespace"
     ],
+    "one-variable-per-declaration": true,
+    "prefer-const": false,
+    "prefer-method-signature": true,
     "quotemark": [true, "double"],
     "radix": false,
     "semicolon": true,
+    "space-before-function-paren": [
+      false, {"anonymous": "always", "named": "never", "asyncArrow": "always"}
+    ],
     "trailing-comma": [false, { "multiline": "never", "singleline": "never" }],
     "triple-equals": [true, "allow-null-check"],
     "variable-name": [true,

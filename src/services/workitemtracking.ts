@@ -48,11 +48,11 @@ export class WorkItemTrackingService {
         let types: WorkItemType[] = await this._witApi.getWorkItemTypes(teamProject);
         let workItemTypes: WorkItemType[] = [];
         let hiddenTypes: WorkItemTypeReference[] = [];
-        types.forEach(type => {
+        types.forEach((type) => {
             workItemTypes.push(type);
         });
         let category: WorkItemTypeCategory = await this._witApi.getWorkItemTypeCategory(teamProject, "Microsoft.HiddenCategory");
-        category.workItemTypes.forEach(hiddenType => {
+        category.workItemTypes.forEach((hiddenType) => {
             hiddenTypes.push(hiddenType);
         });
         let filteredTypes: WorkItemType[] = workItemTypes.filter(function (el) {
@@ -111,7 +111,7 @@ export class WorkItemTrackingService {
 
         //Keep original sort order that wiql specified
         for (let index = 0; index < workItemIds.length; index++) {
-            let item: WorkItem = workItems.find(i => i.id === workItemIds[index]);
+            let item: WorkItem = workItems.find((i) => i.id === workItemIds[index]);
             results.push({
                 id: item.fields[WorkItemFields.Id],
                 label: item.fields[WorkItemFields.Id] + "  [" + item.fields[WorkItemFields.WorkItemType] + "]",

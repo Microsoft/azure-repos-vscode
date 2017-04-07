@@ -62,7 +62,7 @@ export class CommitHoverProvider implements HoverProvider {
     }
 
     private onVisibleTextEditors(editors: TextEditor[]): void {
-        const [editor] = editors.filter(e => isSCMInput(e.document.uri));
+        const [editor] = editors.filter((e) => isSCMInput(e.document.uri));
 
         if (!editor) {
             return;
@@ -71,7 +71,7 @@ export class CommitHoverProvider implements HoverProvider {
         this.visibleTextEditorsDisposable.dispose();
         this.editor = editor;
 
-        const onDidChange = filterEvent(workspace.onDidChangeTextDocument, e => e.document && isSCMInput(e.document.uri));
+        const onDidChange = filterEvent(workspace.onDidChangeTextDocument, (e) => e.document && isSCMInput(e.document.uri));
         onDidChange(this.update, this, this.disposables);
 
         workspace.onDidChangeConfiguration(this.update, this, this.disposables);
@@ -81,12 +81,12 @@ export class CommitHoverProvider implements HoverProvider {
     private update(): void {
         this.diagnostics = [];
         //TODO provide any diagnostic info based on the message here (see git commitcontroller)
-        this.editor.setDecorations(this.decorationType, this.diagnostics.map(d => d.range));
+        this.editor.setDecorations(this.decorationType, this.diagnostics.map((d) => d.range));
     }
 
     /* Implement HoverProvider */
     provideHover(document: TextDocument, position: Position): Hover | undefined {
-        const [decoration] = this.diagnostics.filter(d => d.range.contains(position));
+        const [decoration] = this.diagnostics.filter((d) => d.range.contains(position));
 
         if (!decoration || !document) {
             return;
@@ -96,6 +96,6 @@ export class CommitHoverProvider implements HoverProvider {
     }
 
     dispose(): void {
-        this.disposables.forEach(d => d.dispose());
+        this.disposables.forEach((d) => d.dispose());
     }
 }

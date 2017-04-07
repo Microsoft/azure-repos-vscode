@@ -7,7 +7,7 @@
 import { assert } from "chai";
 
 import { GitPullRequest, PullRequestAsyncStatus } from "vso-node-api/interfaces/GitInterfaces";
-import { GitVcService, PullRequestScore }  from "../../src/services/gitvc";
+import { GitVcService, PullRequestScore } from "../../src/services/gitvc";
 
 describe("GitVcService", function() {
 

@@ -6,7 +6,7 @@
 
 import { assert } from "chai";
 
-import { RepoUtils }  from "../../src/helpers/repoutils";
+import { RepoUtils } from "../../src/helpers/repoutils";
 
 describe("RepoUtils", function() {
 

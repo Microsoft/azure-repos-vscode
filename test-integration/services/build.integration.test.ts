@@ -6,15 +6,13 @@
 
 import { assert, expect } from "chai";
 
+import { Build, BuildBadge } from "vso-node-api/interfaces/BuildInterfaces";
 import { Mocks } from "../helpers-integration/mocks";
 import { TestSettings } from "../helpers-integration/testsettings";
-
-import { Build, BuildBadge } from "vso-node-api/interfaces/BuildInterfaces";
-
 import { CredentialManager } from "../../src/helpers/credentialmanager";
 import { UserAgentProvider } from "../../src/helpers/useragentprovider";
 import { TeamServerContext } from "../../src/contexts/servercontext";
-import { BuildService }  from "../../src/services/build";
+import { BuildService } from "../../src/services/build";
 import { WellKnownRepositoryTypes } from "../../src/helpers/constants";
 
 describe("BuildService-Integration", function() {

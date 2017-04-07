@@ -8,8 +8,8 @@ import { assert } from "chai";
 const path = require("path");
 
 import { RepositoryType } from "../../src/contexts/repositorycontext";
-import { ExternalContext }  from "../../src/contexts/externalcontext";
-import { SettingsMock }  from "./contexthelper";
+import { ExternalContext } from "../../src/contexts/externalcontext";
+import { SettingsMock } from "./contexthelper";
 
 describe("ExternalContext", function() {
     let TEST_REPOS_FOLDER: string = "testrepos";

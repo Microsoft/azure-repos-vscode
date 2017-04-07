@@ -172,7 +172,7 @@ export class WitClient extends BaseClient {
         Logger.LogInfo("Getting my work item queries (" + this._serverContext.RepoInfo.TeamProject + ")...");
         let hierarchyItems: QueryHierarchyItem[] = await svc.GetWorkItemHierarchyItems(this._serverContext.RepoInfo.TeamProject);
         Logger.LogInfo("Retrieved " + hierarchyItems.length + " hierarchyItems");
-        hierarchyItems.forEach(folder => {
+        hierarchyItems.forEach((folder) => {
             if (folder && folder.isFolder === true && folder.isPublic === false) {
                 // Because "My Queries" is localized and there is no API to get the name of the localized
                 // folder, we need to save off the localized name when constructing URLs.
@@ -199,7 +199,7 @@ export class WitClient extends BaseClient {
         Logger.LogInfo("Getting my work items (" + this._serverContext.RepoInfo.TeamProject + ")...");
         let simpleWorkItems: SimpleWorkItem[] = await svc.GetWorkItems(teamProject, wiql);
         Logger.LogInfo("Retrieved " + simpleWorkItems.length + " work items");
-        simpleWorkItems.forEach(wi => {
+        simpleWorkItems.forEach((wi) => {
             workItems.push({ label: wi.label, description: wi.description, id: wi.id});
         });
         if (simpleWorkItems.length === WorkItemTrackingService.MaxResults) {
@@ -229,7 +229,7 @@ export class WitClient extends BaseClient {
         let svc: WorkItemTrackingService = new WorkItemTrackingService(this._serverContext);
         let types: WorkItemType[] = await svc.GetWorkItemTypes(this._serverContext.RepoInfo.TeamProject);
         let workItemTypes: BaseQuickPickItem[] = [];
-        types.forEach(type => {
+        types.forEach((type) => {
             workItemTypes.push({ label: type.name, description: type.description, id: undefined });
         });
         workItemTypes.sort((t1, t2) => {

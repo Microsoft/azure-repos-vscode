@@ -6,16 +6,14 @@
 
 import { assert, expect } from "chai";
 
+import { QueryHierarchyItem, WorkItem, WorkItemType } from "vso-node-api/interfaces/WorkItemTrackingInterfaces";
 import { Mocks } from "../helpers-integration/mocks";
 import { TestSettings } from "../helpers-integration/testsettings";
-
-import { QueryHierarchyItem, WorkItem, WorkItemType } from "vso-node-api/interfaces/WorkItemTrackingInterfaces";
-
 import { WitQueries } from "../../src/helpers/constants";
 import { CredentialManager } from "../../src/helpers/credentialmanager";
 import { UserAgentProvider } from "../../src/helpers/useragentprovider";
 import { TeamServerContext } from "../../src/contexts/servercontext";
-import { SimpleWorkItem, WorkItemTrackingService }  from "../../src/services/workitemtracking";
+import { SimpleWorkItem, WorkItemTrackingService } from "../../src/services/workitemtracking";
 
 describe("WorkItemTrackingService-Integration", function() {
     this.timeout(TestSettings.SuiteTimeout);

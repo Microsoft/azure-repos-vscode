@@ -24,7 +24,7 @@ export class GitVcService {
         this._gitApi = new WebApi(context.RepoInfo.CollectionUrl, CredentialManager.GetCredentialHandler()).getGitApi();
     }
 
-    //Returns a Q.Promise containing an array of GitPullRequest objectss for the creator and repository
+    //Returns a Promise containing an array of GitPullRequest objectss for the creator and repository
     //If creatorId is undefined, all pull requests will be returned
     public async GetPullRequests(repositoryId: string, creatorId?: string, reviewerId?: string, status?: PullRequestStatus) : Promise<GitPullRequest[]> {
         let criteria: GitPullRequestSearchCriteria = { creatorId: creatorId, includeLinks: false, repositoryId: repositoryId, reviewerId: reviewerId,
@@ -32,7 +32,7 @@ export class GitVcService {
         return await this._gitApi.getPullRequests(repositoryId, criteria);
     }
 
-    //Returns a Q.Promise containing an array of GitRepository objects for the project
+    //Returns a Promise containing an array of GitRepository objects for the project
     public async GetRepositories(project: string): Promise<GitRepository[]> {
         return await this._gitApi.getRepositories(project, false);
     }
@@ -96,7 +96,7 @@ export class GitVcService {
         let lowestVote: number = 0;
         let highestVote: number = 0;
         if (pullRequest.reviewers !== undefined && pullRequest.reviewers.length > 0) {
-            pullRequest.reviewers.forEach(reviewer => {
+            pullRequest.reviewers.forEach((reviewer) => {
                 let vote: number = reviewer.vote;
                 if (vote < lowestVote) {
                     lowestVote = vote;

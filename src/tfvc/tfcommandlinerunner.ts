@@ -236,9 +236,9 @@ export class TfCommandLineRunner {
                 once(child, "error", e);
                 once(child, "exit", c);
             }),
-            new Promise<string>(c => {
+            new Promise<string>((c) => {
                 const buffers: string[] = [];
-                on(child.stdout, "data", b => {
+                on(child.stdout, "data", (b) => {
                     buffers.push(b);
                 });
                 once(child.stdout, "close", () => {
@@ -255,9 +255,9 @@ export class TfCommandLineRunner {
                     c(stdout);
                 });
             }),
-            new Promise<string>(c => {
+            new Promise<string>((c) => {
                 const buffers: string[] = [];
-                on(child.stderr, "data", b => buffers.push(b));
+                on(child.stderr, "data", (b) => buffers.push(b));
                 once(child.stderr, "close", () => c(buffers.join("")));
             })
         ]);
