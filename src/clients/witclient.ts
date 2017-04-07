@@ -252,21 +252,22 @@ export class WitClient extends BaseClient {
     }
 
     public PollPinnedQuery(): void {
-        this.GetPinnedQueryResultCount().then((items) => {
+        this.GetPinnedQueryResultCount().then((numberOfItems) => {
             this._statusBarItem.tooltip = Strings.ViewYourPinnedQuery;
-            this._statusBarItem.text = WitClient.GetPinnedQueryStatusText(items);
+            this._statusBarItem.text = WitClient.GetPinnedQueryStatusText(numberOfItems.toString());
         }).catch((err) => {
             this.handleError(err, WitClient.GetOfflinePinnedQueryStatusText(), true, "Failed to get pinned query count during polling");
         });
     }
 
    public static GetOfflinePinnedQueryStatusText() : string {
-        return `$(icon octicon-bug) ` + `???`;
+        return `$(icon octicon-bug) ???`;
     }
 
-    public static GetPinnedQueryStatusText(total: number) : string {
-        let octibug: string = "octicon-bug";
-
-        return `$(icon ${octibug}) ` + total.toString();
+    public static GetPinnedQueryStatusText(total?: string) : string {
+        if (!total) {
+            return `$(icon octicon-bug) $(icon octicon-dash)`;
+        }
+        return `$(icon octicon-bug) ${total.toString()}`;
     }
 }

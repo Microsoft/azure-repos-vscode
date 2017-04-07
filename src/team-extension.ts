@@ -318,7 +318,7 @@ export class TeamExtension  {
             if (!this._pullRequestStatusBarItem) {
                 this._pullRequestStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, 99);
                 this._pullRequestStatusBarItem.command = CommandNames.GetPullRequests;
-                this._pullRequestStatusBarItem.text = GitClient.GetPullRequestStatusText(0);
+                this._pullRequestStatusBarItem.text = GitClient.GetPullRequestStatusText();
                 this._pullRequestStatusBarItem.tooltip = Strings.BrowseYourPullRequests;
                 this._pullRequestStatusBarItem.show();
             }
@@ -327,7 +327,7 @@ export class TeamExtension  {
         if (!this._buildStatusBarItem) {
             this._buildStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, 98);
             this._buildStatusBarItem.command = CommandNames.OpenBuildSummaryPage;
-            this._buildStatusBarItem.text = `$(icon octicon-package) ` + `$(icon octicon-dash)`;
+            this._buildStatusBarItem.text = `$(icon octicon-package) $(icon octicon-dash)`;
             this._buildStatusBarItem.tooltip = Strings.NoBuildsFound;
             this._buildStatusBarItem.show();
         }
@@ -335,7 +335,7 @@ export class TeamExtension  {
         if (!this._pinnedQueryStatusBarItem) {
             this._pinnedQueryStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, 97);
             this._pinnedQueryStatusBarItem.command = CommandNames.ViewPinnedQueryWorkItems;
-            this._pinnedQueryStatusBarItem.text = WitClient.GetPinnedQueryStatusText(0);
+            this._pinnedQueryStatusBarItem.text = WitClient.GetPinnedQueryStatusText();
             this._pinnedQueryStatusBarItem.tooltip = Strings.ViewYourPinnedQuery;
             this._pinnedQueryStatusBarItem.show();
         }
