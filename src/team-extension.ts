@@ -81,7 +81,7 @@ export class TeamExtension  {
                 let token: string = await window.showInputBox({ value: "", prompt: Strings.ProvideAccessToken + " (" + this._manager.ServerContext.RepoInfo.Account + ")", placeHolder: "", password: true });
                 if (token !== undefined) {
                     Logger.LogInfo("Signin: Personal Access Token provided as authentication.");
-                    this._manager.CredentialManager.StoreCredentials(this._manager.ServerContext.RepoInfo.Host, Constants.OAuth, token).then(() => {
+                    this._manager.CredentialManager.StoreCredentials(this._manager.ServerContext.RepoInfo.Host, Constants.OAuth, token.trim()).then(() => {
                         this._manager.Reinitialize();
                     }).catch((err) => {
                         // TODO: Should the message direct the user to open an issue?  send feedback?
