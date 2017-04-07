@@ -68,6 +68,7 @@ export class Strings {
     static TfNoPendingChanges: string = "There are no matching pending changes.";
     static UndoChanges: string = "Undo Changes";
     static NoChangesToCheckin: string = "There are no changes to check in. Changes must be added to the 'Included' section to be checked in.";
+    static NoChangesToUndo: string = "There are no changes to undo.";
     static AllFilesUpToDate: string = "All files are up to date.";
     static CommandRequiresFileContext: string = "This command requires a file context and can only be executed from the TFVC viewlet window.";
     static CommandRequiresExplorerContext: string = "This command requires a file context and can only be executed from the Explorer window.";

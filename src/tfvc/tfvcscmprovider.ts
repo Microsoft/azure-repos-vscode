@@ -46,7 +46,7 @@ export class TfvcSCMProvider {
     }
 
     public static GetCheckinInfo(): ICheckinInfo {
-        const tfvcProvider: TfvcSCMProvider = TfvcSCMProvider.GetProviderInstance();
+        const tfvcProvider: TfvcSCMProvider = TfvcSCMProvider.getProviderInstance();
 
         try {
             const files: string[] = [];
@@ -94,19 +94,19 @@ export class TfvcSCMProvider {
     }
 
     public static async Exclude(paths: string[]): Promise<void> {
-        const tfvcProvider: TfvcSCMProvider = TfvcSCMProvider.GetProviderInstance();
+        const tfvcProvider: TfvcSCMProvider = TfvcSCMProvider.getProviderInstance();
 
         await tfvcProvider._model.Exclude(paths);
     };
 
     public static async Refresh(): Promise<void> {
-        const tfvcProvider: TfvcSCMProvider = TfvcSCMProvider.GetProviderInstance();
+        const tfvcProvider: TfvcSCMProvider = TfvcSCMProvider.getProviderInstance();
 
         await tfvcProvider._model.Refresh();
     };
 
     public static async Unexclude(paths: string[]): Promise<void> {
-        const tfvcProvider: TfvcSCMProvider = TfvcSCMProvider.GetProviderInstance();
+        const tfvcProvider: TfvcSCMProvider = TfvcSCMProvider.getProviderInstance();
 
         await tfvcProvider._model.Unexclude(paths);
     };
@@ -236,6 +236,19 @@ export class TfvcSCMProvider {
     }
 
     /**
+     * If Tfvc is the active provider, returns the number of items it is tracking.
+     */
+    public static HasItems(): boolean {
+        const tfvcProvider: TfvcSCMProvider = TfvcSCMProvider.instance;
+        if (tfvcProvider) {
+            if (tfvcProvider.count > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Gets the uri for the previous version of the file.
      */
     public static  GetLeftResource(resource: Resource): Uri {
@@ -260,11 +273,11 @@ export class TfvcSCMProvider {
         }
     }
 
-    private static GetProviderInstance(): TfvcSCMProvider {
+    private static getProviderInstance(): TfvcSCMProvider {
         const tfvcProvider: TfvcSCMProvider = TfvcSCMProvider.instance;
         if (!tfvcProvider) {
             // We are not the active provider
-            Logger.LogDebug("Failed to GetCheckinInfo. TFVC is not the active provider.");
+            Logger.LogDebug("TFVC is not the active provider.");
             throw TfvcError.CreateInvalidStateError();
         }
         return tfvcProvider;

@@ -277,10 +277,15 @@ export class TfvcExtension  {
     public async UndoAll(): Promise<void> {
         this.displayErrors(
             async () => {
-                let message: string = `Are you sure you want to undo all changes?`;
-                if (await UIHelper.PromptForConfirmation(message, Strings.UndoChanges)) {
-                    //We decided not to send telemetry on file operations
-                    await this._repo.Undo(["*"]);
+                if (TfvcSCMProvider.HasItems()) {
+                    let message: string = `Are you sure you want to undo all changes?`;
+                    if (await UIHelper.PromptForConfirmation(message, Strings.UndoChanges)) {
+                        //We decided not to send telemetry on file operations
+                        await this._repo.Undo(["*"]);
+                    }
+                } else {
+                    window.showInformationMessage(Strings.NoChangesToUndo);
+                    return;
                 }
             },
             "UndoAll");
