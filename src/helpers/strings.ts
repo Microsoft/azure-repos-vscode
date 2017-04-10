@@ -31,6 +31,7 @@ export class Strings {
     static NoFeedbackSent: string = "No feedback was sent.";
     static ThanksForFeedback: string = "Thanks for sending feedback!";
     static LearnMore: string = "Learn more...";
+    static ShowMe: string = "Show Me!";
 
     static ChoosePullRequest: string = "Choose a pull request";
     static ChooseWorkItem: string = "Choose a work item";

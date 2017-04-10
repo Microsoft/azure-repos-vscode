@@ -155,11 +155,15 @@ export class ExtensionManager implements Disposable {
     private displayNoCredentialsMessage(): void {
         let error: string = Strings.NoTeamServerCredentialsRunSignin;
         let displayError: string = Strings.NoTeamServerCredentialsRunSignin;
-        let messageItem: ButtonMessageItem = undefined;
+        let learnMoreMessageItem: ButtonMessageItem = undefined;
+        let showMeMessageItem: ButtonMessageItem = undefined;
         if (this._serverContext.RepoInfo.IsTeamServices === true) {
-            messageItem = { title : Strings.LearnMore,
+            learnMoreMessageItem = { title : Strings.LearnMore,
                             url : Constants.TokenLearnMoreUrl,
                             telemetryId: TelemetryEvents.TokenLearnMoreClick };
+            showMeMessageItem = { title : Strings.ShowMe,
+                            url : Constants.TokenShowMeUrl,
+                            telemetryId: TelemetryEvents.TokenShowMeClick };
             //Need different messages for popup message and status bar
             //Add the account name to the message to help the user
             error =  util.format(Strings.NoAccessTokenRunSignin, this._serverContext.RepoInfo.Account);
@@ -167,7 +171,7 @@ export class ExtensionManager implements Disposable {
         }
         Logger.LogError(error);
         this.setErrorStatus(error, CommandNames.Signin, false);
-        VsCodeUtils.ShowErrorMessageWithOptions(displayError, messageItem).then((item) => {
+        VsCodeUtils.ShowErrorMessageWithOptions(displayError, learnMoreMessageItem, showMeMessageItem).then((item) => {
             if (item) {
                 Utils.OpenUrl(item.url);
                 Telemetry.SendEvent(item.telemetryId);
