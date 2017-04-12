@@ -120,7 +120,7 @@ export class TfvcExtension  {
                         return await commands.executeCommand<void>("vscode.open", right);
                     }
 
-                    return commands.executeCommand<void>("vscode.diff", left, right, title);
+                    return await commands.executeCommand<void>("vscode.diff", left, right, title);
                 }
             },
             "Open");
