@@ -283,9 +283,8 @@ export class TfvcSCMProvider {
         return tfvcProvider;
     }
 
-    public static OpenDiff(resource: Resource): Promise<void> {
-        commands.executeCommand<void>(TfvcCommandNames.Open, resource);
-        return;
+    public static async OpenDiff(resource: Resource): Promise<void> {
+        return await commands.executeCommand<void>(TfvcCommandNames.Open, resource);
     }
 
 }

@@ -110,14 +110,16 @@ export class TfvcExtension  {
                     const right: Uri = TfvcSCMProvider.GetRightResource(resource);
                     const title: string = resource.GetTitle();
 
-                    if (!left) {
-                        if (!right) {
-                            // TODO
-                            console.error("oh no");
-                            return;
-                        }
-                        return commands.executeCommand<void>("vscode.open", right);
+                    if (!right) {
+                        // TODO
+                        console.error("oh no");
+                        return;
                     }
+
+                    if (!left) {
+                        return await commands.executeCommand<void>("vscode.open", right);
+                    }
+
                     return commands.executeCommand<void>("vscode.diff", left, right, title);
                 }
             },
@@ -128,7 +130,7 @@ export class TfvcExtension  {
         this.displayErrors(
             async () => {
                 if (resource) {
-                    TfvcSCMProvider.OpenDiff(resource);
+                    return await TfvcSCMProvider.OpenDiff(resource);
                 }
             },
             "OpenDiff");
@@ -138,8 +140,7 @@ export class TfvcExtension  {
         this.displayErrors(
             async () => {
                 if (resource) {
-                    let path: string = resource.resourceUri.fsPath;
-                    await window.showTextDocument(await workspace.openTextDocument(path));
+                    return await commands.executeCommand<void>("vscode.open", resource.resourceUri);
                 }
             },
             "OpenFile");
