@@ -97,43 +97,43 @@
       ],
       "explorer/context": [
         {
-          "command" : "tfvc.Rename",
+          "command": "tfvc.Rename",
           "group": "9_cutcopypaste",
           "when": "scmProvider == tfvc"
         }
       ],
       "scm/title": [
         {
-          "command" : "tfvc.Checkin",
+          "command": "tfvc.Checkin",
           "group": "navigation@1",
           "when": "scmProvider == tfvc"
         },
         {
-          "command" : "tfvc.Refresh",
+          "command": "tfvc.Refresh",
           "group": "navigation@2",
           "when": "scmProvider == tfvc"
         },
         {
-          "command" : "tfvc.Sync",
+          "command": "tfvc.Sync",
           "group": "1_sync@1",
           "when": "scmProvider == tfvc"
         },
         {
-          "command" : "team.AssociateWorkItems",
+          "command": "team.AssociateWorkItems",
           "group": "3_commit@1"
         },
         {
-          "command" : "tfvc.Checkin",
+          "command": "tfvc.Checkin",
           "group": "3_commit@2",
           "when": "scmProvider == tfvc"
         },
         {
-          "command" : "tfvc.UndoAll",
+          "command": "tfvc.UndoAll",
           "group": "3_commit@3",
           "when": "scmProvider == tfvc"
         },
         {
-          "command" : "tfvc.ShowOutput",
+          "command": "tfvc.ShowOutput",
           "group": "5_output",
           "when": "scmProvider == tfvc"
         }
@@ -222,7 +222,13 @@
         },
         "team.pinnedQueries": {
           "type": "array",
-          "default": [ { "account": "", "queryText": "", "queryPath": "" }],
+          "default": [
+            {
+              "account": "",
+              "queryText": "",
+              "queryPath": ""
+            }
+          ],
           "description": "Specify the account and either the queryText or queryPath of the query you'd like to monitor.  If specified, queryText is preferred over queryPath."
         },
         "team.pollingInterval": {
@@ -438,6 +444,15 @@
     "postinstall": "node ./node_modules/vscode/bin/install"
   },
   "devDependencies": {
+    "@types/applicationinsights": "0.15.33",
+    "@types/chai": "^3.4.1",
+    "@types/mocha": "^2.2.32",
+    "@types/node": "^6.0.40",
+    "@types/node-uuid": "^6.0.26-alpha",
+    "@types/q": "^0.0.32",
+    "@types/winston": "^2.1.1",
+    "@types/xml2js": "^0.0.32",
+    "@types/xmldoc": "^0.5.0",
     "chai": "^3.4.1",
     "del": "^2.2.0",
     "gulp": "^3.9.0",
@@ -453,15 +468,7 @@
     "typescript": "^2.1.5",
     "vscode": "^1.0.0",
     "vsts-task-lib": "^0.9.18",
-    "yargs": "^5.0.0",
-    "@types/applicationinsights": "0.15.33",
-    "@types/chai": "^3.4.1",
-    "@types/mocha": "^2.2.32",
-    "@types/node": "^6.0.40",
-    "@types/node-uuid": "^6.0.26-alpha",
-    "@types/q": "^0.0.32",
-    "@types/winston": "^2.1.1",
-    "@types/xml2js": "^0.0.32"
+    "yargs": "^5.0.0"
   },
   "dependencies": {
     "applicationinsights": "0.15.16",
@@ -478,6 +485,7 @@
     "url": "^0.11.0",
     "vso-node-api": "^5.1.1",
     "winston": "^2.1.1",
-    "xml2js": "^0.4.17"
+    "xml2js": "^0.4.17",
+    "xmldoc": "^0.5.1"
   }
 }

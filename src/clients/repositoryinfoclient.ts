@@ -12,6 +12,7 @@ import { RepoUtils } from "../helpers/repoutils";
 import { Strings } from "../helpers/strings";
 import { IRepositoryContext, RepositoryType } from "../contexts/repositorycontext";
 import { TeamServicesApi } from "./teamservicesclient";
+import { TfsCatalogSoapClient } from "./tfscatalogsoapclient";
 import { RepositoryInfo } from "../info/repositoryinfo";
 import { TeamProject, TeamProjectCollection } from "vso-node-api/interfaces/CoreInterfaces";
 
@@ -81,9 +82,23 @@ export class RepositoryInfoClient {
             }
 
             let coreApiClient: CoreApiClient = new CoreApiClient();
-            //The following call works for VSTS, TFS 2017 and TFS 2015U3 (multiple collections, spaces in the name)
+            let collection: TeamProjectCollection;
             Logger.LogDebug(`Getting project collection...  url: '${serverUrl}', and collection name: '${collectionName}'`);
-            let collection: TeamProjectCollection = await coreApiClient.GetProjectCollection(serverUrl, collectionName);
+            if (isTeamServices) {
+                //The following call works for VSTS, TFS 2017 and TFS 2015U3 (multiple collections, spaces in the name), just not for non-admins on-prem (!)
+                Logger.LogDebug(`Using REST to get the project collection information`);
+                collection = await coreApiClient.GetProjectCollection(serverUrl, collectionName);
+            } else {
+                Logger.LogDebug(`Using SOAP to get the project collection information`);
+                // When called on-prem without admin privileges: Error: Failed Request: Forbidden(403) - Access Denied: Jeff Young (TFS) needs the following permission(s) to perform this action: Edit instance-level information
+                let tfsClient: TfsCatalogSoapClient = new TfsCatalogSoapClient(serverUrl, [this._handler]);
+                collection = await tfsClient.GetProjectCollection(collectionName);
+                if (!collection) {
+                    const error: string = `Using SOAP, could not find a project collection object for ${collectionName} at ${serverUrl}`;
+                    Logger.LogDebug(error);
+                    throw new Error(error);
+                }
+            }
             Logger.LogDebug(`Found a project collection for url: '${serverUrl}' and collection name: '${collection.name}'.`);
 
             Logger.LogDebug(`Getting team project...  Url: '${serverUrl}', collection name: '${collection.name}', and project: '${teamProjectName}'`);
