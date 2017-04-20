@@ -11,7 +11,7 @@ Here are the currently supported features provided by the extension:
 - Associate work items to check-ins
 - Integrated TFVC Output window
 - Support for a TFS proxy
-- Support for workspaces created with either the Visual Studio IDE, the JetBrains IDEs and Eclipse
+- Support for **local** workspaces created with either the Visual Studio IDE, the JetBrains IDEs and Eclipse
 
 ![Team Foundation Version Control Viewlet](assets/tfvc-viewlet.png)
 
@@ -193,6 +193,9 @@ You will follow the same instructions for setting up the TEE CLC as is shown on 
 
 ### *I have workspaces created with Visual Studio. Can I use the TEE CLC to work with them?*
 This should be possible. However, you will need to make the TEE CLC aware of those workspaces by running the `tf workspaces -collection:<collection-url>` command.
+
+### *Where is the support for Server workspaces?*
+At this time, it's still on the backlog. The issue tracking support for Server workspaces is [here](https://github.com/Microsoft/vsts-vscode/issues/176).
 
 ## Further Information
 For information on other features of the extension, support, licensing, privacy, or contributing code, please review the main [README](README.md) file.

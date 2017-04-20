@@ -24,7 +24,10 @@ Server 2015 Update 2 or later. Earlier versions of Team Foundation Server are no
 With Git, the extension uses the remote origin of your repository to determine how to connect to Team Services (or your Team Foundation Server), in most cases you will need to have a Git repository already cloned locally. If you intend on cloning an existing repository, do so before proceeding. If you do not have a Git repository cloned locally but already have a Team Services account (or a Team Foundation Server instance), you may create a local repository (via `git init`) and once you set the "origin" remote for that local repository, the extension will detect the change to the remote and attempt to contact the Team Services account (or Team Foundation Server).
 
 ### Create your TFVC workspace
-With TFVC, the extension uses information about the current workspace to determine how to connect to Team Services (or your Team Foundation Server). At this time, you will need to have a local TFVC workspace already available on your local machine. These can be created using the Visual Studio IDE, Eclipse or with the JetBrains IDEs (e.g, Android Studio, IntelliJ).
+With TFVC, the extension uses information about the current workspace to determine how to connect to Team Services (or your Team Foundation Server). Workspaces can be created using the Visual Studio IDE, Eclipse or with the JetBrains IDEs (e.g, Android Studio, IntelliJ).
+
+**Note:** At this time, you will need to have a ***local*** TFVC workspace already available on your local machine. The issue tracking support
+for Server workspaces is [here](https://github.com/Microsoft/vsts-vscode/issues/176).
 
 ## Installation
 First, you will need to install [Visual Studio Code](https://code.visualstudio.com/download) `1.11.1` or later.
