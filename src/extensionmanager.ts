@@ -92,23 +92,55 @@ export class ExtensionManager implements Disposable {
         this.initializeExtension(signingOut);
     }
 
-    public EnsureInitialized(expectedType: RepositoryType): boolean {
+    //Ensure we have a TFS or Team Services-based repository. Otherwise, return false.
+    private ensureMinimalInitialization(): boolean {
         if (!this._repoContext
                 || !this._serverContext
                 || !this._serverContext.RepoInfo.IsTeamFoundation) {
             this.setErrorStatus(Strings.NoRepoInformation);
             return false;
-        } else if (expectedType !== this._repoContext.Type
-                   && expectedType !== RepositoryType.ANY) {
+        }
+        return true;
+    }
+
+    //Checks to ensure we're good to go for running TFVC commands
+    public EnsureInitializedForTFVC(): boolean {
+        return this.ensureMinimalInitialization();
+    }
+
+    //Checks to ensure that Team Services functionality is ready to go.
+    public EnsureInitialized(expectedType: RepositoryType): boolean {
+        //Ensure we have a TFS or Team Services-based repository. Otherwise, return false.
+        if (!this.ensureMinimalInitialization()) {
+            return false;
+        }
+        //If we aren't the expected type and we also aren't ANY, determine which error to show.
+        //If we aren't ANY, then this If will handle Git and TFVC. So if we get past the first
+        //if, we're returning false either for Git or for TFVC (there's no other option)
+        if (expectedType !== this._repoContext.Type && expectedType !== RepositoryType.ANY) {
+            //If we already have an error message set, we're in an error state and use that message
+            if (this._errorMessage) {
+                return false;
+            }
             //Display the message straightaway in this case (instead of using status bar)
             if (expectedType === RepositoryType.GIT) {
                 VsCodeUtils.ShowErrorMessage(Strings.NotAGitRepository);
                 return false;
-            } else if (expectedType === RepositoryType.TFVC) {
+            }
+            if (expectedType === RepositoryType.TFVC) {
                 VsCodeUtils.ShowErrorMessage(Strings.NotATfvcRepository);
                 return false;
             }
-        } else if (this._errorMessage !== undefined) {
+        }
+        //For TFVC, without a TeamProjectName, we can't initialize the Team Services functionality
+        if ((expectedType === RepositoryType.TFVC || expectedType === RepositoryType.ANY)
+            && this._repoContext.Type === RepositoryType.TFVC
+            && !this._repoContext.TeamProjectName) {
+            this.setErrorStatus(Strings.NoTeamProjectFound);
+            return false;
+        }
+        //Finally, if we set a global error message, there's an issue so we can't initialize.
+        if (this._errorMessage !== undefined) {
             return false;
         }
         return true;
@@ -336,14 +368,17 @@ export class ExtensionManager implements Disposable {
 
     //Set up the initial status bars
     private initializeStatusBars() {
-        if (this.EnsureInitialized(RepositoryType.ANY)) {
+        if (this.EnsureInitializedForTFVC()) {
             this._teamServicesStatusBarItem.command = CommandNames.OpenTeamSite;
-            this._teamServicesStatusBarItem.text = this._serverContext.RepoInfo.TeamProject;
+            this._teamServicesStatusBarItem.text = this._serverContext.RepoInfo.TeamProject ? this._serverContext.RepoInfo.TeamProject : "<none>";
             this._teamServicesStatusBarItem.tooltip = Strings.NavigateToTeamServicesWebSite;
             this._teamServicesStatusBarItem.show();
-            // Update the extensions
-            this._teamExtension.InitializeStatusBars();
-            //this._tfvcExtension.InitializeStatusBars();
+
+            if (this.EnsureInitialized(RepositoryType.ANY)) {
+                // Update the extensions
+                this._teamExtension.InitializeStatusBars();
+                //this._tfvcExtension.InitializeStatusBars();
+            }
         }
     }
 

@@ -346,15 +346,19 @@ export class TeamExtension  {
     }
 
     public InitializeClients(repoType: RepositoryType) : void {
-        //We can initialize for any repo type (just skip _gitClient if not Git)
-        this._pinnedQuerySettings = new PinnedQuerySettings(this._manager.ServerContext.RepoInfo.Account);
-        this._buildClient = new BuildClient(this._manager.ServerContext, this._buildStatusBarItem);
-        //Don't initialize the Git client if we aren't a Git repository
-        if (repoType === RepositoryType.GIT) {
-            this._gitClient = new GitClient(this._manager.ServerContext, this._pullRequestStatusBarItem);
+        //Ensure that the repo type is good to go before we initialize the clients for it. If we
+        //can't get a team project for TFVC, we shouldn't initialize the clients.
+        if (this._manager.EnsureInitialized(repoType)) {
+            //We can initialize for any repo type (just skip _gitClient if not Git)
+            this._pinnedQuerySettings = new PinnedQuerySettings(this._manager.ServerContext.RepoInfo.Account);
+            this._buildClient = new BuildClient(this._manager.ServerContext, this._buildStatusBarItem);
+            //Don't initialize the Git client if we aren't a Git repository
+            if (repoType === RepositoryType.GIT) {
+                this._gitClient = new GitClient(this._manager.ServerContext, this._pullRequestStatusBarItem);
+            }
+            this._witClient = new WitClient(this._manager.ServerContext, this._pinnedQuerySettings.PinnedQuery, this._pinnedQueryStatusBarItem);
+            this.startPolling();
         }
-        this._witClient = new WitClient(this._manager.ServerContext, this._pinnedQuerySettings.PinnedQuery, this._pinnedQueryStatusBarItem);
-        this.startPolling();
     }
 
     private pollBuildStatus(): void {

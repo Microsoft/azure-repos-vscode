@@ -297,6 +297,8 @@ export class TfvcExtension  {
      * opens a web browser to the appropriate history page.
      */
     public async ViewHistory(): Promise<void> {
+        //Since this command provides Team Services functionality, we need
+        //to ensure it is initialized for Team Services
         if (!this._manager.EnsureInitialized(RepositoryType.TFVC)) {
             this._manager.DisplayErrorMessage();
             return;
@@ -338,7 +340,7 @@ export class TfvcExtension  {
     }
 
     private async displayErrors(funcToTry: (prefix) => Promise<void>, prefix: string): Promise<void> {
-        if (!this._manager.EnsureInitialized(RepositoryType.TFVC)) {
+        if (!this._manager.EnsureInitializedForTFVC()) {
             this._manager.DisplayErrorMessage();
             return;
         }

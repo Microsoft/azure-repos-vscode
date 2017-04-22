@@ -104,6 +104,9 @@ export class RepositoryInfoClient {
             Logger.LogDebug(`Getting team project...  Url: '${serverUrl}', collection name: '${collection.name}', and project: '${teamProjectName}'`);
             //For a Team Services collection, ignore the collectionName
             let resolvedRemoteUrl: string = url.resolve(serverUrl, isTeamServices ? "" : collection.name);
+
+            //Delay the check for a teamProjectName (don't fail here).  If we don't have one, that's OK for TFVC
+            //functionality.  We need to disable Team Services functionality if we can't find a team project later.
             let project: TeamProject = await this.getProjectFromServer(coreApiClient, resolvedRemoteUrl, teamProjectName);
             Logger.LogDebug(`Found a team project for url: '${serverUrl}', collection name: '${collection.name}', and project id: '${project.id}'`);
 

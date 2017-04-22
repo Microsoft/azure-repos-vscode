@@ -75,6 +75,7 @@ export class Strings {
     static CommandRequiresExplorerContext: string = "This command requires a file context and can only be executed from the Explorer window.";
     static RenamePrompt: string = "Provide the new name for the file.";
     static NoMatchesFound: string = "No items match any of the file paths provided.";
+    static NoTeamProjectFound: string = "No team project found for this repository. Team Services functionality has been disabled.";
     static NoWorkspaceMappings: string = "Could not find a workspace with mappings.  Perhaps the wrong version of TF is being used with the selected folder?";
     static ShowTfvcOutput: string = "Show TFVC Output";
 
