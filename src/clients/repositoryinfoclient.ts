@@ -65,7 +65,8 @@ export class RepositoryInfoClient {
                 // A full Team Foundation Server collection url is required for the validate call to succeed.
                 // So we try the url given. If that fails, we assume it is a server Url and the collection is
                 // the defaultCollection. If that assumption fails we return false.
-                if (this.validateTfvcCollectionUrl(serverUrl)) {
+                let valid: boolean = await this.validateTfvcCollectionUrl(serverUrl);
+                if (valid) {
                     let parts: string[] = this.splitTfvcCollectionUrl(serverUrl);
                     serverUrl = parts[0];
                     collectionName = parts[1];
@@ -73,7 +74,8 @@ export class RepositoryInfoClient {
                 } else {
                     Logger.LogDebug(`Unable to validate the TFS TFVC repository. Url: '${serverUrl}'  Attempting with DefaultCollection...`);
                     collectionName = "DefaultCollection";
-                    if (!this.validateTfvcCollectionUrl(url.resolve(serverUrl, collectionName))) {
+                    valid = await this.validateTfvcCollectionUrl(url.resolve(serverUrl, collectionName));
+                    if (!valid) {
                         Logger.LogDebug(`Unable to validate the TFS TFVC repository with DefaultCollection.`);
                         throw new Error(Strings.UnableToValidateTfvcRepositoryWithDefaultCollection);
                     }
@@ -192,7 +194,7 @@ export class RepositoryInfoClient {
             await repositoryClient.validateTfvcCollectionUrl();
             return true;
         } catch (err) {
-            if (err.errorCode === "404") {
+            if (err.statusCode === 404) {
                 return false;
             } else {
                 throw err;
