@@ -11,10 +11,10 @@
     "theme": "dark"
   },
   "keywords": [
+    "VSTS",
     "Team Foundation Server",
     "Team Services",
     "Visual Studio Team Services",
-    "VSTS",
     "TFVC"
   ],
   "categories": [
@@ -260,6 +260,11 @@
           "type": "string",
           "default": "",
           "description": "Specify the full URL (ex. http://servername:9999/proxy) to the TFS proxy to use for TFVC functionality."
+        },
+        "tfvc.restrictWorkspace": {
+          "type": "boolean",
+          "default": false,
+          "description": "Restricts the TFVC workspace to the currently open VS Code workspace."
         }
       }
     },

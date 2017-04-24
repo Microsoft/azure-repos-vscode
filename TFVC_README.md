@@ -180,6 +180,14 @@ To configure a TFS proxy server, you must provide the URL to that server in the 
     "tfvc.proxy": "http://servername:9999/proxy"
   ```
 
+### Restricting Status changes to the current VS Code Workspace
+By default, TFVC support shows status across the entire mapped workspace regardless of the folder you may have open in Visual Studio Code. If you
+prefer to see just the status of changes for the currently opened VS Code workspace, you can do so by setting the following flag in the Visual
+Studio Code Settings (**File > Preferences > Settings**):
+  ```javascript
+    "tfvc.restrictWorkspace": true
+  ```
+
 ## Frequently Asked Questions
 ### *Is it required that I have a TFVC workspace already on my local machine to use the TFVC support?*
 With release 1.116.0, yes, it is a requirement that you have an existing workspace on your local machine.

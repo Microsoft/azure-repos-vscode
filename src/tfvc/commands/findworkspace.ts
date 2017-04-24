@@ -4,6 +4,7 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
+import * as path from "path";
 import { Strings } from "../../helpers/strings";
 import { IArgumentProvider, IExecutionResult, ITfvcCommand, IWorkspace, IWorkspaceMapping } from "../interfaces";
 import { ArgumentBuilder } from "./argumentbuilder";
@@ -18,16 +19,26 @@ import { TfvcError, TfvcErrorCodes } from "../tfvcerror";
  */
 export class FindWorkspace implements ITfvcCommand<IWorkspace> {
     private _localPath: string;
+    private _restrictWorkspace: boolean;
 
-    public constructor(localPath: string) {
+    public constructor(localPath: string, restrictWorkspace: boolean = false) {
         CommandHelper.RequireStringArgument(localPath, "localPath");
         this._localPath = localPath;
+        this._restrictWorkspace = restrictWorkspace;
     }
 
     public GetArguments(): IArgumentProvider {
         // Due to a bug in the CLC this command "requires" the login switch although the creds are never used
-        return new ArgumentBuilder("workfold")
-            .AddSwitchWithValue("login", "fake,fake", true);
+        const builder: ArgumentBuilder = new ArgumentBuilder("workfold");
+        //If desired, restrict the workspace to the localPath (VS Code's current workspace)
+        if (this._restrictWorkspace) {
+            //With TEE, I got an error when passing "login", "fake,fake" and the path at the same time.
+                // A client error occurred: Error refreshing cached workspace WorkspaceInfo (*snip*) from server:
+                // Access denied connecting to TFS server http://java-tfs2015:8081/ (authenticating as fake)
+            //TF.exe is fine without the fake login when a localPath is provided
+            return builder.Add(this._localPath);
+        }
+        return builder.AddSwitchWithValue("login", "fake,fake", true);
     }
 
     public GetOptions(): any {
@@ -83,6 +94,9 @@ export class FindWorkspace implements ITfvcCommand<IWorkspace> {
                 const mapping: IWorkspaceMapping = this.getMapping(line);
                 if (mapping) {
                     mappings.push(mapping);
+                    //If we're restricting workspaces, tf.exe will return the proper (single) folder. While TEE will
+                    //return all of the mapped folders (so we have to find the right one based on the folder name passed in)
+                    //We will do that further down but this sets up the default for that scenario.
                     if (!teamProject) {
                         teamProject = this.getTeamProject(mapping.serverPath);
                     }
@@ -94,6 +108,20 @@ export class FindWorkspace implements ITfvcCommand<IWorkspace> {
                 message: Strings.NoWorkspaceMappings,
                 tfvcErrorCode: TfvcErrorCodes.NotATfvcRepository
              });
+        }
+        //If we're restricting the workspace, find the proper teamProject name
+        if (this._restrictWorkspace) {
+            const folder: string = path.basename(this._localPath).toLowerCase();
+            //With tf.exe, folder and teamProject should match (TEE won't)
+            if (folder !== teamProject.toLowerCase()) {
+                for (let i: number = 0; i < mappings.length; i++) {
+                    const project: string = this.getTeamProject(mappings[i].serverPath); //maintain case in serverPath
+                    if (project.toLowerCase() === folder) {
+                        teamProject = project;
+                        break;
+                    }
+                }
+            }
         }
         //If there are mappings but no workspace name, the term 'workspace' couldn't be parsed. According to Bing
         //translate, other than Klingon, no other supported language translates 'workspace' as 'workspace'.

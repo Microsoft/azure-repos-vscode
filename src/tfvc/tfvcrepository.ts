@@ -22,6 +22,7 @@ import { ResolveConflicts } from "./commands/resolveconflicts";
 import { Status } from "./commands/status";
 import { Sync } from "./commands/sync";
 import { Undo } from "./commands/undo";
+import { TfvcSettings } from "./tfvcsettings";
 
 import * as _ from "underscore";
 
@@ -34,14 +35,18 @@ export class TfvcRepository {
     private _tfCommandLine: ITfCommandLine;
     private _repositoryRootFolder: string;
     private _env: any;
-    private _versionAlreadyChecked = false;
+    private _versionAlreadyChecked: boolean = false;
+    private _settings: TfvcSettings;
+    private _isExe: boolean = false;
 
-    public constructor(serverContext: TeamServerContext, tfCommandLine: ITfCommandLine, repositoryRootFolder: string, env: any = {}) {
+    public constructor(serverContext: TeamServerContext, tfCommandLine: ITfCommandLine, repositoryRootFolder: string, env: any = {}, isExe: boolean) {
         Logger.LogDebug(`TFVC Repository created with repositoryRootFolder='${repositoryRootFolder}'`);
         this._serverContext = serverContext;
         this._tfCommandLine = tfCommandLine;
         this._repositoryRootFolder = repositoryRootFolder;
         this._env = env;
+        this._isExe = isExe;
+        this._settings = new TfvcSettings();
 
         // Add the environment variables that we need to make sure the CLC runs as fast as possible and
         // provides English strings back to us to parse.
@@ -57,8 +62,16 @@ export class TfvcRepository {
         return this._serverContext !== undefined && this._serverContext.CredentialInfo !== undefined && this._serverContext.RepoInfo.CollectionUrl !== undefined;
     }
 
+    public get IsExe(): boolean {
+        return this._isExe;
+    }
+
     public get Path(): string {
         return this._repositoryRootFolder;
+    }
+
+    public get RestrictWorkspace(): boolean {
+        return this._settings.RestrictWorkspace;
     }
 
     public async Add(itemPaths: string[]): Promise<string[]> {
@@ -88,7 +101,7 @@ export class TfvcRepository {
     public async FindWorkspace(localPath: string): Promise<IWorkspace> {
         Logger.LogDebug(`TFVC Repository.FindWorkspace with localPath='${localPath}'`);
         return this.RunCommand<IWorkspace>(
-            new FindWorkspace(localPath));
+            new FindWorkspace(localPath, this._settings.RestrictWorkspace));
     }
 
     public async GetInfo(itemPaths: string[]): Promise<IItemInfo[]> {
@@ -105,8 +118,12 @@ export class TfvcRepository {
 
     public async GetStatus(ignoreFiles?: boolean): Promise<IPendingChange[]> {
         Logger.LogDebug(`TFVC Repository.GetStatus`);
-        return this.RunCommand<IPendingChange[]>(
-            new Status(this._serverContext, ignoreFiles === undefined ? true : ignoreFiles));
+        let statusCommand: Status = new Status(this._serverContext, ignoreFiles === undefined ? true : ignoreFiles);
+        //If we're restricting the workspace, pass in the repository root folder to Status
+        if (this._settings.RestrictWorkspace) {
+            statusCommand = new Status(this._serverContext, ignoreFiles === undefined ? true : ignoreFiles, [this._repositoryRootFolder]);
+        }
+        return this.RunCommand<IPendingChange[]>(statusCommand);
     }
 
     public async Rename(sourcePath: string, destinationPath: string): Promise<string> {

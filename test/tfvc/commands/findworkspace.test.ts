@@ -157,6 +157,30 @@ describe("Tfvc-FindWorkspaceCommand", function() {
         }
     });
 
+    it("should verify parse output - no errors - restrictWorkspace", async function() {
+        let localPath: string = "/path/to/workspace/project2";
+        let cmd: FindWorkspace = new FindWorkspace(localPath, true);
+        let executionResult: IExecutionResult = {
+            exitCode: 0,
+            stdout: "=====================================================================================================================================================\n" +
+                "Workspace:  MyWorkspace\n" +
+                "Collection: http://server:8080/tfs/\n" +
+                "$/project1: /path\n" +
+                "$/project2: /path2",
+            stderr: undefined
+        };
+
+        let workspace: IWorkspace = await cmd.ParseOutput(executionResult);
+        assert.equal(workspace.name, "MyWorkspace");
+        assert.equal(workspace.server, "http://server:8080/tfs/");
+        //This test should find project2 as the team porject since the localPath contains project2 and we have restrictWorkspace
+        assert.equal(workspace.defaultTeamProject, "project2");
+        assert.equal(workspace.comment, undefined);
+        assert.equal(workspace.computer, undefined);
+        assert.equal(workspace.owner, undefined);
+        assert.equal(workspace.mappings.length, 2);
+    });
+
     /***********************************************************************************************
      * The methods below are duplicates of the parse output methods but call the parseExeOutput.
      ***********************************************************************************************/
@@ -252,5 +276,29 @@ describe("Tfvc-FindWorkspaceCommand", function() {
             assert.isTrue(err.message.startsWith(Strings.NoWorkspaceMappings));
             assert.equal(err.tfvcErrorCode, TfvcErrorCodes.NotATfvcRepository);
         }
+    });
+
+    it("should verify parse EXE output - no errors - restrictWorkspace", async function() {
+        let localPath: string = "/path/to/workspace/project2";
+        let cmd: FindWorkspace = new FindWorkspace(localPath, true);
+        let executionResult: IExecutionResult = {
+            exitCode: 0,
+            stdout: "=====================================================================================================================================================\n" +
+                "Workspace:  MyWorkspace\n" +
+                "Collection: http://server:8080/tfs/\n" +
+                "$/project1: /path\n" +
+                "$/project2: /path2",
+            stderr: undefined
+        };
+
+        let workspace: IWorkspace = await cmd.ParseExeOutput(executionResult);
+        assert.equal(workspace.name, "MyWorkspace");
+        assert.equal(workspace.server, "http://server:8080/tfs/");
+        //This test should find project2 as the team porject since the localPath contains project2 and we have restrictWorkspace
+        assert.equal(workspace.defaultTeamProject, "project2");
+        assert.equal(workspace.comment, undefined);
+        assert.equal(workspace.computer, undefined);
+        assert.equal(workspace.owner, undefined);
+        assert.equal(workspace.mappings.length, 2);
     });
 });
