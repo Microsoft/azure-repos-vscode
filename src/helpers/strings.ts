@@ -16,12 +16,12 @@ export class Strings {
     static NoAccessTokenFound: string = "A personal access token for this Team Services repository was not found in your local user settings.";
     static NoAccessTokenLearnMoreRunSignin: string = "You are not connected to Team Services (%s). Select 'Learn more...' and then run the 'team signin' command.";
     static NoAccessTokenRunSignin: string = "You are not connected to Team Services (%s). Please run the 'team signin' command.";
-    static NoTeamServerCredentialsRunSignin: string = "You are not connected to a Team Foundation Server.  Please run the 'team signin' command.";
+    static NoTeamServerCredentialsRunSignin: string = "You are not connected to a Team Foundation Server. Please run the 'team signin' command.";
     static NoBuildsFound: string = "No builds were found for this repository and branch. Click to view your team project's build definitions page.";
     static NoTfvcBuildsFound: string = "No builds were found for this repository. Click to view your team project's build definitions page.";
-    static NoRepoInformation: string = "No Team Services or Team Foundation Server repository configuration was found.  Ensure you've opened a folder that contains a repository.";
+    static NoRepoInformation: string = "No Team Services or Team Foundation Server repository configuration was found. Ensure you've opened a folder that contains a repository.";
     static NoSourceFileForBlame: string = "A source file must be opened to show blame information.";
-    static FoundTokenInSettings: string = "A PAT was found in your VS Code settings.  It will be ignored and you should remove it.  You should now use the Sign In command to store your PAT in a secure location.";
+    static FoundTokenInSettings: string = "A PAT was found in your VS Code settings. It will be ignored and you should remove it. You should now use the Sign In command to store your PAT in a secure location.";
 
     static SendAFrown: string = "Send a Frown";
     static SendASmile: string = "Send a Smile";
@@ -44,23 +44,23 @@ export class Strings {
     static ProvideUsername: string = "Provide the username for server";
 
     static UnsupportedServerVersion: string = "The Team Services extension only supports TFS version 2015 Update 2 or later. Please verify your TFS server version.";
-    static UnableToRemoveCredentials: string = "Unable to remove credentials for this host.  You may need to remove them manually.  Host: ";
-    static UnableToStoreCredentials: string = "Unable to store credentials for this host.  Host: ";
+    static UnableToRemoveCredentials: string = "Unable to remove credentials for this host. You may need to remove them manually. Host: ";
+    static UnableToStoreCredentials: string = "Unable to store credentials for this host. Host: ";
 
     static UnableToValidateTeamServicesTfvcRepository: string = "Unable to validate the Team Services TFVC repository.";
     static UnableToValidateTfvcRepositoryWithDefaultCollection: string = "Unable to validate the TFS TFVC repository with DefaultCollection.";
 
     //Status codes
     static StatusCode401: string = "Unauthorized. Check your authentication credentials and try again.";
-    static StatusCodeOffline: string = "It appears Visual Studio Code is offline.  Please connect and try again.";
-    static ProxyUnreachable: string = "It appears the configured proxy is not reachable.  Please check your connection and try again.";
+    static StatusCodeOffline: string = "It appears Visual Studio Code is offline. Please connect and try again.";
+    static ProxyUnreachable: string = "It appears the configured proxy is not reachable. Please check your connection and try again.";
 
     // TFVC messages/errors
     static ChooseItemQuickPickPlaceHolder: string = "Choose a file to open it.";
-    static NotAGitRepository: string = "The open folder is not a Git repository.  Please check the folder location and try again.";
-    static NotATfvcRepository: string = "The open folder is not a TFVC repository.  Please check the folder location and try again.";
-    static NotAnEnuTfCommandLine: string = "It appears you have configured a non-English version of the TF executable.  Please ensure an English version is properly configured.";
-    static TokenNotAllScopes: string = "The personal access token provided does not have All Scopes.  All Scopes is required for TFVC support.";
+    static NotAGitRepository: string = "The open folder is not a Git repository. Please check the folder location and try again.";
+    static NotATfvcRepository: string = "The open folder is not a TFVC repository. Please check the folder location and try again.";
+    static NotAnEnuTfCommandLine: string = "It appears you have configured a non-English version of the TF executable. Please ensure an English version is properly configured.";
+    static TokenNotAllScopes: string = "The personal access token provided does not have All Scopes. All Scopes is required for TFVC support.";
     static TfvcLocationMissingError: string = "The path to the TFVC command line (including filename) was not found in the user settings. Please set this value (tfvc.location) and try again.";
     static TfMissingError: string = "Unable to find the TF executable. Please ensure TF is installed and the path specified contains the filename. Provided path: ";
     static TfInitializeFailureError: string = "Unable to initialize the TF executable. Please verify the installation of Java and ensure it is in the PATH.";
@@ -75,8 +75,8 @@ export class Strings {
     static CommandRequiresExplorerContext: string = "This command requires a file context and can only be executed from the Explorer window.";
     static RenamePrompt: string = "Provide the new name for the file.";
     static NoMatchesFound: string = "No items match any of the file paths provided.";
-    static NoTeamProjectFound: string = "No team project found for this repository. Team Services functionality has been disabled.";
-    static NoWorkspaceMappings: string = "Could not find a workspace with mappings.  Perhaps the wrong version of TF is being used with the selected folder?";
+    static NoTeamProjectFound: string = "No team project found for this repository. Build and Work Item functionality has been disabled.";
+    static NoWorkspaceMappings: string = "Could not find a workspace with mappings (e.g., not a TFVC repository, wrong version of TF is being used)";
     static ShowTfvcOutput: string = "Show TFVC Output";
 
     // TFVC viewlet Strings
