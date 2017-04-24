@@ -15,7 +15,8 @@ import { Utils } from "./helpers/utils";
 import { ButtonMessageItem, VsCodeUtils } from "./helpers/vscodeutils";
 import { RepositoryContextFactory } from "./contexts/repocontextfactory";
 import { IRepositoryContext, RepositoryType } from "./contexts/repositorycontext";
-import { TeamServerContext} from "./contexts/servercontext";
+import { TeamServerContext } from "./contexts/servercontext";
+import { TfvcContext } from "./contexts/tfvccontext";
 import { Telemetry } from "./services/telemetry";
 import { TeamServicesApi } from "./clients/teamservicesclient";
 import { FeedbackClient } from "./clients/feedbackclient";
@@ -27,6 +28,7 @@ import { TfCommandLineRunner } from "./tfvc/tfcommandlinerunner";
 import { TfvcExtension } from "./tfvc/tfvc-extension";
 import { TfvcErrorCodes } from "./tfvc/tfvcerror";
 import { TfvcSCMProvider } from "./tfvc/tfvcscmprovider";
+import { TfvcRepository } from "./tfvc/tfvcrepository";
 
 import * as path from "path";
 import * as util from "util";
@@ -317,6 +319,8 @@ export class ExtensionManager implements Disposable {
 
                     // Now that everything else is ready, create the SCM provider
                     if (this._repoContext.Type === RepositoryType.TFVC) {
+                        const tfvcContext: TfvcContext = <TfvcContext>this._repoContext;
+                        this.sendTfvcToolingTelemetry(tfvcContext.TfvcRepository);
                         if (!this._scmProvider) {
                             this._scmProvider = new TfvcSCMProvider(this);
                             await this._scmProvider.Initialize();
@@ -354,6 +358,20 @@ export class ExtensionManager implements Disposable {
         }
 
         Telemetry.SendEvent(event);
+    }
+
+    //Sends telemetry based on values of the TfvcRepostiory (which TF tooling (Exe or CLC) is being used)
+    private sendTfvcToolingTelemetry(repository: TfvcRepository): void {
+        let event: string = TfvcTelemetryEvents.UsingExe;
+
+        if (!repository.IsExe) {
+            event = TfvcTelemetryEvents.UsingClc;
+        }
+        Telemetry.SendEvent(event);
+
+        if (repository.RestrictWorkspace) {
+            Telemetry.SendEvent(TfvcTelemetryEvents.RestrictWorkspace);
+        }
     }
 
     //Determines which Tfvc errors to display in the status bar ui
@@ -396,8 +414,8 @@ export class ExtensionManager implements Disposable {
                             + "UserCustomDisplayName: " + this._serverContext.UserInfo.CustomDisplayName + " "
                             + "UserProviderDisplayName: " + this._serverContext.UserInfo.ProviderDisplayName + " "
                             + "UserId: " + this._serverContext.UserInfo.Id + " ");
-        Logger.LogDebug("gitFolder: " + this._repoContext.RepoFolder);
-        Logger.LogDebug("gitRemoteUrl: " + this._repoContext.RemoteUrl);
+        Logger.LogDebug("repositoryFolder: " + this._repoContext.RepoFolder);
+        Logger.LogDebug("repositoryRemoteUrl: " + this._repoContext.RemoteUrl);
         if (this._repoContext.Type === RepositoryType.GIT) {
             Logger.LogDebug("gitRepositoryParentFolder: " + this._repoContext.RepositoryParentFolder);
             Logger.LogDebug("gitCurrentBranch: " + this._repoContext.CurrentBranch);

@@ -113,6 +113,7 @@ export class TfvcTelemetryEvents {
     static OpenFileHistory: string = TfvcTelemetryEvents.TelemetryPrefix + "openfilehistory";
     static OpenRepositoryHistory: string = TfvcTelemetryEvents.TelemetryPrefix + "openrepohistory";
     static RenameConflict: string = TfvcTelemetryEvents.TelemetryPrefix + "renameconflict";
+    static RestrictWorkspace: string = TfvcTelemetryEvents.TelemetryPrefix + "restrictWorkspace";
     static Status: string = TfvcTelemetryEvents.TelemetryPrefix + "status";
     static StartUp: string = TfvcTelemetryEvents.TelemetryPrefix + "startup";
     static Sync: string = TfvcTelemetryEvents.TelemetryPrefix + "sync";

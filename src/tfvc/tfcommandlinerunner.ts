@@ -15,8 +15,6 @@ import { TfvcRepository } from "./tfvcrepository";
 import { TfvcSettings } from "./tfvcsettings";
 import { TfvcVersion } from "./tfvcversion";
 import { TfvcOutput } from "./tfvcoutput";
-import { Telemetry } from "../services/telemetry";
-import { TfvcTelemetryEvents } from "../helpers/constants";
 
 import * as _ from "underscore";
 import * as fs from "fs";
@@ -32,7 +30,7 @@ export class TfCommandLineRunner {
      */
     public static CreateRepository(serverContext: TeamServerContext, repositoryRootFolder: string, env: any = {}): TfvcRepository {
         const tfvc: ITfCommandLine = TfCommandLineRunner.GetCommandLine();
-        return new TfvcRepository(serverContext, tfvc, repositoryRootFolder, env);
+        return new TfvcRepository(serverContext, tfvc, repositoryRootFolder, env, tfvc.isExe);
     }
 
     public static GetCommandLine(localPath?: string): ITfCommandLine {
@@ -81,9 +79,6 @@ export class TfCommandLineRunner {
         let minVersion: string = "14.0.4"; //CLC min version
         if (isExe) {
             minVersion = "14.0.0";  //Minimum tf.exe version
-            Telemetry.SendEvent(TfvcTelemetryEvents.UsingExe);
-        } else {
-            Telemetry.SendEvent(TfvcTelemetryEvents.UsingClc);
         }
 
         return {
