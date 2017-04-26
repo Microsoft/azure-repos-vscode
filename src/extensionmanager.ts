@@ -5,7 +5,7 @@
 "use strict";
 
 import { Disposable, FileSystemWatcher, StatusBarAlignment, StatusBarItem, version, window, workspace } from "vscode";
-import { AccountSettings, Settings } from "./helpers/settings";
+import { Settings } from "./helpers/settings";
 import { CommandNames, Constants, TelemetryEvents, TfvcTelemetryEvents } from "./helpers/constants";
 import { CredentialManager } from "./helpers/credentialmanager";
 import { Logger } from "./helpers/logger";
@@ -44,7 +44,6 @@ export class ExtensionManager implements Disposable {
     private _teamExtension: TeamExtension;
     private _tfvcExtension: TfvcExtension;
     private _scmProvider: TfvcSCMProvider;
-    private _showNagMessage: boolean = true;
 
     public async Initialize(): Promise<void> {
         await this.setupFileSystemWatcherOnConfig();
@@ -243,16 +242,8 @@ export class ExtensionManager implements Disposable {
 
                 this._feedbackClient = new FeedbackClient();
                 this._credentialManager = new CredentialManager();
-                let accountSettings = new AccountSettings(this._serverContext.RepoInfo.Account);
-                //FUTURE: The nag message, accountSettings.TeamServicesPersonalAccessToken and signingOut flag can be remove in VNEXT (documentation was removed in 1.104; Aug 2016)
-                if (accountSettings.TeamServicesPersonalAccessToken && !signingOut && this._showNagMessage) {
-                    this._showNagMessage = false;  //show message only at start of VS Code (not during re-initialization)
-                    Logger.LogDebug("Found a token in settings.json");
-                    Telemetry.SendEvent(TelemetryEvents.TokenInSettings);
-                    VsCodeUtils.ShowWarningMessage(Strings.FoundTokenInSettings);
-                }
 
-                this._credentialManager.GetCredentials(this._serverContext, undefined).then(async (creds: CredentialInfo) => {
+                this._credentialManager.GetCredentials(this._serverContext).then(async (creds: CredentialInfo) => {
                     if (!creds || !creds.CredentialHandler) {
                         if (!signingOut) {
                             this.displayNoCredentialsMessage();
@@ -294,6 +285,7 @@ export class ExtensionManager implements Disposable {
                                 await this.initializeClients(this._repoContext.Type);
 
                                 this.sendStartupTelemetry();
+                                Logger.LogInfo(`Sent extension start up telemetry`);
 
                                 Logger.LogObject(settings);
                                 this.logDebugInformation();
@@ -321,11 +313,16 @@ export class ExtensionManager implements Disposable {
                     if (this._repoContext.Type === RepositoryType.TFVC) {
                         const tfvcContext: TfvcContext = <TfvcContext>this._repoContext;
                         this.sendTfvcToolingTelemetry(tfvcContext.TfvcRepository);
+                        Logger.LogInfo(`Sent TFVC tooling telemetry`);
                         if (!this._scmProvider) {
+                            Logger.LogDebug(`Initializing the TfvcSCMProvider`);
                             this._scmProvider = new TfvcSCMProvider(this);
                             await this._scmProvider.Initialize();
+                            Logger.LogDebug(`Initialized the TfvcSCMProvider`);
                         } else {
+                            Logger.LogDebug(`Re-initializing the TfvcSCMProvider`);
                             await this._scmProvider.Reinitialize();
+                            Logger.LogDebug(`Re-initialized the TfvcSCMProvider`);
                         }
                     }
                 }).fail((err) => {
@@ -434,9 +431,10 @@ export class ExtensionManager implements Disposable {
         Logger.SetLoggingLevel(loggingLevel);
         if (rootPath !== undefined) {
             Logger.LogPath = rootPath;
-            Logger.LogInfo("*** FOLDER: " + rootPath + " ***");
+            Logger.LogInfo(`*** FOLDER: ${rootPath} ***`);
+            Logger.LogInfo(`version ${Constants.ExtensionVersion}`);
         } else {
-            Logger.LogInfo("*** Folder not opened ***");
+            Logger.LogInfo(`*** Folder not opened ***`);
         }
     }
 

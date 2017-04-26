@@ -35,6 +35,7 @@ export class RepositoryInfoClient {
             repositoryClient = new TeamServicesApi(this._repoContext.RemoteUrl, [this._handler]);
             repoInfo = await repositoryClient.getVstsInfo();
             repositoryInfo = new RepositoryInfo(repoInfo);
+            Logger.LogDebug(`Finished getting repository information for a Git repository at ${this._repoContext.RemoteUrl}`);
             return repositoryInfo;
         } else if (this._repoContext.Type === RepositoryType.TFVC || this._repoContext.Type === RepositoryType.EXTERNAL) {
             Logger.LogDebug(`Getting repository information for a TFVC repository at ${this._repoContext.RemoteUrl}`);
@@ -65,6 +66,7 @@ export class RepositoryInfoClient {
                 // A full Team Foundation Server collection url is required for the validate call to succeed.
                 // So we try the url given. If that fails, we assume it is a server Url and the collection is
                 // the defaultCollection. If that assumption fails we return false.
+                Logger.LogDebug(`Starting the validation of the TFS TFVC repository collection Url ('${serverUrl}')`);
                 let valid: boolean = await this.validateTfvcCollectionUrl(serverUrl);
                 if (valid) {
                     let parts: string[] = this.splitTfvcCollectionUrl(serverUrl);
@@ -114,7 +116,10 @@ export class RepositoryInfoClient {
 
             //Now, create the JSON blob to send to new RepositoryInfo(repoInfo);
             repoInfo = this.getTfvcRepoInfoBlob(serverUrl, collection.id, collection.name, collection.url, project.id, project.name, project.description, project.url);
+            Logger.LogDebug(`Tfvc repository information blob:`);
+            Logger.LogObject(repoInfo);
             repositoryInfo = new RepositoryInfo(repoInfo);
+            Logger.LogDebug(`Finished getting repository information for a TFVC repository at ${this._repoContext.RemoteUrl}`);
             return repositoryInfo;
         }
         return repositoryInfo;

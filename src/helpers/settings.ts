@@ -65,44 +65,6 @@ export class PinnedQuerySettings extends BaseSettings {
     }
 }
 
-//FUTURE: The AccountSettings class can be remove in VNEXT (documentation was removed in 1.104; Aug 2016)
-export class AccountSettings extends BaseSettings {
-    private _teamServicesPersonalAccessToken: string;
-
-    constructor(account: string) {
-        super();
-        // Storing PATs by account in the configuration settings to make switching between accounts easier
-        this._teamServicesPersonalAccessToken = this.getAccessToken(account);
-    }
-
-    private getAccessToken(account: string) : string {
-        let tokens: any = this.readSetting<any[]>(SettingNames.AccessTokens, undefined);
-        if (tokens !== undefined) {
-            Logger.LogDebug("Found access tokens in user configuration settings.");
-            let global: string = undefined;
-            for (let index: number = 0; index < tokens.length; index++) {
-                let element: any = tokens[index];
-                if (element.account === account ||
-                    element.account === account + ".visualstudio.com") {
-                    return element.token;
-                } else if (element.account === "global") {
-                    global = element.token;
-                }
-            }
-            if (global !== undefined) {
-                Logger.LogDebug("No account-specific token found, using global token.");
-                return global;
-            }
-        }
-        Logger.LogDebug("No account-specific token or global token found.");
-        return undefined;
-    }
-
-    public get TeamServicesPersonalAccessToken() : string {
-        return this._teamServicesPersonalAccessToken;
-    }
-}
-
 export interface ISettings {
     AppInsightsEnabled: boolean;
     AppInsightsKey: string;

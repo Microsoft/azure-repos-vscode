@@ -35,46 +35,12 @@ describe("CredentialManager-Integration", function() {
     it("should verify store, get, remove credentials for Team Services (no token in settings)", async function() {
         try {
             await credentialManager.StoreCredentials(TestSettings.Account, TestSettings.AccountUser, TestSettings.Password);
-            let credInfo: CredentialInfo = await credentialManager.GetCredentials(ctx, undefined);
+            let credInfo: CredentialInfo = await credentialManager.GetCredentials(ctx);
             //For PATs, username stored with StoreCredentials doesn't matter (it's always returned as OAuth)
             assert.equal(credInfo.Username, Constants.OAuth);
             assert.equal(credInfo.Password, TestSettings.Password);
             await credentialManager.RemoveCredentials(TestSettings.Account);
-            credInfo = await credentialManager.GetCredentials(ctx, undefined);
-            //Ensure the creds we added get removed
-            assert.isUndefined(credInfo);
-        } catch (err) {
-            console.log(err);
-        }
-    });
-
-    it("should verify get and remove credentials for Team Services (with token in settings)", async function() {
-        try {
-            //Test scenario where the requested credential is not in the credential store but we're passing the token (from settings)
-            let credInfo: CredentialInfo = await credentialManager.GetCredentials(ctx, TestSettings.SettingsPassword);
-            //For PATs, username stored with StoreCredentials doesn't matter (it's always returned as OAuth)
-            assert.equal(credInfo.Username, Constants.OAuth);
-            assert.equal(credInfo.Password, TestSettings.SettingsPassword);
-            await credentialManager.RemoveCredentials(TestSettings.Account);
-            credInfo = await credentialManager.GetCredentials(ctx, undefined);
-            //Ensure the creds we added get removed
-            assert.isUndefined(credInfo);
-        } catch (err) {
-            console.log(err);
-        }
-    });
-
-    it("should verify store, get, remove credentials for Team Services (with token in settings)", async function() {
-        try {
-            //Test scenario where the requested credential is in the store but we're also passing the token (from settings)
-            await credentialManager.StoreCredentials(TestSettings.Account, TestSettings.AccountUser, TestSettings.Password);
-            let credInfo: CredentialInfo = await credentialManager.GetCredentials(ctx, TestSettings.SettingsPassword);
-            //For PATs, username stored with StoreCredentials doesn't matter (it's always returned as OAuth)
-            assert.equal(credInfo.Username, Constants.OAuth);
-            //We still expect to get the SettingsPassword and not Password
-            assert.equal(credInfo.Password, TestSettings.SettingsPassword);
-            await credentialManager.RemoveCredentials(TestSettings.Account);
-            credInfo = await credentialManager.GetCredentials(ctx, undefined);
+            credInfo = await credentialManager.GetCredentials(ctx);
             //Ensure the creds we added get removed
             assert.isUndefined(credInfo);
         } catch (err) {
@@ -90,12 +56,12 @@ describe("CredentialManager-Integration", function() {
             let password: string = "password";
 
             await credentialManager.StoreCredentials(account, username, password);
-            let credInfo: CredentialInfo = await credentialManager.GetCredentials(ctx, undefined);
+            let credInfo: CredentialInfo = await credentialManager.GetCredentials(ctx);
             assert.equal(credInfo.Domain, "domain");
             assert.equal(credInfo.Username, "user");
             assert.equal(credInfo.Password, password);
             await credentialManager.RemoveCredentials(account);
-            credInfo = await credentialManager.GetCredentials(ctx, undefined);
+            credInfo = await credentialManager.GetCredentials(ctx);
             //Ensure the creds we added get removed
             assert.isUndefined(credInfo);
         } catch (err) {
