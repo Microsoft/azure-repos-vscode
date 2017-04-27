@@ -36,7 +36,6 @@ export async function activate(context: ExtensionContext) {
     context.subscriptions.push(commands.registerCommand(CommandNames.ViewWorkItemQueries, () => _extensionManager.Team.ViewWorkItems()));
     context.subscriptions.push(commands.registerCommand(CommandNames.SendFeedback, () => _extensionManager.Team.SendFeedback()));
     context.subscriptions.push(commands.registerCommand(CommandNames.RefreshPollingStatus, () => _extensionManager.Team.RefreshPollingStatus()));
-    context.subscriptions.push(commands.registerCommand(CommandNames.Reinitialize, () => _extensionManager.Reinitialize()));
 
     // TFVC Commands
     context.subscriptions.push(commands.registerCommand(TfvcCommandNames.Status, () => _extensionManager.Tfvc.Status()));
