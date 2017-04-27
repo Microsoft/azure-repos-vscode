@@ -92,4 +92,9 @@ export class TfvcContext implements IRepositoryContext {
     public get Type(): RepositoryType {
         return RepositoryType.TFVC;
     }
+
+    //This is used if we need to update the RemoteUrl after validating the TFVC collection with the repositoryinfoclient
+    public set RemoteUrl(remoteUrl: string) {
+        this._tfvcRemoteUrl = remoteUrl;
+    }
 }

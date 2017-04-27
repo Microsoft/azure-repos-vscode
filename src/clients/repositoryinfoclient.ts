@@ -15,6 +15,7 @@ import { TeamServicesApi } from "./teamservicesclient";
 import { TfsCatalogSoapClient } from "./tfscatalogsoapclient";
 import { RepositoryInfo } from "../info/repositoryinfo";
 import { TeamProject, TeamProjectCollection } from "vso-node-api/interfaces/CoreInterfaces";
+import { TfvcContext } from "../contexts/tfvccontext";
 
 export class RepositoryInfoClient {
     private _handler: VsoBaseInterfaces.IRequestHandler;
@@ -76,10 +77,16 @@ export class RepositoryInfoClient {
                 } else {
                     Logger.LogDebug(`Unable to validate the TFS TFVC repository. Url: '${serverUrl}'  Attempting with DefaultCollection...`);
                     collectionName = "DefaultCollection";
-                    valid = await this.validateTfvcCollectionUrl(url.resolve(serverUrl, collectionName));
+                    const remoteUrl: string = url.resolve(serverUrl, collectionName);
+                    valid = await this.validateTfvcCollectionUrl(remoteUrl);
                     if (!valid) {
                         Logger.LogDebug(`Unable to validate the TFS TFVC repository with DefaultCollection.`);
                         throw new Error(Strings.UnableToValidateTfvcRepositoryWithDefaultCollection);
+                    }
+                    //Since we validated with the default collection, we need to update the repo context's RemoteUrl
+                    if (this._repoContext.Type === RepositoryType.TFVC) {
+                        const tfvcContext: TfvcContext = <TfvcContext>this._repoContext;
+                        tfvcContext.RemoteUrl = remoteUrl;
                     }
                     Logger.LogDebug(`Validated the TFS TFVC repository with DefaultCollection`);
                 }
