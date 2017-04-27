@@ -31,6 +31,7 @@ export class TeamExtension  {
     private _pinnedQuerySettings: PinnedQuerySettings;
     private _pollingTimer: NodeJS.Timer;
     private _initialTimer: NodeJS.Timer;
+    private _signedOut: boolean = false;
 
     constructor(manager: ExtensionManager) {
         this._manager = manager;
@@ -56,9 +57,16 @@ export class TeamExtension  {
         }
     }
 
+    //Keeps track of whether the user is signed in (or not). It's used by the
+    //ExtensionManager to display more helpful messages after signing out.
+    public get IsSignedOut(): boolean {
+        return this._signedOut;
+    }
+
     public async Signin() {
         // For Signin, first we need to verify _serverContext
         if (this._manager.ServerContext !== undefined && this._manager.ServerContext.RepoInfo !== undefined && this._manager.ServerContext.RepoInfo.IsTeamFoundation === true) {
+            this._signedOut = false;
             if (this._manager.ServerContext.RepoInfo.IsTeamFoundationServer === true) {
                 let defaultUsername : string = this.getDefaultUsername();
                 let username: string = await window.showInputBox({ value: defaultUsername || "", prompt: Strings.ProvideUsername + " (" + this._manager.ServerContext.RepoInfo.Account + ")", placeHolder: "", password: false });
@@ -111,11 +119,14 @@ export class TeamExtension  {
         // For Logout, we just need to verify _serverContext and don't want to set this._errorMessage
         if (this._manager.ServerContext !== undefined && this._manager.ServerContext.RepoInfo !== undefined && this._manager.ServerContext.RepoInfo.IsTeamFoundation === true) {
             this._manager.CredentialManager.RemoveCredentials(this._manager.ServerContext.RepoInfo.Host).then(() => {
-                Logger.LogInfo("Signout: Removed credentials for host '" + this._manager.ServerContext.RepoInfo.Host + "'");
-                this._manager.Reinitialize(true);
+                Logger.LogInfo(`Signout: Removed credentials for host '${this._manager.ServerContext.RepoInfo.Host}'`);
             }).catch((err) => {
                 let msg: string = Strings.UnableToRemoveCredentials + this._manager.ServerContext.RepoInfo.Host;
                 this._manager.ReportError(err, msg, true);
+            }).finally(() => {
+                this._signedOut = true; //keep track of our status so we can display helpful info later
+                this._manager.SignOut(); //tell the ExtensionManager to clean up
+                this.dispose(); //dispose the status bar items
             });
         } else {
             this._manager.DisplayErrorMessage(Strings.NoRepoInformation);
@@ -238,12 +249,6 @@ export class TeamExtension  {
         this._manager.FeedbackClient.SendFeedback();
     }
 
-    //Returns a list of strings representing the work items that the user chose
-    // strings are in the form "#id - description"
-    public async ChooseWorkItems(): Promise<string[]> {
-        return await this._witClient.ChooseWorkItems();
-    }
-
     //Returns the list of work items assigned directly to the current user
     public ViewMyWorkItems(): void {
         if (this._manager.EnsureInitialized(RepositoryType.ANY)) {
@@ -276,7 +281,7 @@ export class TeamExtension  {
     public async AssociateWorkItems(): Promise<void> {
         if (this._manager.EnsureInitialized(RepositoryType.ANY)) {
             Telemetry.SendEvent(TelemetryEvents.AssociateWorkItems);
-            let workitems: string[] = await this.ChooseWorkItems();
+            let workitems: string[] = await this.chooseWorkItems();
             for (let i: number = 0; i < workitems.length; i++) {
                 // Append the string to end of the message
                 // Note: we are prefixing the message with a space so that the # char is not in the first column
@@ -361,6 +366,12 @@ export class TeamExtension  {
         }
     }
 
+    //Returns a list of strings representing the work items that the user chose
+    // strings are in the form "#id - description"
+    private async chooseWorkItems(): Promise<string[]> {
+        return await this._witClient.ChooseWorkItems();
+    }
+
     private pollBuildStatus(): void {
         if (this._manager.EnsureInitialized(RepositoryType.ANY)) {
             Logger.LogInfo("Polling for latest current build status...");
@@ -411,6 +422,7 @@ export class TeamExtension  {
         if (this._pollingTimer) {
             if (this._initialTimer) {
                 clearTimeout(this._initialTimer);
+                this._initialTimer = undefined;
             }
             clearInterval(this._pollingTimer);
             this._pollingTimer = undefined;

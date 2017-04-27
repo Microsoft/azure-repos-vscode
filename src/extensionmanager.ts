@@ -88,9 +88,9 @@ export class ExtensionManager implements Disposable {
     }
 
     //Meant to reinitialize the extension when coming back online
-    public Reinitialize(signingOut?: boolean): void {
-        this.cleanup();
-        this.initializeExtension(signingOut);
+    public Reinitialize(): void {
+        this.cleanup(true);
+        this.initializeExtension();
     }
 
     //Ensure we have a TFS or Team Services-based repository. Otherwise, return false.
@@ -98,7 +98,12 @@ export class ExtensionManager implements Disposable {
         if (!this._repoContext
                 || !this._serverContext
                 || !this._serverContext.RepoInfo.IsTeamFoundation) {
-            this.setErrorStatus(Strings.NoRepoInformation);
+            //If the user previously signed out (in this session of VS Code), show a message to that effect
+            if (this._teamExtension.IsSignedOut) {
+                this.setErrorStatus(Strings.UserMustSignIn);
+            } else {
+                this.setErrorStatus(Strings.NoRepoInformation);
+            }
             return false;
         }
         return true;
@@ -212,7 +217,7 @@ export class ExtensionManager implements Disposable {
         });
     }
 
-    private async initializeExtension(signingOut?: boolean) : Promise<void> {
+    private async initializeExtension() : Promise<void> {
         //Don't initialize if we don't have a workspace
         if (!workspace || !workspace.rootPath) {
             return;
@@ -245,9 +250,7 @@ export class ExtensionManager implements Disposable {
 
                 this._credentialManager.GetCredentials(this._serverContext).then(async (creds: CredentialInfo) => {
                     if (!creds || !creds.CredentialHandler) {
-                        if (!signingOut) {
-                            this.displayNoCredentialsMessage();
-                        }
+                        this.displayNoCredentialsMessage();
                         return;
                     } else {
                         this._serverContext.CredentialInfo = creds;
@@ -526,28 +529,42 @@ export class ExtensionManager implements Disposable {
         }
     }
 
-    private cleanup() {
+    private cleanup(preserveTeamExtension: boolean = false) {
         if (this._teamServicesStatusBarItem) {
             this._teamServicesStatusBarItem.dispose();
             this._teamServicesStatusBarItem = undefined;
         }
-        if (this._teamExtension) {
+        //If we are signing out, we need to keep some of the objects around
+        if (!preserveTeamExtension && this._teamExtension) {
             this._teamExtension.dispose();
             this._teamExtension = undefined;
+            this._serverContext = undefined;
+            this._credentialManager = undefined;
+
+            if (this._tfvcExtension) {
+                this._tfvcExtension.dispose();
+                this._tfvcExtension = undefined;
+            }
+            if (this._scmProvider) {
+                this._scmProvider.dispose();
+                this._scmProvider = undefined;
+            }
+            //Make sure we clean up any running instances of TF
+            TfCommandLineRunner.DisposeStatics();
         }
-        if (this._tfvcExtension) {
-            this._tfvcExtension.dispose();
-            this._tfvcExtension = undefined;
-        }
+
+        //The following will be reset during a re-initialization
+        this._repoContext = undefined;
+        this._settings = undefined;
+        this._errorMessage = undefined;
     }
 
     public dispose() {
         this.cleanup();
-        if (this._scmProvider) {
-            this._scmProvider.dispose();
-            this._scmProvider = undefined;
-        }
-        // Make sure we clean up any running instances of TF
-        TfCommandLineRunner.DisposeStatics();
+    }
+
+    //If we're signing out, we don't want to dispose of everything.
+    public SignOut() {
+        this.cleanup(true);
     }
 }

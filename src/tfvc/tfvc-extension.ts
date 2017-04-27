@@ -344,6 +344,12 @@ export class TfvcExtension  {
             this._manager.DisplayErrorMessage();
             return;
         }
+        //This occurs in the case where we 1) sign in successfully, 2) sign out, 3) sign back in but with invalid credentials
+        //Essentially, the tfvcExtension.InitializeClients call hasn't been made successfully yet.
+        if (!this._repo) {
+            this._manager.DisplayErrorMessage(Strings.UserMustSignIn);
+            return;
+        }
 
         try {
             await funcToTry(prefix);
