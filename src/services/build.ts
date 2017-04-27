@@ -9,6 +9,7 @@ import { IBuildApi } from "vso-node-api/BuildApi";
 import { WebApi } from "vso-node-api/WebApi";
 import { TeamServerContext } from "../contexts/servercontext";
 import { CredentialManager } from "../helpers/credentialmanager";
+import { UrlBuilder } from "../helpers/urlbuilder";
 
 export class BuildService {
     private _buildApi: IBuildApi;
@@ -18,7 +19,7 @@ export class BuildService {
     }
 
     //Get the latest build id and badge of a build definition based on current project, repo and branch
-    public async GetBuildBadge(project: string, repoType: string, repoId: string, branchName: string) : Promise<BuildBadge> {
+    public async GetBuildBadge(project: string, repoType: string, repoId: string, branchName: string): Promise<BuildBadge> {
         return await this._buildApi.getBuildBadge(project, repoType, repoId, branchName);
     }
 
@@ -50,25 +51,27 @@ export class BuildService {
 
     //Construct the url to the individual build definition (completed view)
     //https://account.visualstudio.com/DefaultCollection/project/_build#_a=completed&definitionId=34
-    public static GetBuildDefinitionUrl(remoteUrl: string, definitionId: string) : string {
-        return BuildService.GetBuildsUrl(remoteUrl) + "#_a=completed" + "&definitionId=" + definitionId;
+    public static GetBuildDefinitionUrl(remoteUrl: string, definitionId: string): string {
+        return UrlBuilder.AddHashes(BuildService.GetBuildsUrl(remoteUrl), `_a=completed`, `definitionId=${definitionId}`);
     }
 
     //Construct the url to the individual build summary
     //https://account.visualstudio.com/DefaultCollection/project/_build/index?buildId=1977&_a=summary
-    public static GetBuildSummaryUrl(remoteUrl: string, buildId: string) : string {
-        return BuildService.GetBuildsUrl(remoteUrl) + "/index?buildId=" + buildId + "&_a=summary";
+    public static GetBuildSummaryUrl(remoteUrl: string, buildId: string): string {
+        let summaryUrl: string = UrlBuilder.Join(BuildService.GetBuildsUrl(remoteUrl), "index");
+        summaryUrl = UrlBuilder.AddQueryParams(summaryUrl, `buildId=${buildId}`, `_a=summary`);
+        return summaryUrl;
     }
 
     //Construct the url to the build definitions page for the project
-    public static GetBuildDefinitionsUrl(remoteUrl: string) : string {
+    public static GetBuildDefinitionsUrl(remoteUrl: string): string {
         //The new definitions experience is behind a feature flag
         return BuildService.GetBuildsUrl(remoteUrl); // + "/definitions";
     }
 
     //Construct the url to the builds page for the project
-    public static GetBuildsUrl(remoteUrl: string) : string {
-        return remoteUrl + "/_build";
+    public static GetBuildsUrl(remoteUrl: string): string {
+        return UrlBuilder.Join(remoteUrl, "_build");
     }
 
 }

@@ -27,7 +27,7 @@ export class Telemetry {
     //still want to send telemetry.  Once we have user information, we want to update the Telemetry
     //service with that more specific information.  At the same time, we want global/static access
     //to the Telemetry service so we can send telemetry from just about anywhere at anytime.
-    public static Initialize(settings: Settings, context?: TeamServerContext) : void {
+    public static Initialize(settings: Settings, context?: TeamServerContext): void {
         Telemetry._serverContext = context;
         Telemetry._telemetryEnabled = settings.AppInsightsEnabled;
 
@@ -92,7 +92,7 @@ export class Telemetry {
     }
 
     //Make sure we're calling it after initializing
-    private static ensureInitialized() : void {
+    private static ensureInitialized(): void {
         if (Telemetry._appInsightsClient === undefined) {
             throw new Error("Telemetry service was called before being initialized.");
         }

@@ -5,13 +5,13 @@
 "use strict";
 
 import * as path from "path";
-import url = require("url");
 import { commands, Uri, window, workspace } from "vscode";
 import { RepositoryType } from "../contexts/repositorycontext";
 import { TfvcContext } from "../contexts/tfvccontext";
 import { ExtensionManager } from "../extensionmanager";
 import { TfvcCommandNames, TfvcTelemetryEvents } from "../helpers/constants";
 import { Strings } from "../helpers/strings";
+import { UrlBuilder } from "../helpers/urlbuilder";
 import { Utils } from "../helpers/utils";
 import { ButtonMessageItem, VsCodeUtils } from "../helpers/vscodeutils";
 import { Telemetry } from "../services/telemetry";
@@ -323,7 +323,9 @@ export class TfvcExtension  {
                 Telemetry.SendEvent(TfvcTelemetryEvents.OpenFileHistory);
                 let serverPath: string = itemInfos[0].serverItem;
                 let file: string = encodeURIComponent(serverPath);
-                Utils.OpenUrl(url.resolve(this._manager.RepoContext.RemoteUrl, "_versionControl?path=" + file + "&_a=history"));
+                let historyUrl: string = UrlBuilder.Join(this._manager.RepoContext.RemoteUrl, "_versionControl");
+                historyUrl = UrlBuilder.AddQueryParams(historyUrl, `path=${file}`, `_a=history`);
+                Utils.OpenUrl(historyUrl);
                 return;
             } else {
                 //If the file is in the workspace folder (but not mapped), just display the history url of the entire repo
@@ -380,7 +382,9 @@ export class TfvcExtension  {
 
     private showRepositoryHistory(): void {
         Telemetry.SendEvent(TfvcTelemetryEvents.OpenRepositoryHistory);
-        Utils.OpenUrl(url.resolve(this._manager.RepoContext.RemoteUrl, "_versionControl?_a=history"));
+        let historyUrl: string = UrlBuilder.Join(this._manager.RepoContext.RemoteUrl, "_versionControl");
+        historyUrl = UrlBuilder.AddQueryParams(historyUrl, `_a=history`);
+        Utils.OpenUrl(historyUrl);
     }
 
     dispose() {

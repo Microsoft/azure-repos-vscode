@@ -12,6 +12,7 @@ import { QueryExpand, QueryHierarchyItem, QueryResultType, Wiql, WorkItem,
          WorkItemTypeReference } from "vso-node-api/interfaces/WorkItemTrackingInterfaces";
 import { TeamServerContext } from "../contexts/servercontext";
 import { CredentialManager } from "../helpers/credentialmanager";
+import { UrlBuilder } from "../helpers/urlbuilder";
 
 export class WorkItemTrackingService {
     private _witApi: IWorkItemTrackingApi;
@@ -139,14 +140,14 @@ export class WorkItemTrackingService {
     }
 
     //Construct the url to the individual work item edit page
-    public static GetEditWorkItemUrl(teamProjectUrl: string, workItemId: string) : string {
-        return this.GetWorkItemsBaseUrl(teamProjectUrl) + "/edit/" + workItemId;
+    public static GetEditWorkItemUrl(teamProjectUrl: string, workItemId: string): string {
+        return UrlBuilder.Join(WorkItemTrackingService.GetWorkItemsBaseUrl(teamProjectUrl), "edit", workItemId);
     }
 
     //Construct the url to the creation page for new work item type
     public static GetNewWorkItemUrl(teamProjectUrl: string, issueType: string, title?: string, assignedTo?: string) : string {
         //This form will redirect to the form below so let's use this one
-        let url: string = this.GetWorkItemsBaseUrl(teamProjectUrl) + "/create/" + issueType;
+        let url: string = UrlBuilder.Join(WorkItemTrackingService.GetWorkItemsBaseUrl(teamProjectUrl), "create", issueType);
         let separator: string = "?";
         if (title !== undefined) {
             //title may need to be encoded (issues if first character is '#', for instance)
@@ -161,13 +162,13 @@ export class WorkItemTrackingService {
     }
 
     //Construct the url to the particular query results page
-    public static GetMyQueryResultsUrl(teamProjectUrl: string, folderName: string, queryName: string) : string {
-        return this.GetWorkItemsBaseUrl(teamProjectUrl) + "?path=" + encodeURIComponent(folderName + "/" + queryName) + "&_a=query";
+    public static GetMyQueryResultsUrl(teamProjectUrl: string, folderName: string, queryName: string): string {
+        return UrlBuilder.AddQueryParams(WorkItemTrackingService.GetWorkItemsBaseUrl(teamProjectUrl), `path=${encodeURIComponent(folderName + "/" + queryName)}`, `_a=query`);
     }
 
     //Returns the base url for work items
-    public static GetWorkItemsBaseUrl(teamProjectUrl: string) {
-        return teamProjectUrl + "/_workitems";
+    public static GetWorkItemsBaseUrl(teamProjectUrl: string): string {
+        return UrlBuilder.Join(teamProjectUrl, "_workitems");
     }
 
 /* tslint:disable:variable-name */

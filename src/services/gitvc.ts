@@ -10,6 +10,7 @@ import { IGitApi } from "vso-node-api/GitApi";
 import { WebApi } from "vso-node-api/WebApi";
 import { TeamServerContext } from "../contexts/servercontext";
 import { CredentialManager } from "../helpers/credentialmanager";
+import { UrlBuilder } from "../helpers/urlbuilder";
 
 export class GitVcService {
     private _gitApi: IGitApi;
@@ -26,7 +27,7 @@ export class GitVcService {
 
     //Returns a Promise containing an array of GitPullRequest objectss for the creator and repository
     //If creatorId is undefined, all pull requests will be returned
-    public async GetPullRequests(repositoryId: string, creatorId?: string, reviewerId?: string, status?: PullRequestStatus) : Promise<GitPullRequest[]> {
+    public async GetPullRequests(repositoryId: string, creatorId?: string, reviewerId?: string, status?: PullRequestStatus): Promise<GitPullRequest[]> {
         let criteria: GitPullRequestSearchCriteria = { creatorId: creatorId, includeLinks: false, repositoryId: repositoryId, reviewerId: reviewerId,
                                                        sourceRefName: undefined, status: status, targetRefName: undefined };
         return await this._gitApi.getPullRequests(repositoryId, criteria);
@@ -39,48 +40,47 @@ export class GitVcService {
 
     //Construct the url to the file blame information
     //https://account.visualstudio.com/defaultcollection/project/_git/VSCode.Extension#path=%2FREADME.md&version=GBmaster&annotate=true
-    public static GetFileBlameUrl(remoteUrl: string, currentFile: string, currentBranch: string) : string {
-        let file: string = encodeURIComponent(currentFile);
-        let branch: string = encodeURIComponent(currentBranch);
-
-        return remoteUrl + "#path=" + file + "&version=GB" + branch + "&annotate=true";
+    public static GetFileBlameUrl(remoteUrl: string, currentFile: string, currentBranch: string): string {
+        const file: string = encodeURIComponent(currentFile);
+        const branch: string = encodeURIComponent(currentBranch);
+        return UrlBuilder.AddHashes(remoteUrl, `path=${file}`, `version=GB${branch}`, `annotate=true`);
     }
 
     //Construct the url to the individual file history
     //https://account.visualstudio.com/defaultcollection/project/_git/VSCode.Extension#path=%2FREADME.md&version=GBmaster&_a=history
-    public static GetFileHistoryUrl(remoteUrl: string, currentFile: string, currentBranch: string) : string {
-        let file: string = encodeURIComponent(currentFile);
-        let branch: string = encodeURIComponent(currentBranch);
-
-        return remoteUrl + "#path=" + file + "&version=GB" + branch + "&_a=history";
+    public static GetFileHistoryUrl(remoteUrl: string, currentFile: string, currentBranch: string): string {
+        const file: string = encodeURIComponent(currentFile);
+        const branch: string = encodeURIComponent(currentBranch);
+        return UrlBuilder.AddHashes(remoteUrl, `path=${file}`, `version=GB${branch}`, `_a=history`);
     }
 
     //Construct the url to the repository history (by branch)
     //https://account.visualstudio.com/project/_git/VSCode.Extension/history?itemVersion=GBmaster&_a=history
-    public static GetRepositoryHistoryUrl(remoteUrl: string, currentBranch: string) : string {
-        let branch: string = encodeURIComponent(currentBranch);
-
-        return remoteUrl + "/history" + "?itemVersion=GB" + branch + "&_a=history";
+    public static GetRepositoryHistoryUrl(remoteUrl: string, currentBranch: string): string {
+        const branch: string = encodeURIComponent(currentBranch);
+        let repoHistoryUrl: string = UrlBuilder.Join(remoteUrl, "history");
+        return UrlBuilder.AddQueryParams(repoHistoryUrl, `itemVersion=GB${branch}`, `_a=history`);
     }
 
     //Today, simply craft a url to the create pull request web page
     //https://account.visualstudio.com/DefaultCollection/project/_git/VSCode.Health/pullrequests#_a=createnew&sourceRef=master
-    public static GetCreatePullRequestUrl(remoteUrl: string, currentBranch: string) : string {
-        let branch: string = encodeURIComponent(currentBranch);
-
-        return remoteUrl + "/pullrequests" + "#_a=createnew" + "&sourceRef=" + branch;
+    public static GetCreatePullRequestUrl(remoteUrl: string, currentBranch: string): string {
+        const branch: string = encodeURIComponent(currentBranch);
+        return UrlBuilder.AddHashes(GitVcService.GetPullRequestsUrl(remoteUrl), `_a=createnew`, `sourceRef=${branch}`);
     }
 
     //Construct the url to the view pull request (discussion view)
     //https://account.visualstudio.com/DefaultCollection/VSOnline/project/_git/Java.VSCode/pullrequest/79184?view=discussion
-    public static GetPullRequestDiscussionUrl(repositoryUrl: string, requestId: string) : string {
-        return repositoryUrl + "/pullrequest/" + requestId + "?view=discussion";
+    public static GetPullRequestDiscussionUrl(repositoryUrl: string, requestId: string): string {
+        let discussionUrl: string = UrlBuilder.Join(repositoryUrl, "pullrequest", requestId);
+        discussionUrl = UrlBuilder.AddQueryParams(discussionUrl, "view=discussion");
+        return discussionUrl;
     }
 
     //Construct the url to the main pull requests page
     //https://account.visualstudio.com/DefaultCollection/_git/project/pullrequests
     public static GetPullRequestsUrl(repositoryUrl: string): string {
-        return repositoryUrl + "/pullrequests";
+        return UrlBuilder.Join(repositoryUrl, "pullrequests");
     }
 
     //Returns the 'score' of the pull request so the client knows if the PR failed,
