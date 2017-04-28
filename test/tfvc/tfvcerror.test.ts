@@ -85,7 +85,7 @@ describe("Tfvc-Error", function() {
             stderr: "standard error",
             stdout: "standard output",
             tfvcCommand: "command1",
-            tfvcErrorCode: TfvcErrorCodes.TfvcLocationMissing
+            tfvcErrorCode: TfvcErrorCodes.LocationMissing
         });
         assert.equal(error.error, undefined);
         assert.equal(error.exitCode, 100);
@@ -93,7 +93,7 @@ describe("Tfvc-Error", function() {
         assert.equal(error.stderr, "standard error");
         assert.equal(error.stdout, "standard output");
         assert.equal(error.tfvcCommand, "command1");
-        assert.equal(error.tfvcErrorCode, TfvcErrorCodes.TfvcLocationMissing);
+        assert.equal(error.tfvcErrorCode, TfvcErrorCodes.LocationMissing);
     });
 
     it("should verify CreateArgumentMissingError", function() {
@@ -115,7 +115,7 @@ describe("Tfvc-Error", function() {
         assert.equal(error.stderr, undefined);
         assert.equal(error.stdout, undefined);
         assert.equal(error.tfvcCommand, undefined);
-        assert.equal(error.tfvcErrorCode, TfvcErrorCodes.TfvcInInvalidState);
+        assert.equal(error.tfvcErrorCode, TfvcErrorCodes.InInvalidState);
     });
 
     it("should verify CreateUnknownError", function() {
@@ -138,7 +138,7 @@ describe("Tfvc-Error", function() {
             stderr: "standard error",
             stdout: "standard output",
             tfvcCommand: "command1",
-            tfvcErrorCode: TfvcErrorCodes.TfvcMinVersionWarning
+            tfvcErrorCode: TfvcErrorCodes.MinVersionWarning
         });
         assert.equal(error.toString(), "error1 message Details: exitCode: 11, errorCode: TfvcMinVersionWarning, command: command1, stdout: standard output, stderr: standard error Stack: here; then there");
     });

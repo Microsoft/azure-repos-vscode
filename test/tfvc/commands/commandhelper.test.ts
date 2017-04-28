@@ -216,7 +216,7 @@ describe("Tfvc-CommandHelper", function() {
         } catch (err) {
             assert.equal(err.exitCode, 100);
             assert.equal(err.tfvcCommand, "cmd");
-            assert.equal(err.tfvcErrorCode, TfvcErrorCodes.TfvcNotFound);
+            assert.equal(err.tfvcErrorCode, TfvcErrorCodes.NotFound);
             assert.isTrue(err.message.startsWith(Strings.TfInitializeFailureError));
             assert.equal(err.stdout, undefined);
         }

@@ -305,7 +305,7 @@ describe("Tfvc-GetInfoCommand", function() {
             await cmd.ParseExeOutput(executionResult);
         } catch (err) {
             assert.isTrue(err.message.startsWith(Strings.NoMatchesFound));
-            assert.equal(err.tfvcErrorCode, TfvcErrorCodes.TfvcNoItemsMatch);
+            assert.equal(err.tfvcErrorCode, TfvcErrorCodes.NoItemsMatch);
         }
     });
 
@@ -518,7 +518,7 @@ describe("Tfvc-GetInfoCommand", function() {
             await cmd.ParseExeOutput(executionResult);
         } catch (err) {
             assert.isTrue(err.message.startsWith(Strings.NoMatchesFound));
-            assert.equal(err.tfvcErrorCode, TfvcErrorCodes.TfvcNoItemsMatch);
+            assert.equal(err.tfvcErrorCode, TfvcErrorCodes.NoItemsMatch);
         }
     });
 });

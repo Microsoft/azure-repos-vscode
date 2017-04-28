@@ -104,7 +104,7 @@ export class GetInfo implements ITfvcCommand<IItemInfo[]> {
             itemInfos.length === itemInfos.filter((info) => info.localItem === undefined).length) {
             throw new TfvcError({
                 message: Strings.NoMatchesFound,
-                tfvcErrorCode: TfvcErrorCodes.TfvcNoItemsMatch,
+                tfvcErrorCode: TfvcErrorCodes.NoItemsMatch,
                 exitCode: executionResult.exitCode,
                 stdout: executionResult.stdout,
                 stderr: executionResult.stderr
