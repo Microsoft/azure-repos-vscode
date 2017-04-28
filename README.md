@@ -26,9 +26,7 @@ With Git, the extension uses the remote origin of your repository to determine h
 ### Create your TFVC workspace
 With TFVC, the extension uses information about the current workspace to determine how to connect to Team Services (or your Team Foundation Server). Workspaces can be created using the Visual Studio IDE, Eclipse or with the JetBrains IDEs (e.g, Android Studio, IntelliJ).
 
-**Note:** At this time, you will need to have a ***local*** TFVC workspace already available on your local machine. More information about the difference between
-the two types (and how to determine which one you're using) can be found [here](TFVC_README.md#what-is-the-difference-between-a-local-and-server-workspace-how-can-i-tell-which-one-im-working-with). The issue tracking support
-for Server workspaces is [here](https://github.com/Microsoft/vsts-vscode/issues/176).
+**Note:** At this time, you will need to have a ***local*** TFVC workspace already available on your local machine. More information about the difference between the two types (and how to determine which one you're using) can be found [here](TFVC_README.md#what-is-the-difference-between-a-local-and-server-workspace-how-can-i-tell-which-one-im-working-with). The issue tracking support for Server workspaces is [here](https://github.com/Microsoft/vsts-vscode/issues/176).
 
 ## Installation
 First, you will need to install [Visual Studio Code](https://code.visualstudio.com/download) `1.11.1` or later.
@@ -52,8 +50,7 @@ If you are connecting to Team Foundation Server, you will only need your NTLM cr
 Details on how to connect to either Team Services or Team Foundation Server are found in the next section.
 
 ## TFVC Support
-Once you have a local TFVC workspace available, you must configure the TFVC support in Visual Studio Code. You can find that information (including demo
-videos) in our [TFVC documentation](TFVC_README.md).
+Once you have a local TFVC workspace available, you must configure the TFVC support in Visual Studio Code. You can find that information (including demo videos) in our [TFVC documentation](TFVC_README.md).
 
 ## Open a local Repository folder
 Once you have installed the extension, open either the root folder or a sub-folder of the repository. Once a Team
@@ -194,7 +191,7 @@ In order to facilitate more debugging, you may be provided with a "private build
 likely come in the form of a .ZIP file named similarly to the VSIX that gets deployed to the Marketplace (e.g., `team-0.117.0.vsix.zip`).
 
 To install the private build, you must uninstall the previous version and then _side load_ the new one. First, remove the
-.zip extension from the file and then follow [these instructions](https://code.visualstudio.com/docs/editor/extension-gallery#_install-from-a-vsix) to install the VSIX.
+.ZIP extension from the file and then follow [these instructions](https://code.visualstudio.com/docs/editor/extension-gallery#_install-from-a-vsix) to install the VSIX.
 
 ## Pinned Work Item Queries
 You can customize the pinned work item query by adding the following in the Visual Studio Code Settings. You need to

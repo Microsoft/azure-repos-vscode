@@ -208,7 +208,7 @@ While the TEE CLC is primarily for macOS and Linux users it can also be used on 
 - Update your `tfvc.location` to the full path to `tf.cmd` (e.g., `C:\TEE-CLC-14.111.1\tf.cmd`).
 - The last thing that you **must** do is run the `tf workspaces` command as detailed [here](#i-have-workspaces-created-with-visual-studio-can-i-use-the-tee-clc-to-work-with-them) so that the CLC is aware of the workspaces in the specified collection. (Each tool, tf.cmd and tf.exe, keeps its own local cache of workspaces.)
 
-Finally, there's also a [video](#which-instructions-do-i-follow-to-set-up-tfvc-functionality-on-the-macos) that shows how to do this on Linux (the same high-level steps apply on Windows).
+Finally, there's also a [video](https://youtu.be/VPNaEIVZfr0) that shows how to do this on Linux (the same high-level steps apply on Windows).
 
 ### *Which instructions do I follow to set up TFVC functionality on the macOS?*
 You will follow the same instructions for setting up the TEE CLC as is shown on Ubuntu in [this video](https://youtu.be/VPNaEIVZfr0).
@@ -219,12 +219,9 @@ This should be possible. However, you will need to make the TEE CLC aware of tho
 ### *Where is the support for Server workspaces?*
 At this time, it's still on the backlog. The issue tracking support for Server workspaces is [here](https://github.com/Microsoft/vsts-vscode/issues/176).
 
-https://github.com/Microsoft/vsts-vscode/blob/master/TFVC_README.md#i-have-workspaces-created-with-visual-studio-can-i-use-the-tee-clc-to-work-with-them
-
 ### *What is the difference between a Local and Server workspace? How can I tell which one I'm working with?*
 You can read about the differences between the two in [our documentation](https://www.visualstudio.com/en-us/docs/tfvc/decide-between-using-local-server-workspace).
-Using `tf.exe` on Windows, you can determine which type of workspace you have by running `tf workfold` from the folder where your workspace resides. When you do,
-a dialog box similar to the one below will be displayed and you can see the type of workspace in the `Location` field.
+Using `tf.exe` on Windows, you can determine which type of workspace you have by running `tf workfold` from the folder where your workspace resides. When you do, a dialog box similar to the one below will be displayed and you can see the type of workspace in the `Location` field.
 
 ![Visual Studio Team Services extension](assets/tf-workspace-dialog.png)
 
