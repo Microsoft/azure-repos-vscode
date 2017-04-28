@@ -221,7 +221,8 @@ At this time, it's still on the backlog. The issue tracking support for Server w
 
 ### *What is the difference between a Local and Server workspace? How can I tell which one I'm working with?*
 You can read about the differences between the two in [our documentation](https://www.visualstudio.com/en-us/docs/tfvc/decide-between-using-local-server-workspace).
-Using `tf.exe` on Windows, you can determine which type of workspace you have by running `tf workfold` from the folder where your workspace resides. When you do, a dialog box similar to the one below will be displayed and you can see the type of workspace in the `Location` field.
+Using `tf.exe` on Windows, you can determine which type of workspace you have by running `tf workfold` from the folder where your workspace resides. When you do, a dialog box similar to the one below will be displayed and you can see the type of workspace in the `Location` field (you may need to click the `Advanced >>` button). To change
+the type of workspace, update the `Location` field and click `OK`.
 
 ![Visual Studio Team Services extension](assets/tf-workspace-dialog.png)
 
