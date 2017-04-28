@@ -11,7 +11,7 @@ Here are the currently supported features provided by the extension:
 - Associate work items to check-ins
 - Integrated TFVC Output window
 - Support for a TFS proxy
-- Support for **local** workspaces created with either the Visual Studio IDE, the JetBrains IDEs and Eclipse
+- Support for **local** workspaces created with either Visual Studio, the JetBrains IDEs or Eclipse ([details](#what-is-the-difference-between-a-local-and-server-workspace-how-can-i-tell-which-one-im-working-with))
 
 ![Team Foundation Version Control Viewlet](assets/tfvc-viewlet.png)
 
@@ -196,6 +196,20 @@ With release 1.116.0, yes, it is a requirement that you have an existing workspa
 Yes. If you use Eclipse or one of JetBrain's IDEs (e.g, Android Studio, IntelliJ) on Windows, then you will want to use the TEE CLC to provide
 the TFVC support.
 
+### *How do I set up the CLC on Windows?*
+While the TEE CLC is primarily for macOS and Linux users it can also be used on Windows. In order to use the CLC on Windows, you need to do the following:
+- Download and install a version of [Java 8 for Windows](http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html).
+  - Make sure to install the version (i.e., x86 or x64) that matches your processor architecture
+- Ensure that that path to `java.exe` is a part of your `PATH` environment variable.
+  - Check that you can successully run `java -version`
+- Download and unzip the [latest version](https://github.com/Microsoft/team-explorer-everywhere/releases) of the TEE CLC to a local folder of your choice.
+  - The file you need to download is of the format `TEE-CLC-14.114.0.zip`
+- Open a command prompt and run `{path-to-tf.cmd} eula` and accept the End User License Agreement.
+- Update your `tfvc.location` to the full path to `tf.cmd` (e.g., `C:\TEE-CLC-14.111.1\tf.cmd`).
+- The last thing that you **must** do is run the `tf workspaces` command as detailed [here](#i-have-workspaces-created-with-visual-studio-can-i-use-the-tee-clc-to-work-with-them) so that the CLC is aware of the workspaces in the specified collection. (Each tool, tf.cmd and tf.exe, keeps its own local cache of workspaces.)
+
+Finally, there's also a [video](#which-instructions-do-i-follow-to-set-up-tfvc-functionality-on-the-macos) that shows how to do this on Linux (the same high-level steps apply on Windows).
+
 ### *Which instructions do I follow to set up TFVC functionality on the macOS?*
 You will follow the same instructions for setting up the TEE CLC as is shown on Ubuntu in [this video](https://youtu.be/VPNaEIVZfr0).
 
@@ -204,6 +218,15 @@ This should be possible. However, you will need to make the TEE CLC aware of tho
 
 ### *Where is the support for Server workspaces?*
 At this time, it's still on the backlog. The issue tracking support for Server workspaces is [here](https://github.com/Microsoft/vsts-vscode/issues/176).
+
+https://github.com/Microsoft/vsts-vscode/blob/master/TFVC_README.md#i-have-workspaces-created-with-visual-studio-can-i-use-the-tee-clc-to-work-with-them
+
+### *What is the difference between a Local and Server workspace? How can I tell which one I'm working with?*
+You can read about the differences between the two in [our documentation](https://www.visualstudio.com/en-us/docs/tfvc/decide-between-using-local-server-workspace).
+Using `tf.exe` on Windows, you can determine which type of workspace you have by running `tf workfold` from the folder where your workspace resides. When you do,
+a dialog box similar to the one below will be displayed and you can see the type of workspace in the `Location` field.
+
+![Visual Studio Team Services extension](assets/tf-workspace-dialog.png)
 
 ## Further Information
 For information on other features of the extension, support, licensing, privacy, or contributing code, please review the main [README](README.md) file.
