@@ -4,6 +4,7 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
+import { IButtonMessageItem } from "../helpers/vscodeutils.interfaces";
 import { ConflictType } from "./scm/status";
 
 export interface ITfCommandLine {
@@ -109,6 +110,7 @@ export interface IExecutionResult {
 export interface ITfvcErrorData {
     error?: Error;
     message?: string;
+    messageOptions?: IButtonMessageItem[];
     stdout?: string;
     stderr?: string;
     exitCode?: number;

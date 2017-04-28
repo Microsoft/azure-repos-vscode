@@ -49,7 +49,7 @@ export class TfCommandLineRunner {
                 Logger.LogWarning(`TFVC Couldn't find where the TF command lives on disk.`);
                 throw new TfvcError({
                     message: Strings.TfvcLocationMissingError,
-                    tfvcErrorCode: TfvcErrorCodes.TfvcLocationMissing
+                    tfvcErrorCode: TfvcErrorCodes.LocationMissing
                 });
             }
         }
@@ -63,14 +63,14 @@ export class TfCommandLineRunner {
                 Logger.LogWarning(`TFVC ${tfvcPath} exists but isn't a file.`);
                 throw new TfvcError({
                     message: Strings.TfMissingError + tfvcPath,
-                    tfvcErrorCode: TfvcErrorCodes.TfvcNotFound
+                    tfvcErrorCode: TfvcErrorCodes.NotFound
                 });
             }
         } else {
             Logger.LogWarning(`TFVC ${tfvcPath} does not exist.`);
             throw new TfvcError({
                 message: Strings.TfMissingError + tfvcPath,
-                tfvcErrorCode: TfvcErrorCodes.TfvcNotFound
+                tfvcErrorCode: TfvcErrorCodes.NotFound
             });
         }
 
@@ -107,7 +107,7 @@ export class TfCommandLineRunner {
             Logger.LogWarning(`TFVC ${version} is less that the min version of ${tfvc.minVersion}.`);
             throw new TfvcError({
                 message: Strings.TfVersionWarning + minVersion.ToString(),
-                tfvcErrorCode: TfvcErrorCodes.TfvcMinVersionWarning
+                tfvcErrorCode: TfvcErrorCodes.MinVersionWarning
             });
         }
     }

@@ -105,12 +105,7 @@ export class TeamExtension  {
                 let messageItem : ButtonMessageItem = { title : Strings.LearnMore,
                                     url : Constants.ReadmeLearnMoreUrl,
                                     telemetryId: TelemetryEvents.ReadmeLearnMoreClick };
-                VsCodeUtils.ShowErrorMessageWithOptions(Strings.NoRepoInformation, messageItem).then((item) => {
-                    if (item) {
-                        Utils.OpenUrl(item.url);
-                        Telemetry.SendEvent(item.telemetryId);
-                    }
-                });
+                VsCodeUtils.ShowErrorMessage(Strings.NoRepoInformation, messageItem);
             }
         }
     }

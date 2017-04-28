@@ -13,6 +13,7 @@ export class Constants {
     static TokenLearnMoreUrl: string = "https://aka.ms/v9r4jt";
     static TokenShowMeUrl: string = "https://aka.ms/o2wkmo";
     static ReadmeLearnMoreUrl: string = "https://aka.ms/jkapah";
+    static ServerWorkspaceUrl: string = "https://github.com/Microsoft/vsts-vscode/blob/master/TFVC_README.md#what-is-the-difference-between-a-local-and-server-workspace-how-can-i-tell-which-one-im-working-with";
 }
 
 export class CommandNames {

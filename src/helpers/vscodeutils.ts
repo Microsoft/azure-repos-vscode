@@ -4,10 +4,11 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import { MessageItem, QuickPickItem, Range, window } from "vscode";
+import { commands, MessageItem, QuickPickItem, Range, window } from "vscode";
 import { Constants } from "./constants";
-
-import Q = require("q");
+import { IButtonMessageItem } from "./vscodeutils.interfaces";
+import { Utils } from "./utils";
+import { Telemetry } from "../services/telemetry";
 
 export class BaseQuickPickItem implements QuickPickItem {
     label: string;
@@ -19,7 +20,8 @@ export class WorkItemQueryQuickPickItem extends BaseQuickPickItem {
     wiql: string;
 }
 
-export class ButtonMessageItem implements MessageItem {
+//Any changes to ButtonMessageItem must be reflected in IButtonMessageItem
+export class ButtonMessageItem implements MessageItem, IButtonMessageItem {
     title: string;
     url?: string;
     command?: string;
@@ -27,7 +29,6 @@ export class ButtonMessageItem implements MessageItem {
 }
 
 export class VsCodeUtils {
-
     //Returns the trimmed value if there's an activeTextEditor and a selection
     public static GetActiveSelection(): string {
         let editor = window.activeTextEditor;
@@ -47,7 +48,7 @@ export class VsCodeUtils {
         return value;
     }
 
-    public static FormatMessage(message: string) : string {
+    public static FormatMessage(message: string): string {
         if (message) {
             //Replace newlines with spaces
             return message.replace(/\r\n/g, " ").replace(/\n/g, " ").trim();
@@ -55,26 +56,27 @@ export class VsCodeUtils {
         return message;
     }
 
-    public static ShowErrorMessage(message: string) {
-        window.showErrorMessage("(" + Constants.ExtensionName + ") " + VsCodeUtils.FormatMessage(message));
-    }
-
-    //Allow ability to show additional buttons with the message and return any chosen one via Promise
-    public static ShowErrorMessageWithOptions(message: string, ...urlMessageItem: ButtonMessageItem[]) : Q.Promise<ButtonMessageItem> {
-        let promiseToReturn: Q.Promise<ButtonMessageItem>;
-        let deferred = Q.defer<ButtonMessageItem>();
-        promiseToReturn = deferred.promise;
+    //We have a single method to display either simple messages (with no options) or messages
+    //that have multiple buttons that can run commands, open URLs, send telemetry, etc.
+    public static async ShowErrorMessage(message: string, ...urlMessageItem: IButtonMessageItem[]): Promise<void> {
+        //The following "cast" allows us to pass our own type around (and not reference "vscode" via an import)
+        const messageItems: ButtonMessageItem[] = <ButtonMessageItem[]>urlMessageItem;
+        const messageToDisplay: string = `(${Constants.ExtensionName}) ${VsCodeUtils.FormatMessage(message)}`;
 
         //Use the typescript spread operator to pass the rest parameter to showErrorMessage
-        window.showErrorMessage("(" + Constants.ExtensionName + ") " + VsCodeUtils.FormatMessage(message), ...urlMessageItem).then((item) => {
-            if (item) {
-                deferred.resolve(item);
-            } else {
-                deferred.resolve(undefined);
+        const chosenItem: IButtonMessageItem = await window.showErrorMessage(messageToDisplay, ...messageItems);
+        if (chosenItem) {
+            if (chosenItem.url) {
+                Utils.OpenUrl(chosenItem.url);
             }
-        });
-
-        return promiseToReturn;
+            if (chosenItem.telemetryId) {
+                Telemetry.SendEvent(chosenItem.telemetryId);
+            }
+            if (chosenItem.command) {
+                commands.executeCommand<void>(chosenItem.command);
+            }
+        }
+        return;
     }
 
     public static ShowWarningMessage(message: string) {

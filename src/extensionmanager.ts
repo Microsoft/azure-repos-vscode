@@ -12,7 +12,8 @@ import { Logger } from "./helpers/logger";
 import { Strings } from "./helpers/strings";
 import { UserAgentProvider } from "./helpers/useragentprovider";
 import { Utils } from "./helpers/utils";
-import { ButtonMessageItem, VsCodeUtils } from "./helpers/vscodeutils";
+import { VsCodeUtils } from "./helpers/vscodeutils";
+import { IButtonMessageItem } from "./helpers/vscodeutils.interfaces";
 import { RepositoryContextFactory } from "./contexts/repocontextfactory";
 import { IRepositoryContext, RepositoryType } from "./contexts/repositorycontext";
 import { TeamServerContext } from "./contexts/servercontext";
@@ -193,8 +194,8 @@ export class ExtensionManager implements Disposable {
     private displayNoCredentialsMessage(): void {
         let error: string = Strings.NoTeamServerCredentialsRunSignin;
         let displayError: string = Strings.NoTeamServerCredentialsRunSignin;
-        let learnMoreMessageItem: ButtonMessageItem = undefined;
-        let showMeMessageItem: ButtonMessageItem = undefined;
+        let learnMoreMessageItem: IButtonMessageItem;
+        let showMeMessageItem: IButtonMessageItem;
         if (this._serverContext.RepoInfo.IsTeamServices === true) {
             learnMoreMessageItem = { title : Strings.LearnMore,
                             url : Constants.TokenLearnMoreUrl,
@@ -209,12 +210,7 @@ export class ExtensionManager implements Disposable {
         }
         Logger.LogError(error);
         this.setErrorStatus(error, CommandNames.Signin, false);
-        VsCodeUtils.ShowErrorMessageWithOptions(displayError, learnMoreMessageItem, showMeMessageItem).then((item) => {
-            if (item) {
-                Utils.OpenUrl(item.url);
-                Telemetry.SendEvent(item.telemetryId);
-            }
-        });
+        VsCodeUtils.ShowErrorMessage(displayError, learnMoreMessageItem, showMeMessageItem);
     }
 
     private async initializeExtension() : Promise<void> {
@@ -341,8 +337,7 @@ export class ExtensionManager implements Disposable {
             //For now, don't report these errors via the _feedbackClient
             if (!err.tfvcErrorCode || this.shouldDisplayTfvcError(err.tfvcErrorCode)) {
                 this.setErrorStatus(err.message, undefined, false);
-                //TODO: Perhaps show button with a link to more information on how to set the path to tf.cmd|tf.exe?
-                VsCodeUtils.ShowErrorMessage(err.message);
+                VsCodeUtils.ShowErrorMessage(err.message, ...err.messageOptions);
             }
         }
     }
@@ -376,8 +371,9 @@ export class ExtensionManager implements Disposable {
 
     //Determines which Tfvc errors to display in the status bar ui
     private shouldDisplayTfvcError(errorCode: string): boolean {
-        if (TfvcErrorCodes.TfvcMinVersionWarning === errorCode ||
-            TfvcErrorCodes.TfvcNotFound === errorCode ||
+        if (TfvcErrorCodes.MinVersionWarning === errorCode ||
+            TfvcErrorCodes.NotFound === errorCode ||
+            TfvcErrorCodes.NotAuthorizedToAccess === errorCode ||
             TfvcErrorCodes.NotAnEnuTfCommandLine === errorCode) {
             return true;
         }

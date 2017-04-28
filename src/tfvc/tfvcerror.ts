@@ -5,11 +5,13 @@
 "use strict";
 
 import { Strings } from "../helpers/strings";
+import { IButtonMessageItem } from "../helpers/vscodeutils.interfaces";
 import { ITfvcErrorData } from "./interfaces";
 
 export class TfvcError {
     error: Error;
     message: string;
+    messageOptions: IButtonMessageItem[] = [];
     stdout: string;
     stderr: string;
     exitCode: number;
@@ -30,7 +32,7 @@ export class TfvcError {
     public static CreateInvalidStateError(): TfvcError {
         return new TfvcError({
             message: "The TFVC SCMProvider is in an invalid state for this action.",
-            tfvcErrorCode: TfvcErrorCodes.TfvcInInvalidState
+            tfvcErrorCode: TfvcErrorCodes.InInvalidState
         });
     }
 
@@ -55,6 +57,7 @@ export class TfvcError {
         }
 
         this.message = this.message || data.message || Strings.TfExecFailedError;
+        this.messageOptions = data.messageOptions;
         this.stdout = data.stdout;
         this.stderr = data.stderr;
         this.exitCode = data.exitCode;
@@ -80,15 +83,16 @@ export class TfvcError {
 export class TfvcErrorCodes {
     public static get MissingArgument(): string { return "MissingArgument"; }
     public static get AuthenticationFailed(): string { return "AuthenticationFailed"; }
+    public static get NotAuthorizedToAccess(): string { return "NotAuthorizedToAccess"; }
     public static get NotATfvcRepository(): string { return "NotATfvcRepository"; }
     public static get NotAnEnuTfCommandLine(): string { return "NotAnEnuTfCommandLine"; }
-    public static get TfvcLocationMissing(): string { return "TfvcLocationMissing"; }
-    public static get TfvcNotFound(): string { return "TfvcNotFound"; }
-    public static get TfvcMinVersionWarning(): string { return "TfvcMinVersionWarning"; }
+    public static get LocationMissing(): string { return "TfvcLocationMissing"; }
+    public static get NotFound(): string { return "TfvcNotFound"; }
+    public static get MinVersionWarning(): string { return "TfvcMinVersionWarning"; }
     public static get RepositoryNotFound(): string { return "RepositoryNotFound"; }
     public static get FileNotInMappings(): string { return "FileNotInMappings"; }
     public static get FileNotInWorkspace(): string { return "FileNotInWorkspace"; }
-    public static get TfvcInInvalidState(): string { return "TfvcInInvalidState"; }
-    public static get TfvcNoItemsMatch(): string { return "TfvcNoItemsMatch"; }
+    public static get InInvalidState(): string { return "TfvcInInvalidState"; }
+    public static get NoItemsMatch(): string { return "TfvcNoItemsMatch"; }
     public static get UnknownError(): string { return "UnknownError"; }
 };

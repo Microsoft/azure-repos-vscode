@@ -67,6 +67,7 @@ export class Strings {
     static TfExecFailedError: string = "Execution of the TFVC command line failed unexpectedly.";
     static TfVersionWarning: string = "The installed version of the TF command line does not meet the minimum suggested version. You may run into errors or limitations with certain commands until you upgrade. Minimum suggested version: ";
     static TfNoPendingChanges: string = "There are no matching pending changes.";
+    static TfServerWorkspace: string = "It appears you are using a Server workspace. Currently, TFVC support is limited to Local workspaces.";
     static UndoChanges: string = "Undo Changes";
     static NoChangesToCheckin: string = "There are no changes to check in. Changes must be added to the 'Included' section to be checked in.";
     static NoChangesToUndo: string = "There are no changes to undo.";

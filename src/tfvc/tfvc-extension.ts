@@ -13,7 +13,8 @@ import { TfvcCommandNames, TfvcTelemetryEvents } from "../helpers/constants";
 import { Strings } from "../helpers/strings";
 import { UrlBuilder } from "../helpers/urlbuilder";
 import { Utils } from "../helpers/utils";
-import { ButtonMessageItem, VsCodeUtils } from "../helpers/vscodeutils";
+import { VsCodeUtils } from "../helpers/vscodeutils";
+import { IButtonMessageItem } from "../helpers/vscodeutils.interfaces";
 import { Telemetry } from "../services/telemetry";
 import { Resource } from "./scm/resource";
 import { TfvcSCMProvider } from "./tfvcscmprovider";
@@ -361,12 +362,8 @@ export class TfvcExtension  {
             if (err.stdout) { //TODO: perhaps just for 'Checkin'? Or the CLC?
                 TfvcOutput.AppendLine(VsCodeUtils.FormatMessage(`[${prefix}] ${err.stdout}`));
             }
-            let messageItem : ButtonMessageItem = { title : Strings.ShowTfvcOutput, command: TfvcCommandNames.ShowOutput };
-            VsCodeUtils.ShowErrorMessageWithOptions(err.message, messageItem).then((item) => {
-                if (item) {
-                    commands.executeCommand<void>(item.command);
-                }
-            });
+            let messageItem: IButtonMessageItem = { title : Strings.ShowTfvcOutput, command: TfvcCommandNames.ShowOutput };
+            VsCodeUtils.ShowErrorMessage(err.message, messageItem);
         }
     }
 

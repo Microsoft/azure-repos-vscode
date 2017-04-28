@@ -7,8 +7,10 @@
 import * as path from "path";
 
 import { parseString } from "xml2js";
+import { Constants } from "../../helpers/constants";
 import { Logger } from "../../helpers/logger";
 import { Strings } from "../../helpers/strings";
+import { IButtonMessageItem } from "../../helpers/vscodeutils.interfaces";
 import { TfvcError, TfvcErrorCodes } from "../tfvcerror";
 import { IExecutionResult } from "../interfaces";
 
@@ -42,15 +44,16 @@ export class CommandHelper {
         if (result.exitCode) {
             let tfvcErrorCode: string = TfvcErrorCodes.UnknownError;
             let message: string;
+            let messageOptions: IButtonMessageItem[];
 
             if (/Authentication failed/.test(result.stderr)) {
                 tfvcErrorCode = TfvcErrorCodes.AuthenticationFailed;
-            } else if (/workspace could not be determined/.test(result.stderr) ||
-                       /The workspace could not be determined from any argument paths or the current working directory/.test(result.stderr) || // CLC error
-                       /Unable to determine the source control server/.test(result.stderr)) { // EXE error
+            } else if (/workspace could not be determined/i.test(result.stderr) ||
+                       /The workspace could not be determined from any argument paths or the current working directory/i.test(result.stderr) || // CLC error
+                       /Unable to determine the source control server/i.test(result.stderr)) { // EXE error
                 tfvcErrorCode = TfvcErrorCodes.NotATfvcRepository;
                 message = Strings.NoWorkspaceMappings;
-            } else if (/Repository not found/.test(result.stderr)) {
+            } else if (/Repository not found/i.test(result.stderr)) {
                 tfvcErrorCode = TfvcErrorCodes.RepositoryNotFound;
             } else if (/project collection URL to use could not be determined/i.test(result.stderr)) {
                 tfvcErrorCode = TfvcErrorCodes.NotATfvcRepository;
@@ -58,13 +61,19 @@ export class CommandHelper {
             } else if (/Access denied connecting.*authenticating as OAuth/i.test(result.stderr)) {
                 tfvcErrorCode = TfvcErrorCodes.AuthenticationFailed;
                 message = Strings.TokenNotAllScopes;
-            } else if (/'java' is not recognized as an internal or external command/.test(result.stderr)) {
-                tfvcErrorCode = TfvcErrorCodes.TfvcNotFound;
+            } else if (/'java' is not recognized as an internal or external command/i.test(result.stderr)) {
+                tfvcErrorCode = TfvcErrorCodes.NotFound;
                 message = Strings.TfInitializeFailureError;
             } else if (/There is no working folder mapping/i.test(result.stderr)) {
                 tfvcErrorCode = TfvcErrorCodes.FileNotInMappings;
             } else if (/could not be found in your workspace, or you do not have permission to access it./i.test(result.stderr)) {
                 tfvcErrorCode = TfvcErrorCodes.FileNotInWorkspace;
+            } else if (/TF30063: You are not authorized to access/i.test(result.stderr)) {
+                //For now, we're assuming this is an indication of a Server workspace
+                tfvcErrorCode = TfvcErrorCodes.NotAuthorizedToAccess;
+                message = Strings.TfServerWorkspace;
+                messageOptions = [{ title : Strings.LearnMore,
+                                    url : Constants.ServerWorkspaceUrl }];
             } else if (showFirstError) {
                 message = result.stderr ? result.stderr : result.stdout;
             }
@@ -73,6 +82,7 @@ export class CommandHelper {
 
             throw new TfvcError({
                 message: message || Strings.TfExecFailedError,
+                messageOptions: messageOptions,
                 stdout: result.stdout,
                 stderr: result.stderr,
                 exitCode: result.exitCode,
