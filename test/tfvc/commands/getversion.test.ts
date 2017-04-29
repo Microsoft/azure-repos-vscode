@@ -39,9 +39,17 @@ describe("Tfvc-GetVersionCommand", function() {
             stdout: "",
             stderr: undefined
         };
+        let threw: boolean = false;
 
-        let version: string = await cmd.ParseOutput(executionResult);
-        assert.equal(version, "");
+        try {
+            await cmd.ParseExeOutput(executionResult);
+        } catch (err) {
+            assert.equal(err.tfvcErrorCode, TfvcErrorCodes.NotAnEnuTfCommandLine);
+            assert.isTrue(err.message.startsWith(Strings.NotAnEnuTfCommandLine));
+            threw = true;
+        } finally {
+            assert.isTrue(threw);
+        }
     });
 
     it("should verify parse Exe output - no version", async function() {
@@ -51,9 +59,17 @@ describe("Tfvc-GetVersionCommand", function() {
             stdout: "",
             stderr: undefined
         };
+        let threw: boolean = false;
 
-        let version: string = await cmd.ParseExeOutput(executionResult);
-        assert.equal(version, "");
+        try {
+            await cmd.ParseExeOutput(executionResult);
+        } catch (err) {
+            assert.equal(err.tfvcErrorCode, TfvcErrorCodes.NotAnEnuTfCommandLine);
+            assert.isTrue(err.message.startsWith(Strings.NotAnEnuTfCommandLine));
+            threw = true;
+        } finally {
+            assert.isTrue(threw);
+        }
     });
 
     it("should verify parse output - valid version", async function() {
@@ -87,6 +103,7 @@ describe("Tfvc-GetVersionCommand", function() {
             stdout: "Something bad this way comes.",
             stderr: undefined
         };
+        let threw: boolean = false;
 
         try {
             await cmd.ParseOutput(executionResult);
@@ -95,6 +112,9 @@ describe("Tfvc-GetVersionCommand", function() {
             assert.equal(err.tfvcCommand, "add");
             assert.isTrue(err.message.startsWith(Strings.TfExecFailedError));
             assert.isTrue(err.stdout.startsWith("Something bad this way comes."));
+            threw = true;
+        } finally {
+            assert.isTrue(threw);
         }
     });
 
@@ -105,6 +125,7 @@ describe("Tfvc-GetVersionCommand", function() {
             stdout: "Something bad this way comes.",
             stderr: undefined
         };
+        let threw: boolean = false;
 
         try {
             await cmd.ParseExeOutput(executionResult);
@@ -113,6 +134,9 @@ describe("Tfvc-GetVersionCommand", function() {
             assert.equal(err.tfvcCommand, "add");
             assert.isTrue(err.message.startsWith(Strings.TfExecFailedError));
             assert.isTrue(err.stdout.startsWith("Something bad this way comes."));
+            threw = true;
+        } finally {
+            assert.isTrue(threw);
         }
     });
 
@@ -123,12 +147,16 @@ describe("Tfvc-GetVersionCommand", function() {
             stdout: "Microsoft (R) TF - Herramienta Control de versiones de Team Foundation, versi�n 14.102.25619.0",
             stderr: undefined
         };
+        let threw: boolean = false;
 
         try {
             await cmd.ParseExeOutput(executionResult);
         } catch (err) {
             assert.equal(err.tfvcErrorCode, TfvcErrorCodes.NotAnEnuTfCommandLine);
             assert.isTrue(err.message.startsWith(Strings.NotAnEnuTfCommandLine));
+            threw = true;
+        } finally {
+            assert.isTrue(threw, "Checking Spanish version did not throw an error.");
         }
     });
 
@@ -139,12 +167,16 @@ describe("Tfvc-GetVersionCommand", function() {
             stdout: "Microsoft (R) TF�- Outil Team Foundation Version Control, version�14.102.25619.0",
             stderr: undefined
         };
+        let threw: boolean = false;
 
         try {
             await cmd.ParseExeOutput(executionResult);
         } catch (err) {
             assert.equal(err.tfvcErrorCode, TfvcErrorCodes.NotAnEnuTfCommandLine);
             assert.isTrue(err.message.startsWith(Strings.NotAnEnuTfCommandLine));
+            threw = true;
+        } finally {
+            assert.isTrue(threw, "Checking French version did not throw an error.");
         }
     });
 
@@ -158,5 +190,25 @@ describe("Tfvc-GetVersionCommand", function() {
 
         let version: string = await cmd.ParseExeOutput(executionResult);
         assert.equal(version, "14.102.25619.0");
+    });
+
+    it("should verify parse EXE output - version is not in the first line", async function() {
+        let cmd: GetVersion = new GetVersion();
+        let executionResult: IExecutionResult = {
+            exitCode: 0,
+            stdout: "\r\nc:\\TFS\\folder1\\folder two\\folder3\\folder4\\folder5> add -noprompt -?\r\n" +
+                    "Microsoft (R) TF - Team Foundation Version Control Tool, Version 14.98.25331.0\r\n" +
+                    "Copyright (c) Microsoft Corporation.  All rights reserved.\r\n" +
+                    "Adds new files and folders from a local file system location to Team Foundation\r\n" +
+                    "version control.\r\n" +
+                    "\r\n" +
+                    "tf vc add [itemspec] [/lock:(none|checkin|checkout)] [/encoding:filetype]\r\n" +
+                    "          [/noprompt] [/recursive] [/noignore] [/login:username,[password]]\r\n" +
+                    "\r\n",
+            stderr: undefined
+        };
+
+        let version: string = await cmd.ParseExeOutput(executionResult);
+        assert.equal(version, "14.98.25331.0");
     });
 });
