@@ -32,6 +32,7 @@ export class Strings {
     static ThanksForFeedback: string = "Thanks for sending feedback!";
     static LearnMore: string = "Learn more...";
     static ShowMe: string = "Show Me!";
+    static VS2015Update3CSR: string = "Get Latest VS 2015 Update";
 
     static ChoosePullRequest: string = "Choose a pull request";
     static ChooseWorkItem: string = "Choose a work item";
@@ -65,7 +66,7 @@ export class Strings {
     static TfMissingError: string = "Unable to find the TF executable. Please ensure TF is installed and the path specified contains the filename. Provided path: ";
     static TfInitializeFailureError: string = "Unable to initialize the TF executable. Please verify the installation of Java and ensure it is in the PATH.";
     static TfExecFailedError: string = "Execution of the TFVC command line failed unexpectedly.";
-    static TfVersionWarning: string = "The installed version of the TF command line does not meet the minimum suggested version. You may run into errors or limitations with certain commands until you upgrade. Minimum suggested version: ";
+    static TfVersionWarning: string = "The configured version of TF does not meet the minimum version. You may run into errors or limitations with certain commands until you upgrade. Minimum version: ";
     static TfNoPendingChanges: string = "There are no matching pending changes.";
     static TfServerWorkspace: string = "It appears you are using a Server workspace. Currently, TFVC support is limited to Local workspaces.";
     static UndoChanges: string = "Undo Changes";

@@ -6,8 +6,10 @@
 
 import * as cp from "child_process";
 import { TeamServerContext } from "../contexts/servercontext";
+import { Constants, TelemetryEvents } from "../helpers/constants";
 import { Logger } from "../helpers/logger";
 import { Strings } from "../helpers/strings";
+import { IButtonMessageItem } from "../helpers/vscodeutils.interfaces";
 import { IDisposable, toDisposable, dispose } from "./util";
 import { IArgumentProvider, IExecutionResult, ITfCommandLine } from "./interfaces";
 import { TfvcError, TfvcErrorCodes } from "./tfvcerror";
@@ -78,7 +80,7 @@ export class TfCommandLineRunner {
         const isExe: boolean = path.extname(tfvcPath) === ".exe";
         let minVersion: string = "14.0.4"; //CLC min version
         if (isExe) {
-            minVersion = "14.0.0";  //Minimum tf.exe version
+            minVersion = "14.102.0";  //Minimum tf.exe version
         }
 
         return {
@@ -105,8 +107,16 @@ export class TfCommandLineRunner {
         const curVersion: TfvcVersion = TfvcVersion.FromString(version);
         if (TfvcVersion.Compare(curVersion, minVersion) < 0) {
             Logger.LogWarning(`TFVC ${version} is less that the min version of ${tfvc.minVersion}.`);
+            let options: IButtonMessageItem[] = [];
+            if (tfvc.isExe) {
+                //Provide more information on how to update tf.exe to the minimum version required
+                options =  [{ title : Strings.VS2015Update3CSR,
+                            url : Constants.VS2015U3CSRUrl,
+                            telemetryId: TelemetryEvents.VS2015U3CSR }];
+            }
             throw new TfvcError({
-                message: Strings.TfVersionWarning + minVersion.ToString(),
+                message: `${Strings.TfVersionWarning}${minVersion.ToString()}`,
+                messageOptions: options,
                 tfvcErrorCode: TfvcErrorCodes.MinVersionWarning
             });
         }

@@ -14,6 +14,7 @@ export class Constants {
     static TokenShowMeUrl: string = "https://aka.ms/o2wkmo";
     static ReadmeLearnMoreUrl: string = "https://aka.ms/jkapah";
     static ServerWorkspaceUrl: string = "https://github.com/Microsoft/vsts-vscode/blob/master/TFVC_README.md#what-is-the-difference-between-a-local-and-server-workspace-how-can-i-tell-which-one-im-working-with";
+    static VS2015U3CSRUrl: string = "https://msdn.microsoft.com/en-us/library/mt752379.aspx";
 }
 
 export class CommandNames {
@@ -104,6 +105,7 @@ export class TelemetryEvents {
     static ViewPinnedQueryWorkItems: string = TelemetryEvents.TelemetryPrefix + "viewpinnedqueryworkitems";
     static ViewWorkItem: string = TelemetryEvents.TelemetryPrefix + "viewworkitem";
     static ViewWorkItems: string = TelemetryEvents.TelemetryPrefix + "viewworkitems";
+    static VS2015U3CSR: string = TelemetryEvents.TelemetryPrefix + "vs2015u3csr";
 }
 
 export class TfvcTelemetryEvents {
