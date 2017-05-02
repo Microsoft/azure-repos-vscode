@@ -15,42 +15,42 @@ import { CommandHelper } from "../../../src/tfvc/commands/commandhelper";
 describe("Tfvc-CommandHelper", function() {
 
     it("should verify RequireArgument - success", function() {
-        let arg: any = { prop1: "prop 1" };
+        const arg: any = { prop1: "prop 1" };
         CommandHelper.RequireArgument(arg, "arg");
     });
 
     it("should verify RequireArgument - failure", function() {
-        let arg: any = undefined;
+        const arg: any = undefined;
         assert.throws(() => CommandHelper.RequireArgument(arg, "arg"), TfvcError, /Argument is required/);
     });
 
     it("should verify RequireStringArgument - success", function() {
-        let arg: string = "myString";
+        const arg: string = "myString";
         CommandHelper.RequireStringArgument(arg, "arg");
     });
 
     it("should verify RequireStringArgument - failure", function() {
-        let arg: string = "";
+        const arg: string = "";
         assert.throws(() => CommandHelper.RequireStringArgument(arg, "arg"), TfvcError, /Argument is required/);
     });
 
     it("should verify RequireStringArrayArgument - success", function() {
-        let arg: string[] = ["myString"];
+        const arg: string[] = ["myString"];
         CommandHelper.RequireStringArrayArgument(arg, "arg");
     });
 
     it("should verify RequireStringArrayArgument - failure - empty array", function() {
-        let arg: string[] = [];
+        const arg: string[] = [];
         assert.throws(() => CommandHelper.RequireStringArrayArgument(arg, "arg"), TfvcError, /Argument is required/);
     });
 
     it("should verify RequireStringArrayArgument - failure - undefined", function() {
-        let arg: string[] = undefined;
+        const arg: string[] = undefined;
         assert.throws(() => CommandHelper.RequireStringArrayArgument(arg, "arg"), TfvcError, /Argument is required/);
     });
 
     it("should verify HasError - no errors", function() {
-        let result: IExecutionResult = {
+        const result: IExecutionResult = {
             exitCode: 123,
             stdout: undefined,
             stderr: undefined
@@ -63,7 +63,7 @@ describe("Tfvc-CommandHelper", function() {
     });
 
     it("should verify HasError - has errors", function() {
-        let result: IExecutionResult = {
+        const result: IExecutionResult = {
             exitCode: 123,
             stdout: undefined,
             stderr: "Something bad happened!"
@@ -79,7 +79,7 @@ describe("Tfvc-CommandHelper", function() {
     });
 
     it("should verify ProcessErrors - no errors", function() {
-        let result: IExecutionResult = {
+        const result: IExecutionResult = {
             exitCode: 0,
             stdout: undefined,
             stderr: undefined
@@ -88,7 +88,7 @@ describe("Tfvc-CommandHelper", function() {
     });
 
     it("should verify ProcessErrors - bad exit code only", function() {
-        let result: IExecutionResult = {
+        const result: IExecutionResult = {
             exitCode: 100,
             stdout: undefined,
             stderr: undefined
@@ -104,7 +104,7 @@ describe("Tfvc-CommandHelper", function() {
     });
 
     it("should verify ProcessErrors - auth failed", function() {
-        let result: IExecutionResult = {
+        const result: IExecutionResult = {
             exitCode: 100,
             stdout: undefined,
             stderr: "Authentication failed"
@@ -121,7 +121,7 @@ describe("Tfvc-CommandHelper", function() {
     });
 
     it("should verify ProcessErrors - auth failed", function() {
-        let result: IExecutionResult = {
+        const result: IExecutionResult = {
             exitCode: 100,
             stdout: undefined,
             stderr: "workspace could not be determined"
@@ -138,7 +138,7 @@ describe("Tfvc-CommandHelper", function() {
     });
 
     it("should verify ProcessErrors - no workspace", function() {
-        let result: IExecutionResult = {
+        const result: IExecutionResult = {
             exitCode: 100,
             stdout: undefined,
             stderr: "workspace could not be determined"
@@ -155,7 +155,7 @@ describe("Tfvc-CommandHelper", function() {
     });
 
     it("should verify ProcessErrors - no repo", function() {
-        let result: IExecutionResult = {
+        const result: IExecutionResult = {
             exitCode: 100,
             stdout: undefined,
             stderr: "Repository not found"
@@ -172,7 +172,7 @@ describe("Tfvc-CommandHelper", function() {
     });
 
     it("should verify ProcessErrors - no collection", function() {
-        let result: IExecutionResult = {
+        const result: IExecutionResult = {
             exitCode: 100,
             stdout: undefined,
             stderr: "project collection URL to use could not be determined"
@@ -189,7 +189,7 @@ describe("Tfvc-CommandHelper", function() {
     });
 
     it("should verify ProcessErrors - access denied", function() {
-        let result: IExecutionResult = {
+        const result: IExecutionResult = {
             exitCode: 100,
             stdout: undefined,
             stderr: "Access denied connecting: some other text: authenticating as OAuth"
@@ -206,7 +206,7 @@ describe("Tfvc-CommandHelper", function() {
     });
 
     it("should verify ProcessErrors - no java", function() {
-        let result: IExecutionResult = {
+        const result: IExecutionResult = {
             exitCode: 100,
             stdout: undefined,
             stderr: "'java' is not recognized as an internal or external command"
@@ -223,7 +223,7 @@ describe("Tfvc-CommandHelper", function() {
     });
 
     it("should verify ProcessErrors - no mapping", function() {
-        let result: IExecutionResult = {
+        const result: IExecutionResult = {
             exitCode: 100,
             stdout: undefined,
             stderr: "There is no working folder mapping"
@@ -240,7 +240,7 @@ describe("Tfvc-CommandHelper", function() {
     });
 
     it("should verify ProcessErrors - not in workspace", function() {
-        let result: IExecutionResult = {
+        const result: IExecutionResult = {
             exitCode: 100,
             stdout: undefined,
             stderr: "could not be found in your workspace, or you do not have permission to access it."
@@ -256,8 +256,27 @@ describe("Tfvc-CommandHelper", function() {
         }
     });
 
+    it("should verify ProcessErrors - Server workspace detection (TF30063)", function() {
+        const result: IExecutionResult = {
+            exitCode: 100,
+            stdout: undefined,
+            stderr: "TF30063: You are not authorized to access anything because I said so"
+        };
+        try {
+            CommandHelper.ProcessErrors("cmd", result, false);
+        } catch (err) {
+            assert.equal(err.exitCode, 100);
+            assert.equal(err.tfvcCommand, "cmd");
+            assert.equal(err.tfvcErrorCode, TfvcErrorCodes.NotAuthorizedToAccess);
+            assert.isTrue(err.message.startsWith(Strings.TfServerWorkspace));
+            assert.isDefined(err.messageOptions);
+            assert.isTrue(err.messageOptions.length  === 1);
+            assert.equal(err.stdout, undefined);
+        }
+    });
+
     it("should verify ProcessErrors - showFirstError - stderr", function() {
-        let result: IExecutionResult = {
+        const result: IExecutionResult = {
             exitCode: 100,
             stdout: undefined,
             stderr: "something bad"
@@ -274,7 +293,7 @@ describe("Tfvc-CommandHelper", function() {
     });
 
     it("should verify ProcessErrors - showFirstError - stdout", function() {
-        let result: IExecutionResult = {
+        const result: IExecutionResult = {
             exitCode: 100,
             stdout: "something bad",
             stderr: undefined
@@ -291,8 +310,8 @@ describe("Tfvc-CommandHelper", function() {
     });
 
     it("should verify SplitIntoLines", function() {
-        let text: string = "one\ntwo\r\nthree\r\nfour\nfive\n";
-        let lines: string[] = CommandHelper.SplitIntoLines(text);
+        const text: string = "one\ntwo\r\nthree\r\nfour\nfive\n";
+        const lines: string[] = CommandHelper.SplitIntoLines(text);
         assert.equal(lines.length, 6);
         assert.equal(lines[0], "one");
         assert.equal(lines[1], "two");
@@ -303,22 +322,21 @@ describe("Tfvc-CommandHelper", function() {
     });
 
     it("should verify SplitIntoLines - undefined input", function() {
-        let text: string;
-        let lines: string[] = CommandHelper.SplitIntoLines(text);
+        const lines: string[] = CommandHelper.SplitIntoLines(undefined);
         assert.isDefined(lines);
         assert.equal(lines.length, 0);
     });
 
     it("should verify SplitIntoLines - empty input", function() {
-        let text: string = "";
-        let lines: string[] = CommandHelper.SplitIntoLines(text);
+        const text: string = "";
+        const lines: string[] = CommandHelper.SplitIntoLines(text);
         assert.isDefined(lines);
         assert.equal(lines.length, 0);
     });
 
     it("should verify SplitIntoLines - trim WARNings", function() {
-        let text: string = "WARN 1\nWARN 2\nwarning\none\ntwo\r\n\n";
-        let lines: string[] = CommandHelper.SplitIntoLines(text);
+        const text: string = "WARN 1\nWARN 2\nwarning\none\ntwo\r\n\n";
+        const lines: string[] = CommandHelper.SplitIntoLines(text);
         assert.equal(lines.length, 5);
         assert.equal(lines[0], "warning");
         assert.equal(lines[1], "one");
@@ -328,8 +346,8 @@ describe("Tfvc-CommandHelper", function() {
     });
 
     it("should verify SplitIntoLines - leave WARNings", function() {
-        let text: string = "WARN 1\nWARN 2\nwarning\none\ntwo\r\n\n";
-        let lines: string[] = CommandHelper.SplitIntoLines(text, false);
+        const text: string = "WARN 1\nWARN 2\nwarning\none\ntwo\r\n\n";
+        const lines: string[] = CommandHelper.SplitIntoLines(text, false);
         assert.equal(lines.length, 7);
         assert.equal(lines[0], "WARN 1");
         assert.equal(lines[1], "WARN 2");
@@ -341,8 +359,8 @@ describe("Tfvc-CommandHelper", function() {
     });
 
     it("should verify SplitIntoLines - filter empty lines", function() {
-        let text: string = "zero\n      \none\ntwo\r\n"; //ensure there's a line with just spaces too
-        let lines: string[] = CommandHelper.SplitIntoLines(text, false, true);
+        const text: string = "zero\n      \none\ntwo\r\n"; //ensure there's a line with just spaces too
+        const lines: string[] = CommandHelper.SplitIntoLines(text, false, true);
         assert.equal(lines.length, 3);
         assert.equal(lines[0], "zero");
         assert.equal(lines[1], "one");
@@ -350,8 +368,8 @@ describe("Tfvc-CommandHelper", function() {
     });
 
     it("should verify SplitIntoLines - leave empty lines", function() {
-        let text: string = "one\ntwo\n\nthree\nfour\n\n";
-        let lines: string[] = CommandHelper.SplitIntoLines(text);
+        const text: string = "one\ntwo\n\nthree\nfour\n\n";
+        const lines: string[] = CommandHelper.SplitIntoLines(text);
         assert.equal(lines.length, 7);
         assert.equal(lines[0], "one");
         assert.equal(lines[1], "two");
@@ -363,8 +381,8 @@ describe("Tfvc-CommandHelper", function() {
     });
 
     it("should verify TrimToXml", async function() {
-        let text: string = "WARN 1\nWARN 2\nwarning\n<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<status>\r\n</status>\n\n";
-        let xml: string = CommandHelper.TrimToXml(text);
+        const text: string = "WARN 1\nWARN 2\nwarning\n<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<status>\r\n</status>\n\n";
+        const xml: string = CommandHelper.TrimToXml(text);
         assert.equal(xml, "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<status>\r\n</status>");
     });
 
@@ -374,7 +392,7 @@ describe("Tfvc-CommandHelper", function() {
     });
 
     it("should verify ParseXml - undefined input", async function() {
-        let xml: any = await CommandHelper.ParseXml(undefined);
+        const xml: any = await CommandHelper.ParseXml(undefined);
         assert.isUndefined(xml);
     });
 
@@ -388,9 +406,9 @@ describe("Tfvc-CommandHelper", function() {
     });
 
     it("should verify ParseXml", async function() {
-        let text: string = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<one attr1=\"35\" attr2=\"two\"><child1 attr1=\"44\" attr2=\"55\" attr3=\"three\"/><child2>child two</child2>\r\n</one>\n\n";
-        let xml: any = await CommandHelper.ParseXml(text);
-        let expectedJSON = {
+        const text: string = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<one attr1=\"35\" attr2=\"two\"><child1 attr1=\"44\" attr2=\"55\" attr3=\"three\"/><child2>child two</child2>\r\n</one>\n\n";
+        const xml: any = await CommandHelper.ParseXml(text);
+        const expectedJSON = {
             "one": {
                 "$": {
                     "attr1": "35",
@@ -412,7 +430,7 @@ describe("Tfvc-CommandHelper", function() {
     });
 
     it("should verify GetChangesetNumber", async function() {
-        let text: string = "/Users/leantk/tfvc-tfs/tfsTest_01/addFold:\n" +
+        const text: string = "/Users/leantk/tfvc-tfs/tfsTest_01/addFold:\n" +
                     "Checking in edit: testHere.txt\n" +
                     "\n" +
                     "/Users/leantk/tfvc-tfs/tfsTest_01:\n" +
@@ -420,19 +438,19 @@ describe("Tfvc-CommandHelper", function() {
                     "Checking in edit: TestAdd.txt\n" +
                     "\n" +
                     "Changeset #23 checked in.\n";
-        let changeset: string = CommandHelper.GetChangesetNumber(text);
+        const changeset: string = CommandHelper.GetChangesetNumber(text);
         assert.equal(changeset, "23");
     });
 
     it("should verify GetChangesetNumber - exact", async function() {
-        let text: string = "Changeset #20 checked in.";
-        let changeset: string = CommandHelper.GetChangesetNumber(text);
+        const text: string = "Changeset #20 checked in.";
+        const changeset: string = CommandHelper.GetChangesetNumber(text);
         assert.equal(changeset, "20");
     });
 
     it("should verify GetChangesetNumber - no match", async function() {
-        let text: string = "WARN 1\nWARN 2\ntext\nChangeset # checked in.\n\r\ntext\r\nmore text\n\n";
-        let changeset: string = CommandHelper.GetChangesetNumber(text);
+        const text: string = "WARN 1\nWARN 2\ntext\nChangeset # checked in.\n\r\ntext\r\nmore text\n\n";
+        const changeset: string = CommandHelper.GetChangesetNumber(text);
         assert.equal(changeset, "");
     });
 
