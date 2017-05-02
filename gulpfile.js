@@ -109,6 +109,7 @@ gulp.task('test-coverage', function() {
         ,'!out/src/contexts/repocontextfactory.js'
         ,'!out/src/contexts/tfvccontext.js'
         ,'!out/src/helpers/settings.js'
+        ,'!out/src/helpers/vscodeutils.interfaces.js'
         ,'!out/src/helpers/vscodeutils.js'
         ,'!out/src/services/telemetry.js'
         ,'!out/src/services/coreapi.js'
