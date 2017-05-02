@@ -4,7 +4,8 @@ This extension allows you to connect to Team Services, manage your pull requests
 monitor builds and work items for your team project. It uses your local repository information to connect to either
 Team Services or Team Foundation Server 2015 Update 2 (and later).
 
-As of version 1.116.0, it **provides support for the TFVC source control system**! To learn about the TFVC support, review our [documentation](TFVC_README.md).
+As of version 1.116.0, it **provides support for the TFVC source control system**! To learn about the TFVC support, review our [documentation](TFVC_README.md) or watch
+our [overview video](https://youtu.be/6IzJ2UPGmoQ).
 
 ![Visual Studio Team Services extension](assets/vscode.png)
 
@@ -93,6 +94,9 @@ summary page in your browser. This indicator will update its status every 5 minu
 the number of items returned by your pinned work item query. If you have not configured a pinned query it
 defaults to the work items assigned to you. Clicking the item will show you the work items the query returns.
 This indicator will update its status every 5 minutes.
+
+* ![Feedback indicator](assets/feedback-indicator.png) – Clicking this status bar item allows you to quickly send
+feedback about the Team Services extension.
 
 ## Commands
 In addition to the status bar integrations, the extension also provides several commands for interacting with
