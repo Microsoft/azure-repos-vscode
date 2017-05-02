@@ -41,7 +41,7 @@ export class UrlBuilder {
             finalUrl = finalUrl.substring(0, finalUrl.length - 1);
         }
         for (let idx: number = 0; idx < args.length; idx++) {
-            let prefix: string = (idx === 0 ? "?" : "&");
+            const prefix: string = (idx === 0 ? "?" : "&");
 
             let arg: string = args[idx];
             if (arg.startsWith("?") || arg.startsWith("&")) {
@@ -65,7 +65,7 @@ export class UrlBuilder {
             finalUrl = finalUrl.substring(0, finalUrl.length - 1);
         }
         for (let idx: number = 0; idx < args.length; idx++) {
-            let prefix: string = (idx === 0 ? "#" : "&");
+            const prefix: string = (idx === 0 ? "#" : "&");
 
             let arg: string = args[idx];
             if (arg.startsWith("#") || arg.startsWith("&")) {

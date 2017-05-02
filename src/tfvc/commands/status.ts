@@ -34,7 +34,7 @@ export class Status implements ITfvcCommand<IPendingChange[]> {
             .AddSwitch("recursive");
 
         if (this._localPaths && this._localPaths.length > 0) {
-            for (let i = 0; i < this._localPaths.length; i++) {
+            for (let i: number = 0; i < this._localPaths.length; i++) {
                 builder.Add(this._localPaths[i]);
             }
         }
@@ -63,7 +63,7 @@ export class Status implements ITfvcCommand<IPendingChange[]> {
         // Throw if any errors are found in stderr or if exitcode is not 0
         CommandHelper.ProcessErrors(this.GetArguments().GetCommand(), executionResult);
 
-        let changes: IPendingChange[] = [];
+        const changes: IPendingChange[] = [];
         const xml: string = CommandHelper.TrimToXml(executionResult.stdout);
         // Parse the xml using xml2js
         const json: any = await CommandHelper.ParseXml(xml);
@@ -71,14 +71,14 @@ export class Status implements ITfvcCommand<IPendingChange[]> {
             // get all the pending changes first
             const pending: any = json.status.pendingchanges[0].pendingchange;
             if (pending) {
-                for (let i = 0; i < pending.length; i++) {
+                for (let i: number = 0; i < pending.length; i++) {
                     this.add(changes, this.convert(pending[i].$, false), this._ignoreFolders);
                 }
             }
             // next, get all the candidate pending changes
             const candidate: any = json.status.candidatependingchanges[0].pendingchange;
             if (candidate) {
-                for (let i = 0; i < candidate.length; i++) {
+                for (let i: number = 0; i < candidate.length; i++) {
                     this.add(changes, this.convert(candidate[i].$, true), this._ignoreFolders);
                 }
             }
@@ -93,7 +93,7 @@ export class Status implements ITfvcCommand<IPendingChange[]> {
             .AddSwitch("recursive");
 
         if (this._localPaths && this._localPaths.length > 0) {
-            for (let i = 0; i < this._localPaths.length; i++) {
+            for (let i: number = 0; i < this._localPaths.length; i++) {
                 builder.Add(this._localPaths[i]);
             }
         }
@@ -134,7 +134,7 @@ export class Status implements ITfvcCommand<IPendingChange[]> {
         // Throw if any errors are found in stderr or if exitcode is not 0
         CommandHelper.ProcessErrors(this.GetArguments().GetCommand(), executionResult);
 
-        let changes: IPendingChange[] = [];
+        const changes: IPendingChange[] = [];
         if (!executionResult.stdout) {
             return changes;
         }
@@ -167,7 +167,7 @@ export class Status implements ITfvcCommand<IPendingChange[]> {
             if (line.startsWith("$/")) {
                 //$/jeyou/README.md;C19  //versioned
                 //$/jeyou/README.md  //isCandidate
-                let parts: string[] = line.split(";C");
+                const parts: string[] = line.split(";C");
 
                 curChange = { changeType: undefined, computer: undefined, date: undefined, localItem: undefined,
                             sourceItem: undefined, lock: undefined, owner: undefined,
@@ -183,7 +183,7 @@ export class Status implements ITfvcCommand<IPendingChange[]> {
                         let propertyValue: string = colonPos + 1 < line.length ? line.slice(colonPos + 1).trim() : "";
                         if (propertyName.toLowerCase() === "localitem") {
                             //Local item : [JEYOU-DEV00] C:\repos\TfExe.Tfvc.L2VSCodeExtension.RC.TFS\README.md
-                            let parts: string[] = propertyValue.split("] ");
+                            const parts: string[] = propertyValue.split("] ");
                             curChange["computer"] = parts[0].substr(1); //pop off the beginning [
                             propertyValue = parts[1];
                         }

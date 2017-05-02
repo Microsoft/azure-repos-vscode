@@ -23,9 +23,9 @@ export abstract class BaseClient {
     }
 
     protected handleError(err: Error, offlineText: string, polling: boolean, infoMessage?: string) : void {
-        let offline: boolean = Utils.IsOffline(err);
-        let msg: string = Utils.GetMessageForStatusCode(err, err.message);
-        let logPrefix: string = (infoMessage === undefined) ? "" : infoMessage + " ";
+        const offline: boolean = Utils.IsOffline(err);
+        const msg: string = Utils.GetMessageForStatusCode(err, err.message);
+        const logPrefix: string = (infoMessage === undefined) ? "" : infoMessage + " ";
 
         //When polling, we never display an error, we only log it (no telemetry either)
         if (polling === true) {
@@ -45,7 +45,7 @@ export abstract class BaseClient {
             }
         //If we aren't polling, we always log an error and, optionally, send telemetry
         } else {
-            let logMessage: string = logPrefix + msg;
+            const logMessage: string = logPrefix + msg;
             if (offline === true) {
                 Logger.LogError(logMessage);
             } else {

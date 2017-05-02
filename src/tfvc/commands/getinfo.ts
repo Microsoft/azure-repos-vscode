@@ -58,7 +58,7 @@ export class GetInfo implements ITfvcCommand<IItemInfo[]> {
         // Throw if any errors are found in stderr or if exitcode is not 0
         CommandHelper.ProcessErrors(this.GetArguments().GetCommand(), executionResult);
 
-        let itemInfos: IItemInfo[] = [];
+        const itemInfos: IItemInfo[] = [];
         if (!executionResult.stdout) {
             return itemInfos;
         }

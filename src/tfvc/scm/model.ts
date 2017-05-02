@@ -105,7 +105,7 @@ export class Model implements Disposable {
     public async Exclude(paths: string[]): Promise<void> {
         if (paths && paths.length > 0) {
             paths.forEach((path) => {
-                let normalizedPath: string = path.toLowerCase();
+                const normalizedPath: string = path.toLowerCase();
                 if (!_.contains(this._explicitlyExcluded, normalizedPath)) {
                     this._explicitlyExcluded.push(normalizedPath);
                 }
@@ -118,7 +118,7 @@ export class Model implements Disposable {
     public async Unexclude(paths: string[]): Promise<void> {
         if (paths && paths.length > 0) {
             paths.forEach((path) => {
-                let normalizedPath: string = path.toLowerCase();
+                const normalizedPath: string = path.toLowerCase();
                 if (_.contains(this._explicitlyExcluded, normalizedPath)) {
                     this._explicitlyExcluded = _.without(this._explicitlyExcluded, normalizedPath);
                 }
@@ -214,9 +214,9 @@ export class Model implements Disposable {
     //When files are deleted in the VS Code Explorer, they are marked as Deleted but as candidate changes
     //So we are looking for those and then running the Delete command on each.
     private async processDeletes(changes: IPendingChange[]): Promise<void> {
-        let deleteCandidatePaths: string[] = [];
+        const deleteCandidatePaths: string[] = [];
         for (let index: number = 0; index < changes.length; index++) {
-            let change: IPendingChange = changes[index];
+            const change: IPendingChange = changes[index];
             if (change.isCandidate && GetStatuses(change.changeType).find((e) => e === Status.DELETE)) {
                 deleteCandidatePaths.push(change.localItem);
             }

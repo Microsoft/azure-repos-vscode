@@ -42,7 +42,7 @@
       "check-whitespace"
     ],
     "one-variable-per-declaration": true,
-    "prefer-const": false,
+    "prefer-const": true,
     "prefer-method-signature": true,
     "quotemark": [true, "double"],
     "radix": false,

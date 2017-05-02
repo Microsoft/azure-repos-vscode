@@ -68,10 +68,10 @@ export class TeamExtension  {
         if (this._manager.ServerContext !== undefined && this._manager.ServerContext.RepoInfo !== undefined && this._manager.ServerContext.RepoInfo.IsTeamFoundation === true) {
             this._signedOut = false;
             if (this._manager.ServerContext.RepoInfo.IsTeamFoundationServer === true) {
-                let defaultUsername : string = this.getDefaultUsername();
-                let username: string = await window.showInputBox({ value: defaultUsername || "", prompt: Strings.ProvideUsername + " (" + this._manager.ServerContext.RepoInfo.Account + ")", placeHolder: "", password: false });
+                const defaultUsername : string = this.getDefaultUsername();
+                const username: string = await window.showInputBox({ value: defaultUsername || "", prompt: Strings.ProvideUsername + " (" + this._manager.ServerContext.RepoInfo.Account + ")", placeHolder: "", password: false });
                 if (username !== undefined && username.length > 0) {
-                    let password: string = await window.showInputBox({ value: "", prompt: Strings.ProvidePassword + " (" + username + ")", placeHolder: "", password: true });
+                    const password: string = await window.showInputBox({ value: "", prompt: Strings.ProvidePassword + " (" + username + ")", placeHolder: "", password: true });
                     if (password !== undefined) {
                         Logger.LogInfo("Signin: Username and Password provided as authentication.");
                         this._manager.CredentialManager.StoreCredentials(this._manager.ServerContext.RepoInfo.Host, username, password).then(() => {
@@ -79,30 +79,30 @@ export class TeamExtension  {
                             this._manager.Reinitialize();
                         }).catch((err) => {
                             // TODO: Should the message direct the user to open an issue?  send feedback?
-                            let msg: string = Strings.UnableToStoreCredentials + this._manager.ServerContext.RepoInfo.Host;
+                            const msg: string = Strings.UnableToStoreCredentials + this._manager.ServerContext.RepoInfo.Host;
                             this._manager.ReportError(err, msg, true);
                         });
                     }
                 }
             } else if (this._manager.ServerContext.RepoInfo.IsTeamServices === true) {
                 // Until Device Flow, we can prompt for the PAT for Team Services
-                let token: string = await window.showInputBox({ value: "", prompt: Strings.ProvideAccessToken + " (" + this._manager.ServerContext.RepoInfo.Account + ")", placeHolder: "", password: true });
+                const token: string = await window.showInputBox({ value: "", prompt: Strings.ProvideAccessToken + " (" + this._manager.ServerContext.RepoInfo.Account + ")", placeHolder: "", password: true });
                 if (token !== undefined) {
                     Logger.LogInfo("Signin: Personal Access Token provided as authentication.");
                     this._manager.CredentialManager.StoreCredentials(this._manager.ServerContext.RepoInfo.Host, Constants.OAuth, token.trim()).then(() => {
                         this._manager.Reinitialize();
                     }).catch((err) => {
                         // TODO: Should the message direct the user to open an issue?  send feedback?
-                        let msg: string = Strings.UnableToStoreCredentials + this._manager.ServerContext.RepoInfo.Host;
+                        const msg: string = Strings.UnableToStoreCredentials + this._manager.ServerContext.RepoInfo.Host;
                         this._manager.ReportError(err, msg, true);
                     });
                 }
             }
         } else {
             //If _manager has an error to display, display it and forgo the other. Otherwise, show the default error message.
-            let displayed: boolean = this._manager.DisplayErrorMessage();
+            const displayed: boolean = this._manager.DisplayErrorMessage();
             if (!displayed) {
-                let messageItem : ButtonMessageItem = { title : Strings.LearnMore,
+                const messageItem : ButtonMessageItem = { title : Strings.LearnMore,
                                     url : Constants.ReadmeLearnMoreUrl,
                                     telemetryId: TelemetryEvents.ReadmeLearnMoreClick };
                 VsCodeUtils.ShowErrorMessage(Strings.NoRepoInformation, messageItem);
@@ -116,7 +116,7 @@ export class TeamExtension  {
             this._manager.CredentialManager.RemoveCredentials(this._manager.ServerContext.RepoInfo.Host).then(() => {
                 Logger.LogInfo(`Signout: Removed credentials for host '${this._manager.ServerContext.RepoInfo.Host}'`);
             }).catch((err) => {
-                let msg: string = Strings.UnableToRemoveCredentials + this._manager.ServerContext.RepoInfo.Host;
+                const msg: string = Strings.UnableToRemoveCredentials + this._manager.ServerContext.RepoInfo.Host;
                 this._manager.ReportError(err, msg, true);
             }).finally(() => {
                 this._signedOut = true; //keep track of our status so we can display helpful info later
@@ -167,7 +167,7 @@ export class TeamExtension  {
     public OpenNewBug(): void {
         if (this._manager.EnsureInitialized(RepositoryType.ANY)) {
             //Bug is in all three templates
-            let taskTitle = VsCodeUtils.GetActiveSelection();
+            const taskTitle = VsCodeUtils.GetActiveSelection();
             this._witClient.CreateNewItem(WitTypes.Bug, taskTitle);
         } else {
             this._manager.DisplayErrorMessage();
@@ -190,7 +190,7 @@ export class TeamExtension  {
         if (this._manager.EnsureInitialized(RepositoryType.ANY)) {
             //Issue is only in Agile and CMMI templates (not Scrum)
             //Task is in all three templates (Agile, CMMI, Scrum)
-            let taskTitle = VsCodeUtils.GetActiveSelection();
+            const taskTitle = VsCodeUtils.GetActiveSelection();
             this._witClient.CreateNewItem(WitTypes.Task, taskTitle);
         } else {
             this._manager.DisplayErrorMessage();
@@ -200,7 +200,7 @@ export class TeamExtension  {
     //Opens a browser to a new work item (based on the work item type selected)
     public OpenNewWorkItem(): void {
         if (this._manager.EnsureInitialized(RepositoryType.ANY)) {
-            let taskTitle = VsCodeUtils.GetActiveSelection();
+            const taskTitle = VsCodeUtils.GetActiveSelection();
             this._witClient.CreateNewWorkItem(taskTitle);
         } else {
             this._manager.DisplayErrorMessage();
@@ -276,7 +276,7 @@ export class TeamExtension  {
     public async AssociateWorkItems(): Promise<void> {
         if (this._manager.EnsureInitialized(RepositoryType.ANY)) {
             Telemetry.SendEvent(TelemetryEvents.AssociateWorkItems);
-            let workitems: string[] = await this.chooseWorkItems();
+            const workitems: string[] = await this.chooseWorkItems();
             for (let i: number = 0; i < workitems.length; i++) {
                 // Append the string to end of the message
                 // Note: we are prefixing the message with a space so that the # char is not in the first column
@@ -300,8 +300,8 @@ export class TeamExtension  {
     private getDefaultUsername() : string {
         if (os.platform() === "win32") {
             let defaultUsername: string;
-            let domain: string = process.env.USERDOMAIN || "";
-            let username: string = process.env.USERNAME || "";
+            const domain: string = process.env.USERDOMAIN || "";
+            const username: string = process.env.USERNAME || "";
             if (domain !== undefined) {
                 defaultUsername = domain;
             }

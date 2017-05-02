@@ -26,7 +26,7 @@ export class BuildClient extends BaseClient {
     //Gets any available build status information and adds it to the status bar
     public async DisplayCurrentBuildStatus(context: IRepositoryContext, polling: boolean, definitionId?: number): Promise<void> {
         try {
-            let svc: BuildService = new BuildService(this._serverContext);
+            const svc: BuildService = new BuildService(this._serverContext);
             Logger.LogInfo("Getting current build from badge...");
             let buildBadge: BuildBadge;
             if (context.Type === RepositoryType.GIT) {
@@ -36,7 +36,7 @@ export class BuildClient extends BaseClient {
                 buildBadge = await this.getTfvcBuildBadge(svc, this._serverContext.RepoInfo.TeamProject);
             } else if (definitionId) {
                 //TODO: Allow definitionId to override Git and TFVC defaults (above)?
-                let builds: Build[] = await svc.GetBuildsByDefinitionId(this._serverContext.RepoInfo.TeamProject, definitionId);
+                const builds: Build[] = await svc.GetBuildsByDefinitionId(this._serverContext.RepoInfo.TeamProject, definitionId);
                 if (builds.length > 0) {
                     buildBadge = { buildId: builds[0].id, imageUrl: undefined };
                 } else {
@@ -45,13 +45,13 @@ export class BuildClient extends BaseClient {
             }
             if (buildBadge && buildBadge.buildId !== undefined) {
                 Logger.LogInfo("Found build id " + buildBadge.buildId.toString() + ". Getting build details...");
-                let build: Build = await svc.GetBuildById(buildBadge.buildId);
+                const build: Build = await svc.GetBuildById(buildBadge.buildId);
                 this._buildSummaryUrl = BuildService.GetBuildSummaryUrl(this._serverContext.RepoInfo.TeamProjectUrl, build.id.toString());
                 Logger.LogInfo("Build summary info: " + build.id.toString() + " " + BuildStatus[build.status] +
                     " " + BuildResult[build.result] + " " + this._buildSummaryUrl);
 
                 if (this._statusBarItem !== undefined) {
-                    let icon: string = Utils.GetBuildResultIcon(build.result);
+                    const icon: string = Utils.GetBuildResultIcon(build.result);
                     this._statusBarItem.command = CommandNames.OpenBuildSummaryPage;
                     this._statusBarItem.text = `$(icon octicon-package) ` + `$(icon ${icon})`;
                     this._statusBarItem.tooltip = "(" + BuildResult[build.result] + ") " + Strings.NavigateToBuildSummary + " " + build.buildNumber;
@@ -73,16 +73,16 @@ export class BuildClient extends BaseClient {
     //Gets the appropriate build for TFVC repositories and returns a 'BuildBadge' for it
     private async getTfvcBuildBadge(svc: BuildService, teamProjectId: string): Promise<BuildBadge> {
         //Create an build that doesn't exist and use as the default
-        let emptyBuild: BuildBadge = { buildId: undefined, imageUrl: undefined };
+        const emptyBuild: BuildBadge = { buildId: undefined, imageUrl: undefined };
 
-        let builds: Build[] = await svc.GetBuilds(teamProjectId);
+        const builds: Build[] = await svc.GetBuilds(teamProjectId);
         if (builds.length === 0) {
             return emptyBuild;
         }
 
         let matchingBuild: Build;
-        for (let idx = 0; idx < builds.length; idx++) {
-            let b: Build = builds[idx];
+        for (let idx: number = 0; idx < builds.length; idx++) {
+            const b: Build = builds[idx];
             // Ignore canceled builds
             if (b.result === BuildResult.Canceled) {
                 continue;

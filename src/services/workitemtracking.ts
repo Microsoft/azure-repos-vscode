@@ -23,7 +23,7 @@ export class WorkItemTrackingService {
 
     //Returns a Promise containing the WorkItem that was created
     public async CreateWorkItem(context: TeamServerContext, itemType: string, taskTitle: string): Promise<WorkItem> {
-        let newWorkItem = [{ op: "add", path: "/fields/" + WorkItemFields.Title, value: taskTitle }];
+        const newWorkItem = [{ op: "add", path: "/fields/" + WorkItemFields.Title, value: taskTitle }];
         /* tslint:disable:no-null-keyword */
         return await this._witApi.createWorkItem(null, newWorkItem, context.RepoInfo.TeamProject, itemType, false, false);
         /* tslint:enable:no-null-keyword */
@@ -46,18 +46,18 @@ export class WorkItemTrackingService {
 
     //Returns a Promise containing the array of work item types available for the team project
     public async GetWorkItemTypes(teamProject: string): Promise<WorkItemType[]> {
-        let types: WorkItemType[] = await this._witApi.getWorkItemTypes(teamProject);
-        let workItemTypes: WorkItemType[] = [];
-        let hiddenTypes: WorkItemTypeReference[] = [];
+        const types: WorkItemType[] = await this._witApi.getWorkItemTypes(teamProject);
+        const workItemTypes: WorkItemType[] = [];
+        const hiddenTypes: WorkItemTypeReference[] = [];
         types.forEach((type) => {
             workItemTypes.push(type);
         });
-        let category: WorkItemTypeCategory = await this._witApi.getWorkItemTypeCategory(teamProject, "Microsoft.HiddenCategory");
+        const category: WorkItemTypeCategory = await this._witApi.getWorkItemTypeCategory(teamProject, "Microsoft.HiddenCategory");
         category.workItemTypes.forEach((hiddenType) => {
             hiddenTypes.push(hiddenType);
         });
-        let filteredTypes: WorkItemType[] = workItemTypes.filter(function (el) {
-            for (let index = 0; index < hiddenTypes.length; index++) {
+        const filteredTypes: WorkItemType[] = workItemTypes.filter(function (el) {
+            for (let index: number = 0; index < hiddenTypes.length; index++) {
                 if (el.name === hiddenTypes[index].name) {
                     return false;
                 }
@@ -69,8 +69,8 @@ export class WorkItemTrackingService {
 
     //Returns a Promise containing a SimpleWorkItem representing the work item specified by id
     public async GetWorkItemById(id: string): Promise<SimpleWorkItem> {
-        let workItem: WorkItem = await this._witApi.getWorkItem(parseInt(id), [WorkItemFields.Id, WorkItemFields.Title]);
-        let result: SimpleWorkItem = new SimpleWorkItem();
+        const workItem: WorkItem = await this._witApi.getWorkItem(parseInt(id), [WorkItemFields.Id, WorkItemFields.Title]);
+        const result: SimpleWorkItem = new SimpleWorkItem();
         result.id = workItem.id.toString();
         result.label = workItem.fields[WorkItemFields.Title];
         return result;
@@ -79,7 +79,7 @@ export class WorkItemTrackingService {
     //Returns a Promise containing an array of SimpleWorkItems that are the results of the passed in wiql
     private async execWorkItemQuery(teamProject: string, wiql: Wiql): Promise<SimpleWorkItem[]> {
         //Querying WIT requires a TeamContext
-        let teamContext: TeamContext = {
+        const teamContext: TeamContext = {
             projectId: undefined,
             project: teamProject,
             teamId: undefined,
@@ -87,8 +87,8 @@ export class WorkItemTrackingService {
         };
 
         // Execute the wiql and get the work item ids
-        let queryResult: WorkItemQueryResult = await this._witApi.queryByWiql(wiql, teamContext);
-        let results: SimpleWorkItem[] = [];
+        const queryResult: WorkItemQueryResult = await this._witApi.queryByWiql(wiql, teamContext);
+        const results: SimpleWorkItem[] = [];
         let workItemIds: number[] = [];
         if (queryResult.queryResultType === QueryResultType.WorkItem) {
             workItemIds = queryResult.workItems.map(function(w) {return w.id; });
@@ -104,15 +104,15 @@ export class WorkItemTrackingService {
         }
 
         /* tslint:disable:no-null-keyword */
-        let workItems: WorkItem[] = await this._witApi.getWorkItems(workItemIds,
-                                                                    [WorkItemFields.Id, WorkItemFields.Title, WorkItemFields.WorkItemType],
-                                                                    null,
-                                                                    WorkItemExpand.None);
+        const workItems: WorkItem[] = await this._witApi.getWorkItems(workItemIds,
+                                                                      [WorkItemFields.Id, WorkItemFields.Title, WorkItemFields.WorkItemType],
+                                                                      null,
+                                                                      WorkItemExpand.None);
         /* tslint:enable:no-null-keyword */
 
         //Keep original sort order that wiql specified
-        for (let index = 0; index < workItemIds.length; index++) {
-            let item: WorkItem = workItems.find((i) => i.id === workItemIds[index]);
+        for (let index: number = 0; index < workItemIds.length; index++) {
+            const item: WorkItem = workItems.find((i) => i.id === workItemIds[index]);
             results.push({
                 id: item.fields[WorkItemFields.Id],
                 label: item.fields[WorkItemFields.Id] + "  [" + item.fields[WorkItemFields.WorkItemType] + "]",
@@ -125,7 +125,7 @@ export class WorkItemTrackingService {
 
      public async GetQueryResultCount(teamProject: string, wiql: string): Promise<number> {
         //Querying WIT requires a TeamContext
-        let teamContext: TeamContext = {
+        const teamContext: TeamContext = {
             projectId: undefined,
             project: teamProject,
             teamId: undefined,
@@ -133,7 +133,7 @@ export class WorkItemTrackingService {
         };
 
         // Execute the wiql and get count of results
-        let queryResult: WorkItemQueryResult = await this._witApi.queryByWiql({ query: wiql}, teamContext);
+        const queryResult: WorkItemQueryResult = await this._witApi.queryByWiql({ query: wiql}, teamContext);
         //If a Promise is returned here, then() will return that Promise
         //If not, it will wrap the value within a Promise and return that
         return queryResult.workItems.length;

@@ -52,14 +52,14 @@ export class Add implements ITfvcCommand<string[]> {
         //Ex. /usr/alias/repos/Tfvc.L2VSCodeExtension.RC/file-does-not-exist.md: No file matches.
         lines = lines.filter((e) => !e.endsWith(" No file matches."));  //tf.exe
 
-        let filesAdded: string[] = [];
+        const filesAdded: string[] = [];
         let path: string = "";
         for (let index: number = 0; index < lines.length; index++) {
-            let line: string = lines[index];
+            const line: string = lines[index];
             if (CommandHelper.IsFilePath(line)) {
                 path = line;
             } else {
-                let file: string = this.getFileFromLine(line);
+                const file: string = this.getFileFromLine(line);
                 filesAdded.push(CommandHelper.GetFilePath(path, file));
             }
         }

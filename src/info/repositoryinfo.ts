@@ -48,7 +48,7 @@ export class RepositoryInfo {
             repositoryUrl = repositoryInfo;
         }
 
-        let purl = url.parse(repositoryUrl);
+        const purl: url.Url = url.parse(repositoryUrl);
         if (purl) {
             this._host = purl.host;
             this._hostName = purl.hostname;
@@ -60,7 +60,7 @@ export class RepositoryInfo {
 
             this._repositoryUrl = repositoryUrl;
             if (RepoUtils.IsTeamFoundationServicesRepo(repositoryUrl)) {
-                let splitHost = this._host.split(".");
+                const splitHost = this._host.split(".");
                 this._account = splitHost[0];
                 this._isTeamServicesUrl = true;
                 Logger.LogDebug("_isTeamServicesUrl: true");

@@ -32,7 +32,7 @@ export class Telemetry {
         Telemetry._telemetryEnabled = settings.AppInsightsEnabled;
 
         // Always initialize Application Insights
-        let insightsKey = Telemetry._productionKey;
+        let insightsKey: string = Telemetry._productionKey;
         if (settings.AppInsightsKey !== undefined) {
             insightsKey = settings.AppInsightsKey;
         }
@@ -111,10 +111,10 @@ export class Telemetry {
         };
 
         //Set the userid on the AI context so that we can get user counts in the telemetry
-        let aiUserId = Telemetry._appInsightsClient.context.keys.userId;
+        const aiUserId = Telemetry._appInsightsClient.context.keys.userId;
         Telemetry._appInsightsClient.context.tags[aiUserId] = Telemetry._userId;
 
-        let aiSessionId = Telemetry._appInsightsClient.context.keys.sessionId;
+        const aiSessionId = Telemetry._appInsightsClient.context.keys.sessionId;
         Telemetry._appInsightsClient.context.tags[aiSessionId] = Telemetry._sessionId;
     }
 }

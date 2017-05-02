@@ -28,7 +28,7 @@ export class GitVcService {
     //Returns a Promise containing an array of GitPullRequest objectss for the creator and repository
     //If creatorId is undefined, all pull requests will be returned
     public async GetPullRequests(repositoryId: string, creatorId?: string, reviewerId?: string, status?: PullRequestStatus): Promise<GitPullRequest[]> {
-        let criteria: GitPullRequestSearchCriteria = { creatorId: creatorId, includeLinks: false, repositoryId: repositoryId, reviewerId: reviewerId,
+        const criteria: GitPullRequestSearchCriteria = { creatorId: creatorId, includeLinks: false, repositoryId: repositoryId, reviewerId: reviewerId,
                                                        sourceRefName: undefined, status: status, targetRefName: undefined };
         return await this._gitApi.getPullRequests(repositoryId, criteria);
     }
@@ -58,7 +58,7 @@ export class GitVcService {
     //https://account.visualstudio.com/project/_git/VSCode.Extension/history?itemVersion=GBmaster&_a=history
     public static GetRepositoryHistoryUrl(remoteUrl: string, currentBranch: string): string {
         const branch: string = encodeURIComponent(currentBranch);
-        let repoHistoryUrl: string = UrlBuilder.Join(remoteUrl, "history");
+        const repoHistoryUrl: string = UrlBuilder.Join(remoteUrl, "history");
         return UrlBuilder.AddQueryParams(repoHistoryUrl, `itemVersion=GB${branch}`, `_a=history`);
     }
 
@@ -86,7 +86,7 @@ export class GitVcService {
     //Returns the 'score' of the pull request so the client knows if the PR failed,
     //didn't receive any reponses, succeeded or is waiting for the author.
     public static GetPullRequestScore(pullRequest: GitPullRequest): PullRequestScore {
-        let mergeStatus: PullRequestAsyncStatus = pullRequest.mergeStatus;
+        const mergeStatus: PullRequestAsyncStatus = pullRequest.mergeStatus;
         if (mergeStatus === PullRequestAsyncStatus.Conflicts
             || mergeStatus === PullRequestAsyncStatus.Failure
             || mergeStatus === PullRequestAsyncStatus.RejectedByPolicy) {
@@ -97,7 +97,7 @@ export class GitVcService {
         let highestVote: number = 0;
         if (pullRequest.reviewers !== undefined && pullRequest.reviewers.length > 0) {
             pullRequest.reviewers.forEach((reviewer) => {
-                let vote: number = reviewer.vote;
+                const vote: number = reviewer.vote;
                 if (vote < lowestVote) {
                     lowestVote = vote;
                 }

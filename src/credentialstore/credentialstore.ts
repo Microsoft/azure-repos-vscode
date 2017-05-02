@@ -72,7 +72,7 @@ export class CredentialStore implements ICredentialStore {
     }
 
     public SetCredential(service: string, username: string, password: any) : Q.Promise<void> {
-        let deferred: Q.Deferred<void> = Q.defer<void>();
+        const deferred: Q.Deferred<void> = Q.defer<void>();
 
         // First, look to see if we have a credential for this service already.  If so, remove it
         // since we don't know if the user is changing the username or the password (or both) for

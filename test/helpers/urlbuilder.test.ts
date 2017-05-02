@@ -168,7 +168,7 @@ describe("UrlBuilder", function() {
         const url: string = "http://xplatalm.visualstudio.com/";
         const arg: string = "#path";
 
-        let result: string = UrlBuilder.AddHashes(url, arg);
+        const result: string = UrlBuilder.AddHashes(url, arg);
         assert.equal(`http://xplatalm.visualstudio.com${arg}`, result);
     });
 

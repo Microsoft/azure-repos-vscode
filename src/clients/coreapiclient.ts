@@ -14,14 +14,14 @@ export class CoreApiClient {
     /* tslint:enable:no-empty */
 
     public async GetTeamProject(remoteUrl: string, teamProjectName: string): Promise<TeamProject> {
-        let svc: CoreApiService = new CoreApiService(remoteUrl);
-        let teamProject:TeamProject = await svc.GetTeamProject(teamProjectName);
+        const svc: CoreApiService = new CoreApiService(remoteUrl);
+        const teamProject:TeamProject = await svc.GetTeamProject(teamProjectName);
         return teamProject;
     }
 
     public async GetProjectCollection(remoteUrl: string, collectionName: string): Promise<TeamProjectCollection> {
-        let svc: CoreApiService = new CoreApiService(remoteUrl);
-        let collection:TeamProjectCollection = await svc.GetProjectCollection(collectionName);
+        const svc: CoreApiService = new CoreApiService(remoteUrl);
+        const collection:TeamProjectCollection = await svc.GetProjectCollection(collectionName);
         return collection;
     }
 

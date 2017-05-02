@@ -41,12 +41,12 @@ export class RepositoryInfoClient {
         } else if (this._repoContext.Type === RepositoryType.TFVC || this._repoContext.Type === RepositoryType.EXTERNAL) {
             Logger.LogDebug(`Getting repository information for a TFVC repository at ${this._repoContext.RemoteUrl}`);
             //For TFVC, the teamProjectName is retrieved by tf.cmd and set on the context
-            let teamProjectName: string = this._repoContext.TeamProjectName;
+            const teamProjectName: string = this._repoContext.TeamProjectName;
             repositoryInfo = new RepositoryInfo(this._repoContext.RemoteUrl);
 
             let serverUrl: string;
             let collectionName: string;
-            let isTeamServices: boolean = RepoUtils.IsTeamFoundationServicesRepo(this._repoContext.RemoteUrl);
+            const isTeamServices: boolean = RepoUtils.IsTeamFoundationServicesRepo(this._repoContext.RemoteUrl);
             if (isTeamServices) {
                 // The Team Services collection is ALWAYS defaultCollection, and both the url with defaultcollection
                 // and the url without defaultCollection will validate just fine. However, it expects you to refer to
@@ -55,9 +55,9 @@ export class RepositoryInfoClient {
                 // If validation fails, we return false.
                 collectionName = repositoryInfo.Account;
                 serverUrl = `https://${repositoryInfo.Account}.visualstudio.com/`;
-                let valid: boolean = await this.validateTfvcCollectionUrl(serverUrl);
+                const valid: boolean = await this.validateTfvcCollectionUrl(serverUrl);
                 if (!valid) {
-                    let error: string = `Unable to validate the Team Services TFVC repository. Collection name: '${collectionName}', Url: '${serverUrl}'`;
+                    const error: string = `Unable to validate the Team Services TFVC repository. Collection name: '${collectionName}', Url: '${serverUrl}'`;
                     Logger.LogDebug(error);
                     throw new Error(`${Strings.UnableToValidateTeamServicesTfvcRepository} Collection name: '${collectionName}', Url: '${serverUrl}'`);
                 }
@@ -70,7 +70,7 @@ export class RepositoryInfoClient {
                 Logger.LogDebug(`Starting the validation of the TFS TFVC repository collection Url ('${serverUrl}')`);
                 let valid: boolean = await this.validateTfvcCollectionUrl(serverUrl);
                 if (valid) {
-                    let parts: string[] = this.splitTfvcCollectionUrl(serverUrl);
+                    const parts: string[] = this.splitTfvcCollectionUrl(serverUrl);
                     serverUrl = parts[0];
                     collectionName = parts[1];
                     Logger.LogDebug(`Validated the TFS TFVC repository. Collection name: '${collectionName}', Url: '${serverUrl}'`);
@@ -92,7 +92,7 @@ export class RepositoryInfoClient {
                 }
             }
 
-            let coreApiClient: CoreApiClient = new CoreApiClient();
+            const coreApiClient: CoreApiClient = new CoreApiClient();
             let collection: TeamProjectCollection;
             Logger.LogDebug(`Getting project collection...  url: '${serverUrl}', and collection name: '${collectionName}'`);
             if (isTeamServices) {
@@ -102,7 +102,7 @@ export class RepositoryInfoClient {
             } else {
                 Logger.LogDebug(`Using SOAP to get the project collection information`);
                 // When called on-prem without admin privileges: Error: Failed Request: Forbidden(403) - Access Denied: Jeff Young (TFS) needs the following permission(s) to perform this action: Edit instance-level information
-                let tfsClient: TfsCatalogSoapClient = new TfsCatalogSoapClient(serverUrl, [this._handler]);
+                const tfsClient: TfsCatalogSoapClient = new TfsCatalogSoapClient(serverUrl, [this._handler]);
                 collection = await tfsClient.GetProjectCollection(collectionName);
                 if (!collection) {
                     const error: string = `Using SOAP, could not find a project collection object for ${collectionName} at ${serverUrl}`;
@@ -114,11 +114,11 @@ export class RepositoryInfoClient {
 
             Logger.LogDebug(`Getting team project...  Url: '${serverUrl}', collection name: '${collection.name}', and project: '${teamProjectName}'`);
             //For a Team Services collection, ignore the collectionName
-            let resolvedRemoteUrl: string = url.resolve(serverUrl, isTeamServices ? "" : collection.name);
+            const resolvedRemoteUrl: string = url.resolve(serverUrl, isTeamServices ? "" : collection.name);
 
             //Delay the check for a teamProjectName (don't fail here).  If we don't have one, that's OK for TFVC
             //functionality.  We need to disable Team Services functionality if we can't find a team project later.
-            let project: TeamProject = await this.getProjectFromServer(coreApiClient, resolvedRemoteUrl, teamProjectName);
+            const project: TeamProject = await this.getProjectFromServer(coreApiClient, resolvedRemoteUrl, teamProjectName);
             Logger.LogDebug(`Found a team project for url: '${serverUrl}', collection name: '${collection.name}', and project id: '${project.id}'`);
 
             //Now, create the JSON blob to send to new RepositoryInfo(repoInfo);
@@ -133,14 +133,14 @@ export class RepositoryInfoClient {
     }
 
     private splitTfvcCollectionUrl(collectionUrl: string): string[] {
-        let result: string[] = [ , ];
+        const result: string[] = [ , ];
         if (!collectionUrl) {
             return result;
         }
 
         // Now find the TRUE last separator (before the collection name)
-        let trimmedUrl: string = this.trimTrailingSeparators(collectionUrl);
-        let index: number = trimmedUrl.lastIndexOf("/");
+        const trimmedUrl: string = this.trimTrailingSeparators(collectionUrl);
+        const index: number = trimmedUrl.lastIndexOf("/");
         if (index >= 0) {
             // result0 is the server url without the collection name
             result[0] = trimmedUrl.substring(0, index + 1);
@@ -202,7 +202,7 @@ export class RepositoryInfoClient {
 
     private async validateTfvcCollectionUrl(serverUrl: string): Promise<boolean> {
         try {
-            let repositoryClient: TeamServicesApi = new TeamServicesApi(serverUrl, [this._handler]);
+            const repositoryClient: TeamServicesApi = new TeamServicesApi(serverUrl, [this._handler]);
             await repositoryClient.validateTfvcCollectionUrl();
             return true;
         } catch (err) {

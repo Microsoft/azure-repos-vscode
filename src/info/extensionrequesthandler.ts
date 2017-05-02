@@ -58,7 +58,7 @@ export class ExtensionRequestHandler implements IRequestHandler {
         this._credentialHandler.prepareRequest(options);
 
         // Get user agent string from the UserAgentProvider (Example: VSTSVSCode/1.115.1 (VSCode/10.1.0; Windows_NT/10.0.10586; Node/6.5.0))
-        let userAgent: string = UserAgentProvider.UserAgent;
+        const userAgent: string = UserAgentProvider.UserAgent;
         options.headers["User-Agent"] = userAgent;
     }
 

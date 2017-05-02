@@ -68,7 +68,7 @@ export class FindWorkspace implements ITfvcCommand<IWorkspace> {
         let workspaceName: string = "";
         let collectionUrl: string = "";
         let equalsLineFound: boolean = false;
-        let mappings: IWorkspaceMapping[] = [];
+        const mappings: IWorkspaceMapping[] = [];
         let teamProject: string = undefined;
 
         for (let i: number = 0; i <= lines.length; i++) {
@@ -162,7 +162,7 @@ export class FindWorkspace implements ITfvcCommand<IWorkspace> {
      * $/tfsTest_01: D:\tmp\test
      */
     public async ParseExeOutput(executionResult: IExecutionResult): Promise<IWorkspace> {
-        let workspace: IWorkspace = await this.ParseOutput(executionResult);
+        const workspace: IWorkspace = await this.ParseOutput(executionResult);
         if (workspace && workspace.name) {
             // The workspace name includes the user name, so let's fix that
             const lastOpenParenIndex: number = workspace.name.lastIndexOf(" (");

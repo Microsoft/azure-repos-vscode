@@ -31,19 +31,19 @@ export class ButtonMessageItem implements MessageItem, IButtonMessageItem {
 export class VsCodeUtils {
     //Returns the trimmed value if there's an activeTextEditor and a selection
     public static GetActiveSelection(): string {
-        let editor = window.activeTextEditor;
+        const editor = window.activeTextEditor;
         if (!editor) {
             return undefined;
         }
 
         // Make sure that the selection is not empty and it is a single line
-        let selection = editor.selection;
+        const selection = editor.selection;
         if (selection.isEmpty || !selection.isSingleLine) {
             return undefined;
         }
 
-        let range = new Range(selection.start.line, selection.start.character, selection.end.line, selection.end.character);
-        let value = editor.document.getText(range).trim();
+        const range = new Range(selection.start.line, selection.start.character, selection.end.line, selection.end.character);
+        const value = editor.document.getText(range).trim();
 
         return value;
     }

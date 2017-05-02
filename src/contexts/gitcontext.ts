@@ -49,7 +49,7 @@ export class GitContext implements IRepositoryContext {
                 this._gitConfig = pgc.sync(syncObj);
 
                 /* tslint:disable:quotemark */
-                let remote: any = this._gitConfig['remote "origin"'];
+                const remote: any = this._gitConfig['remote "origin"'];
                 /* tslint:enable:quotemark */
                 if (remote === undefined) {
                     return;
@@ -67,11 +67,11 @@ export class GitContext implements IRepositoryContext {
 
                 //All Team Services and TFS Git remote urls contain /_git/
                 if (RepoUtils.IsTeamFoundationGitRepo(this._gitOriginalRemoteUrl)) {
-                    let purl = url.parse(this._gitOriginalRemoteUrl);
+                    const purl = url.parse(this._gitOriginalRemoteUrl);
                     if (purl) {
                         if (RepoUtils.IsTeamFoundationServicesRepo(this._gitOriginalRemoteUrl)) {
                             this._isTeamServicesUrl = true;
-                            let splitHref = purl.href.split("@");
+                            const splitHref = purl.href.split("@");
                             if (splitHref.length === 2) {  //RemoteUrl is SSH
                                 //For Team Services, default to https:// as the protocol
                                 this._gitRemoteUrl = "https://" + purl.hostname + purl.pathname;

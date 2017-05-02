@@ -57,7 +57,7 @@ export class TfvcExtension  {
             async () => {
                 if (resources && resources.length > 0) {
                     //Keep an in-memory list of items that were explicitly excluded. The list is not persisted at this time.
-                    let paths: string[] = [];
+                    const paths: string[] = [];
                     resources.forEach((resource) => {
                         paths.push(resource.resourceUri.fsPath);
                     });
@@ -71,10 +71,10 @@ export class TfvcExtension  {
         this.displayErrors(
             async () => {
                 if (resources && resources.length > 0) {
-                    let pathsToUnexclude: string[] = [];
-                    let pathsToAdd: string[] = [];
+                    const pathsToUnexclude: string[] = [];
+                    const pathsToAdd: string[] = [];
                     resources.forEach((resource) => {
-                        let path: string = resource.resourceUri.fsPath;
+                        const path: string = resource.resourceUri.fsPath;
                         //Unexclude each file passed in
                         pathsToUnexclude.push(path);
                         //At this point, an unversioned file could be a candidate file, so call Add.
@@ -162,11 +162,11 @@ export class TfvcExtension  {
         this.displayErrors(
             async () => {
                 if (uri) {
-                    let basename: string = path.basename(uri.fsPath);
-                    let newFilename: string = await window.showInputBox({ value: basename, prompt: Strings.RenamePrompt, placeHolder: undefined, password: false });
+                    const basename: string = path.basename(uri.fsPath);
+                    const newFilename: string = await window.showInputBox({ value: basename, prompt: Strings.RenamePrompt, placeHolder: undefined, password: false });
                     if (newFilename && newFilename !== basename) {
-                        let dirName: string = path.dirname(uri.fsPath);
-                        let destination: string = path.join(dirName, newFilename);
+                        const dirName: string = path.dirname(uri.fsPath);
+                        const destination: string = path.join(dirName, newFilename);
 
                         try {
                             //We decided not to send telemetry on file operations
@@ -191,7 +191,7 @@ export class TfvcExtension  {
         this.displayErrors(
             async () => {
                 if (resource) {
-                    let localPath: string = resource.resourceUri.fsPath;
+                    const localPath: string = resource.resourceUri.fsPath;
                     const resolveTypeString: string = UIHelper.GetDisplayTextForAutoResolveType(autoResolveType);
                     const basename: string = path.basename(localPath);
                     const message: string = `Are you sure you want to resolve changes in ${basename} as ${resolveTypeString}?`;
@@ -250,7 +250,7 @@ export class TfvcExtension  {
         this.displayErrors(
             async () => {
                 if (resources) {
-                    let pathsToUndo: string[] = [];
+                    const pathsToUndo: string[] = [];
                     resources.forEach((resource) => {
                         pathsToUndo.push(resource.resourceUri.fsPath);
                     });
@@ -280,7 +280,7 @@ export class TfvcExtension  {
         this.displayErrors(
             async () => {
                 if (TfvcSCMProvider.HasItems()) {
-                    let message: string = `Are you sure you want to undo all changes?`;
+                    const message: string = `Are you sure you want to undo all changes?`;
                     if (await UIHelper.PromptForConfirmation(message, Strings.UndoChanges)) {
                         //We decided not to send telemetry on file operations
                         await this._repo.Undo(["*"]);
@@ -307,7 +307,7 @@ export class TfvcExtension  {
 
         try {
             let itemPath: string;
-            let editor = window.activeTextEditor;
+            const editor = window.activeTextEditor;
             //Get the path to the file open in the VSCode editor (if any)
             if (editor) {
                 itemPath = editor.document.fileName;
@@ -318,12 +318,12 @@ export class TfvcExtension  {
                 return;
             }
 
-            let itemInfos: IItemInfo[] = await this._repo.GetInfo([itemPath]);
+            const itemInfos: IItemInfo[] = await this._repo.GetInfo([itemPath]);
             //With a single file, show that file's history
             if (itemInfos && itemInfos.length === 1) {
                 Telemetry.SendEvent(TfvcTelemetryEvents.OpenFileHistory);
-                let serverPath: string = itemInfos[0].serverItem;
-                let file: string = encodeURIComponent(serverPath);
+                const serverPath: string = itemInfos[0].serverItem;
+                const file: string = encodeURIComponent(serverPath);
                 let historyUrl: string = UrlBuilder.Join(this._manager.RepoContext.RemoteUrl, "_versionControl");
                 historyUrl = UrlBuilder.AddQueryParams(historyUrl, `path=${file}`, `_a=history`);
                 Utils.OpenUrl(historyUrl);
@@ -362,7 +362,7 @@ export class TfvcExtension  {
             if (err.stdout) { //TODO: perhaps just for 'Checkin'? Or the CLC?
                 TfvcOutput.AppendLine(VsCodeUtils.FormatMessage(`[${prefix}] ${err.stdout}`));
             }
-            let messageItem: IButtonMessageItem = { title : Strings.ShowTfvcOutput, command: TfvcCommandNames.ShowOutput };
+            const messageItem: IButtonMessageItem = { title : Strings.ShowTfvcOutput, command: TfvcCommandNames.ShowOutput };
             VsCodeUtils.ShowErrorMessage(err.message, messageItem);
         }
     }

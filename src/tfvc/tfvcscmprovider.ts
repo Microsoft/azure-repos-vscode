@@ -74,7 +74,7 @@ export class TfvcSCMProvider {
     }
 
     private static getWorkItemIdsFromMessage(message: string) {
-        let ids: number[] = [];
+        const ids: number[] = [];
         try {
             // Find all the work item mentions in the string.
             // This returns an array like: ["#1", "#12", "#33"]
@@ -166,7 +166,7 @@ export class TfvcSCMProvider {
             return;
         }
 
-        let repoContext: TfvcContext = <TfvcContext>this._extensionManager.RepoContext;
+        const repoContext: TfvcContext = <TfvcContext>this._extensionManager.RepoContext;
         const fsWatcher = workspace.createFileSystemWatcher("**");
         const onWorkspaceChange = anyEvent(fsWatcher.onDidChange, fsWatcher.onDidCreate, fsWatcher.onDidDelete);
         const onTfvcChange = filterEvent(onWorkspaceChange, (uri) => /^\$tf\//.test(workspace.asRelativePath(uri)));
@@ -182,8 +182,8 @@ export class TfvcSCMProvider {
         }
         TfvcOutput.AppendLine("Using TFVC command line: " + repoContext.TfvcRepository.TfvcLocation + " (" + version + ")");
 
-        const commitHoverProvider = new CommitHoverProvider();
-        const contentProvider = new TfvcContentProvider(repoContext.TfvcRepository, rootPath, onTfvcChange);
+        const commitHoverProvider: CommitHoverProvider = new CommitHoverProvider();
+        const contentProvider: TfvcContentProvider = new TfvcContentProvider(repoContext.TfvcRepository, rootPath, onTfvcChange);
         //const checkoutStatusBar = new CheckoutStatusBar(model);
         //const syncStatusBar = new SyncStatusBar(model);
         //const autoFetcher = new AutoFetcher(model);

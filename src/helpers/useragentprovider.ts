@@ -12,7 +12,7 @@ export class UserAgentProvider  {
 
     public static get UserAgent() : string {
         // Example: VSTSVSCode/1.115.1 (VSCode/10.1.0; Windows_NT/10.0.10586; Node/6.5.0)
-        let userAgent: string = `${Constants.ExtensionUserAgentName}/${Constants.ExtensionVersion} (VSCode ${UserAgentProvider._vsCodeVersion}; ${os.type()} ${os.release()}; Node ${process.versions["node"]})`;
+        const userAgent: string = `${Constants.ExtensionUserAgentName}/${Constants.ExtensionVersion} (VSCode ${UserAgentProvider._vsCodeVersion}; ${os.type()} ${os.release()}; Node ${process.versions["node"]})`;
         return userAgent;
     }
 

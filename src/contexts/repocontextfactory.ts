@@ -50,7 +50,7 @@ export class RepositoryContextFactory {
      */
     public static UpdateRepositoryContext(currentRepo: IRepositoryContext, serverContext: TeamServerContext): IRepositoryContext {
         if (currentRepo && currentRepo instanceof TfvcContext) {
-            let context: TfvcContext = <TfvcContext>currentRepo;
+            const context: TfvcContext = <TfvcContext>currentRepo;
             context.TfvcRepository = TfCommandLineRunner.CreateRepository(serverContext, context.RepoFolder);
         }
         return currentRepo;

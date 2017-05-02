@@ -17,7 +17,7 @@ export class Logger {
     private static initalize() {
         //Only initialize the logger if a logging level is set (in settings) and we haven't initialized it yet
         if (Logger.loggingLevel !== undefined && Logger.initialized === false) {
-            let fileOpt:winston.FileTransportOptions =  { json: false, filename: path.join(Logger.logPath, Constants.ExtensionName + "-extension.log"),
+            const fileOpt:winston.FileTransportOptions =  { json: false, filename: path.join(Logger.logPath, Constants.ExtensionName + "-extension.log"),
                                                             level: LoggingLevel[Logger.loggingLevel].toLowerCase(), maxsize: 4000000,
                                                             maxFiles: 5, tailable: false };
             winston.add(winston.transports.File, fileOpt);
@@ -122,8 +122,8 @@ export class Logger {
         return Logger.getNow();
     }
     private static getNow(): string {
-        let now: Date = new Date();
-        let strDateTime: string = [[Logger.addZero(now.getHours()), Logger.addZero(now.getMinutes()), Logger.addZero(now.getSeconds())].join(":"),
+        const now: Date = new Date();
+        const strDateTime: string = [[Logger.addZero(now.getHours()), Logger.addZero(now.getMinutes()), Logger.addZero(now.getSeconds())].join(":"),
                                         Logger.addZero(now.getMilliseconds(), 100)].join(".");
 
         return strDateTime + " ";

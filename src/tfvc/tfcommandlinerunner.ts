@@ -38,11 +38,11 @@ export class TfCommandLineRunner {
     public static GetCommandLine(localPath?: string): ITfCommandLine {
         Logger.LogDebug(`TFVC Creating Tfvc object with localPath='${localPath}'`);
         // Get Proxy from settings
-        const settings = new TfvcSettings();
-        const proxy = settings.Proxy;
+        const settings: TfvcSettings = new TfvcSettings();
+        const proxy: string = settings.Proxy;
         Logger.LogDebug(`Using TFS proxy: ${proxy}`);
 
-        let tfvcPath = localPath;
+        let tfvcPath: string = localPath;
         if (!tfvcPath) {
             // get the location from settings
             tfvcPath = settings.Location;
@@ -57,7 +57,7 @@ export class TfCommandLineRunner {
         }
 
         // check to make sure that the file exists in that location
-        let exists: boolean = fs.existsSync(tfvcPath);
+        const exists: boolean = fs.existsSync(tfvcPath);
         if (exists) {
             // if it exists, check to ensure that it's a file and not a folder
             const stats: fs.Stats = fs.lstatSync(tfvcPath);
@@ -250,7 +250,7 @@ export class TfCommandLineRunner {
                     let stdout: string = buffers.join("");
                     if (isExe) {
                         // TF.exe repeats the command line as part of the standard out when using the @ response file options
-                        // So, we look for the noprompt option to let us know where that line is so we can strip it off
+                        // So, we look for the noprompt option to const us know where that line is so we can strip it off
                         const start: number = stdout.indexOf("-noprompt");
                         if (start >= 0) {
                             const end: number = stdout.indexOf("\n", start);

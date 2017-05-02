@@ -10,8 +10,8 @@ import { Logger } from "../helpers/logger";
 
 export abstract class BaseSettings {
     protected readSetting<T>(name: string, defaultValue:T): T {
-        let configuration = workspace.getConfiguration();
-        let value = configuration.get<T>(name, undefined);
+        const configuration = workspace.getConfiguration();
+        const value = configuration.get<T>(name, undefined);
 
         // If user specified a value, use it
         if (value) {
@@ -38,12 +38,12 @@ export class PinnedQuerySettings extends BaseSettings {
     }
 
     private getPinnedQuery(account: string) : IPinnedQuery {
-        let pinnedQueries = this.readSetting<IPinnedQuery[]>(SettingNames.PinnedQueries, undefined);
+        const pinnedQueries = this.readSetting<IPinnedQuery[]>(SettingNames.PinnedQueries, undefined);
         if (pinnedQueries !== undefined) {
             Logger.LogDebug("Found pinned queries in user configuration settings.");
             let global: IPinnedQuery = undefined;
             for (let index: number = 0; index < pinnedQueries.length; index++) {
-                let element = pinnedQueries[index];
+                const element = pinnedQueries[index];
                 if (element.account === account ||
                     element.account === account + ".visualstudio.com") {
                     return element;
@@ -87,10 +87,10 @@ export class Settings extends BaseSettings implements ISettings {
     constructor() {
         super();
 
-        let loggingLevel = SettingNames.LoggingLevel;
+        const loggingLevel = SettingNames.LoggingLevel;
         this._loggingLevel = this.readSetting<string>(loggingLevel, undefined);
 
-        let pollingInterval = SettingNames.PollingInterval;
+        const pollingInterval = SettingNames.PollingInterval;
         this._pollingInterval = this.readSetting<number>(pollingInterval, 5);
         Logger.LogDebug("Polling interval value (minutes): " + this._pollingInterval.toString());
         // Ensure a minimum value when an invalid value is set

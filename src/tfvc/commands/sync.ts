@@ -112,15 +112,15 @@ export class Sync implements ITfvcCommand<ISyncResults> {
     }
 
     private getItemResults(stdout: string): ISyncItemResult[] {
-        let itemResults: ISyncItemResult[] = [];
+        const itemResults: ISyncItemResult[] = [];
         let folderPath: string = "";
         const lines: string[] = CommandHelper.SplitIntoLines(stdout, true, true);
-        for (let i = 0; i < lines.length; i++) {
+        for (let i: number = 0; i < lines.length; i++) {
             const line = lines[i];
             if (CommandHelper.IsFilePath(line)) {
                 folderPath = line;
             } else if (line) {
-                let sr: ISyncItemResult = this.getSyncResultFromLine(folderPath, line);
+                const sr: ISyncItemResult = this.getSyncResultFromLine(folderPath, line);
                 if (sr) {
                     itemResults.push(sr);
                 }
@@ -151,14 +151,14 @@ export class Sync implements ITfvcCommand<ISyncResults> {
                 itemPath: CommandHelper.GetFilePath(folderPath, line.slice("Deleting ".length).trim())
             };
         } else if (line.startsWith("Conflict ")) {
-            let dashIndex = line.lastIndexOf("-");
+            const dashIndex = line.lastIndexOf("-");
             newResult = {
                 syncType: SyncType.Conflict,
                 itemPath: CommandHelper.GetFilePath(folderPath, line.slice("Conflict ".length, dashIndex).trim()),
                 message: line.slice(dashIndex + 1).trim()
             };
         } else if (line.startsWith("Warning ")) {
-            let dashIndex = line.lastIndexOf("-");
+            const dashIndex = line.lastIndexOf("-");
             newResult = {
                 syncType: SyncType.Warning,
                 itemPath: CommandHelper.GetFilePath(folderPath, line.slice("Warning ".length, dashIndex).trim()),
@@ -166,7 +166,7 @@ export class Sync implements ITfvcCommand<ISyncResults> {
             };
         } else {
             // This must be an error. Usually of the form "filename - message" or "filename cannot be deleted reason"
-            let index = line.lastIndexOf("-");
+            let index: number = line.lastIndexOf("-");
             if (index >= 0) {
                 newResult = {
                     syncType: SyncType.Error,
@@ -197,9 +197,9 @@ export class Sync implements ITfvcCommand<ISyncResults> {
      * D:\tmp\vscodeBugBash\folder1 cannot be deleted because it is not empty.
      */
     private getErrorMessages(stderr: string): ISyncItemResult[] {
-        let errorMessages: ISyncItemResult[] = [];
+        const errorMessages: ISyncItemResult[] = [];
         const lines: string[] = CommandHelper.SplitIntoLines(stderr, false, true);
-        for (let i = 0; i < lines.length; i++) {
+        for (let i: number = 0; i < lines.length; i++) {
             // stderr doesn't get any file path lines, so the files will all be just the filenames
             errorMessages.push(this.getSyncResultFromLine("", lines[i]));
         }

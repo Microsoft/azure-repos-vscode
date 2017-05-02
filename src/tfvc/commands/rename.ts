@@ -60,15 +60,15 @@ export class Rename implements ITfvcCommand<string> {
         //Throw if any errors are found in stderr or if exitcode is not 0
         CommandHelper.ProcessErrors(this.GetArguments().GetCommand(), executionResult);
 
-        let lines: string[] = CommandHelper.SplitIntoLines(executionResult.stdout, false, true /*filterEmptyLines*/);
+        const lines: string[] = CommandHelper.SplitIntoLines(executionResult.stdout, false, true /*filterEmptyLines*/);
 
         let path: string = "";
         for (let index: number = 0; index < lines.length; index++) {
-            let line: string = lines[index];
+            const line: string = lines[index];
             if (CommandHelper.IsFilePath(line)) {
                 path = line;
             } else {
-                let file: string = this.getFileFromLine(line);
+                const file: string = this.getFileFromLine(line);
                 return CommandHelper.GetFilePath(path, file);
             }
         }

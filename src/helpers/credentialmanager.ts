@@ -26,7 +26,7 @@ export class CredentialManager {
     }
 
     public GetCredentials(context: TeamServerContext) : Q.Promise<CredentialInfo> {
-        let deferred: Q.Deferred<CredentialInfo> = Q.defer<CredentialInfo>();
+        const deferred: Q.Deferred<CredentialInfo> = Q.defer<CredentialInfo>();
 
         this.getCredentials(context).then((credInfo: CredentialInfo) => {
             if (credInfo !== undefined) {
@@ -42,7 +42,7 @@ export class CredentialManager {
     }
 
     public RemoveCredentials(account: string) : Q.Promise<void> {
-        let deferred: Q.Deferred<void> = Q.defer<void>();
+        const deferred: Q.Deferred<void> = Q.defer<void>();
 
         this._credentialStore.RemoveCredential(account).then(() => {
             deferred.resolve(undefined);
@@ -53,7 +53,7 @@ export class CredentialManager {
     }
 
     public StoreCredentials(account: string, username: string, password: string) : Q.Promise<void> {
-        let deferred: Q.Deferred<void> = Q.defer<void>();
+        const deferred: Q.Deferred<void> = Q.defer<void>();
 
         this._credentialStore.SetCredential(account, username, password).then(() => {
             deferred.resolve(undefined);
@@ -64,7 +64,7 @@ export class CredentialManager {
     }
 
     private getCredentials(context:TeamServerContext) : Q.Promise<CredentialInfo> {
-        let deferred: Q.Deferred<CredentialInfo> = Q.defer<CredentialInfo>();
+        const deferred: Q.Deferred<CredentialInfo> = Q.defer<CredentialInfo>();
 
         this._credentialStore.GetCredential(context.RepoInfo.Host).then((cred) => {
             if (cred !== undefined) {
@@ -73,7 +73,7 @@ export class CredentialManager {
                 } else if (context.RepoInfo.IsTeamFoundationServer) {
                     let domain: string;
                     let user: string = cred.Username;
-                    let pair = user.split("\\");
+                    const pair: string[] = user.split("\\");
                     if (pair.length > 1) {
                         domain = pair[0];
                         user = pair[pair.length - 1];

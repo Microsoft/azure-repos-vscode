@@ -17,10 +17,10 @@ export class TfvcVersion {
 
     public static FromString(version: string): TfvcVersion {
         const parts: string[] = version ? version.split(TfvcVersion.separator) : [];
-        let major = parts.length >= 1 ? Number(parts[0]) : 0;
-        let minor = parts.length >= 2 ? Number(parts[1]) : 0;
-        let revision = parts.length >= 3 ? Number(parts[2]) : 0;
-        let build = parts.length >= 4 ? parts.slice(3).join(TfvcVersion.separator) : "";
+        const major: number = parts.length >= 1 ? Number(parts[0]) : 0;
+        const minor: number = parts.length >= 2 ? Number(parts[1]) : 0;
+        const revision: number = parts.length >= 3 ? Number(parts[2]) : 0;
+        const build: string = parts.length >= 4 ? parts.slice(3).join(TfvcVersion.separator) : "";
         return new TfvcVersion(major, minor, revision, build);
     }
 

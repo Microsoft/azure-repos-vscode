@@ -30,7 +30,7 @@ export class GitClient extends BaseClient {
         Telemetry.SendEvent(TelemetryEvents.ViewPullRequests);
 
         try {
-            let request: BaseQuickPickItem = await window.showQuickPick(this.getMyPullRequests(), { matchOnDescription: true, placeHolder: Strings.ChoosePullRequest });
+            const request: BaseQuickPickItem = await window.showQuickPick(this.getMyPullRequests(), { matchOnDescription: true, placeHolder: Strings.ChoosePullRequest });
             if (request) {
                 Telemetry.SendEvent(TelemetryEvents.ViewPullRequest);
                 let discUrl: string = undefined;
@@ -52,7 +52,7 @@ export class GitClient extends BaseClient {
         this.ensureGitContext(context);
         let url: string = undefined;
 
-        let editor = window.activeTextEditor;
+        const editor = window.activeTextEditor;
         if (editor) {
             Telemetry.SendEvent(TelemetryEvents.OpenBlamePage);
 
@@ -65,7 +65,7 @@ export class GitClient extends BaseClient {
             Logger.LogInfo("OpenBlame: " + url);
             Utils.OpenUrl(url);
         } else {
-            let msg: string = Utils.GetMessageForStatusCode(0, Strings.NoSourceFileForBlame);
+            const msg: string = Utils.GetMessageForStatusCode(0, Strings.NoSourceFileForBlame);
             Logger.LogError(msg);
             VsCodeUtils.ShowErrorMessage(msg);
         }
@@ -76,7 +76,7 @@ export class GitClient extends BaseClient {
         this.ensureGitContext(context);
         let historyUrl: string = undefined;
 
-        let editor = window.activeTextEditor;
+        const editor = window.activeTextEditor;
         if (!editor) {
             Telemetry.SendEvent(TelemetryEvents.OpenRepositoryHistory);
 
@@ -100,7 +100,7 @@ export class GitClient extends BaseClient {
     public OpenNewPullRequest(remoteUrl: string, currentBranch: string): void {
         Telemetry.SendEvent(TelemetryEvents.OpenNewPullRequest);
 
-        let url: string = GitVcService.GetCreatePullRequestUrl(remoteUrl, currentBranch);
+        const url: string = GitVcService.GetCreatePullRequestUrl(remoteUrl, currentBranch);
         Logger.LogInfo("CreatePullRequestPage: " + url);
         Utils.OpenUrl(url);
     }
@@ -108,14 +108,14 @@ export class GitClient extends BaseClient {
     public OpenPullRequestsPage(): void {
         Telemetry.SendEvent(TelemetryEvents.OpenPullRequestsPage);
 
-        let url: string = GitVcService.GetPullRequestsUrl(this._serverContext.RepoInfo.RepositoryUrl);
+        const url: string = GitVcService.GetPullRequestsUrl(this._serverContext.RepoInfo.RepositoryUrl);
         Logger.LogInfo("OpenPullRequestsPage: " + url);
         Utils.OpenUrl(url);
     }
 
     public async PollMyPullRequests(): Promise<void> {
         try {
-            let requests: BaseQuickPickItem[] = await this.getMyPullRequests();
+            const requests: BaseQuickPickItem[] = await this.getMyPullRequests();
             this._statusBarItem.tooltip = Strings.BrowseYourPullRequests;
             //Remove the default Strings.BrowseYourPullRequests item from the calculation
             this._statusBarItem.text = GitClient.GetPullRequestStatusText((requests.length - 1).toString());
@@ -125,18 +125,18 @@ export class GitClient extends BaseClient {
     }
 
     private async getMyPullRequests(): Promise<BaseQuickPickItem[]> {
-        let requestItems: BaseQuickPickItem[] = [];
-        let requestIds: number[] = [];
+        const requestItems: BaseQuickPickItem[] = [];
+        const requestIds: number[] = [];
 
         Logger.LogInfo("Getting pull requests that I requested...");
-        let svc: GitVcService = new GitVcService(this._serverContext);
-        let myPullRequests: GitPullRequest[] = await svc.GetPullRequests(this._serverContext.RepoInfo.RepositoryId, this._serverContext.UserInfo.Id, undefined, PullRequestStatus.Active);
-        let icon: string = "octicon-search";
-        let label: string = `$(icon ${icon}) `;
+        const svc: GitVcService = new GitVcService(this._serverContext);
+        const myPullRequests: GitPullRequest[] = await svc.GetPullRequests(this._serverContext.RepoInfo.RepositoryId, this._serverContext.UserInfo.Id, undefined, PullRequestStatus.Active);
+        const icon: string = "octicon-search";
+        const label: string = `$(icon ${icon}) `;
         requestItems.push({ label: label + Strings.BrowseYourPullRequests, description: undefined, id: undefined });
 
         myPullRequests.forEach((pr) => {
-            let score: PullRequestScore = GitVcService.GetPullRequestScore(pr);
+            const score: PullRequestScore = GitVcService.GetPullRequestScore(pr);
             requestItems.push(this.getPullRequestLabel(pr.createdBy.displayName, pr.title, pr.description, pr.pullRequestId.toString(), score));
             requestIds.push(pr.pullRequestId);
         });
@@ -144,9 +144,9 @@ export class GitClient extends BaseClient {
 
         Logger.LogInfo("Getting pull requests for which I'm a reviewer...");
         //Go get the active pull requests that I'm a reviewer for
-        let myReviewPullRequests: GitPullRequest[] = await svc.GetPullRequests(this._serverContext.RepoInfo.RepositoryId, undefined, this._serverContext.UserInfo.Id, PullRequestStatus.Active);
+        const myReviewPullRequests: GitPullRequest[] = await svc.GetPullRequests(this._serverContext.RepoInfo.RepositoryId, undefined, this._serverContext.UserInfo.Id, PullRequestStatus.Active);
         myReviewPullRequests.forEach((pr) => {
-            let score: PullRequestScore = GitVcService.GetPullRequestScore(pr);
+            const score: PullRequestScore = GitVcService.GetPullRequestScore(pr);
             if (requestIds.indexOf(pr.pullRequestId) < 0) {
                 requestItems.push(this.getPullRequestLabel(pr.createdBy.displayName, pr.title, pr.description, pr.pullRequestId.toString(), score));
             }
@@ -172,7 +172,7 @@ export class GitClient extends BaseClient {
         } else if (score === PullRequestScore.NoResponse) {
             scoreIcon = "octicon-git-pull-request";
         }
-        let scoreLabel: string = `$(icon ${scoreIcon}) `;
+        const scoreLabel: string = `$(icon ${scoreIcon}) `;
 
         return { label: scoreLabel + " (" + displayName + ") " + title, description: description, id: id };
     }

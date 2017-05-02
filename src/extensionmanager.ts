@@ -155,7 +155,7 @@ export class ExtensionManager implements Disposable {
 
     //Return value indicates whether a message was displayed
     public DisplayErrorMessage(message?: string): boolean {
-        let msg: string = message ? message : this._errorMessage;
+        const msg: string = message ? message : this._errorMessage;
         if (msg) {
             VsCodeUtils.ShowErrorMessage(msg);
             return true;
@@ -169,7 +169,7 @@ export class ExtensionManager implements Disposable {
 
     //Logs an error to the logger and sends an exception to telemetry service
     public ReportError(err: Error, message: string, showToUser: boolean = false): void {
-        let fullMessage = err ? message + " " + err : message;
+        const fullMessage = err ? message + " " + err : message;
 
         // Log the message
         Logger.LogError(fullMessage);
@@ -254,7 +254,7 @@ export class ExtensionManager implements Disposable {
                         Logger.LogDebug("Started ApplicationInsights telemetry");
 
                         //Set up the client we need to talk to the server for more repository information
-                        let repositoryInfoClient: RepositoryInfoClient = new RepositoryInfoClient(this._repoContext, CredentialManager.GetCredentialHandler());
+                        const repositoryInfoClient: RepositoryInfoClient = new RepositoryInfoClient(this._repoContext, CredentialManager.GetCredentialHandler());
 
                         Logger.LogInfo("Getting repository information with repositoryInfoClient");
                         Logger.LogDebug("RemoteUrl = " + this._repoContext.RemoteUrl);
@@ -265,12 +265,12 @@ export class ExtensionManager implements Disposable {
                             this._serverContext.RepoInfo = await repositoryInfoClient.GetRepositoryInfo();
 
                             //Now we need to go and get the authorized user information
-                            let connectionUrl: string = (this._serverContext.RepoInfo.IsTeamServices === true ? this._serverContext.RepoInfo.AccountUrl : this._serverContext.RepoInfo.CollectionUrl);
-                            let accountClient: TeamServicesApi = new TeamServicesApi(connectionUrl, [CredentialManager.GetCredentialHandler()]);
+                            const connectionUrl: string = (this._serverContext.RepoInfo.IsTeamServices === true ? this._serverContext.RepoInfo.AccountUrl : this._serverContext.RepoInfo.CollectionUrl);
+                            const accountClient: TeamServicesApi = new TeamServicesApi(connectionUrl, [CredentialManager.GetCredentialHandler()]);
                             Logger.LogInfo("Getting connectionData with accountClient");
                             Logger.LogDebug("connectionUrl = " + connectionUrl);
                             try {
-                                let settings: any = await accountClient.connect();
+                                const settings: any = await accountClient.connect();
                                 Logger.LogInfo("Retrieved connectionData with accountClient");
                                 this.resetErrorStatus();
 
@@ -327,7 +327,7 @@ export class ExtensionManager implements Disposable {
                 }).fail((err) => {
                     this.setErrorStatus(Utils.GetMessageForStatusCode(err, err.message), (err.statusCode === 401 ? CommandNames.Signin : undefined), false);
                     //If we can't get a requestHandler, report the error via the feedbackclient
-                    let message: string = Utils.GetMessageForStatusCode(err, err.message, "Failed to get a credential handler");
+                    const message: string = Utils.GetMessageForStatusCode(err, err.message, "Failed to get a credential handler");
                     Logger.LogError(message);
                     Telemetry.SendException(err);
                 });
@@ -447,7 +447,7 @@ export class ExtensionManager implements Disposable {
             //TODO: Should the default command be to do nothing?  Or perhaps to display the message?
             this._teamServicesStatusBarItem.command = commandOnClick === undefined ? CommandNames.Reinitialize : commandOnClick;
             this._teamServicesStatusBarItem.text = "Team " + `$(icon octicon-stop)`;
-            let message: string = this._errorMessage + (showRetryMessage !== undefined && showRetryMessage === true ? " " + Strings.ClickToRetryConnection : "") ;
+            const message: string = this._errorMessage + (showRetryMessage !== undefined && showRetryMessage === true ? " " + Strings.ClickToRetryConnection : "") ;
             this._teamServicesStatusBarItem.tooltip = message;
             this._teamServicesStatusBarItem.show();
         }
@@ -456,8 +456,8 @@ export class ExtensionManager implements Disposable {
     //Sets up a file system watcher on HEAD so we can know when the current branch has changed
     private async setupFileSystemWatcherOnHead(): Promise<void> {
         if (this._repoContext && this._repoContext.Type === RepositoryType.GIT) {
-            let pattern: string = this._repoContext.RepoFolder + "/HEAD";
-            let fsw:FileSystemWatcher = workspace.createFileSystemWatcher(pattern, true, false, true);
+            const pattern: string = this._repoContext.RepoFolder + "/HEAD";
+            const fsw:FileSystemWatcher = workspace.createFileSystemWatcher(pattern, true, false, true);
             fsw.onDidChange(async (/*uri*/) => {
                 Logger.LogInfo("HEAD has changed, re-parsing RepoContext object");
                 this._repoContext = await RepositoryContextFactory.CreateRepositoryContext(workspace.rootPath, this._settings);
@@ -480,9 +480,9 @@ export class ExtensionManager implements Disposable {
         }
 
         if (this._repoContext && this._repoContext.Type === RepositoryType.GIT) {
-            let pattern: string = path.join(workspace.rootPath, ".git", "config");
+            const pattern: string = path.join(workspace.rootPath, ".git", "config");
             //We want to listen to file creation, change and delete events
-            let fsw:FileSystemWatcher = workspace.createFileSystemWatcher(pattern, false, false, false);
+            const fsw:FileSystemWatcher = workspace.createFileSystemWatcher(pattern, false, false, false);
             fsw.onDidCreate((/*uri*/) => {
                 //When a new local repo is initialized (e.g., git init), re-initialize the extension
                 Logger.LogInfo("config has been created, re-initializing the extension");
@@ -490,8 +490,8 @@ export class ExtensionManager implements Disposable {
             });
             fsw.onDidChange(async (uri) => {
                 Logger.LogInfo("config has changed, checking if 'remote origin' changed");
-                let context: IRepositoryContext = await RepositoryContextFactory.CreateRepositoryContext(uri.fsPath, this._settings);
-                let remote: string = context.RemoteUrl;
+                const context: IRepositoryContext = await RepositoryContextFactory.CreateRepositoryContext(uri.fsPath, this._settings);
+                const remote: string = context.RemoteUrl;
                 if (remote === undefined) {
                     //There is either no remote defined yet or it isn't a Team Services repo
                     if (this._repoContext.RemoteUrl !== undefined) {

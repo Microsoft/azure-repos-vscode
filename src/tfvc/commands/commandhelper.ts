@@ -98,10 +98,10 @@ export class CommandHelper {
     public static GetChangesetNumber(stdout: string): string {
         // parse output for changeset number
         if (stdout) {
-            let prefix: string = "Changeset #";
-            let start: number = stdout.indexOf(prefix) + prefix.length;
+            const prefix: string = "Changeset #";
+            const start: number = stdout.indexOf(prefix) + prefix.length;
             if (start >= 0) {
-                let end: number = stdout.indexOf(" ", start);
+                const end: number = stdout.indexOf(" ", start);
                 if (end > start) {
                     return stdout.slice(start, end);
                 }

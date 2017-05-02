@@ -30,7 +30,7 @@ export class WitClient extends BaseClient {
     public CreateNewItem(itemType: string, taskTitle: string): void {
         this.logTelemetryForWorkItem(itemType);
         Logger.LogInfo("Work item type is " + itemType);
-        let newItemUrl: string = WorkItemTrackingService.GetNewWorkItemUrl(this._serverContext.RepoInfo.TeamProjectUrl, itemType, taskTitle, this.getUserName(this._serverContext));
+        const newItemUrl: string = WorkItemTrackingService.GetNewWorkItemUrl(this._serverContext.RepoInfo.TeamProjectUrl, itemType, taskTitle, this.getUserName(this._serverContext));
         Logger.LogInfo("New Work Item Url: " + newItemUrl);
         Utils.OpenUrl(newItemUrl);
     }
@@ -39,12 +39,12 @@ export class WitClient extends BaseClient {
     public async CreateNewWorkItem(taskTitle: string): Promise<void> {
         try {
             Telemetry.SendEvent(TelemetryEvents.OpenNewWorkItem);
-            let selectedType: BaseQuickPickItem = await window.showQuickPick(await this.getWorkItemTypes(), { matchOnDescription: true, placeHolder: Strings.ChooseWorkItemType });
+            const selectedType: BaseQuickPickItem = await window.showQuickPick(await this.getWorkItemTypes(), { matchOnDescription: true, placeHolder: Strings.ChooseWorkItemType });
             if (selectedType) {
                 Telemetry.SendEvent(TelemetryEvents.OpenNewWorkItem);
 
                 Logger.LogInfo("Selected work item type is " + selectedType.label);
-                let newItemUrl: string = WorkItemTrackingService.GetNewWorkItemUrl(this._serverContext.RepoInfo.TeamProjectUrl, selectedType.label, taskTitle, this.getUserName(this._serverContext));
+                const newItemUrl: string = WorkItemTrackingService.GetNewWorkItemUrl(this._serverContext.RepoInfo.TeamProjectUrl, selectedType.label, taskTitle, this.getUserName(this._serverContext));
                 Logger.LogInfo("New Work Item Url: " + newItemUrl);
                 Utils.OpenUrl(newItemUrl);
             }
@@ -59,13 +59,13 @@ export class WitClient extends BaseClient {
     public async ShowMyWorkItemQueries(): Promise<void> {
         try {
             Telemetry.SendEvent(TelemetryEvents.ShowMyWorkItemQueries);
-            let query: WorkItemQueryQuickPickItem = await window.showQuickPick(await this.getMyWorkItemQueries(), { matchOnDescription: false, placeHolder: Strings.ChooseWorkItemQuery });
+            const query: WorkItemQueryQuickPickItem = await window.showQuickPick(await this.getMyWorkItemQueries(), { matchOnDescription: false, placeHolder: Strings.ChooseWorkItemQuery });
             if (query) {
                 Telemetry.SendEvent(TelemetryEvents.ViewWorkItems);
                 Logger.LogInfo("Selected query is " + query.label);
                 Logger.LogInfo("Getting work items for query...");
 
-                let workItem: BaseQuickPickItem = await window.showQuickPick(await this.getMyWorkItems(this._serverContext.RepoInfo.TeamProject, query.wiql), { matchOnDescription: true, placeHolder: Strings.ChooseWorkItem });
+                const workItem: BaseQuickPickItem = await window.showQuickPick(await this.getMyWorkItems(this._serverContext.RepoInfo.TeamProject, query.wiql), { matchOnDescription: true, placeHolder: Strings.ChooseWorkItem });
                 if (workItem) {
                     let url: string = undefined;
                     if (workItem.id === undefined) {
@@ -88,7 +88,7 @@ export class WitClient extends BaseClient {
         Telemetry.SendEvent(TelemetryEvents.ViewPinnedQueryWorkItems);
 
         try {
-            let queryText: string = await this.getPinnedQueryText();
+            const queryText: string = await this.getPinnedQueryText();
             await this.showWorkItems(queryText);
         } catch (err) {
             this.handleError(err, WitClient.GetOfflinePinnedQueryStatusText(), false, "Error showing pinned query work items");
@@ -107,9 +107,9 @@ export class WitClient extends BaseClient {
 
     public async ChooseWorkItems(): Promise<string[]> {
         Logger.LogInfo("Getting work items to choose from...");
-        let query: string = await this.getPinnedQueryText(); //gets either MyWorkItems, queryText or wiql of queryPath of PinnedQuery
+        const query: string = await this.getPinnedQueryText(); //gets either MyWorkItems, queryText or wiql of queryPath of PinnedQuery
         // TODO: There isn't a way to do a multi select pick list right now, but when there is we should change this to use it.
-        let workItem: BaseQuickPickItem = await window.showQuickPick(await this.getMyWorkItems(this._serverContext.RepoInfo.TeamProject, query), { matchOnDescription: true, placeHolder: Strings.ChooseWorkItem });
+        const workItem: BaseQuickPickItem = await window.showQuickPick(await this.getMyWorkItems(this._serverContext.RepoInfo.TeamProject, query), { matchOnDescription: true, placeHolder: Strings.ChooseWorkItem });
         if (workItem) {
             return ["#" + workItem.id + " - " + workItem.description];
         } else {
@@ -119,7 +119,7 @@ export class WitClient extends BaseClient {
 
     private async showWorkItems(wiql: string): Promise<void> {
         Logger.LogInfo("Getting work items...");
-        let workItem: BaseQuickPickItem = await window.showQuickPick(await this.getMyWorkItems(this._serverContext.RepoInfo.TeamProject, wiql), { matchOnDescription: true, placeHolder: Strings.ChooseWorkItem });
+        const workItem: BaseQuickPickItem = await window.showQuickPick(await this.getMyWorkItems(this._serverContext.RepoInfo.TeamProject, wiql), { matchOnDescription: true, placeHolder: Strings.ChooseWorkItem });
         if (workItem) {
             let url: string = undefined;
             if (workItem.id === undefined) {
@@ -137,9 +137,9 @@ export class WitClient extends BaseClient {
     public async GetPinnedQueryResultCount() : Promise<number> {
         try {
             Logger.LogInfo("Running pinned work item query to get count (" + this._serverContext.RepoInfo.TeamProject + ")...");
-            let queryText: string = await this.getPinnedQueryText();
+            const queryText: string = await this.getPinnedQueryText();
 
-            let svc: WorkItemTrackingService = new WorkItemTrackingService(this._serverContext);
+            const svc: WorkItemTrackingService = new WorkItemTrackingService(this._serverContext);
             return svc.GetQueryResultCount(this._serverContext.RepoInfo.TeamProject, queryText);
         } catch (err) {
             this.handleError(err, WitClient.GetOfflinePinnedQueryStatusText(), false, "Error getting pinned query result count");
@@ -147,16 +147,16 @@ export class WitClient extends BaseClient {
     }
 
     private async getPinnedQueryText(): Promise<string> {
-        let promise: Promise<string> = new Promise<string>(async (resolve, reject) => {
+        const promise: Promise<string> = new Promise<string>(async (resolve, reject) => {
             try {
                 if (this._pinnedQuery.queryText && this._pinnedQuery.queryText.length > 0) {
                     resolve(this._pinnedQuery.queryText);
                 } else if (this._pinnedQuery.queryPath && this._pinnedQuery.queryPath.length > 0) {
                     Logger.LogInfo("Getting my work item query (" + this._serverContext.RepoInfo.TeamProject + ")...");
                     Logger.LogInfo("QueryPath: " + this._pinnedQuery.queryPath);
-                    let svc: WorkItemTrackingService = new WorkItemTrackingService(this._serverContext);
+                    const svc: WorkItemTrackingService = new WorkItemTrackingService(this._serverContext);
 
-                    let queryItem: QueryHierarchyItem = await svc.GetWorkItemQuery(this._serverContext.RepoInfo.TeamProject, this._pinnedQuery.queryPath);
+                    const queryItem: QueryHierarchyItem = await svc.GetWorkItemQuery(this._serverContext.RepoInfo.TeamProject, this._pinnedQuery.queryPath);
                     resolve(queryItem.wiql);
                 }
             } catch (err) {
@@ -167,10 +167,10 @@ export class WitClient extends BaseClient {
     }
 
     private async getMyWorkItemQueries(): Promise<WorkItemQueryQuickPickItem[]> {
-        let queries: WorkItemQueryQuickPickItem[] = [];
-        let svc: WorkItemTrackingService = new WorkItemTrackingService(this._serverContext);
+        const queries: WorkItemQueryQuickPickItem[] = [];
+        const svc: WorkItemTrackingService = new WorkItemTrackingService(this._serverContext);
         Logger.LogInfo("Getting my work item queries (" + this._serverContext.RepoInfo.TeamProject + ")...");
-        let hierarchyItems: QueryHierarchyItem[] = await svc.GetWorkItemHierarchyItems(this._serverContext.RepoInfo.TeamProject);
+        const hierarchyItems: QueryHierarchyItem[] = await svc.GetWorkItemHierarchyItems(this._serverContext.RepoInfo.TeamProject);
         Logger.LogInfo("Retrieved " + hierarchyItems.length + " hierarchyItems");
         hierarchyItems.forEach((folder) => {
             if (folder && folder.isFolder === true && folder.isPublic === false) {
@@ -179,7 +179,7 @@ export class WitClient extends BaseClient {
                 this._myQueriesFolder = folder.name;
                 if (folder.hasChildren === true) {
                     //Gets all of the queries under "My Queries" and gets their name and wiql
-                    for (let index = 0; index < folder.children.length; index++) {
+                    for (let index: number = 0; index < folder.children.length; index++) {
                         queries.push({
                             id: folder.children[index].id,
                             label: folder.children[index].name,
@@ -194,10 +194,10 @@ export class WitClient extends BaseClient {
     }
 
     private async getMyWorkItems(teamProject: string, wiql: string): Promise<BaseQuickPickItem[]> {
-        let workItems: BaseQuickPickItem[] = [];
-        let svc: WorkItemTrackingService = new WorkItemTrackingService(this._serverContext);
+        const workItems: BaseQuickPickItem[] = [];
+        const svc: WorkItemTrackingService = new WorkItemTrackingService(this._serverContext);
         Logger.LogInfo("Getting my work items (" + this._serverContext.RepoInfo.TeamProject + ")...");
-        let simpleWorkItems: SimpleWorkItem[] = await svc.GetWorkItems(teamProject, wiql);
+        const simpleWorkItems: SimpleWorkItem[] = await svc.GetWorkItems(teamProject, wiql);
         Logger.LogInfo("Retrieved " + simpleWorkItems.length + " work items");
         simpleWorkItems.forEach((wi) => {
             workItems.push({ label: wi.label, description: wi.description, id: wi.id});
@@ -226,9 +226,9 @@ export class WitClient extends BaseClient {
     }
 
     private async getWorkItemTypes(): Promise<BaseQuickPickItem[]> {
-        let svc: WorkItemTrackingService = new WorkItemTrackingService(this._serverContext);
-        let types: WorkItemType[] = await svc.GetWorkItemTypes(this._serverContext.RepoInfo.TeamProject);
-        let workItemTypes: BaseQuickPickItem[] = [];
+        const svc: WorkItemTrackingService = new WorkItemTrackingService(this._serverContext);
+        const types: WorkItemType[] = await svc.GetWorkItemTypes(this._serverContext.RepoInfo.TeamProject);
+        const workItemTypes: BaseQuickPickItem[] = [];
         types.forEach((type) => {
             workItemTypes.push({ label: type.name, description: type.description, id: undefined });
         });

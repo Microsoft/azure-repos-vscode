@@ -22,7 +22,7 @@ export class FileTokenStorage {
     }
 
     public AddEntries(newEntries: Array<any>, existingEntries: Array<any>) : Q.Promise<void> {
-        let entries: Array<any> = existingEntries.concat(newEntries);
+        const entries: Array<any> = existingEntries.concat(newEntries);
         return this.saveEntries(entries);
     }
 
@@ -31,12 +31,12 @@ export class FileTokenStorage {
     }
 
     public LoadEntries() : Q.Promise<any> {
-        let deferred: Q.Deferred<any> = Q.defer();
+        const deferred: Q.Deferred<any> = Q.defer();
         let entries: Array<any> = [];
         let err: any;
 
         try {
-            let content: string = fs.readFileSync(this._filename, {encoding: "utf8", flag: "r"});
+            const content: string = fs.readFileSync(this._filename, {encoding: "utf8", flag: "r"});
             entries = JSON.parse(content);
             deferred.resolve(entries);
         } catch (ex) {
@@ -57,16 +57,16 @@ export class FileTokenStorage {
     }
 
     private saveEntries(entries: Array<any>) : Q.Promise<void> {
-        let defer: Q.Deferred<void> = Q.defer<void>();
+        const defer: Q.Deferred<void> = Q.defer<void>();
 
-        let writeOptions = {
+        const writeOptions = {
             encoding: "utf8",
             mode: 384, // Permission 0600 - owner read/write, nobody else has access
             flag: "w"
         };
 
         // If the path we want to store in doesn't exist, create it
-        let folder: string = path.dirname(this._filename);
+        const folder: string = path.dirname(this._filename);
         if (!fs.existsSync(folder)) {
             fs.mkdirSync(folder);
         }

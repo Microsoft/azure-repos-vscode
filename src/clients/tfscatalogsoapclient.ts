@@ -497,7 +497,7 @@ export class TfsCatalogSoapClient {
         if (!catalogResources) {
             throw new Error(`No CatalogResources were received for ProjectCollections from ${this.endpointUrl}`);
         }
-        let collectionNodes: any[] = [];
+        const collectionNodes: any[] = [];
         catalogResources.eachChild(function(catalogResource) {
             if (catalogResource.attr.ResourceTypeIdentifier.toLowerCase() === TfsCatalogSoapClient.ProjectCollection) {
                 collectionNodes.push(catalogResource);
@@ -523,11 +523,11 @@ export class TfsCatalogSoapClient {
 
                 //Get the project collections, foundationServerRootPath looks something like 3eYRYkJOok6GHrKam0AcAA==GJQSi7i010yMVKSDvyLgHQ==
                 this.getCatalogDataFromServer(foundationServerRootPath + TfsCatalogSoapClient.SingleRecurseStar, TfsCatalogSoapClient.QueryOptionsExpandDependencies).then((catalogDataXml:any) => {
-                    let collectionNodes: any[] = this.parseProjectCollections(catalogDataXml);
+                    const collectionNodes: any[] = this.parseProjectCollections(catalogDataXml);
 
                     //Now go and find the project collection we're looking for
                     let foundTeamProject: any;
-                    for (let idx = 0; idx < collectionNodes.length; idx++) {
+                    for (let idx: number = 0; idx < collectionNodes.length; idx++) {
                         if (collectionNodes[idx].attr.DisplayName.toLowerCase() === collectionName.toLowerCase()) {
                             foundTeamProject = collectionNodes[idx];
                             break;
@@ -553,9 +553,9 @@ export class TfsCatalogSoapClient {
     }
 
     private getCatalogDataFromServer(pathSpecs: string, queryOptions: string) : Q.Promise<any> {
-        let deferred: Q.Deferred<any> = Q.defer<any>();
+        const deferred: Q.Deferred<any> = Q.defer<any>();
 
-        let onResult = (err: any, statusCode: number, responseEnvelope: any) => {
+        const onResult = (err: any, statusCode: number, responseEnvelope: any) => {
             if (err) {
                 err.statusCode = statusCode;
                 deferred.reject(err);
@@ -564,7 +564,7 @@ export class TfsCatalogSoapClient {
             }
         };
 
-        let envelope: string = "<?xml version='1.0' encoding='UTF-8'?>"
+        const envelope: string = "<?xml version='1.0' encoding='UTF-8'?>"
             + "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
             + "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">"
             + "<soap:Body xmlns=\"http://microsoft.com/webservices/\">"

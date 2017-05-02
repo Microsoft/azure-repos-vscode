@@ -32,7 +32,7 @@ export class GetFileContent implements ITfvcCommand<string> {
     }
 
     public GetArguments(): IArgumentProvider {
-        let builder: ArgumentBuilder = new ArgumentBuilder("print", this._serverContext)
+        const builder: ArgumentBuilder = new ArgumentBuilder("print", this._serverContext)
             .Add(this._localPath);
         if (this._versionSpec) {
             builder.AddSwitchWithValue("version", this._versionSpec, false);
@@ -63,7 +63,7 @@ export class GetFileContent implements ITfvcCommand<string> {
     }
 
     public GetExeArguments(): IArgumentProvider {
-        let builder: ArgumentBuilder = new ArgumentBuilder("view", this._serverContext)
+        const builder: ArgumentBuilder = new ArgumentBuilder("view", this._serverContext)
             .Add(this._localPath);
         if (this._versionSpec) {
             builder.AddSwitchWithValue("version", this._versionSpec, false);

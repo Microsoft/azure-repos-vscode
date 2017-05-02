@@ -51,7 +51,7 @@ export class FindConflicts implements ITfvcCommand<IConflict[]> {
             CommandHelper.ProcessErrors(this.GetArguments().GetCommand(), executionResult);
         }
 
-        let conflicts: IConflict[] = [];
+        const conflicts: IConflict[] = [];
         const lines: string[] = CommandHelper.SplitIntoLines(executionResult.stderr, false, true);
         for (let i: number = 0; i < lines.length; i++) {
             const line: string = lines[i];

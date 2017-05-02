@@ -5,7 +5,7 @@
 "use strict";
 
 export function GetStatuses(statusText: string): Status[] {
-    let result: Status[] = [];
+    const result: Status[] = [];
     if (!statusText) {
         return result;
     }

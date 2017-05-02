@@ -50,7 +50,7 @@ export class ResolveConflicts implements ITfvcCommand<IConflict[]> {
     public async ParseOutput(executionResult: IExecutionResult): Promise<IConflict[]> {
         CommandHelper.ProcessErrors(this.GetArguments().GetCommand(), executionResult);
 
-        let conflicts: IConflict[] = [];
+        const conflicts: IConflict[] = [];
         const lines: string[] = CommandHelper.SplitIntoLines(executionResult.stdout, true, true);
         for (let i: number = 0; i < lines.length; i++) {
             const line: string = lines[i];
