@@ -42,10 +42,10 @@ export class TfvcExtension  {
                     return;
                 }
 
-                Telemetry.SendEvent(TfvcTelemetryEvents.Checkin);
+                Telemetry.SendEvent(this._repo.IsExe ? TfvcTelemetryEvents.CheckinExe : TfvcTelemetryEvents.CheckinClc);
                 const changeset: string =
                     await this._repo.Checkin(checkinInfo.files, checkinInfo.comment, checkinInfo.workItemIds);
-                TfvcOutput.AppendLine("Changeset " + changeset + " checked in.");
+                TfvcOutput.AppendLine(`Changeset ${changeset} checked in.`);
                 TfvcSCMProvider.ClearCheckinMessage();
                 TfvcSCMProvider.Refresh();
             },
@@ -169,7 +169,7 @@ export class TfvcExtension  {
                         const destination: string = path.join(dirName, newFilename);
 
                         try {
-                            //We decided not to send telemetry on file operations
+                            Telemetry.SendEvent(this._repo.IsExe ? TfvcTelemetryEvents.RenameExe : TfvcTelemetryEvents.RenameClc);
                             await this._repo.Rename(uri.fsPath, destination);
                         } catch (err) {
                             //Provide a better error message if the file to be renamed isn't in the workspace (e.g., it's a new file)
@@ -196,6 +196,7 @@ export class TfvcExtension  {
                     const basename: string = path.basename(localPath);
                     const message: string = `Are you sure you want to resolve changes in ${basename} as ${resolveTypeString}?`;
                     if (await UIHelper.PromptForConfirmation(message, resolveTypeString)) {
+                        Telemetry.SendEvent(this._repo.IsExe ? TfvcTelemetryEvents.ResolveConflictsExe : TfvcTelemetryEvents.ResolveConflictsClc);
                         await this._repo.ResolveConflicts([localPath], autoResolveType);
                         TfvcSCMProvider.Refresh();
                     }
@@ -217,7 +218,7 @@ export class TfvcExtension  {
     public async Sync(): Promise<void> {
         this.displayErrors(
             async () => {
-                Telemetry.SendEvent(TfvcTelemetryEvents.Sync);
+                Telemetry.SendEvent(this._repo.IsExe ? TfvcTelemetryEvents.SyncExe : TfvcTelemetryEvents.SyncClc);
                 const results: ISyncResults = await this._repo.Sync([this._repo.Path], true);
                 await UIHelper.ShowSyncResults(results, results.hasConflicts || results.hasErrors, true);
             },
@@ -245,7 +246,7 @@ export class TfvcExtension  {
                             message = `Are you sure you want to undo changes to ${pathsToUndo.length.toString()} files?`;
                         }
                         if (await UIHelper.PromptForConfirmation(message, Strings.UndoChanges)) {
-                            //We decided not to send telemetry on file operations
+                            Telemetry.SendEvent(this._repo.IsExe ? TfvcTelemetryEvents.UndoExe : TfvcTelemetryEvents.UndoClc);
                             await this._repo.Undo(pathsToUndo);
                         }
                     }
@@ -265,7 +266,7 @@ export class TfvcExtension  {
                 if (TfvcSCMProvider.HasItems()) {
                     const message: string = `Are you sure you want to undo all changes?`;
                     if (await UIHelper.PromptForConfirmation(message, Strings.UndoChanges)) {
-                        //We decided not to send telemetry on file operations
+                        Telemetry.SendEvent(this._repo.IsExe ? TfvcTelemetryEvents.UndoAllExe : TfvcTelemetryEvents.UndoAllClc);
                         await this._repo.Undo(["*"]);
                     }
                 } else {
