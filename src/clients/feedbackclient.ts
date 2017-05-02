@@ -46,7 +46,11 @@ export class FeedbackClient {
                     providedEmail = email;
                 }
                 //This feedback will go no matter whether Application Insights is enabled or not.
-                Telemetry.SendFeedback(choice.id, { "VSCode.Feedback.Comment" : value, "VSCode.Feedback.Email" : providedEmail} );
+                let trimmedValue: string = value.trim();
+                if (trimmedValue.length > 1000) {
+                    trimmedValue = trimmedValue.substring(0, 1000);
+                }
+                Telemetry.SendFeedback(choice.id, { "VSCode.Feedback.Comment" : trimmedValue, "VSCode.Feedback.Email" : providedEmail} );
 
                 const disposable: Disposable = window.setStatusBarMessage(Strings.ThanksForFeedback);
                 setInterval(() => disposable.dispose(), 1000 * 5);

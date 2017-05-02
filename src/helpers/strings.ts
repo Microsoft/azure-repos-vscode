@@ -26,7 +26,7 @@ export class Strings {
     static SendAFrown: string = "Send a Frown";
     static SendASmile: string = "Send a Smile";
     static SendEmailPrompt: string = "(Optional) Provide your email address";
-    static SendFeedback: string = "Send us feedback!";
+    static SendFeedback: string = "Send us feedback about the Team Services extension!";
     static SendFeedbackPrompt: string = "Enter your feedback here (1000 char limit)";
     static NoFeedbackSent: string = "No feedback was sent.";
     static ThanksForFeedback: string = "Thanks for sending feedback!";
