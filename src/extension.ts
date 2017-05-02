@@ -29,7 +29,6 @@ export async function activate(context: ExtensionContext) {
     context.subscriptions.push(commands.registerCommand(CommandNames.OpenNewPullRequest, () => _extensionManager.Team.OpenNewPullRequest()));
     context.subscriptions.push(commands.registerCommand(CommandNames.OpenNewTask, () => _extensionManager.Team.OpenNewTask()));
     context.subscriptions.push(commands.registerCommand(CommandNames.OpenNewWorkItem, () => _extensionManager.Team.OpenNewWorkItem()));
-    context.subscriptions.push(commands.registerCommand(CommandNames.OpenPullRequestsPage, () => _extensionManager.Team.OpenPullRequestsPage()));
     context.subscriptions.push(commands.registerCommand(CommandNames.OpenTeamSite, () => _extensionManager.Team.OpenTeamProjectWebSite()));
     context.subscriptions.push(commands.registerCommand(CommandNames.ViewWorkItems, () => _extensionManager.Team.ViewMyWorkItems()));
     context.subscriptions.push(commands.registerCommand(CommandNames.ViewPinnedQueryWorkItems, () => _extensionManager.Team.ViewPinnedQueryWorkItems()));
@@ -38,7 +37,6 @@ export async function activate(context: ExtensionContext) {
     context.subscriptions.push(commands.registerCommand(CommandNames.RefreshPollingStatus, () => _extensionManager.Team.RefreshPollingStatus()));
 
     // TFVC Commands
-    context.subscriptions.push(commands.registerCommand(TfvcCommandNames.Status, () => _extensionManager.Tfvc.Status()));
     context.subscriptions.push(commands.registerCommand(TfvcCommandNames.UndoAll, () => {
             _extensionManager.Tfvc.UndoAll();
         }));

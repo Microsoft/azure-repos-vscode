@@ -28,7 +28,6 @@ export class CommandNames {
     static OpenNewTask: string = CommandNames.CommandPrefix + "OpenNewTask";
     static OpenNewPullRequest: string = CommandNames.CommandPrefix + "OpenNewPullRequest";
     static OpenNewWorkItem: string = CommandNames.CommandPrefix + "OpenNewWorkItem";
-    static OpenPullRequestsPage: string = CommandNames.CommandPrefix + "OpenPullRequestsPage";
     static OpenTeamSite: string = CommandNames.CommandPrefix + "OpenTeamSite";
     static RefreshPollingStatus: string = CommandNames.CommandPrefix + "RefreshPollingStatus";
     static Reinitialize: string = CommandNames.CommandPrefix + "Reinitialize";
@@ -55,7 +54,6 @@ export class TfvcCommandNames {
     static ResolveKeepYours: string = TfvcCommandNames.CommandPrefix + "ResolveKeepYours";
     static ResolveTakeTheirs: string = TfvcCommandNames.CommandPrefix + "ResolveTakeTheirs";
     static ShowOutput: string = TfvcCommandNames.CommandPrefix + "ShowOutput";
-    static Status: string = TfvcCommandNames.CommandPrefix + "Status";
     static Sync: string = TfvcCommandNames.CommandPrefix + "Sync";
     static Undo: string = TfvcCommandNames.CommandPrefix + "Undo";
     static UndoAll: string = TfvcCommandNames.CommandPrefix + "UndoAll";
@@ -90,7 +88,6 @@ export class TelemetryEvents {
     static OpenNewWorkItem: string = TelemetryEvents.TelemetryPrefix + "opennewworkitem";
     static OpenRepositoryHistory: string = TelemetryEvents.TelemetryPrefix + "openrepohistory";
     static OpenTeamSite: string = TelemetryEvents.TelemetryPrefix + "openteamprojectweb";
-    static OpenPullRequestsPage: string = TelemetryEvents.TelemetryPrefix + "openpullrequestspage";
     static ReadmeLearnMoreClick: string = TelemetryEvents.TelemetryPrefix + "readmelearnmoreclick";
     static SendAFrown: string = TelemetryEvents.TelemetryPrefix + "sendafrown";
     static SendASmile: string = TelemetryEvents.TelemetryPrefix + "sendasmile";
@@ -116,7 +113,6 @@ export class TfvcTelemetryEvents {
     static OpenRepositoryHistory: string = TfvcTelemetryEvents.TelemetryPrefix + "openrepohistory";
     static RenameConflict: string = TfvcTelemetryEvents.TelemetryPrefix + "renameconflict";
     static RestrictWorkspace: string = TfvcTelemetryEvents.TelemetryPrefix + "restrictWorkspace";
-    static Status: string = TfvcTelemetryEvents.TelemetryPrefix + "status";
     static StartUp: string = TfvcTelemetryEvents.TelemetryPrefix + "startup";
     static Sync: string = TfvcTelemetryEvents.TelemetryPrefix + "sync";
     static UsingClc: string = TfvcTelemetryEvents.TelemetryPrefix + "clc";

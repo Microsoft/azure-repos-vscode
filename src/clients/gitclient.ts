@@ -105,14 +105,6 @@ export class GitClient extends BaseClient {
         Utils.OpenUrl(url);
     }
 
-    public OpenPullRequestsPage(): void {
-        Telemetry.SendEvent(TelemetryEvents.OpenPullRequestsPage);
-
-        const url: string = GitVcService.GetPullRequestsUrl(this._serverContext.RepoInfo.RepositoryUrl);
-        Logger.LogInfo("OpenPullRequestsPage: " + url);
-        Utils.OpenUrl(url);
-    }
-
     public async PollMyPullRequests(): Promise<void> {
         try {
             const requests: BaseQuickPickItem[] = await this.getMyPullRequests();

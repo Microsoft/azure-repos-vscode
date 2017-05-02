@@ -5,7 +5,7 @@
 "use strict";
 
 import * as path from "path";
-import { commands, Uri, window, workspace } from "vscode";
+import { commands, Uri, window } from "vscode";
 import { RepositoryType } from "../contexts/repositorycontext";
 import { TfvcContext } from "../contexts/tfvccontext";
 import { ExtensionManager } from "../extensionmanager";
@@ -21,7 +21,7 @@ import { TfvcSCMProvider } from "./tfvcscmprovider";
 import { TfvcErrorCodes } from "./tfvcerror";
 import { TfvcRepository } from "./tfvcrepository";
 import { UIHelper } from "./uihelper";
-import { AutoResolveType, ICheckinInfo, IItemInfo, IPendingChange, ISyncResults } from "./interfaces";
+import { AutoResolveType, ICheckinInfo, IItemInfo, ISyncResults } from "./interfaces";
 import { TfvcOutput } from "./tfvcoutput";
 
 export class TfvcExtension  {
@@ -208,23 +208,6 @@ export class TfvcExtension  {
 
     public async ShowOutput(): Promise<void> {
         TfvcOutput.Show();
-    }
-
-    /**
-     * This command runs a status command on the VSCode workspace folder and
-     * displays the results to the user. Selecting one of the files in the list will
-     * open the file in the editor.
-     */
-    public async Status(): Promise<void> {
-        this.displayErrors(
-            async () => {
-                Telemetry.SendEvent(TfvcTelemetryEvents.Status);
-                const chosenItem: IPendingChange = await UIHelper.ChoosePendingChange(await this._repo.GetStatus());
-                if (chosenItem) {
-                    window.showTextDocument(await workspace.openTextDocument(chosenItem.localItem));
-                }
-            },
-            "Status");
     }
 
     /**

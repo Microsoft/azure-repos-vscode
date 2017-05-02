@@ -207,17 +207,6 @@ export class TeamExtension  {
         }
     }
 
-    //Opens the main pull requests page
-    public OpenPullRequestsPage(): void {
-        if (this._manager.EnsureInitialized(RepositoryType.GIT)) {
-            if (this._gitClient) {
-                this._gitClient.OpenPullRequestsPage();
-            }
-        } else {
-            this._manager.DisplayErrorMessage();
-        }
-    }
-
     //Opens the team project web site
     public OpenTeamProjectWebSite(): void {
         if (this._manager.EnsureInitialized(RepositoryType.ANY)) {
