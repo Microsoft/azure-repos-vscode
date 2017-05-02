@@ -17,8 +17,8 @@ import { TeamServicesApi } from "../../src/clients/teamservicesclient";
 describe("TeamServicesClient-Integration", function() {
     this.timeout(TestSettings.SuiteTimeout); //http://mochajs.org/#timeouts
 
-    let credentialManager: CredentialManager = new CredentialManager();
-    let ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
+    const credentialManager: CredentialManager = new CredentialManager();
+    const ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
 
     before(function() {
         UserAgentProvider.VSCodeVersion = "0.0.0";
@@ -35,8 +35,8 @@ describe("TeamServicesClient-Integration", function() {
     it("should verify repositoryClient.getVstsInfo", async function() {
         this.timeout(TestSettings.TestTimeout); //http://mochajs.org/#timeouts
 
-        let repositoryClient: TeamServicesApi = new TeamServicesApi(TestSettings.RemoteRepositoryUrl, [CredentialManager.GetCredentialHandler()]);
-        let repoInfo: any = await repositoryClient.getVstsInfo();
+        const repositoryClient: TeamServicesApi = new TeamServicesApi(TestSettings.RemoteRepositoryUrl, [CredentialManager.GetCredentialHandler()]);
+        const repoInfo: any = await repositoryClient.getVstsInfo();
         assert.isNotNull(repoInfo, "repoInfo was null when it shouldn't have been");
         assert.equal(repoInfo.serverUrl, TestSettings.AccountUrl);
         assert.equal(repoInfo.collection.name, TestSettings.CollectionName);
@@ -49,8 +49,8 @@ describe("TeamServicesClient-Integration", function() {
         this.timeout(TestSettings.TestTimeout); //http://mochajs.org/#timeouts
 
         try {
-            let repositoryClient: TeamServicesApi = new TeamServicesApi(TestSettings.RemoteRepositoryUrl + "1", [CredentialManager.GetCredentialHandler()]);
-            let repoInfo: any = await repositoryClient.getVstsInfo();
+            const repositoryClient: TeamServicesApi = new TeamServicesApi(TestSettings.RemoteRepositoryUrl + "1", [CredentialManager.GetCredentialHandler()]);
+            const repoInfo: any = await repositoryClient.getVstsInfo();
             assert.isNull(repoInfo);
         } catch (err) {
             assert.isNotNull(err, "err was null when it shouldn't have been");
@@ -61,8 +61,8 @@ describe("TeamServicesClient-Integration", function() {
     it("should verify accountClient.connect", async function() {
         this.timeout(TestSettings.TestTimeout); //http://mochajs.org/#timeouts
 
-        let accountClient: TeamServicesApi = new TeamServicesApi(TestSettings.AccountUrl, [CredentialManager.GetCredentialHandler()]);
-        let settings: any = await accountClient.connect();
+        const accountClient: TeamServicesApi = new TeamServicesApi(TestSettings.AccountUrl, [CredentialManager.GetCredentialHandler()]);
+        const settings: any = await accountClient.connect();
         //console.log(settings);
         assert.isNotNull(settings, "settings was null when it shouldn't have been");
         assert.isNotNull(settings.providerDisplayName);
@@ -74,9 +74,9 @@ describe("TeamServicesClient-Integration", function() {
     it("should verify repositoryClient.validateTfvcCollectionUrl", async function() {
         this.timeout(TestSettings.TestTimeout); //http://mochajs.org/#timeouts
 
-        let success: boolean;
+        let success: boolean = false;
         try {
-            let repositoryClient: TeamServicesApi = new TeamServicesApi(TestSettings.RemoteTfvcRepositoryUrl, [CredentialManager.GetCredentialHandler()]);
+            const repositoryClient: TeamServicesApi = new TeamServicesApi(TestSettings.RemoteTfvcRepositoryUrl, [CredentialManager.GetCredentialHandler()]);
             await repositoryClient.validateTfvcCollectionUrl();
             success = true;
         } finally {
@@ -88,7 +88,7 @@ describe("TeamServicesClient-Integration", function() {
         this.timeout(TestSettings.TestTimeout); //http://mochajs.org/#timeouts
 
         try {
-            let repositoryClient: TeamServicesApi = new TeamServicesApi(TestSettings.RemoteTfvcRepositoryUrl + "1", [CredentialManager.GetCredentialHandler()]);
+            const repositoryClient: TeamServicesApi = new TeamServicesApi(TestSettings.RemoteTfvcRepositoryUrl + "1", [CredentialManager.GetCredentialHandler()]);
             await repositoryClient.validateTfvcCollectionUrl();
             assert.fail(undefined, undefined, "validateTfvcCollectionUrl should have thrown but didn't."); //It shouldn't get here
         } catch (err) {

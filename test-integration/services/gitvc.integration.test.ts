@@ -17,8 +17,8 @@ import { GitVcService, PullRequestScore } from "../../src/services/gitvc";
 describe("GitVcService-Integration", function() {
     this.timeout(TestSettings.SuiteTimeout);
 
-    let credentialManager: CredentialManager = new CredentialManager();
-    let ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
+    const credentialManager: CredentialManager = new CredentialManager();
+    const ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
 
     before(function() {
         UserAgentProvider.VSCodeVersion = "0.0.0";
@@ -35,13 +35,13 @@ describe("GitVcService-Integration", function() {
     it("should verify GitVcService.GetRepositories", async function() {
         this.timeout(TestSettings.TestTimeout); //http://mochajs.org/#timeouts
 
-        let ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
+        const ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
         ctx.CredentialHandler = CredentialManager.GetCredentialHandler();
         ctx.RepoInfo = Mocks.RepositoryInfo();
         ctx.UserInfo = undefined;
 
-        let svc: GitVcService = new GitVcService(ctx);
-        let repos: GitRepository[] = await svc.GetRepositories(TestSettings.TeamProject);
+        const svc: GitVcService = new GitVcService(ctx);
+        const repos: GitRepository[] = await svc.GetRepositories(TestSettings.TeamProject);
         assert.isNotNull(repos, "repos was null when it shouldn't have been");
         //console.log(repos.length);
         expect(repos.length).to.equal(2);
@@ -50,13 +50,13 @@ describe("GitVcService-Integration", function() {
     it("should verify GitVcService.GetPullRequests", async function() {
         this.timeout(TestSettings.TestTimeout); //http://mochajs.org/#timeouts
 
-        let ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
+        const ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
         ctx.CredentialHandler = CredentialManager.GetCredentialHandler();
         ctx.RepoInfo = Mocks.RepositoryInfo();
         ctx.UserInfo = undefined;
 
-        let svc: GitVcService = new GitVcService(ctx);
-        let requests: GitPullRequest[] = await svc.GetPullRequests(ctx.RepoInfo.RepositoryId);
+        const svc: GitVcService = new GitVcService(ctx);
+        const requests: GitPullRequest[] = await svc.GetPullRequests(ctx.RepoInfo.RepositoryId);
         assert.isNotNull(requests, "requests was null when it shouldn't have been");
         //console.log(requests.length);
         expect(requests.length).to.equal(4);
@@ -65,20 +65,20 @@ describe("GitVcService-Integration", function() {
     it("should verify GitVcService.GetPullRequestScore", async function() {
         this.timeout(TestSettings.TestTimeout); //http://mochajs.org/#timeouts
 
-        let ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
+        const ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
         ctx.CredentialHandler = CredentialManager.GetCredentialHandler();
         ctx.RepoInfo = Mocks.RepositoryInfo();
         ctx.UserInfo = undefined;
 
-        let svc: GitVcService = new GitVcService(ctx);
-        let requests: GitPullRequest[] = await svc.GetPullRequests(ctx.RepoInfo.RepositoryId);
-        let totals = [];
+        const svc: GitVcService = new GitVcService(ctx);
+        const requests: GitPullRequest[] = await svc.GetPullRequests(ctx.RepoInfo.RepositoryId);
+        const totals = [];
         requests.forEach((request) => {
             totals.push({ "id" : request.pullRequestId, "score" : GitVcService.GetPullRequestScore(request) });
         });
         assert.equal(totals.length, 4);
         for (let index = 0; index < totals.length; index++) {
-            let element: any = totals[index];
+            const element: any = totals[index];
             if (element.id === 5) { assert.equal(element.score, PullRequestScore.Succeeded); continue; }
             if (element.id === 4) { assert.equal(element.score, PullRequestScore.Waiting); continue; }
             if (element.id === 3) { assert.equal(element.score, PullRequestScore.Failed); continue; }

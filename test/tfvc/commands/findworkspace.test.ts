@@ -18,7 +18,7 @@ describe("Tfvc-FindWorkspaceCommand", function() {
     });
 
     it("should verify constructor", function() {
-        let localPath: string = "/path/to/workspace";
+        const localPath: string = "/path/to/workspace";
         new FindWorkspace(localPath);
     });
 
@@ -27,62 +27,62 @@ describe("Tfvc-FindWorkspaceCommand", function() {
     });
 
     it("should verify GetOptions", function() {
-        let localPath: string = "/path/to/workspace";
-        let cmd: FindWorkspace = new FindWorkspace(localPath);
+        const localPath: string = "/path/to/workspace";
+        const cmd: FindWorkspace = new FindWorkspace(localPath);
         assert.deepEqual(cmd.GetOptions(), { cwd: "/path/to/workspace" });
     });
 
     it("should verify GetExeOptions", function() {
-        let localPath: string = "/path/to/workspace";
-        let cmd: FindWorkspace = new FindWorkspace(localPath);
+        const localPath: string = "/path/to/workspace";
+        const cmd: FindWorkspace = new FindWorkspace(localPath);
         assert.deepEqual(cmd.GetExeOptions(), { cwd: "/path/to/workspace" });
     });
 
     it("should verify arguments", function() {
-        let localPath: string = "/path/to/workspace";
-        let cmd: FindWorkspace = new FindWorkspace(localPath);
+        const localPath: string = "/path/to/workspace";
+        const cmd: FindWorkspace = new FindWorkspace(localPath);
 
         assert.equal(cmd.GetArguments().GetArgumentsForDisplay(), "workfold -noprompt ********");
     });
 
     it("should verify GetExeArguments", function() {
-        let localPath: string = "/path/to/workspace";
-        let cmd: FindWorkspace = new FindWorkspace(localPath);
+        const localPath: string = "/path/to/workspace";
+        const cmd: FindWorkspace = new FindWorkspace(localPath);
 
         assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "workfold -noprompt ********");
     });
 
     it("should verify working folder", function() {
-        let localPath: string = "/path/to/workspace";
-        let cmd: FindWorkspace = new FindWorkspace(localPath);
+        const localPath: string = "/path/to/workspace";
+        const cmd: FindWorkspace = new FindWorkspace(localPath);
 
         assert.equal(cmd.GetOptions().cwd, localPath);
     });
 
     it("should verify EXE working folder", function() {
-        let localPath: string = "/path/to/workspace";
-        let cmd: FindWorkspace = new FindWorkspace(localPath);
+        const localPath: string = "/path/to/workspace";
+        const cmd: FindWorkspace = new FindWorkspace(localPath);
 
         assert.equal(cmd.GetExeOptions().cwd, localPath);
     });
 
     it("should verify parse output - no output", async function() {
-        let localPath: string = "/path/to/workspace";
-        let cmd: FindWorkspace = new FindWorkspace(localPath);
-        let executionResult: IExecutionResult = {
+        const localPath: string = "/path/to/workspace";
+        const cmd: FindWorkspace = new FindWorkspace(localPath);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: undefined,
             stderr: undefined
         };
 
-        let workspace: IWorkspace = await cmd.ParseOutput(executionResult);
+        const workspace: IWorkspace = await cmd.ParseOutput(executionResult);
         assert.equal(workspace, undefined);
     });
 
     it("should verify parse output - no errors", async function() {
-        let localPath: string = "/path/to/workspace";
-        let cmd: FindWorkspace = new FindWorkspace(localPath);
-        let executionResult: IExecutionResult = {
+        const localPath: string = "/path/to/workspace";
+        const cmd: FindWorkspace = new FindWorkspace(localPath);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: "=====================================================================================================================================================\n" +
                 "Workspace:  MyWorkspace\n" +
@@ -91,7 +91,7 @@ describe("Tfvc-FindWorkspaceCommand", function() {
             stderr: undefined
         };
 
-        let workspace: IWorkspace = await cmd.ParseOutput(executionResult);
+        const workspace: IWorkspace = await cmd.ParseOutput(executionResult);
         assert.equal(workspace.name, "MyWorkspace");
         assert.equal(workspace.server, "http://server:8080/tfs/");
         assert.equal(workspace.defaultTeamProject, "project1");
@@ -102,9 +102,9 @@ describe("Tfvc-FindWorkspaceCommand", function() {
     });
 
     it("should verify parse output - German - no 'workspace' and 'collection'", async function() {
-        let localPath: string = "/path/to/workspace";
-        let cmd: FindWorkspace = new FindWorkspace(localPath);
-        let executionResult: IExecutionResult = {
+        const localPath: string = "/path/to/workspace";
+        const cmd: FindWorkspace = new FindWorkspace(localPath);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: "=====================================================================================================================================================\n" +
                 "Arbeitsbereich: DESKTOP-KI56MCL (Jeff Young (TFS))\n" +
@@ -122,9 +122,9 @@ describe("Tfvc-FindWorkspaceCommand", function() {
     });
 
     it("should verify parse output - not a tf workspace", async function() {
-        let localPath: string = "/path/to/workspace";
-        let cmd: FindWorkspace = new FindWorkspace(localPath);
-        let executionResult: IExecutionResult = {
+        const localPath: string = "/path/to/workspace";
+        const cmd: FindWorkspace = new FindWorkspace(localPath);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: undefined,
             stderr: "An argument error occurred: The workspace could not be determined from any argument paths or the current working directory."
@@ -139,9 +139,9 @@ describe("Tfvc-FindWorkspaceCommand", function() {
     });
 
     it("should verify parse output - no mappings error", async function() {
-        let localPath: string = "/path/to/workspace";
-        let cmd: FindWorkspace = new FindWorkspace(localPath);
-        let executionResult: IExecutionResult = {
+        const localPath: string = "/path/to/workspace";
+        const cmd: FindWorkspace = new FindWorkspace(localPath);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: "=====================================================================================================================================================\n" +
                 "Workspace:  MyWorkspace\n" +
@@ -158,9 +158,9 @@ describe("Tfvc-FindWorkspaceCommand", function() {
     });
 
     it("should verify parse output - no errors - restrictWorkspace", async function() {
-        let localPath: string = "/path/to/workspace/project2";
-        let cmd: FindWorkspace = new FindWorkspace(localPath, true);
-        let executionResult: IExecutionResult = {
+        const localPath: string = "/path/to/workspace/project2";
+        const cmd: FindWorkspace = new FindWorkspace(localPath, true);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: "=====================================================================================================================================================\n" +
                 "Workspace:  MyWorkspace\n" +
@@ -170,7 +170,7 @@ describe("Tfvc-FindWorkspaceCommand", function() {
             stderr: undefined
         };
 
-        let workspace: IWorkspace = await cmd.ParseOutput(executionResult);
+        const workspace: IWorkspace = await cmd.ParseOutput(executionResult);
         assert.equal(workspace.name, "MyWorkspace");
         assert.equal(workspace.server, "http://server:8080/tfs/");
         //This test should find project2 as the team porject since the localPath contains project2 and we have restrictWorkspace
@@ -186,22 +186,22 @@ describe("Tfvc-FindWorkspaceCommand", function() {
      ***********************************************************************************************/
 
     it("should verify parse EXE output - no output", async function() {
-        let localPath: string = "/path/to/workspace";
-        let cmd: FindWorkspace = new FindWorkspace(localPath);
-        let executionResult: IExecutionResult = {
+        const localPath: string = "/path/to/workspace";
+        const cmd: FindWorkspace = new FindWorkspace(localPath);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: undefined,
             stderr: undefined
         };
 
-        let workspace: IWorkspace = await cmd.ParseExeOutput(executionResult);
+        const workspace: IWorkspace = await cmd.ParseExeOutput(executionResult);
         assert.equal(workspace, undefined);
     });
 
     it("should verify parse EXE output - no errors", async function() {
-        let localPath: string = "/path/to/workspace";
-        let cmd: FindWorkspace = new FindWorkspace(localPath);
-        let executionResult: IExecutionResult = {
+        const localPath: string = "/path/to/workspace";
+        const cmd: FindWorkspace = new FindWorkspace(localPath);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout:
                 "=============================================================================\n" +
@@ -211,7 +211,7 @@ describe("Tfvc-FindWorkspaceCommand", function() {
             stderr: undefined
         };
 
-        let workspace: IWorkspace = await cmd.ParseExeOutput(executionResult);
+        const workspace: IWorkspace = await cmd.ParseExeOutput(executionResult);
         assert.equal(workspace.name, "MyWorkspace");
         assert.equal(workspace.server, "http://server:8080/tfs/");
         assert.equal(workspace.defaultTeamProject, "project1");
@@ -222,9 +222,9 @@ describe("Tfvc-FindWorkspaceCommand", function() {
     });
 
     it("should verify parse EXE output - German - no 'workspace' and 'collection'", async function() {
-        let localPath: string = "/path/to/workspace";
-        let cmd: FindWorkspace = new FindWorkspace(localPath);
-        let executionResult: IExecutionResult = {
+        const localPath: string = "/path/to/workspace";
+        const cmd: FindWorkspace = new FindWorkspace(localPath);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: "=====================================================================================================================================================\n" +
                 "Arbeitsbereich: DESKTOP-KI56MCL (Jeff Young (TFS))\n" +
@@ -242,9 +242,9 @@ describe("Tfvc-FindWorkspaceCommand", function() {
     });
 
     it("should verify parse EXE output - not a tf workspace", async function() {
-        let localPath: string = "/path/to/workspace";
-        let cmd: FindWorkspace = new FindWorkspace(localPath);
-        let executionResult: IExecutionResult = {
+        const localPath: string = "/path/to/workspace";
+        const cmd: FindWorkspace = new FindWorkspace(localPath);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: undefined,
             stderr: "Unable to determine the source control server."
@@ -259,9 +259,9 @@ describe("Tfvc-FindWorkspaceCommand", function() {
     });
 
     it("should verify parse EXE output - no mappings error", async function() {
-        let localPath: string = "/path/to/workspace";
-        let cmd: FindWorkspace = new FindWorkspace(localPath);
-        let executionResult: IExecutionResult = {
+        const localPath: string = "/path/to/workspace";
+        const cmd: FindWorkspace = new FindWorkspace(localPath);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout:
                 "=============================================================================\n" +
@@ -279,9 +279,9 @@ describe("Tfvc-FindWorkspaceCommand", function() {
     });
 
     it("should verify parse EXE output - no errors - restrictWorkspace", async function() {
-        let localPath: string = "/path/to/workspace/project2";
-        let cmd: FindWorkspace = new FindWorkspace(localPath, true);
-        let executionResult: IExecutionResult = {
+        const localPath: string = "/path/to/workspace/project2";
+        const cmd: FindWorkspace = new FindWorkspace(localPath, true);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: "=====================================================================================================================================================\n" +
                 "Workspace:  MyWorkspace\n" +
@@ -291,7 +291,7 @@ describe("Tfvc-FindWorkspaceCommand", function() {
             stderr: undefined
         };
 
-        let workspace: IWorkspace = await cmd.ParseExeOutput(executionResult);
+        const workspace: IWorkspace = await cmd.ParseExeOutput(executionResult);
         assert.equal(workspace.name, "MyWorkspace");
         assert.equal(workspace.server, "http://server:8080/tfs/");
         //This test should find project2 as the team porject since the localPath contains project2 and we have restrictWorkspace

@@ -14,11 +14,11 @@ import { RepositoryInfo } from "../../../src/info/repositoryinfo";
 import { Strings } from "../../../src/helpers/strings";
 
 describe("Tfvc-StatusCommand", function() {
-    let serverUrl: string = "http://server:8080/tfs";
-    let repoUrl: string = "http://server:8080/tfs/collection1/_git/repo1";
-    let collectionUrl: string = "http://server:8080/tfs/collection1";
-    let user: string = "user1";
-    let pass: string = "pass1";
+    const serverUrl: string = "http://server:8080/tfs";
+    const repoUrl: string = "http://server:8080/tfs/collection1/_git/repo1";
+    const collectionUrl: string = "http://server:8080/tfs/collection1";
+    const user: string = "user1";
+    const pass: string = "pass1";
     let context: TeamServerContext;
 
     beforeEach(function() {
@@ -42,7 +42,7 @@ describe("Tfvc-StatusCommand", function() {
     });
 
     it("should verify constructor", function() {
-        let localPaths: string[] = ["/path/to/workspace"];
+        const localPaths: string[] = ["/path/to/workspace"];
         new Status(undefined, true, localPaths);
     });
 
@@ -51,7 +51,7 @@ describe("Tfvc-StatusCommand", function() {
     });
 
     it("should verify constructor with context", function() {
-        let localPaths: string[] = ["/path/to/workspace"];
+        const localPaths: string[] = ["/path/to/workspace"];
         new Status(context, true, localPaths);
     });
 
@@ -60,101 +60,101 @@ describe("Tfvc-StatusCommand", function() {
     });
 
     it("should verify GetOptions", function() {
-        let localPaths: string[] = ["/path/to/workspace"];
-        let cmd: Status = new Status(undefined, true, localPaths);
+        const localPaths: string[] = ["/path/to/workspace"];
+        const cmd: Status = new Status(undefined, true, localPaths);
         assert.deepEqual(cmd.GetOptions(), {});
     });
 
     it("should verify GetExeOptions", function() {
-        let localPaths: string[] = ["/path/to/workspace"];
-        let cmd: Status = new Status(undefined, true, localPaths);
+        const localPaths: string[] = ["/path/to/workspace"];
+        const cmd: Status = new Status(undefined, true, localPaths);
         assert.deepEqual(cmd.GetExeOptions(), {});
     });
 
     it("should verify arguments", function() {
-        let localPaths: string[] = ["/path/to/workspace"];
-        let cmd: Status = new Status(undefined, true, localPaths);
+        const localPaths: string[] = ["/path/to/workspace"];
+        const cmd: Status = new Status(undefined, true, localPaths);
 
         assert.equal(cmd.GetArguments().GetArgumentsForDisplay(), "status -noprompt -format:xml -recursive " + localPaths[0]);
     });
 
     it("should verify Exe arguments", function() {
-        let localPaths: string[] = ["/path/to/workspace"];
-        let cmd: Status = new Status(undefined, true, localPaths);
+        const localPaths: string[] = ["/path/to/workspace"];
+        const cmd: Status = new Status(undefined, true, localPaths);
 
         assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "status -noprompt -format:detailed -recursive " + localPaths[0]);
     });
 
     it("should verify arguments - no paths", function() {
-        let cmd: Status = new Status(undefined, true);
+        const cmd: Status = new Status(undefined, true);
 
         assert.equal(cmd.GetArguments().GetArgumentsForDisplay(), "status -noprompt -format:xml -recursive");
     });
 
     it("should verify Exe arguments - no paths", function() {
-        let cmd: Status = new Status(undefined, true);
+        const cmd: Status = new Status(undefined, true);
 
         assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "status -noprompt -format:detailed -recursive");
     });
 
     it("should verify arguments - multiple paths", function() {
-        let localPaths: string[] = ["/path/to/workspace", "/path/to/workspace2"];
-        let cmd: Status = new Status(undefined, true, localPaths);
+        const localPaths: string[] = ["/path/to/workspace", "/path/to/workspace2"];
+        const cmd: Status = new Status(undefined, true, localPaths);
 
         assert.equal(cmd.GetArguments().GetArgumentsForDisplay(), "status -noprompt -format:xml -recursive " + localPaths[0] + " " + localPaths[1]);
     });
 
     it("should verify Exe arguments - multiple paths", function() {
-        let localPaths: string[] = ["/path/to/workspace", "/path/to/workspace2"];
-        let cmd: Status = new Status(undefined, true, localPaths);
+        const localPaths: string[] = ["/path/to/workspace", "/path/to/workspace2"];
+        const cmd: Status = new Status(undefined, true, localPaths);
 
         assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "status -noprompt -format:detailed -recursive " + localPaths[0] + " " + localPaths[1]);
     });
 
     it("should verify arguments with context", function() {
-        let localPaths: string[] = ["/path/to/workspace"];
-        let cmd: Status = new Status(context, true, localPaths);
+        const localPaths: string[] = ["/path/to/workspace"];
+        const cmd: Status = new Status(context, true, localPaths);
 
         assert.equal(cmd.GetArguments().GetArgumentsForDisplay(), "status -noprompt -collection:" + collectionUrl + " ******** -format:xml -recursive " + localPaths[0]);
     });
 
     it("should verify Exe arguments with context", function() {
-        let localPaths: string[] = ["/path/to/workspace"];
-        let cmd: Status = new Status(context, true, localPaths);
+        const localPaths: string[] = ["/path/to/workspace"];
+        const cmd: Status = new Status(context, true, localPaths);
 
         assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "status -noprompt -collection:" + collectionUrl + " ******** -format:detailed -recursive " + localPaths[0]);
     });
 
     it("should verify parse output - no output", async function() {
-        let localPaths: string[] = ["/path/to/workspace"];
-        let cmd: Status = new Status(undefined, true, localPaths);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/path/to/workspace"];
+        const cmd: Status = new Status(undefined, true, localPaths);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: undefined,
             stderr: undefined
         };
 
-        let changes: IPendingChange[] = await cmd.ParseOutput(executionResult);
+        const changes: IPendingChange[] = await cmd.ParseOutput(executionResult);
         assert.equal(changes.length, 0);
     });
 
     it("should verify parse Exe output - no output", async function() {
-        let localPaths: string[] = ["/path/to/workspace"];
-        let cmd: Status = new Status(undefined, true, localPaths);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/path/to/workspace"];
+        const cmd: Status = new Status(undefined, true, localPaths);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: undefined,
             stderr: undefined
         };
 
-        let changes: IPendingChange[] = await cmd.ParseExeOutput(executionResult);
+        const changes: IPendingChange[] = await cmd.ParseExeOutput(executionResult);
         assert.equal(changes.length, 0);
     });
 
     it("should verify parse output - valid json", async function() {
-        let localPaths: string[] = ["/path/to/workspace"];
-        let cmd: Status = new Status(undefined, true, localPaths);
-        let stdout: string = `<?xml version="1.0" encoding="utf-8"?>
+        const localPaths: string[] = ["/path/to/workspace"];
+        const cmd: Status = new Status(undefined, true, localPaths);
+        const stdout: string = `<?xml version="1.0" encoding="utf-8"?>
      <status>
      <pending-changes>
      <pending-change server-item="$/tfsTest_03/Folder333/DemandEquals_renamed.java" version="217" owner="NORTHAMERICA\\jpricket" date="2017-02-08T11:12:06.766-0500" lock="none" change-type="rename" workspace="Folder1_00" source-item="$/tfsTest_03/Folder333/DemandEquals.java" computer="JPRICKET-DEV2" local-item="/tmp/tfsTest03_44/Folder333/DemandEquals_renamed.java" file-type="windows-1252"/>
@@ -164,13 +164,13 @@ describe("Tfvc-StatusCommand", function() {
      </candidate-pending-changes>
      </status>`;
 
-        let executionResult: IExecutionResult = {
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: `${stdout}`,
             stderr: undefined
         };
 
-        let changes: IPendingChange[] = await cmd.ParseOutput(executionResult);
+        const changes: IPendingChange[] = await cmd.ParseOutput(executionResult);
         assert.equal(changes.length, 2);
         assert.equal(changes[0].changeType, "rename");
         assert.equal(changes[0].computer, "JPRICKET-DEV2");
@@ -198,9 +198,9 @@ describe("Tfvc-StatusCommand", function() {
     });
 
     it("should verify parse Exe output - pending changes only - no errors", async function() {
-        let localPaths: string[] = ["/path/to/workspace"];
-        let cmd: Status = new Status(undefined, true, localPaths);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/path/to/workspace"];
+        const cmd: Status = new Status(undefined, true, localPaths);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: "$/jeyou/README.md;C19\n" +
                     "  User       : Jeff Young (TFS)\n" +
@@ -215,7 +215,7 @@ describe("Tfvc-StatusCommand", function() {
             stderr: undefined
         };
 
-        let changes: IPendingChange[] = await cmd.ParseExeOutput(executionResult);
+        const changes: IPendingChange[] = await cmd.ParseExeOutput(executionResult);
         assert.equal(changes.length, 1);
         assert.equal(changes[0].changeType, "edit");
         assert.equal(changes[0].computer, "JEYOU-DEV00");
@@ -231,9 +231,9 @@ describe("Tfvc-StatusCommand", function() {
     });
 
     it("should verify parse Exe output - pending and detected changes - no errors", async function() {
-        let localPaths: string[] = ["/path/to/workspace"];
-        let cmd: Status = new Status(undefined, true, localPaths);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/path/to/workspace"];
+        const cmd: Status = new Status(undefined, true, localPaths);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: "$/jeyou/README.md;C19\n" +
                     "  User       : Jeff Young (TFS)\n" +
@@ -259,7 +259,7 @@ describe("Tfvc-StatusCommand", function() {
             stderr: undefined
         };
 
-        let changes: IPendingChange[] = await cmd.ParseExeOutput(executionResult);
+        const changes: IPendingChange[] = await cmd.ParseExeOutput(executionResult);
         assert.equal(changes.length, 2);
         assert.equal(changes[0].changeType, "edit");
         assert.equal(changes[0].computer, "JEYOU-DEV00");
@@ -286,9 +286,9 @@ describe("Tfvc-StatusCommand", function() {
     });
 
     it("should verify parse Exe output - detected changes only - no errors", async function() {
-        let localPaths: string[] = ["/path/to/workspace"];
-        let cmd: Status = new Status(undefined, true, localPaths);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/path/to/workspace"];
+        const cmd: Status = new Status(undefined, true, localPaths);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: "-----------------\n" +
                     "Detected Changes:\n" +
@@ -305,7 +305,7 @@ describe("Tfvc-StatusCommand", function() {
             stderr: undefined
         };
 
-        let changes: IPendingChange[] = await cmd.ParseExeOutput(executionResult);
+        const changes: IPendingChange[] = await cmd.ParseExeOutput(executionResult);
         assert.equal(changes.length, 1);
         assert.equal(changes[0].changeType, "add");
         assert.equal(changes[0].computer, "JEYOU-DEV00");
@@ -321,9 +321,9 @@ describe("Tfvc-StatusCommand", function() {
     });
 
     it("should verify parse Exe output - multiple pending and multiple detected changes - no errors", async function() {
-        let localPaths: string[] = ["/path/to/workspace"];
-        let cmd: Status = new Status(undefined, true, localPaths);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/path/to/workspace"];
+        const cmd: Status = new Status(undefined, true, localPaths);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: "$/jeyou/README.md;C19\n" +
                     "  User       : Jeff Young (TFS)\n" +
@@ -366,15 +366,15 @@ describe("Tfvc-StatusCommand", function() {
             stderr: undefined
         };
 
-        let changes: IPendingChange[] = await cmd.ParseExeOutput(executionResult);
+        const changes: IPendingChange[] = await cmd.ParseExeOutput(executionResult);
         assert.equal(changes.length, 4);
         //Other tests verify the actual values (so skip them here)
     });
 
     it("should verify parse Exe output - pending rename only - no errors", async function() {
-        let localPaths: string[] = ["/path/to/workspace"];
-        let cmd: Status = new Status(undefined, true, localPaths);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/path/to/workspace"];
+        const cmd: Status = new Status(undefined, true, localPaths);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: "$/jeyou/READU.md;C19\n" +
                     "  User       : Jeff Young (TFS)\n" +
@@ -390,7 +390,7 @@ describe("Tfvc-StatusCommand", function() {
             stderr: undefined
         };
 
-        let changes: IPendingChange[] = await cmd.ParseExeOutput(executionResult);
+        const changes: IPendingChange[] = await cmd.ParseExeOutput(executionResult);
         assert.equal(changes.length, 1);
         assert.equal(changes[0].changeType, "rename");
         assert.equal(changes[0].computer, "JEYOU-DEV00");
@@ -406,9 +406,9 @@ describe("Tfvc-StatusCommand", function() {
     });
 
     it("should verify parse output - error exit code", async function() {
-        let localPaths: string[] = ["folder1/file1.txt", "folder2/file2.txt"];
-        let cmd: Status = new Status(undefined, true, localPaths);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["folder1/file1.txt", "folder2/file2.txt"];
+        const cmd: Status = new Status(undefined, true, localPaths);
+        const executionResult: IExecutionResult = {
             exitCode: 42,
             stdout: "Something bad this way comes.",
             stderr: undefined
@@ -425,9 +425,9 @@ describe("Tfvc-StatusCommand", function() {
     });
 
     it("should verify parse Exe output - error exit code", async function() {
-        let localPaths: string[] = ["folder1/file1.txt", "folder2/file2.txt"];
-        let cmd: Status = new Status(undefined, true, localPaths);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["folder1/file1.txt", "folder2/file2.txt"];
+        const cmd: Status = new Status(undefined, true, localPaths);
+        const executionResult: IExecutionResult = {
             exitCode: 42,
             stdout: "Something bad this way comes.",
             stderr: undefined

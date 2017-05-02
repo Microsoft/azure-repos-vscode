@@ -12,8 +12,8 @@ describe("RepositoryInfo", function() {
 
     /* Team Server URLs */
     it("should verify host, account and isTeamFoundationServer for valid remoteUrl", function() {
-        let url: string = "http://jeyou-dev00000:8080/tfs/DefaultCollection/_git/GitAgile";
-        let repoInfo: RepositoryInfo = new RepositoryInfo(url);
+        const url: string = "http://jeyou-dev00000:8080/tfs/DefaultCollection/_git/GitAgile";
+        const repoInfo: RepositoryInfo = new RepositoryInfo(url);
         assert.equal(repoInfo.Host, "jeyou-dev00000:8080");  //TODO: Should host on-prem contain the port number?
         assert.equal(repoInfo.Account, "jeyou-dev00000:8080");  //TODO: Should account on-prem contain the port number?
         assert.isUndefined(repoInfo.AccountUrl);  // we only get this when we pass a JSON blob
@@ -33,7 +33,7 @@ describe("RepositoryInfo", function() {
     });
 
     it("should verify valid values in repositoryInfo to RepositoryInfo constructor", function() {
-        let repositoryInfo = {
+        const repositoryInfo: any = {
            "serverUrl": "http://server:8080/tfs",
            "collection": {
               "id": "d543db53-9479-46c1-9d33-2cb9cb76f622",
@@ -55,7 +55,7 @@ describe("RepositoryInfo", function() {
               "remoteUrl": "http://server:8080/tfs/DefaultCollection/teamproject/_git/repositoryName"
            }
         };
-        let repoInfo = new RepositoryInfo(repositoryInfo);
+        const repoInfo = new RepositoryInfo(repositoryInfo);
         assert.equal(repoInfo.Host, "server:8080");  //TODO: Should host on-prem contain the port number?
         assert.equal(repoInfo.Account, "server:8080");  //TODO: Should account on-prem contain the port number?
         assert.equal(repoInfo.AccountUrl, "http://server:8080/tfs");
@@ -74,7 +74,7 @@ describe("RepositoryInfo", function() {
 
     /* Team Services URLs */
     it("should verify host, account and isTeamServices for valid remoteUrl", function() {
-        let repoInfo: RepositoryInfo = new RepositoryInfo("https://account.visualstudio.com/DefaultCollection/teamproject/_git/repositoryName");
+        const repoInfo: RepositoryInfo = new RepositoryInfo("https://account.visualstudio.com/DefaultCollection/teamproject/_git/repositoryName");
         assert.equal(repoInfo.Host, "account.visualstudio.com");
         assert.equal(repoInfo.Account, "account");
         assert.isTrue(repoInfo.IsTeamServices);
@@ -87,7 +87,7 @@ describe("RepositoryInfo", function() {
         assert.equal(repoInfo.Account, "account");
         assert.isTrue(repoInfo.IsTeamServices);
         assert.isTrue(repoInfo.IsTeamFoundation);
-        let repositoryInfo = {
+        const repositoryInfo: any = {
            "serverUrl": "https://account.visualstudio.com",
            "collection": {
               "id": "5e082e28-e8b2-4314-9200-629619e91098",
@@ -133,7 +133,7 @@ describe("RepositoryInfo", function() {
         assert.isTrue(repoInfo.IsTeamServices);
         assert.isTrue(repoInfo.IsTeamFoundation);
         // To properly test 'collection in the domain' case insensitivity, ensure the collection name is a different case than the account (e.g., 'ACCOUNT' versus 'account')
-        let repositoryInfo = {
+        const repositoryInfo: any = {
            "serverUrl": "https://account.visualstudio.com",
            "collection": {
               "id": "5e082e28-e8b2-4314-9200-629619e91098",

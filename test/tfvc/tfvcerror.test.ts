@@ -19,7 +19,7 @@ describe("Tfvc-Error", function() {
     });
 
     it("should verify constructor - empty data", function() {
-        let error: TfvcError = new TfvcError({
+        const error: TfvcError = new TfvcError({
             error: undefined,
             exitCode: 0,
             message: undefined,
@@ -38,7 +38,7 @@ describe("Tfvc-Error", function() {
     });
 
     it("should verify constructor - error not empty", function() {
-        let error: TfvcError = new TfvcError({
+        const error: TfvcError = new TfvcError({
             error: { name: "err1", message: "error1 message" },
             exitCode: 0,
             message: undefined,
@@ -58,7 +58,7 @@ describe("Tfvc-Error", function() {
     });
 
     it("should verify constructor - error.message over message", function() {
-        let error: TfvcError = new TfvcError({
+        const error: TfvcError = new TfvcError({
             error: { name: "err1", message: "error1 message" },
             exitCode: 0,
             message: "other message",
@@ -78,7 +78,7 @@ describe("Tfvc-Error", function() {
     });
 
     it("should verify constructor - no error", function() {
-        let error: TfvcError = new TfvcError({
+        const error: TfvcError = new TfvcError({
             error: undefined,
             exitCode: 100,
             message: "other message",
@@ -97,7 +97,7 @@ describe("Tfvc-Error", function() {
     });
 
     it("should verify CreateArgumentMissingError", function() {
-        let error: TfvcError = TfvcError.CreateArgumentMissingError("arg1");
+        const error: TfvcError = TfvcError.CreateArgumentMissingError("arg1");
         assert.equal(error.error, undefined);
         assert.equal(error.exitCode, undefined);
         assert.equal(error.message, "Argument is required: arg1");
@@ -108,7 +108,7 @@ describe("Tfvc-Error", function() {
     });
 
     it("should verify CreateInvalidStateError", function() {
-        let error: TfvcError = TfvcError.CreateInvalidStateError();
+        const error: TfvcError = TfvcError.CreateInvalidStateError();
         assert.equal(error.error, undefined);
         assert.equal(error.exitCode, undefined);
         assert.equal(error.message, "The TFVC SCMProvider is in an invalid state for this action.");
@@ -119,7 +119,7 @@ describe("Tfvc-Error", function() {
     });
 
     it("should verify CreateUnknownError", function() {
-        let error: TfvcError = TfvcError.CreateUnknownError({ name: "err1", message: "error1 message" });
+        const error: TfvcError = TfvcError.CreateUnknownError({ name: "err1", message: "error1 message" });
         assert.equal(error.error.name, "err1");
         assert.equal(error.error.message, "error1 message");
         assert.equal(error.exitCode, undefined);
@@ -131,7 +131,7 @@ describe("Tfvc-Error", function() {
     });
 
     it("should verify toString", function() {
-        let error: TfvcError = new TfvcError({
+        const error: TfvcError = new TfvcError({
             error: { name: "err1", message: "error1 message", stack: "here; then there" },
             exitCode: 11,
             message: undefined,

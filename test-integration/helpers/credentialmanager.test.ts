@@ -17,8 +17,8 @@ import { Constants } from "../../src/helpers/constants";
 describe("CredentialManager-Integration", function() {
     this.timeout(TestSettings.SuiteTimeout); //http://mochajs.org/#timeouts
 
-    let credentialManager: CredentialManager = new CredentialManager();
-    let ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
+    const credentialManager: CredentialManager = new CredentialManager();
+    const ctx: TeamServerContext = Mocks.TeamServerContext(TestSettings.RemoteRepositoryUrl);
 
     before(function() {
         //
@@ -50,10 +50,10 @@ describe("CredentialManager-Integration", function() {
 
     it("should verify store, get, remove credentials for Team Foundation Server", async function() {
         try {
-            let ctx: TeamServerContext = Mocks.TeamServerContext("http://java-tfs2015:8081/tfs/DefaultCollection/_git/GitJava");
-            let account: string = "java-tfs2015:8081";
-            let username: string = "domain\\user";
-            let password: string = "password";
+            const ctx: TeamServerContext = Mocks.TeamServerContext("http://java-tfs2015:8081/tfs/DefaultCollection/_git/GitJava");
+            const account: string = "java-tfs2015:8081";
+            const username: string = "domain\\user";
+            const password: string = "password";
 
             await credentialManager.StoreCredentials(account, username, password);
             let credInfo: CredentialInfo = await credentialManager.GetCredentials(ctx);

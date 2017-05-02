@@ -14,11 +14,11 @@ import { CredentialInfo } from "../../../src/info/credentialinfo";
 import { RepositoryInfo } from "../../../src/info/repositoryinfo";
 
 describe("Tfvc-CheckinCommand", function() {
-    let serverUrl: string = "http://server:8080/tfs";
-    let repoUrl: string = "http://server:8080/tfs/collection1/_git/repo1";
-    let collectionUrl: string = "http://server:8080/tfs/collection1";
-    let user: string = "user1";
-    let pass: string = "pass1";
+    const serverUrl: string = "http://server:8080/tfs";
+    const repoUrl: string = "http://server:8080/tfs/collection1/_git/repo1";
+    const collectionUrl: string = "http://server:8080/tfs/collection1";
+    const user: string = "user1";
+    const pass: string = "pass1";
     let context: TeamServerContext;
 
     beforeEach(function() {
@@ -42,12 +42,12 @@ describe("Tfvc-CheckinCommand", function() {
     });
 
     it("should verify constructor", function() {
-        let files: string[] = ["/path/to/workspace/file.txt"];
+        const files: string[] = ["/path/to/workspace/file.txt"];
         new Checkin(undefined, files);
     });
 
     it("should verify constructor with context", function() {
-        let files: string[] = ["/path/to/workspace/file.txt"];
+        const files: string[] = ["/path/to/workspace/file.txt"];
         new Checkin(context, files);
     });
 
@@ -56,106 +56,106 @@ describe("Tfvc-CheckinCommand", function() {
     });
 
     it("should verify GetOptions", function() {
-        let files: string[] = ["/path/to/workspace/file.txt"];
-        let cmd: Checkin = new Checkin(undefined, files);
+        const files: string[] = ["/path/to/workspace/file.txt"];
+        const cmd: Checkin = new Checkin(undefined, files);
         assert.deepEqual(cmd.GetOptions(), {});
     });
 
     it("should verify GetExeOptions", function() {
-        let files: string[] = ["/path/to/workspace/file.txt"];
-        let cmd: Checkin = new Checkin(undefined, files);
+        const files: string[] = ["/path/to/workspace/file.txt"];
+        const cmd: Checkin = new Checkin(undefined, files);
         assert.deepEqual(cmd.GetExeOptions(), {});
     });
 
     it("should verify arguments", function() {
-        let files: string[] = ["/path/to/workspace/file.txt"];
-        let cmd: Checkin = new Checkin(undefined, files);
+        const files: string[] = ["/path/to/workspace/file.txt"];
+        const cmd: Checkin = new Checkin(undefined, files);
 
         assert.equal(cmd.GetArguments().GetArgumentsForDisplay(), "checkin -noprompt " + files[0]);
     });
 
     it("should verify Exe arguments", function() {
-        let files: string[] = ["/path/to/workspace/file.txt"];
-        let cmd: Checkin = new Checkin(undefined, files);
+        const files: string[] = ["/path/to/workspace/file.txt"];
+        const cmd: Checkin = new Checkin(undefined, files);
 
         assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "checkin -noprompt " + files[0]);
     });
 
     it("should verify arguments with context", function() {
-        let files: string[] = ["/path/to/workspace/file.txt"];
-        let cmd: Checkin = new Checkin(context, files);
+        const files: string[] = ["/path/to/workspace/file.txt"];
+        const cmd: Checkin = new Checkin(context, files);
 
         assert.equal(cmd.GetArguments().GetArgumentsForDisplay(), "checkin -noprompt -collection:" + collectionUrl + " ******** " + files[0]);
     });
 
     it("should verify Exe arguments with context", function() {
-        let files: string[] = ["/path/to/workspace/file.txt"];
-        let cmd: Checkin = new Checkin(context, files);
+        const files: string[] = ["/path/to/workspace/file.txt"];
+        const cmd: Checkin = new Checkin(context, files);
 
         assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "checkin -noprompt ******** " + files[0]);
     });
 
     it("should verify arguments with workitems", function() {
-        let files: string[] = ["/path/to/workspace/file.txt"];
-        let cmd: Checkin = new Checkin(context, files, undefined, [1, 2, 3]);
+        const files: string[] = ["/path/to/workspace/file.txt"];
+        const cmd: Checkin = new Checkin(context, files, undefined, [1, 2, 3]);
 
         assert.equal(cmd.GetArguments().GetArgumentsForDisplay(), "checkin -noprompt -collection:" + collectionUrl + " ******** " + files[0] + " -associate:1,2,3");
     });
 
     it("should verify Exe arguments with workitems", function() {
-        let files: string[] = ["/path/to/workspace/file.txt"];
-        let cmd: Checkin = new Checkin(context, files, undefined, [1, 2, 3]);
+        const files: string[] = ["/path/to/workspace/file.txt"];
+        const cmd: Checkin = new Checkin(context, files, undefined, [1, 2, 3]);
 
         //Note that no associate option should be here (tf.exe doesn't support it)
         assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "checkin -noprompt ******** " + files[0]);
     });
 
     it("should verify arguments with comment", function() {
-        let files: string[] = ["/path/to/workspace/file.txt"];
-        let cmd: Checkin = new Checkin(context, files, "a comment\nthat has\r\nmultiple lines");
+        const files: string[] = ["/path/to/workspace/file.txt"];
+        const cmd: Checkin = new Checkin(context, files, "a comment\nthat has\r\nmultiple lines");
 
         assert.equal(cmd.GetArguments().GetArgumentsForDisplay(), "checkin -noprompt -collection:" + collectionUrl + " ******** " + files[0] + " -comment:a comment that has multiple lines");
     });
 
     it("should verify Exe arguments with comment", function() {
-        let files: string[] = ["/path/to/workspace/file.txt"];
-        let cmd: Checkin = new Checkin(context, files, "a comment\nthat has\r\nmultiple lines");
+        const files: string[] = ["/path/to/workspace/file.txt"];
+        const cmd: Checkin = new Checkin(context, files, "a comment\nthat has\r\nmultiple lines");
 
         assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "checkin -noprompt ******** " + files[0] + " -comment:a comment that has multiple lines");
     });
 
     it("should verify arguments with all params", function() {
-        let files: string[] = ["/path/to/workspace/file.txt"];
-        let cmd: Checkin = new Checkin(context, files, "a comment", [1, 2, 3]);
+        const files: string[] = ["/path/to/workspace/file.txt"];
+        const cmd: Checkin = new Checkin(context, files, "a comment", [1, 2, 3]);
 
         assert.equal(cmd.GetArguments().GetArgumentsForDisplay(), "checkin -noprompt -collection:" + collectionUrl + " ******** " + files[0] + " -comment:a comment -associate:1,2,3");
     });
 
     it("should verify Exe arguments with all params", function() {
-        let files: string[] = ["/path/to/workspace/file.txt"];
-        let cmd: Checkin = new Checkin(context, files, "a comment", [1, 2, 3]);
+        const files: string[] = ["/path/to/workspace/file.txt"];
+        const cmd: Checkin = new Checkin(context, files, "a comment", [1, 2, 3]);
 
         //Note that no associate option should be here (tf.exe doesn't support it)
         assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "checkin -noprompt ******** " + files[0] + " -comment:a comment");
     });
 
     it("should verify parse output - no output", async function() {
-        let files: string[] = ["/path/to/workspace/file.txt"];
-        let cmd: Checkin = new Checkin(undefined, files);
-        let executionResult: IExecutionResult = {
+        const files: string[] = ["/path/to/workspace/file.txt"];
+        const cmd: Checkin = new Checkin(undefined, files);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: undefined,
             stderr: undefined
         };
 
-        let result: string = await cmd.ParseOutput(executionResult);
+        const result: string = await cmd.ParseOutput(executionResult);
         assert.equal(result, "");
     });
 
     it("should verify parse output - no errors", async function() {
-        let files: string[] = ["/path/to/workspace/file.txt"];
-        let cmd: Checkin = new Checkin(undefined, files);
-        let executionResult: IExecutionResult = {
+        const files: string[] = ["/path/to/workspace/file.txt"];
+        const cmd: Checkin = new Checkin(undefined, files);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: "/Users/leantk/tfvc-tfs/tfsTest_01/addFold:\n" +
                     "Checking in edit: testHere.txt\n" +
@@ -168,14 +168,14 @@ describe("Tfvc-CheckinCommand", function() {
             stderr: undefined
         };
 
-        let result: string = await cmd.ParseOutput(executionResult);
+        const result: string = await cmd.ParseOutput(executionResult);
         assert.equal(result, "23");
     });
 
     it("should verify parse output - with error", async function() {
-        let files: string[] = ["/path/to/workspace/file.txt"];
-        let cmd: Checkin = new Checkin(undefined, files);
-        let executionResult: IExecutionResult = {
+        const files: string[] = ["/path/to/workspace/file.txt"];
+        const cmd: Checkin = new Checkin(undefined, files);
+        const executionResult: IExecutionResult = {
             exitCode: 100,
             stdout: "/Users/leantk/tfvc-tfs/tfsTest_01:\n" +
                     "Checking in edit: test3.txt\n" +
@@ -196,22 +196,22 @@ describe("Tfvc-CheckinCommand", function() {
 //
 //
     it("should verify parse Exe output - no output", async function() {
-        let files: string[] = ["/path/to/workspace/file.txt"];
-        let cmd: Checkin = new Checkin(undefined, files);
-        let executionResult: IExecutionResult = {
+        const files: string[] = ["/path/to/workspace/file.txt"];
+        const cmd: Checkin = new Checkin(undefined, files);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: undefined,
             stderr: undefined
         };
 
-        let result: string = await cmd.ParseExeOutput(executionResult);
+        const result: string = await cmd.ParseExeOutput(executionResult);
         assert.equal(result, "");
     });
 
     it("should verify parse Exe output - no errors", async function() {
-        let files: string[] = ["/path/to/workspace/file.txt"];
-        let cmd: Checkin = new Checkin(undefined, files);
-        let executionResult: IExecutionResult = {
+        const files: string[] = ["/path/to/workspace/file.txt"];
+        const cmd: Checkin = new Checkin(undefined, files);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: "/Users/leantk/tfvc-tfs/tfsTest_01/addFold:\n" +
                     "Checking in edit: testHere.txt\n" +
@@ -224,14 +224,14 @@ describe("Tfvc-CheckinCommand", function() {
             stderr: undefined
         };
 
-        let result: string = await cmd.ParseExeOutput(executionResult);
+        const result: string = await cmd.ParseExeOutput(executionResult);
         assert.equal(result, "23");
     });
 
     it("should verify parse Exe output - with error", async function() {
-        let files: string[] = ["/path/to/workspace/file.txt"];
-        let cmd: Checkin = new Checkin(undefined, files);
-        let executionResult: IExecutionResult = {
+        const files: string[] = ["/path/to/workspace/file.txt"];
+        const cmd: Checkin = new Checkin(undefined, files);
+        const executionResult: IExecutionResult = {
             exitCode: 100,
             stdout: "/Users/leantk/tfvc-tfs/tfsTest_01:\n" +
                     "Checking in edit: test3.txt\n" +

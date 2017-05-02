@@ -15,11 +15,11 @@ import { CredentialInfo } from "../../../src/info/credentialinfo";
 import { RepositoryInfo } from "../../../src/info/repositoryinfo";
 
 describe("Tfvc-SyncCommand", function() {
-    let serverUrl: string = "http://server:8080/tfs";
-    let repoUrl: string = "http://server:8080/tfs/collection1/_git/repo1";
-    let collectionUrl: string = "http://server:8080/tfs/collection1";
-    let user: string = "user1";
-    let pass: string = "pass1";
+    const serverUrl: string = "http://server:8080/tfs";
+    const repoUrl: string = "http://server:8080/tfs/collection1/_git/repo1";
+    const collectionUrl: string = "http://server:8080/tfs/collection1";
+    const user: string = "user1";
+    const pass: string = "pass1";
     let context: TeamServerContext;
 
     beforeEach(function() {
@@ -43,12 +43,12 @@ describe("Tfvc-SyncCommand", function() {
     });
 
     it("should verify constructor", function() {
-        let localPaths: string[] = ["/usr/alias/repo1"];
+        const localPaths: string[] = ["/usr/alias/repo1"];
         new Sync(undefined, localPaths, true);
     });
 
     it("should verify constructor with context", function() {
-        let localPaths: string[] = ["/usr/alias/repo1"];
+        const localPaths: string[] = ["/usr/alias/repo1"];
         new Sync(context, localPaths, true);
     });
 
@@ -57,100 +57,100 @@ describe("Tfvc-SyncCommand", function() {
     });
 
     it("should verify GetOptions", function() {
-        let localPaths: string[] = ["/usr/alias/repo1"];
-        let cmd: Sync = new Sync(undefined, localPaths, false);
+        const localPaths: string[] = ["/usr/alias/repo1"];
+        const cmd: Sync = new Sync(undefined, localPaths, false);
         assert.deepEqual(cmd.GetOptions(), {});
     });
 
     it("should verify GetExeOptions", function() {
-        let localPaths: string[] = ["/usr/alias/repo1"];
-        let cmd: Sync = new Sync(undefined, localPaths, false);
+        const localPaths: string[] = ["/usr/alias/repo1"];
+        const cmd: Sync = new Sync(undefined, localPaths, false);
         assert.deepEqual(cmd.GetExeOptions(), {});
     });
 
     it("should verify arguments", function() {
-        let localPaths: string[] = ["/usr/alias/repo1"];
-        let cmd: Sync = new Sync(undefined, localPaths, false);
+        const localPaths: string[] = ["/usr/alias/repo1"];
+        const cmd: Sync = new Sync(undefined, localPaths, false);
 
         assert.equal(cmd.GetArguments().GetArgumentsForDisplay(), "get -noprompt -nosummary " + localPaths[0]);
     });
 
     it("should verify arguments with context", function() {
-        let localPaths: string[] = ["/usr/alias/repo1"];
-        let cmd: Sync = new Sync(context, localPaths, false);
+        const localPaths: string[] = ["/usr/alias/repo1"];
+        const cmd: Sync = new Sync(context, localPaths, false);
 
         assert.equal(cmd.GetArguments().GetArgumentsForDisplay(), "get -noprompt -collection:" + collectionUrl + " ******** -nosummary " + localPaths[0]);
     });
 
     it("should verify arguments with context and recursive", function() {
-        let localPaths: string[] = ["/usr/alias/repo1"];
-        let cmd: Sync = new Sync(context, localPaths, true);
+        const localPaths: string[] = ["/usr/alias/repo1"];
+        const cmd: Sync = new Sync(context, localPaths, true);
 
         assert.equal(cmd.GetArguments().GetArgumentsForDisplay(), "get -noprompt -collection:" + collectionUrl + " ******** -nosummary " + localPaths[0] + " -recursive");
     });
 
     it("should verify getExeArguments", function() {
-        let localPaths: string[] = ["/usr/alias/repo1"];
-        let cmd: Sync = new Sync(undefined, localPaths, false);
+        const localPaths: string[] = ["/usr/alias/repo1"];
+        const cmd: Sync = new Sync(undefined, localPaths, false);
 
         assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "get -noprompt -nosummary " + localPaths[0]);
     });
 
     it("should verify getExeArguments with context", function() {
-        let localPaths: string[] = ["/usr/alias/repo1"];
-        let cmd: Sync = new Sync(context, localPaths, false);
+        const localPaths: string[] = ["/usr/alias/repo1"];
+        const cmd: Sync = new Sync(context, localPaths, false);
 
         assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "get -noprompt ******** -nosummary " + localPaths[0]);
     });
 
     it("should verify getExeArguments with context and recursive", function() {
-        let localPaths: string[] = ["/usr/alias/repo1"];
-        let cmd: Sync = new Sync(context, localPaths, true);
+        const localPaths: string[] = ["/usr/alias/repo1"];
+        const cmd: Sync = new Sync(context, localPaths, true);
 
         assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "get -noprompt ******** -nosummary " + localPaths[0] + " -recursive");
     });
 
     it("should verify parse output - no output", async function() {
-        let localPaths: string[] = ["/usr/alias/repo1"];
-        let cmd: Sync = new Sync(undefined, localPaths, true);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/usr/alias/repo1"];
+        const cmd: Sync = new Sync(undefined, localPaths, true);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: undefined,
             stderr: undefined
         };
 
-        let results: ISyncResults = await cmd.ParseOutput(executionResult);
+        const results: ISyncResults = await cmd.ParseOutput(executionResult);
         assert.equal(results.itemResults.length, 0);
         assert.equal(results.hasConflicts, false);
         assert.equal(results.hasErrors, false);
     });
 
     it("should verify parse output - up to date", async function() {
-        let localPaths: string[] = ["/usr/alias/repo1"];
-        let cmd: Sync = new Sync(undefined, localPaths, true);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/usr/alias/repo1"];
+        const cmd: Sync = new Sync(undefined, localPaths, true);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: "All files up to date.",
             stderr: undefined
         };
 
-        let results: ISyncResults = await cmd.ParseOutput(executionResult);
+        const results: ISyncResults = await cmd.ParseOutput(executionResult);
         assert.equal(results.itemResults.length, 0);
         assert.equal(results.hasConflicts, false);
         assert.equal(results.hasErrors, false);
     });
 
     it("should verify parse output - single file edit - no errors", async function() {
-        let localPaths: string[] = ["/usr/alias/repo1"];
-        let cmd: Sync = new Sync(undefined, localPaths, true);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/usr/alias/repo1"];
+        const cmd: Sync = new Sync(undefined, localPaths, true);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: "/usr/alias/repo1/test:\n" +
                     "Replacing test1.txt\n",
             stderr: undefined
         };
 
-        let results: ISyncResults = await cmd.ParseOutput(executionResult);
+        const results: ISyncResults = await cmd.ParseOutput(executionResult);
         assert.equal(results.itemResults.length, 1);
         assert.equal(results.hasConflicts, false);
         assert.equal(results.hasErrors, false);
@@ -159,16 +159,16 @@ describe("Tfvc-SyncCommand", function() {
     });
 
     it("should verify parse output - single file add - no errors", async function() {
-        let localPaths: string[] = ["/usr/alias/repo1"];
-        let cmd: Sync = new Sync(undefined, localPaths, true);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/usr/alias/repo1"];
+        const cmd: Sync = new Sync(undefined, localPaths, true);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: "/usr/alias/repo1/test:\n" +
                     "Getting test1.txt\n",
             stderr: undefined
         };
 
-        let results: ISyncResults = await cmd.ParseOutput(executionResult);
+        const results: ISyncResults = await cmd.ParseOutput(executionResult);
         assert.equal(results.itemResults.length, 1);
         assert.equal(results.hasConflicts, false);
         assert.equal(results.hasErrors, false);
@@ -177,16 +177,16 @@ describe("Tfvc-SyncCommand", function() {
     });
 
     it("should verify parse output - single file add - spaces - no errors", async function() {
-        let localPaths: string[] = ["/usr/alias/repo 1"];
-        let cmd: Sync = new Sync(undefined, localPaths, true);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/usr/alias/repo 1"];
+        const cmd: Sync = new Sync(undefined, localPaths, true);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: "/usr/alias/repo 1/test:\n" +
                     "Getting test 1.txt\n",
             stderr: undefined
         };
 
-        let results: ISyncResults = await cmd.ParseOutput(executionResult);
+        const results: ISyncResults = await cmd.ParseOutput(executionResult);
         assert.equal(results.itemResults.length, 1);
         assert.equal(results.hasConflicts, false);
         assert.equal(results.hasErrors, false);
@@ -195,9 +195,9 @@ describe("Tfvc-SyncCommand", function() {
     });
 
     it("should verify parse output - multiple files - with conflict", async function() {
-        let localPaths: string[] = ["/usr/alias/repo1"];
-        let cmd: Sync = new Sync(undefined, localPaths, true);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/usr/alias/repo1"];
+        const cmd: Sync = new Sync(undefined, localPaths, true);
+        const executionResult: IExecutionResult = {
             exitCode: 1,
             stdout: "/usr/alias/repo1:\n" +
                     "Getting addFold\n" +
@@ -218,7 +218,7 @@ describe("Tfvc-SyncCommand", function() {
             stderr: "Conflict test_renamed.txt - Unable to perform the get operation because you have a conflicting rename, edit\n"
         };
 
-        let results: ISyncResults = await cmd.ParseOutput(executionResult);
+        const results: ISyncResults = await cmd.ParseOutput(executionResult);
         assert.equal(results.itemResults.length, 9);
         assert.equal(results.hasConflicts, true);
         assert.equal(results.hasErrors, false);
@@ -245,9 +245,9 @@ describe("Tfvc-SyncCommand", function() {
     });
 
     it("should verify parse output - errors - exit code 1", async function() {
-        let localPaths: string[] = ["/usr/alias/repo1"];
-        let cmd: Sync = new Sync(undefined, localPaths, true);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/usr/alias/repo1"];
+        const cmd: Sync = new Sync(undefined, localPaths, true);
+        const executionResult: IExecutionResult = {
             exitCode: 1,
             stdout: "/usr/alias/repo1:\n",
             stderr: "Conflict new.txt - Unable to perform the get operation because you have a conflicting edit\n" +
@@ -255,7 +255,7 @@ describe("Tfvc-SyncCommand", function() {
                     "Warning new111.txt - Unable to perform the get operation because it is writable"
         };
 
-        let results: ISyncResults = await cmd.ParseOutput(executionResult);
+        const results: ISyncResults = await cmd.ParseOutput(executionResult);
         assert.equal(results.itemResults.length, 3);
         assert.equal(results.hasConflicts, true);
         assert.equal(results.hasErrors, true);
@@ -271,9 +271,9 @@ describe("Tfvc-SyncCommand", function() {
     });
 
     it("should verify parse output - errors - no conflicts", async function() {
-        let localPaths: string[] = ["/usr/alias/repo1"];
-        let cmd: Sync = new Sync(undefined, localPaths, true);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/usr/alias/repo1"];
+        const cmd: Sync = new Sync(undefined, localPaths, true);
+        const executionResult: IExecutionResult = {
             exitCode: 1,
             stdout: "/usr/alias/repo1:\n",
             stderr: "new4.txt - Unable to perform the get operation because you have a conflicting rename (to be moved from /path/new5.txt)\n" +
@@ -281,7 +281,7 @@ describe("Tfvc-SyncCommand", function() {
                     "/usr/alias/repo1/folder cannot be deleted because it is not empty"
         };
 
-        let results: ISyncResults = await cmd.ParseOutput(executionResult);
+        const results: ISyncResults = await cmd.ParseOutput(executionResult);
         assert.equal(results.itemResults.length, 3);
         assert.equal(results.hasConflicts, false);
         assert.equal(results.hasErrors, true);
@@ -297,9 +297,9 @@ describe("Tfvc-SyncCommand", function() {
     });
 
     it("should verify parse output - errors - exit code 100", async function() {
-        let localPaths: string[] = ["/usr/alias/repo 1"];
-        let cmd: Sync = new Sync(undefined, localPaths, true);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/usr/alias/repo 1"];
+        const cmd: Sync = new Sync(undefined, localPaths, true);
+        const executionResult: IExecutionResult = {
             exitCode: 100,
             stdout: "Something bad this way comes.",
             stderr: undefined
@@ -320,46 +320,46 @@ describe("Tfvc-SyncCommand", function() {
      ***********************************************************************************************/
 
     it("should verify parse EXE output - no output", async function() {
-        let localPaths: string[] = ["/usr/alias/repo1"];
-        let cmd: Sync = new Sync(undefined, localPaths, true);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/usr/alias/repo1"];
+        const cmd: Sync = new Sync(undefined, localPaths, true);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: undefined,
             stderr: undefined
         };
 
-        let results: ISyncResults = await cmd.ParseExeOutput(executionResult);
+        const results: ISyncResults = await cmd.ParseExeOutput(executionResult);
         assert.equal(results.itemResults.length, 0);
         assert.equal(results.hasConflicts, false);
         assert.equal(results.hasErrors, false);
     });
 
     it("should verify parse EXE output - up to date", async function() {
-        let localPaths: string[] = ["/usr/alias/repo1"];
-        let cmd: Sync = new Sync(undefined, localPaths, true);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/usr/alias/repo1"];
+        const cmd: Sync = new Sync(undefined, localPaths, true);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: "All files are up to date.",
             stderr: undefined
         };
 
-        let results: ISyncResults = await cmd.ParseExeOutput(executionResult);
+        const results: ISyncResults = await cmd.ParseExeOutput(executionResult);
         assert.equal(results.itemResults.length, 0);
         assert.equal(results.hasConflicts, false);
         assert.equal(results.hasErrors, false);
     });
 
     it("should verify parse EXE output - single file edit - no errors", async function() {
-        let localPaths: string[] = ["/usr/alias/repo1"];
-        let cmd: Sync = new Sync(undefined, localPaths, true);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/usr/alias/repo1"];
+        const cmd: Sync = new Sync(undefined, localPaths, true);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: "/usr/alias/repo1/test:\n" +
                     "Replacing test1.txt\n",
             stderr: undefined
         };
 
-        let results: ISyncResults = await cmd.ParseExeOutput(executionResult);
+        const results: ISyncResults = await cmd.ParseExeOutput(executionResult);
         assert.equal(results.itemResults.length, 1);
         assert.equal(results.hasConflicts, false);
         assert.equal(results.hasErrors, false);
@@ -368,16 +368,16 @@ describe("Tfvc-SyncCommand", function() {
     });
 
     it("should verify parse EXE output - single file add - no errors", async function() {
-        let localPaths: string[] = ["/usr/alias/repo1"];
-        let cmd: Sync = new Sync(undefined, localPaths, true);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/usr/alias/repo1"];
+        const cmd: Sync = new Sync(undefined, localPaths, true);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: "/usr/alias/repo1/test:\n" +
                     "Getting test1.txt\n",
             stderr: undefined
         };
 
-        let results: ISyncResults = await cmd.ParseExeOutput(executionResult);
+        const results: ISyncResults = await cmd.ParseExeOutput(executionResult);
         assert.equal(results.itemResults.length, 1);
         assert.equal(results.hasConflicts, false);
         assert.equal(results.hasErrors, false);
@@ -386,16 +386,16 @@ describe("Tfvc-SyncCommand", function() {
     });
 
     it("should verify parse EXE output - single file add - spaces - no errors", async function() {
-        let localPaths: string[] = ["/usr/alias/repo 1"];
-        let cmd: Sync = new Sync(undefined, localPaths, true);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/usr/alias/repo 1"];
+        const cmd: Sync = new Sync(undefined, localPaths, true);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: "/usr/alias/repo 1/test:\n" +
                     "Getting test 1.txt\n",
             stderr: undefined
         };
 
-        let results: ISyncResults = await cmd.ParseExeOutput(executionResult);
+        const results: ISyncResults = await cmd.ParseExeOutput(executionResult);
         assert.equal(results.itemResults.length, 1);
         assert.equal(results.hasConflicts, false);
         assert.equal(results.hasErrors, false);
@@ -404,9 +404,9 @@ describe("Tfvc-SyncCommand", function() {
     });
 
     it("should verify parse EXE output - multiple files - with conflict", async function() {
-        let localPaths: string[] = ["/usr/alias/repo1"];
-        let cmd: Sync = new Sync(undefined, localPaths, true);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/usr/alias/repo1"];
+        const cmd: Sync = new Sync(undefined, localPaths, true);
+        const executionResult: IExecutionResult = {
             exitCode: 1,
             stdout: "/usr/alias/repo1:\n" +
                     "Getting addFold\n" +
@@ -427,7 +427,7 @@ describe("Tfvc-SyncCommand", function() {
             stderr: "Conflict test_renamed.txt - Unable to perform the get operation because you have a conflicting rename, edit\n"
         };
 
-        let results: ISyncResults = await cmd.ParseExeOutput(executionResult);
+        const results: ISyncResults = await cmd.ParseExeOutput(executionResult);
         assert.equal(results.itemResults.length, 9);
         assert.equal(results.hasConflicts, true);
         assert.equal(results.hasErrors, false);
@@ -454,9 +454,9 @@ describe("Tfvc-SyncCommand", function() {
     });
 
     it("should verify parse EXE output - errors - exit code 1", async function() {
-        let localPaths: string[] = ["/usr/alias/repo1"];
-        let cmd: Sync = new Sync(undefined, localPaths, true);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/usr/alias/repo1"];
+        const cmd: Sync = new Sync(undefined, localPaths, true);
+        const executionResult: IExecutionResult = {
             exitCode: 1,
             stdout: "/usr/alias/repo1:\n",
             stderr: "Conflict new.txt - Unable to perform the get operation because you have a conflicting edit\n" +
@@ -464,7 +464,7 @@ describe("Tfvc-SyncCommand", function() {
                     "Warning new111.txt - Unable to perform the get operation because it is writable"
         };
 
-        let results: ISyncResults = await cmd.ParseExeOutput(executionResult);
+        const results: ISyncResults = await cmd.ParseExeOutput(executionResult);
         assert.equal(results.itemResults.length, 3);
         assert.equal(results.hasConflicts, true);
         assert.equal(results.hasErrors, true);
@@ -480,9 +480,9 @@ describe("Tfvc-SyncCommand", function() {
     });
 
     it("should verify parse EXE output - errors - no conflicts", async function() {
-        let localPaths: string[] = ["/usr/alias/repo1"];
-        let cmd: Sync = new Sync(undefined, localPaths, true);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/usr/alias/repo1"];
+        const cmd: Sync = new Sync(undefined, localPaths, true);
+        const executionResult: IExecutionResult = {
             exitCode: 1,
             stdout: "/usr/alias/repo1:\n",
             stderr: "new4.txt - Unable to perform the get operation because you have a conflicting rename (to be moved from /path/new5.txt)\n" +
@@ -490,7 +490,7 @@ describe("Tfvc-SyncCommand", function() {
                     "/usr/alias/repo1/folder cannot be deleted because it is not empty"
         };
 
-        let results: ISyncResults = await cmd.ParseExeOutput(executionResult);
+        const results: ISyncResults = await cmd.ParseExeOutput(executionResult);
         assert.equal(results.itemResults.length, 3);
         assert.equal(results.hasConflicts, false);
         assert.equal(results.hasErrors, true);
@@ -506,9 +506,9 @@ describe("Tfvc-SyncCommand", function() {
     });
 
     it("should verify parse EXE output - errors - exit code 100", async function() {
-        let localPaths: string[] = ["/usr/alias/repo 1"];
-        let cmd: Sync = new Sync(undefined, localPaths, true);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/usr/alias/repo 1"];
+        const cmd: Sync = new Sync(undefined, localPaths, true);
+        const executionResult: IExecutionResult = {
             exitCode: 100,
             stdout: "Something bad this way comes.",
             stderr: undefined
@@ -529,46 +529,46 @@ describe("Tfvc-SyncCommand", function() {
      ***********************************************************************************************/
 
     it("should verify parse EXE output - no output", async function() {
-        let localPaths: string[] = ["/usr/alias/repo1"];
-        let cmd: Sync = new Sync(undefined, localPaths, true);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/usr/alias/repo1"];
+        const cmd: Sync = new Sync(undefined, localPaths, true);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: undefined,
             stderr: undefined
         };
 
-        let results: ISyncResults = await cmd.ParseExeOutput(executionResult);
+        const results: ISyncResults = await cmd.ParseExeOutput(executionResult);
         assert.equal(results.itemResults.length, 0);
         assert.equal(results.hasConflicts, false);
         assert.equal(results.hasErrors, false);
     });
 
     it("should verify parse EXE output - up to date", async function() {
-        let localPaths: string[] = ["/usr/alias/repo1"];
-        let cmd: Sync = new Sync(undefined, localPaths, true);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/usr/alias/repo1"];
+        const cmd: Sync = new Sync(undefined, localPaths, true);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: "All files are up to date.",
             stderr: undefined
         };
 
-        let results: ISyncResults = await cmd.ParseExeOutput(executionResult);
+        const results: ISyncResults = await cmd.ParseExeOutput(executionResult);
         assert.equal(results.itemResults.length, 0);
         assert.equal(results.hasConflicts, false);
         assert.equal(results.hasErrors, false);
     });
 
     it("should verify parse EXE output - single file edit - no errors", async function() {
-        let localPaths: string[] = ["/usr/alias/repo1"];
-        let cmd: Sync = new Sync(undefined, localPaths, true);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/usr/alias/repo1"];
+        const cmd: Sync = new Sync(undefined, localPaths, true);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: "/usr/alias/repo1/test:\n" +
                     "Replacing test1.txt\n",
             stderr: undefined
         };
 
-        let results: ISyncResults = await cmd.ParseExeOutput(executionResult);
+        const results: ISyncResults = await cmd.ParseExeOutput(executionResult);
         assert.equal(results.itemResults.length, 1);
         assert.equal(results.hasConflicts, false);
         assert.equal(results.hasErrors, false);
@@ -577,16 +577,16 @@ describe("Tfvc-SyncCommand", function() {
     });
 
     it("should verify parse EXE output - single file add - no errors", async function() {
-        let localPaths: string[] = ["/usr/alias/repo1"];
-        let cmd: Sync = new Sync(undefined, localPaths, true);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/usr/alias/repo1"];
+        const cmd: Sync = new Sync(undefined, localPaths, true);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: "/usr/alias/repo1/test:\n" +
                     "Getting test1.txt\n",
             stderr: undefined
         };
 
-        let results: ISyncResults = await cmd.ParseExeOutput(executionResult);
+        const results: ISyncResults = await cmd.ParseExeOutput(executionResult);
         assert.equal(results.itemResults.length, 1);
         assert.equal(results.hasConflicts, false);
         assert.equal(results.hasErrors, false);
@@ -595,16 +595,16 @@ describe("Tfvc-SyncCommand", function() {
     });
 
     it("should verify parse EXE output - single file add - spaces - no errors", async function() {
-        let localPaths: string[] = ["/usr/alias/repo 1"];
-        let cmd: Sync = new Sync(undefined, localPaths, true);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/usr/alias/repo 1"];
+        const cmd: Sync = new Sync(undefined, localPaths, true);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: "/usr/alias/repo 1/test:\n" +
                     "Getting test 1.txt\n",
             stderr: undefined
         };
 
-        let results: ISyncResults = await cmd.ParseExeOutput(executionResult);
+        const results: ISyncResults = await cmd.ParseExeOutput(executionResult);
         assert.equal(results.itemResults.length, 1);
         assert.equal(results.hasConflicts, false);
         assert.equal(results.hasErrors, false);
@@ -613,9 +613,9 @@ describe("Tfvc-SyncCommand", function() {
     });
 
     it("should verify parse EXE output - multiple files - with conflict", async function() {
-        let localPaths: string[] = ["/usr/alias/repo1"];
-        let cmd: Sync = new Sync(undefined, localPaths, true);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/usr/alias/repo1"];
+        const cmd: Sync = new Sync(undefined, localPaths, true);
+        const executionResult: IExecutionResult = {
             exitCode: 1,
             stdout: "/usr/alias/repo1:\n" +
                     "Getting addFold\n" +
@@ -636,7 +636,7 @@ describe("Tfvc-SyncCommand", function() {
             stderr: "Conflict test_renamed.txt - Unable to perform the get operation because you have a conflicting rename, edit\n"
         };
 
-        let results: ISyncResults = await cmd.ParseExeOutput(executionResult);
+        const results: ISyncResults = await cmd.ParseExeOutput(executionResult);
         assert.equal(results.itemResults.length, 9);
         assert.equal(results.hasConflicts, true);
         assert.equal(results.hasErrors, false);
@@ -663,9 +663,9 @@ describe("Tfvc-SyncCommand", function() {
     });
 
     it("should verify parse EXE output - errors - exit code 1", async function() {
-        let localPaths: string[] = ["/usr/alias/repo1"];
-        let cmd: Sync = new Sync(undefined, localPaths, true);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/usr/alias/repo1"];
+        const cmd: Sync = new Sync(undefined, localPaths, true);
+        const executionResult: IExecutionResult = {
             exitCode: 1,
             stdout: "/usr/alias/repo1:\n",
             stderr: "Conflict new.txt - Unable to perform the get operation because you have a conflicting edit\n" +
@@ -673,7 +673,7 @@ describe("Tfvc-SyncCommand", function() {
                     "Warning new111.txt - Unable to perform the get operation because it is writable"
         };
 
-        let results: ISyncResults = await cmd.ParseExeOutput(executionResult);
+        const results: ISyncResults = await cmd.ParseExeOutput(executionResult);
         assert.equal(results.itemResults.length, 3);
         assert.equal(results.hasConflicts, true);
         assert.equal(results.hasErrors, true);
@@ -689,9 +689,9 @@ describe("Tfvc-SyncCommand", function() {
     });
 
     it("should verify parse EXE output - errors - no conflicts", async function() {
-        let localPaths: string[] = ["/usr/alias/repo1"];
-        let cmd: Sync = new Sync(undefined, localPaths, true);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/usr/alias/repo1"];
+        const cmd: Sync = new Sync(undefined, localPaths, true);
+        const executionResult: IExecutionResult = {
             exitCode: 1,
             stdout: "/usr/alias/repo1:\n",
             stderr: "new4.txt - Unable to perform the get operation because you have a conflicting rename (to be moved from /path/new5.txt)\n" +
@@ -699,7 +699,7 @@ describe("Tfvc-SyncCommand", function() {
                     "/usr/alias/repo1/folder cannot be deleted because it is not empty"
         };
 
-        let results: ISyncResults = await cmd.ParseExeOutput(executionResult);
+        const results: ISyncResults = await cmd.ParseExeOutput(executionResult);
         assert.equal(results.itemResults.length, 3);
         assert.equal(results.hasConflicts, false);
         assert.equal(results.hasErrors, true);
@@ -715,9 +715,9 @@ describe("Tfvc-SyncCommand", function() {
     });
 
     it("should verify parse EXE output - errors - exit code 100", async function() {
-        let localPaths: string[] = ["/usr/alias/repo 1"];
-        let cmd: Sync = new Sync(undefined, localPaths, true);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/usr/alias/repo 1"];
+        const cmd: Sync = new Sync(undefined, localPaths, true);
+        const executionResult: IExecutionResult = {
             exitCode: 100,
             stdout: "Something bad this way comes.",
             stderr: undefined

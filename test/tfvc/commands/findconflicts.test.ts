@@ -15,11 +15,11 @@ import { CredentialInfo } from "../../../src/info/credentialinfo";
 import { RepositoryInfo } from "../../../src/info/repositoryinfo";
 
 describe("Tfvc-FindConflictsCommand", function() {
-    let serverUrl: string = "http://server:8080/tfs";
-    let repoUrl: string = "http://server:8080/tfs/collection1/_git/repo1";
-    let collectionUrl: string = "http://server:8080/tfs/collection1";
-    let user: string = "user1";
-    let pass: string = "pass1";
+    const serverUrl: string = "http://server:8080/tfs";
+    const repoUrl: string = "http://server:8080/tfs/collection1/_git/repo1";
+    const collectionUrl: string = "http://server:8080/tfs/collection1";
+    const user: string = "user1";
+    const pass: string = "pass1";
     let context: TeamServerContext;
 
     beforeEach(function() {
@@ -43,12 +43,12 @@ describe("Tfvc-FindConflictsCommand", function() {
     });
 
     it("should verify constructor", function() {
-        let localPath: string = "/usr/alias/repo1";
+        const localPath: string = "/usr/alias/repo1";
         new FindConflicts(undefined, localPath);
     });
 
     it("should verify constructor with context", function() {
-        let localPath: string = "/usr/alias/repo1";
+        const localPath: string = "/usr/alias/repo1";
         new FindConflicts(context, localPath);
     });
 
@@ -57,62 +57,62 @@ describe("Tfvc-FindConflictsCommand", function() {
     });
 
     it("should verify GetOptions", function() {
-        let localPath: string = "/usr/alias/repo1";
-        let cmd: FindConflicts = new FindConflicts(undefined, localPath);
+        const localPath: string = "/usr/alias/repo1";
+        const cmd: FindConflicts = new FindConflicts(undefined, localPath);
         assert.deepEqual(cmd.GetOptions(), {});
     });
 
     it("should verify GetExeOptions", function() {
-        let localPath: string = "/usr/alias/repo1";
-        let cmd: FindConflicts = new FindConflicts(undefined, localPath);
+        const localPath: string = "/usr/alias/repo1";
+        const cmd: FindConflicts = new FindConflicts(undefined, localPath);
         assert.deepEqual(cmd.GetExeOptions(), {});
     });
 
     it("should verify arguments", function() {
-        let localPath: string = "/usr/alias/repo1";
-        let cmd: FindConflicts = new FindConflicts(undefined, localPath);
+        const localPath: string = "/usr/alias/repo1";
+        const cmd: FindConflicts = new FindConflicts(undefined, localPath);
 
         assert.equal(cmd.GetArguments().GetArgumentsForDisplay(), "resolve -noprompt " + localPath + " -recursive -preview");
     });
 
     it("should verify Exe arguments", function() {
-        let localPath: string = "/usr/alias/repo1";
-        let cmd: FindConflicts = new FindConflicts(undefined, localPath);
+        const localPath: string = "/usr/alias/repo1";
+        const cmd: FindConflicts = new FindConflicts(undefined, localPath);
 
         assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "resolve -noprompt " + localPath + " -recursive -preview");
     });
 
     it("should verify arguments with context", function() {
-        let localPath: string = "/usr/alias/repo1";
-        let cmd: FindConflicts = new FindConflicts(context, localPath);
+        const localPath: string = "/usr/alias/repo1";
+        const cmd: FindConflicts = new FindConflicts(context, localPath);
 
         assert.equal(cmd.GetArguments().GetArgumentsForDisplay(), "resolve -noprompt -collection:" + collectionUrl + " ******** " + localPath + " -recursive -preview");
     });
 
     it("should verify Exe arguments with context", function() {
-        let localPath: string = "/usr/alias/repo1";
-        let cmd: FindConflicts = new FindConflicts(context, localPath);
+        const localPath: string = "/usr/alias/repo1";
+        const cmd: FindConflicts = new FindConflicts(context, localPath);
 
         assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "resolve -noprompt ******** " + localPath + " -recursive -preview");
     });
 
     it("should verify parse output - no output", async function() {
-        let localPath: string = "/usr/alias/repo1";
-        let cmd: FindConflicts = new FindConflicts(undefined, localPath);
-        let executionResult: IExecutionResult = {
+        const localPath: string = "/usr/alias/repo1";
+        const cmd: FindConflicts = new FindConflicts(undefined, localPath);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: undefined,
             stderr: undefined
         };
 
-        let results: IConflict[] = await cmd.ParseOutput(executionResult);
+        const results: IConflict[] = await cmd.ParseOutput(executionResult);
         assert.equal(results.length, 0);
     });
 
     it("should verify parse output - one of each type", async function() {
-        let localPath: string = "/usr/alias/repo1";
-        let cmd: FindConflicts = new FindConflicts(undefined, localPath);
-        let executionResult: IExecutionResult = {
+        const localPath: string = "/usr/alias/repo1";
+        const cmd: FindConflicts = new FindConflicts(undefined, localPath);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: "",
             stderr: "contentChange.txt: The item content has changed\n" +
@@ -126,7 +126,7 @@ describe("Tfvc-FindConflictsCommand", function() {
                     "branchDelete.txt: The item has been deleted in the target branch"
         };
 
-        let results: IConflict[] = await cmd.ParseOutput(executionResult);
+        const results: IConflict[] = await cmd.ParseOutput(executionResult);
         assert.equal(results.length, 9);
         assert.equal(results[0].localPath, "contentChange.txt");
         assert.equal(results[0].type, ConflictType.CONTENT);
@@ -149,9 +149,9 @@ describe("Tfvc-FindConflictsCommand", function() {
     });
 
     it("should verify parse output - errors - exit code 100", async function() {
-        let localPath: string = "/usr/alias/repo 1";
-        let cmd: FindConflicts = new FindConflicts(undefined, localPath);
-        let executionResult: IExecutionResult = {
+        const localPath: string = "/usr/alias/repo 1";
+        const cmd: FindConflicts = new FindConflicts(undefined, localPath);
+        const executionResult: IExecutionResult = {
             exitCode: 100,
             stdout: "Something bad this way comes.",
             stderr: undefined
@@ -168,29 +168,29 @@ describe("Tfvc-FindConflictsCommand", function() {
     });
 
     it("should verify parse Exe output - no output", async function() {
-        let localPath: string = "/usr/alias/repo1";
-        let cmd: FindConflicts = new FindConflicts(undefined, localPath);
-        let executionResult: IExecutionResult = {
+        const localPath: string = "/usr/alias/repo1";
+        const cmd: FindConflicts = new FindConflicts(undefined, localPath);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: undefined,
             stderr: undefined
         };
 
-        let results: IConflict[] = await cmd.ParseExeOutput(executionResult);
+        const results: IConflict[] = await cmd.ParseExeOutput(executionResult);
         assert.equal(results.length, 0);
     });
 
     it("should verify parse Exe output - one of each type", async function() {
-        let localPath: string = "/usr/alias/repo1";
-        let cmd: FindConflicts = new FindConflicts(undefined, localPath);
-        let executionResult: IExecutionResult = {
+        const localPath: string = "/usr/alias/repo1";
+        const cmd: FindConflicts = new FindConflicts(undefined, localPath);
+        const executionResult: IExecutionResult = {
             exitCode: 1,
             stdout: "",
             stderr: "folder1\\anothernewfile2.txt: A newer version exists on the server.\n" +
                     "folder1\\anothernewfile4.txt: The item has been deleted from the server.\n"
         };
 
-        let results: IConflict[] = await cmd.ParseExeOutput(executionResult);
+        const results: IConflict[] = await cmd.ParseExeOutput(executionResult);
         assert.equal(results.length, 2);
         assert.equal(results[0].localPath, "folder1\\anothernewfile2.txt");
         assert.equal(results[0].type, ConflictType.NAME_AND_CONTENT);
@@ -199,9 +199,9 @@ describe("Tfvc-FindConflictsCommand", function() {
     });
 
     it("should verify parse Exe output - errors - exit code 100", async function() {
-        let localPath: string = "/usr/alias/repo 1";
-        let cmd: FindConflicts = new FindConflicts(undefined, localPath);
-        let executionResult: IExecutionResult = {
+        const localPath: string = "/usr/alias/repo 1";
+        const cmd: FindConflicts = new FindConflicts(undefined, localPath);
+        const executionResult: IExecutionResult = {
             exitCode: 100,
             stdout: "Something bad this way comes.",
             stderr: undefined

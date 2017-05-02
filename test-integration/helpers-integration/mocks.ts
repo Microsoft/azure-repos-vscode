@@ -10,12 +10,12 @@ import { TestSettings } from "./testsettings";
 
 export class Mocks {
 
-    public static TeamServerContext(repositoryUrl: string) : TeamServerContext {
+    public static TeamServerContext(repositoryUrl: string): TeamServerContext {
         return new TeamServerContext(repositoryUrl);
     }
 
-    public static RepositoryInfo() : RepositoryInfo {
-        let repositoryInfo : any = {
+    public static RepositoryInfo(): RepositoryInfo {
+        const repositoryInfo: any = {
             "serverUrl":"undefined",
             "collection":{
                 "id":"undefined",
