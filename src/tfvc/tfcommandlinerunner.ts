@@ -250,7 +250,7 @@ export class TfCommandLineRunner {
                     let stdout: string = buffers.join("");
                     if (isExe) {
                         // TF.exe repeats the command line as part of the standard out when using the @ response file options
-                        // So, we look for the noprompt option to const us know where that line is so we can strip it off
+                        // So, we look for the noprompt option to allow us to know where that line is so we can strip it off
                         const start: number = stdout.indexOf("-noprompt");
                         if (start >= 0) {
                             const end: number = stdout.indexOf("\n", start);

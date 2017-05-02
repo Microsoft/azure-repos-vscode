@@ -53,7 +53,7 @@ export class Undo implements ITfvcCommand<string[]> {
         //  * All of the files have no pending changes (exitCode === 100)
         //If some of the files have no pending changes, we want to process the ones that did.
         //If all of the files have no pending changes, return []
-        //Otherwise, we assume some error occurred so const that be thrown.
+        //Otherwise, we assume some error occurred so allow that to be thrown.
         if (executionResult.exitCode !== 0) {
             //Remove any entries for which there were no pending changes
             lines = lines.filter((e) => !e.startsWith("No pending changes "));
