@@ -25,7 +25,6 @@ export class TeamExtension  {
     private _buildStatusBarItem: StatusBarItem;
     private _pullRequestStatusBarItem: StatusBarItem;
     private _pinnedQueryStatusBarItem: StatusBarItem;
-    private _feedbackStatusBarItem: StatusBarItem;
     private _buildClient: BuildClient;
     private _gitClient: GitClient;
     private _witClient: WitClient;
@@ -333,14 +332,6 @@ export class TeamExtension  {
             this._pinnedQueryStatusBarItem.tooltip = Strings.ViewYourPinnedQuery;
             this._pinnedQueryStatusBarItem.show();
         }
-
-        if (!this._feedbackStatusBarItem) {
-            this._feedbackStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, 96);
-            this._feedbackStatusBarItem.command = CommandNames.SendFeedback;
-            this._feedbackStatusBarItem.text = `$(icon octicon-megaphone)`;
-            this._feedbackStatusBarItem.tooltip = Strings.SendFeedback;
-            this._feedbackStatusBarItem.show();
-        }
     }
 
     public InitializeClients(repoType: RepositoryType) : void {
@@ -427,10 +418,6 @@ export class TeamExtension  {
         if (this._buildStatusBarItem !== undefined) {
             this._buildStatusBarItem.dispose();
             this._buildStatusBarItem = undefined;
-        }
-        if (this._feedbackStatusBarItem !== undefined) {
-            this._feedbackStatusBarItem.dispose();
-            this._feedbackStatusBarItem = undefined;
         }
         if (this._pinnedQueryStatusBarItem !== undefined) {
             this._pinnedQueryStatusBarItem.dispose();

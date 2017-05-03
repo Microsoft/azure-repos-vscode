@@ -36,6 +36,7 @@ import * as util from "util";
 
 export class ExtensionManager implements Disposable {
     private _teamServicesStatusBarItem: StatusBarItem;
+    private _feedbackStatusBarItem: StatusBarItem;
     private _errorMessage: string;
     private _feedbackClient: FeedbackClient;
     private _serverContext: TeamServerContext;
@@ -213,7 +214,7 @@ export class ExtensionManager implements Disposable {
         VsCodeUtils.ShowErrorMessage(displayError, learnMoreMessageItem, showMeMessageItem);
     }
 
-    private async initializeExtension() : Promise<void> {
+    private async initializeExtension(): Promise<void> {
         //Don't initialize if we don't have a workspace
         if (!workspace || !workspace.rootPath) {
             return;
@@ -231,6 +232,8 @@ export class ExtensionManager implements Disposable {
         Telemetry.Initialize(this._settings); //We don't have the serverContext just yet
         this.logStart(this._settings.LoggingLevel, workspace.rootPath);
         this._teamServicesStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, 100);
+        this._feedbackStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, 96);
+        this.showFeedbackItem();
 
         try {
             //RepositoryContext has some initial information about the repository (what we can get without authenticating with server)
@@ -381,8 +384,8 @@ export class ExtensionManager implements Disposable {
     }
 
     //Set up the initial status bars
-    private initializeStatusBars() {
-        if (this.EnsureInitializedForTFVC()) {
+    private initializeStatusBars(): void {
+        if (this.ensureMinimalInitialization()) {
             this._teamServicesStatusBarItem.command = CommandNames.OpenTeamSite;
             this._teamServicesStatusBarItem.text = this._serverContext.RepoInfo.TeamProject ? this._serverContext.RepoInfo.TeamProject : "<none>";
             this._teamServicesStatusBarItem.tooltip = Strings.NavigateToTeamServicesWebSite;
@@ -397,7 +400,7 @@ export class ExtensionManager implements Disposable {
     }
 
     //Set up the initial status bars
-    private async initializeClients(repoType: RepositoryType) {
+    private async initializeClients(repoType: RepositoryType): Promise<void> {
         await this._teamExtension.InitializeClients(repoType);
         await this._tfvcExtension.InitializeClients(repoType);
     }
@@ -437,11 +440,11 @@ export class ExtensionManager implements Disposable {
         }
     }
 
-    private resetErrorStatus() {
+    private resetErrorStatus(): void {
         this._errorMessage = undefined;
     }
 
-    private setErrorStatus(message: string, commandOnClick?: string, showRetryMessage?: boolean) {
+    private setErrorStatus(message: string, commandOnClick?: string, showRetryMessage?: boolean): void {
         this._errorMessage = message;
         if (this._teamServicesStatusBarItem !== undefined) {
             //TODO: Should the default command be to do nothing?  Or perhaps to display the message?
@@ -467,7 +470,7 @@ export class ExtensionManager implements Disposable {
         }
     }
 
-    private notifyBranchChanged(/*TODO: currentBranch: string*/) : void {
+    private notifyBranchChanged(/*TODO: currentBranch: string*/): void {
         this._teamExtension.NotifyBranchChanged();
         //this._tfvcExtension.NotifyBranchChanged(currentBranch);
     }
@@ -525,10 +528,21 @@ export class ExtensionManager implements Disposable {
         }
     }
 
-    private cleanup(preserveTeamExtension: boolean = false) {
+    private showFeedbackItem(): void {
+        this._feedbackStatusBarItem.command = CommandNames.SendFeedback;
+        this._feedbackStatusBarItem.text = `$(icon octicon-megaphone)`;
+        this._feedbackStatusBarItem.tooltip = Strings.SendFeedback;
+        this._feedbackStatusBarItem.show();
+    }
+
+    private cleanup(preserveTeamExtension: boolean = false): void {
         if (this._teamServicesStatusBarItem) {
             this._teamServicesStatusBarItem.dispose();
             this._teamServicesStatusBarItem = undefined;
+        }
+        if (this._feedbackStatusBarItem !== undefined) {
+            this._feedbackStatusBarItem.dispose();
+            this._feedbackStatusBarItem = undefined;
         }
         //If we are signing out, we need to keep some of the objects around
         if (!preserveTeamExtension && this._teamExtension) {
@@ -560,7 +574,7 @@ export class ExtensionManager implements Disposable {
     }
 
     //If we're signing out, we don't want to dispose of everything.
-    public SignOut() {
+    public SignOut(): void {
         this.cleanup(true);
     }
 }
