@@ -113,9 +113,10 @@ export class WorkItemTrackingService {
         //Keep original sort order that wiql specified
         for (let index: number = 0; index < workItemIds.length; index++) {
             const item: WorkItem = workItems.find((i) => i.id === workItemIds[index]);
+            const id: string = item.id.toString();
             results.push({
-                id: item.fields[WorkItemFields.Id],
-                label: item.fields[WorkItemFields.Id] + "  [" + item.fields[WorkItemFields.WorkItemType] + "]",
+                id: id,
+                label: `${id} [${item.fields[WorkItemFields.WorkItemType]}]`,
                 description: item.fields[WorkItemFields.Title]
             });
         }
