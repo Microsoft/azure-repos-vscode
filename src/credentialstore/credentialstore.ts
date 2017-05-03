@@ -85,11 +85,15 @@ export class CredentialStore implements ICredentialStore {
                 this.RemoveCredential(service).then(() => {
                     this._credentialStore.SetCredential(service, username, password).then(() => {
                         deferred.resolve(undefined);
+                    }).catch((reason) => {
+                        deferred.reject(reason);
                     });
                 });
             } else {
                 this._credentialStore.SetCredential(service, username, password).then(() => {
                     deferred.resolve(undefined);
+                }).catch((reason) => {
+                    deferred.reject(reason);
                 });
             }
         }).catch((reason) => {
