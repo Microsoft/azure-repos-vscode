@@ -234,12 +234,12 @@ export class ExtensionManager implements Disposable {
         this.logStart(this._settings.LoggingLevel, workspace.rootPath);
         this._teamServicesStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, 100);
         this._feedbackStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, 96);
-        this.showFeedbackItem();
 
         try {
             //RepositoryContext has some initial information about the repository (what we can get without authenticating with server)
             this._repoContext = await RepositoryContextFactory.CreateRepositoryContext(workspace.rootPath, this._settings);
             if (this._repoContext) {
+                this.showFeedbackItem();
                 this.setupFileSystemWatcherOnHead();
                 this._serverContext = new TeamServerContext(this._repoContext.RemoteUrl);
                 //Now that we have a server context, we can update it on the repository context
