@@ -8,6 +8,8 @@
 import { workspace, Uri, Disposable, Event, EventEmitter } from "vscode";
 import { TfvcSCMProvider } from "../tfvcscmprovider";
 import { TfvcRepository } from "../tfvcrepository";
+import { TfvcTelemetryEvents } from "../../helpers/constants";
+import { Telemetry } from "../../services/telemetry";
 
 export class TfvcContentProvider {
     private _tfvcRepository: TfvcRepository;
@@ -51,6 +53,7 @@ export class TfvcContentProvider {
         }
 
         try {
+            Telemetry.SendEvent(this._tfvcRepository.IsExe ? TfvcTelemetryEvents.GetFileContentExe : TfvcTelemetryEvents.GetFileContentClc);
             const contents: string = await this._tfvcRepository.GetFileContent(path, versionSpec);
             return contents;
         } catch (err) {

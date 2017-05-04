@@ -86,6 +86,7 @@ export class TfvcExtension  {
 
                     //If we need to add files, run a single Add with those files
                     if (pathsToAdd.length > 0) {
+                        Telemetry.SendEvent(this._repo.IsExe ? TfvcTelemetryEvents.AddExe : TfvcTelemetryEvents.AddClc);
                         await this._repo.Add(pathsToAdd);
                     }
 

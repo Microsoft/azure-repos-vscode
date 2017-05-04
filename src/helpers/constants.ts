@@ -78,6 +78,7 @@ export class TelemetryEvents {
     static TelemetryPrefix: string = Constants.ExtensionName + "/";
     static AssociateWorkItems: string = TelemetryEvents.TelemetryPrefix + "associateworkitems";
     static ExternalRepository: string = TelemetryEvents.TelemetryPrefix + "externalrepo";
+    static Installed: string = TelemetryEvents.TelemetryPrefix + "installed";
     static OpenAdditionalQueryResults: string = TelemetryEvents.TelemetryPrefix + "openaddlqueryresults";
     static OpenBlamePage: string = TelemetryEvents.TelemetryPrefix + "openblame";
     static OpenBuildSummaryPage: string = TelemetryEvents.TelemetryPrefix + "openbuildsummary";
@@ -110,7 +111,12 @@ class TfvcBaseTelemetryEvents {
     static TelemetryPrefix: string = "tfvc/";
     static Clc: string = TfvcBaseTelemetryEvents.TelemetryPrefix + "clc";
     static Exe: string = TfvcBaseTelemetryEvents.TelemetryPrefix + "exe";
+    static Add: string = "add";
     static Checkin: string = "checkin";
+    static Configured: string = "configured";
+    static Connected: string = "connected";
+    static Delete: string = "delete";
+    static GetFileContent: string = "getfilecontent";
     static NameAndContentConflict: string = "nameandcontentconflict";
     static OpenFileHistory: string = "openfilehistory";
     static OpenRepositoryHistory: string = "openrepohistory";
@@ -134,8 +140,18 @@ export class TfvcTelemetryEvents {
     static RestrictWorkspace: string = TfvcBaseTelemetryEvents.TelemetryPrefix + TfvcBaseTelemetryEvents.RestrictWorkspace;
     static StartUp: string = TfvcBaseTelemetryEvents.TelemetryPrefix + TfvcBaseTelemetryEvents.StartUp;
     //Begin tooling-specific telemetry (tf.exe or CLC)
+    static ClcConfigured: string = TfvcTelemetryEvents.UsingClc + "-" + TfvcBaseTelemetryEvents.Configured;
+    static ExeConfigured: string = TfvcTelemetryEvents.UsingExe + "-" + TfvcBaseTelemetryEvents.Configured;
+    static ClcConnected: string = TfvcTelemetryEvents.UsingClc + "-" + TfvcBaseTelemetryEvents.Connected;
+    static ExeConnected: string = TfvcTelemetryEvents.UsingExe + "-" + TfvcBaseTelemetryEvents.Connected;
+    static AddExe: string = TfvcTelemetryEvents.UsingExe + "-" + TfvcBaseTelemetryEvents.Add;
+    static AddClc: string = TfvcTelemetryEvents.UsingClc + "-" + TfvcBaseTelemetryEvents.Add;
     static CheckinExe: string = TfvcTelemetryEvents.UsingExe + "-" + TfvcBaseTelemetryEvents.Checkin;
     static CheckinClc: string = TfvcTelemetryEvents.UsingClc + "-" + TfvcBaseTelemetryEvents.Checkin;
+    static DeleteExe: string = TfvcTelemetryEvents.UsingExe + "-" + TfvcBaseTelemetryEvents.Delete;
+    static DeleteClc: string = TfvcTelemetryEvents.UsingClc + "-" + TfvcBaseTelemetryEvents.Delete;
+    static GetFileContentExe: string = TfvcTelemetryEvents.UsingExe + "-" + TfvcBaseTelemetryEvents.GetFileContent;
+    static GetFileContentClc: string = TfvcTelemetryEvents.UsingClc + "-" + TfvcBaseTelemetryEvents.GetFileContent;
     static RenameExe: string = TfvcTelemetryEvents.UsingExe + "-" + TfvcBaseTelemetryEvents.Rename;
     static RenameClc: string = TfvcTelemetryEvents.UsingClc + "-" + TfvcBaseTelemetryEvents.Rename;
     static ResolveConflictsExe: string = TfvcTelemetryEvents.UsingExe + "-" + TfvcBaseTelemetryEvents.ResolveConflicts;

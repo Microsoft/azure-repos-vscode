@@ -222,7 +222,7 @@ export class Model implements Disposable {
             }
         }
         if (deleteCandidatePaths && deleteCandidatePaths.length > 0) {
-            //We decided not to send telemetry on file operations
+            Telemetry.SendEvent(this._repository.IsExe ? TfvcTelemetryEvents.DeleteExe : TfvcTelemetryEvents.DeleteClc);
             await this._repository.Delete(deleteCandidatePaths);
         }
     }
