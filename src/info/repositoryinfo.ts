@@ -7,6 +7,7 @@
 import url = require("url");
 import { Logger } from "../helpers/logger";
 import { RepoUtils } from "../helpers/repoutils";
+import { UrlBuilder } from "../helpers/urlbuilder";
 
 //When a RepositoryInfo object is created, we have already verified whether or not it
 //is either a Team Services or Team Foundation Server repository.  With the introduction
@@ -115,7 +116,7 @@ export class RepositoryInfo {
         }
         //While leaving the actual data alone, check for 'collection in the domain'
         if (this._account.toLowerCase() !== this._collection.toLowerCase()) {
-            return this.AccountUrl + "/" + this._collection;
+            return UrlBuilder.Join(this.AccountUrl, this._collection);
         } else {
             return this.AccountUrl;
         }
@@ -145,7 +146,7 @@ export class RepositoryInfo {
         if (this._teamProject === undefined) {
             return undefined;
         }
-        return this.CollectionUrl + "/" + this._teamProject;
+        return UrlBuilder.Join(this.CollectionUrl, this._teamProject);
     }
     public get TeamProject(): string {
         return this._teamProject;
