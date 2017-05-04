@@ -557,6 +557,10 @@ export class ExtensionManager implements Disposable {
             this._feedbackStatusBarItem.dispose();
             this._feedbackStatusBarItem = undefined;
         }
+        //No matter if we're signing out or re-initializing, we need the team extension's
+        //status bars and timers to be disposed but not the entire object
+        this._teamExtension.cleanup();
+
         //If we are signing out, we need to keep some of the objects around
         if (!preserveTeamExtension && this._teamExtension) {
             this._teamExtension.dispose();

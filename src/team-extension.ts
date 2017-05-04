@@ -402,7 +402,7 @@ export class TeamExtension  {
         this.refreshPollingItems();
     }
 
-    dispose() {
+    public cleanup(): void {
         if (this._pollingTimer) {
             if (this._initialTimer) {
                 clearTimeout(this._initialTimer);
@@ -423,5 +423,9 @@ export class TeamExtension  {
             this._pinnedQueryStatusBarItem.dispose();
             this._pinnedQueryStatusBarItem = undefined;
         }
+    }
+
+    dispose() {
+        this.cleanup();
     }
 }
