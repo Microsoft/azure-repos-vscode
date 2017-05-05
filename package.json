@@ -47,6 +47,10 @@
           "when": "false"
         },
         {
+          "command": "tfvc.UndoAll",
+          "when": "false"
+        },
+        {
           "command": "tfvc.ResolveTakeTheirs",
           "when": "false"
         },
