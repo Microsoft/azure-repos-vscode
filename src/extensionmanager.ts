@@ -192,6 +192,26 @@ export class ExtensionManager implements Disposable {
         Telemetry.SendException(err);
     }
 
+    //Ensures a folder is open before attempting to run any command already shown in
+    //the Command Palette (and defined in package.json).
+    public async RunAsyncCommand(asyncFuncToTry: (args) => Promise<void>, ...args: string[]): Promise<void> {
+        if (!workspace || !workspace.rootPath) {
+            this.DisplayErrorMessage(Strings.FolderNotOpened);
+            return;
+        }
+        await asyncFuncToTry(args);
+    }
+
+    //Ensures a folder is open before attempting to run any command already shown in
+    //the Command Palette (and defined in package.json).
+    public RunCommand(funcToTry: (args) => void, ...args: string[]): void {
+        if (!workspace || !workspace.rootPath) {
+            this.DisplayErrorMessage(Strings.FolderNotOpened);
+            return;
+        }
+        funcToTry(args);
+    }
+
     private displayNoCredentialsMessage(): void {
         let error: string = Strings.NoTeamServerCredentialsRunSignin;
         let displayError: string = Strings.NoTeamServerCredentialsRunSignin;

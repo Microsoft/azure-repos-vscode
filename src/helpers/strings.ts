@@ -11,6 +11,7 @@ export class Strings {
     static BrowseYourPullRequests: string = "Browse your pull requests.";
     static BrowseAdditionalWorkItems: string = "Browse additional work items...";
     static BrowseAdditionalWorkItemsDescription: string = "Choose this item to see all query results in your web browser";
+    static FolderNotOpened: string = "You must open a repository folder in order to use the Team Services extension.";
     static NavigateToBuildSummary: string = "Click to view build";
     static NavigateToTeamServicesWebSite: string = "Click to view your team project website.";
     static NoAccessTokenFound: string = "A personal access token for this Team Services repository was not found in your local user settings.";
