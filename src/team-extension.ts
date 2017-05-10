@@ -227,12 +227,6 @@ export class TeamExtension  {
         }
     }
 
-    //Prompts for either a smile or frown, feedback text and an optional email address
-    public SendFeedback(): void {
-        //SendFeedback doesn't need to ensure the extension is initialized
-        this._manager.FeedbackClient.SendFeedback();
-    }
-
     //Returns the list of work items assigned directly to the current user
     public ViewMyWorkItems(): void {
         if (this._manager.EnsureInitialized(RepositoryType.ANY)) {

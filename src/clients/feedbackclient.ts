@@ -14,12 +14,8 @@ import { Telemetry } from "../services/telemetry";
 
 export class FeedbackClient {
 
-    constructor() {
-        //
-    }
-
     //This feedback will go no matter whether Application Insights is enabled or not.
-    public async SendFeedback(): Promise<void> {
+    public static async SendFeedback(): Promise<void> {
         try {
             const choices: BaseQuickPickItem[] = [];
             choices.push({ label: Strings.SendASmile, description: undefined, id: TelemetryEvents.SendASmile });

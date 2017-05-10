@@ -95,6 +95,11 @@ export class ExtensionManager implements Disposable {
         this.initializeExtension();
     }
 
+    public SendFeedback(): void {
+        //SendFeedback doesn't need to ensure the extension is initialized
+        FeedbackClient.SendFeedback();
+    }
+
     //Ensure we have a TFS or Team Services-based repository. Otherwise, return false.
     private ensureMinimalInitialization(): boolean {
         if (!this._repoContext
@@ -190,16 +195,6 @@ export class ExtensionManager implements Disposable {
             return;
         }
         Telemetry.SendException(err);
-    }
-
-    //Ensures a folder is open before attempting to run any command already shown in
-    //the Command Palette (and defined in package.json).
-    public async RunAsyncCommand(asyncFuncToTry: (args) => Promise<void>, ...args: string[]): Promise<void> {
-        if (!workspace || !workspace.rootPath) {
-            this.DisplayErrorMessage(Strings.FolderNotOpened);
-            return;
-        }
-        await asyncFuncToTry(args);
     }
 
     //Ensures a folder is open before attempting to run any command already shown in
