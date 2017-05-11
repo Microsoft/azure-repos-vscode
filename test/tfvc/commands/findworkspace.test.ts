@@ -173,12 +173,34 @@ describe("Tfvc-FindWorkspaceCommand", function() {
         const workspace: IWorkspace = await cmd.ParseOutput(executionResult);
         assert.equal(workspace.name, "MyWorkspace");
         assert.equal(workspace.server, "http://server:8080/tfs/");
-        //This test should find project2 as the team porject since the localPath contains project2 and we have restrictWorkspace
+        //This test should find project2 as the team project since the localPath contains project2 and we have restrictWorkspace
         assert.equal(workspace.defaultTeamProject, "project2");
         assert.equal(workspace.comment, undefined);
         assert.equal(workspace.computer, undefined);
         assert.equal(workspace.owner, undefined);
         assert.equal(workspace.mappings.length, 2);
+    });
+
+    it("should verify parse output - no errors - encoded output", async function() {
+        const localPath: string = "/path/to/workspace/project1";
+        const cmd: FindWorkspace = new FindWorkspace(localPath, true);
+        const executionResult: IExecutionResult = {
+            exitCode: 0,
+            stdout: "=====================================================================================================================================================\n" +
+                "Workspace:  MyWorkspace\n" +
+                "Collection: http://server:8080/tfs/spaces%20in%20the%20name/\n" +
+                "$/project1: /path",
+            stderr: undefined
+        };
+
+        const workspace: IWorkspace = await cmd.ParseOutput(executionResult);
+        assert.equal(workspace.name, "MyWorkspace");
+        assert.equal(workspace.server, "http://server:8080/tfs/spaces in the name/");
+        assert.equal(workspace.defaultTeamProject, "project1");
+        assert.equal(workspace.comment, undefined);
+        assert.equal(workspace.computer, undefined);
+        assert.equal(workspace.owner, undefined);
+        assert.equal(workspace.mappings.length, 1);
     });
 
     /***********************************************************************************************
@@ -294,11 +316,33 @@ describe("Tfvc-FindWorkspaceCommand", function() {
         const workspace: IWorkspace = await cmd.ParseExeOutput(executionResult);
         assert.equal(workspace.name, "MyWorkspace");
         assert.equal(workspace.server, "http://server:8080/tfs/");
-        //This test should find project2 as the team porject since the localPath contains project2 and we have restrictWorkspace
+        //This test should find project2 as the team project since the localPath contains project2 and we have restrictWorkspace
         assert.equal(workspace.defaultTeamProject, "project2");
         assert.equal(workspace.comment, undefined);
         assert.equal(workspace.computer, undefined);
         assert.equal(workspace.owner, undefined);
         assert.equal(workspace.mappings.length, 2);
+    });
+
+    it("should verify parse EXE output - no errors - encoded output", async function() {
+        const localPath: string = "/path/to/workspace/project1";
+        const cmd: FindWorkspace = new FindWorkspace(localPath, true);
+        const executionResult: IExecutionResult = {
+            exitCode: 0,
+            stdout: "=====================================================================================================================================================\n" +
+                "Workspace:  MyWorkspace\n" +
+                "Collection: http://server:8080/tfs/spaces%20in%20the%20name/\n" +
+                "$/project1: /path",
+            stderr: undefined
+        };
+
+        const workspace: IWorkspace = await cmd.ParseExeOutput(executionResult);
+        assert.equal(workspace.name, "MyWorkspace");
+        assert.equal(workspace.server, "http://server:8080/tfs/spaces in the name/");
+        assert.equal(workspace.defaultTeamProject, "project1");
+        assert.equal(workspace.comment, undefined);
+        assert.equal(workspace.computer, undefined);
+        assert.equal(workspace.owner, undefined);
+        assert.equal(workspace.mappings.length, 1);
     });
 });

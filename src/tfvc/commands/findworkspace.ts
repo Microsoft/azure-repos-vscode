@@ -134,10 +134,11 @@ export class FindWorkspace implements ITfvcCommand<IWorkspace> {
              });
         }
 
+        //Decode collectionURL and teamProject here (for cases like 'Collection: http://java-tfs2015:8081/tfs/spaces%20in%20the%20name')
         const workspace: IWorkspace = {
             name: workspaceName,
-            server: collectionUrl,
-            defaultTeamProject: teamProject,
+            server: decodeURI(collectionUrl),
+            defaultTeamProject: decodeURI(teamProject),
             mappings: mappings
         };
 
