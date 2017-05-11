@@ -57,38 +57,38 @@ export class RepositoryInfoClient {
                 serverUrl = `https://${repositoryInfo.Account}.visualstudio.com/`;
                 const valid: boolean = await this.validateTfvcCollectionUrl(serverUrl);
                 if (!valid) {
-                    const error: string = `Unable to validate the Team Services TFVC repository. Collection name: '${collectionName}', Url: '${serverUrl}'`;
-                    Logger.LogDebug(error);
-                    throw new Error(`${Strings.UnableToValidateTeamServicesTfvcRepository} Collection name: '${collectionName}', Url: '${serverUrl}'`);
+                    const errorMsg: string = `${Strings.UnableToValidateTeamServicesCollection} Collection name: '${collectionName}', Url: '${serverUrl}'`;
+                    Logger.LogDebug(errorMsg);
+                    throw new Error(errorMsg);
                 }
                 Logger.LogDebug(`Successfully validated the Team Services TFVC repository. Collection name: '${collectionName}', 'Url: ${serverUrl}'`);
-            } else {
+            } else { //This could be either a TFVC context or an External context
                 serverUrl = this._repoContext.RemoteUrl;
                 // A full Team Foundation Server collection url is required for the validate call to succeed.
                 // So we try the url given. If that fails, we assume it is a server Url and the collection is
                 // the defaultCollection. If that assumption fails we return false.
-                Logger.LogDebug(`Starting the validation of the TFS TFVC repository collection Url ('${serverUrl}')`);
+                Logger.LogDebug(`Starting the validation of the collection. Url: '${serverUrl}'`);
                 let valid: boolean = await this.validateTfvcCollectionUrl(serverUrl);
                 if (valid) {
                     const parts: string[] = this.splitTfvcCollectionUrl(serverUrl);
                     serverUrl = parts[0];
                     collectionName = parts[1];
-                    Logger.LogDebug(`Validated the TFS TFVC repository. Collection name: '${collectionName}', Url: '${serverUrl}'`);
+                    Logger.LogDebug(`Validated the collection and splitting Url and Collection name. Collection name: '${collectionName}', Url: '${serverUrl}'`);
                 } else {
-                    Logger.LogDebug(`Unable to validate the TFS TFVC repository. Url: '${serverUrl}'  Attempting with DefaultCollection...`);
+                    Logger.LogDebug(`Unable to validate the collection. Url: '${serverUrl}' Attempting validation assuming 'DefaultCollection'...`);
                     collectionName = "DefaultCollection";
                     const remoteUrl: string = url.resolve(serverUrl, collectionName);
                     valid = await this.validateTfvcCollectionUrl(remoteUrl);
                     if (!valid) {
-                        Logger.LogDebug(`Unable to validate the TFS TFVC repository with DefaultCollection.`);
-                        throw new Error(Strings.UnableToValidateTfvcRepositoryWithDefaultCollection);
+                        Logger.LogDebug(Strings.UnableToValidateCollectionAssumingDefaultCollection);
+                        throw new Error(Strings.UnableToValidateCollectionAssumingDefaultCollection);
                     }
                     //Since we validated with the default collection, we need to update the repo context's RemoteUrl
                     if (this._repoContext.Type === RepositoryType.TFVC) {
                         const tfvcContext: TfvcContext = <TfvcContext>this._repoContext;
                         tfvcContext.RemoteUrl = remoteUrl;
                     }
-                    Logger.LogDebug(`Validated the TFS TFVC repository with DefaultCollection`);
+                    Logger.LogDebug(`Validated the collection assuming 'DefaultCollection'.`);
                 }
             }
 
@@ -123,10 +123,10 @@ export class RepositoryInfoClient {
 
             //Now, create the JSON blob to send to new RepositoryInfo(repoInfo);
             repoInfo = this.getTfvcRepoInfoBlob(serverUrl, collection.id, collection.name, collection.url, project.id, project.name, project.description, project.url);
-            Logger.LogDebug(`Tfvc repository information blob:`);
+            Logger.LogDebug(`Repository information blob:`);
             Logger.LogObject(repoInfo);
             repositoryInfo = new RepositoryInfo(repoInfo);
-            Logger.LogDebug(`Finished getting repository information for a TFVC repository at ${this._repoContext.RemoteUrl}`);
+            Logger.LogDebug(`Finished getting repository information for the repository at ${this._repoContext.RemoteUrl}`);
             return repositoryInfo;
         }
         return repositoryInfo;

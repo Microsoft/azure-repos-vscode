@@ -49,8 +49,8 @@ export class Strings {
     static UnableToRemoveCredentials: string = "Unable to remove credentials for this host. You may need to remove them manually. Host: ";
     static UnableToStoreCredentials: string = "Unable to store credentials for this host. Host: ";
 
-    static UnableToValidateTeamServicesTfvcRepository: string = "Unable to validate the Team Services TFVC repository.";
-    static UnableToValidateTfvcRepositoryWithDefaultCollection: string = "Unable to validate the TFS TFVC repository with DefaultCollection.";
+    static UnableToValidateTeamServicesCollection: string = "Unable to validate the Team Services collection.";
+    static UnableToValidateCollectionAssumingDefaultCollection: string = "Unable to validate the collection assuming 'DefaultCollection'.";
 
     //Status codes
     static StatusCode401: string = "Unauthorized. Check your authentication credentials and try again.";
