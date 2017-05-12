@@ -10,6 +10,7 @@ import { parseString } from "xml2js";
 import { Constants } from "../../helpers/constants";
 import { Logger } from "../../helpers/logger";
 import { Strings } from "../../helpers/strings";
+import { Utils } from "../../helpers/utils";
 import { IButtonMessageItem } from "../../helpers/vscodeutils.interfaces";
 import { TfvcError, TfvcErrorCodes } from "../tfvcerror";
 import { IExecutionResult } from "../interfaces";
@@ -44,7 +45,7 @@ export class CommandHelper {
         if (result.exitCode) {
             let tfvcErrorCode: string = TfvcErrorCodes.UnknownError;
             let message: string;
-            let messageOptions: IButtonMessageItem[];
+            let messageOptions: IButtonMessageItem[] = [];
 
             if (/Authentication failed/.test(result.stderr)) {
                 tfvcErrorCode = TfvcErrorCodes.AuthenticationFailed;
@@ -64,6 +65,11 @@ export class CommandHelper {
             } else if (/'java' is not recognized as an internal or external command/i.test(result.stderr)) {
                 tfvcErrorCode = TfvcErrorCodes.NotFound;
                 message = Strings.TfInitializeFailureError;
+            } else if (/Error occurred during initialization of VM/i.test(result.stdout)) {
+                //Example: "Error occurred during initialization of VM\nCould not reserve enough space for 2097152KB object heap\n"
+                //This one occurs with the error message in stdout!
+                tfvcErrorCode = TfvcErrorCodes.NotFound;
+                message = `${Strings.TfInitializeFailureError} (${Utils.FormatMessage(result.stdout)})`;
             } else if (/There is no working folder mapping/i.test(result.stderr)) {
                 tfvcErrorCode = TfvcErrorCodes.FileNotInMappings;
             } else if (/could not be found in your workspace, or you do not have permission to access it./i.test(result.stderr)) {
@@ -78,7 +84,9 @@ export class CommandHelper {
                 message = result.stderr ? result.stderr : result.stdout;
             }
 
-            Logger.LogDebug(`TFVC errors: ${result.stderr}`);
+            //We're banking on content being in one or the other with preference to stderr
+            const logMsg: string = result.stderr ? result.stderr : result.stdout;
+            Logger.LogDebug(`TFVC errors: ${logMsg}`);
 
             throw new TfvcError({
                 message: message || Strings.TfExecFailedError,

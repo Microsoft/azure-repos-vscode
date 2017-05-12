@@ -14,6 +14,14 @@ import * as opener from "opener";
 
 export class Utils {
 
+    public static FormatMessage(message: string): string {
+        if (message) {
+            //Replace newlines with spaces
+            return message.replace(/\r\n/g, " ").replace(/\n/g, " ").trim();
+        }
+        return message;
+    }
+
     //gitDir provided for unit testing purposes
     public static FindGitFolder(startingPath: string, gitDir?: string): string {
         if (!fs.existsSync(startingPath)) { return undefined; }

@@ -48,20 +48,12 @@ export class VsCodeUtils {
         return value;
     }
 
-    public static FormatMessage(message: string): string {
-        if (message) {
-            //Replace newlines with spaces
-            return message.replace(/\r\n/g, " ").replace(/\n/g, " ").trim();
-        }
-        return message;
-    }
-
     //We have a single method to display either simple messages (with no options) or messages
     //that have multiple buttons that can run commands, open URLs, send telemetry, etc.
     public static async ShowErrorMessage(message: string, ...urlMessageItem: IButtonMessageItem[]): Promise<void> {
         //The following "cast" allows us to pass our own type around (and not reference "vscode" via an import)
         const messageItems: ButtonMessageItem[] = <ButtonMessageItem[]>urlMessageItem;
-        const messageToDisplay: string = `(${Constants.ExtensionName}) ${VsCodeUtils.FormatMessage(message)}`;
+        const messageToDisplay: string = `(${Constants.ExtensionName}) ${Utils.FormatMessage(message)}`;
 
         //Use the typescript spread operator to pass the rest parameter to showErrorMessage
         const chosenItem: IButtonMessageItem = await window.showErrorMessage(messageToDisplay, ...messageItems);
@@ -80,6 +72,6 @@ export class VsCodeUtils {
     }
 
     public static ShowWarningMessage(message: string) {
-        window.showWarningMessage("(" + Constants.ExtensionName + ") " + VsCodeUtils.FormatMessage(message));
+        window.showWarningMessage("(" + Constants.ExtensionName + ") " + Utils.FormatMessage(message));
     }
 }
