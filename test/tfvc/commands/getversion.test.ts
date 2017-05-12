@@ -118,6 +118,27 @@ describe("Tfvc-GetVersionCommand", function() {
         }
     });
 
+    it("should verify parse output - java object heap error", async function() {
+        const cmd: GetVersion = new GetVersion();
+        const executionResult: IExecutionResult = {
+            exitCode: 1,
+            stdout: "Error occurred during initialization of VM\r\nCould not reserve enough space for 2097152KB object heap\r\n",
+            stderr: undefined
+        };
+
+        let threw: boolean = false;
+
+        try {
+            await cmd.ParseOutput(executionResult);
+        } catch (err) {
+            assert.equal(err.tfvcErrorCode, TfvcErrorCodes.NotFound);
+            assert.isTrue(err.message.startsWith(Strings.TfInitializeFailureError));
+            threw = true;
+        } finally {
+            assert.isTrue(threw, "Checking for Java object heap error did not throw an error.");
+        }
+    });
+
     it("should verify parse Exe output - error exit code", async function() {
         const cmd: GetVersion = new GetVersion();
         const executionResult: IExecutionResult = {

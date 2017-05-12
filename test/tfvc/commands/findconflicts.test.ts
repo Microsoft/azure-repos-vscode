@@ -148,6 +148,61 @@ describe("Tfvc-FindConflictsCommand", function() {
         assert.equal(results[8].type, ConflictType.DELETE_TARGET);
     });
 
+    //With _JAVA_OPTIONS set and there are conflicts, _JAVA_OPTIONS will appear in stderr along with the results also in stderr (and stdout will be empty)
+    it("should verify parse output - one of each type - _JAVA_OPTIONS", async function() {
+        const localPath: string = "/usr/alias/repo1";
+        const cmd: FindConflicts = new FindConflicts(undefined, localPath);
+        const executionResult: IExecutionResult = {
+            exitCode: 0,
+            stdout: "",
+            stderr: "contentChange.txt: The item content has changed\n" +
+                    "addConflict.txt: Another item with the same name exists on the server\n" +
+                    "nameChange.txt: The item name has changed\n" +
+                    "nameAndContentChange.txt: The item name and content have changed\n" +
+                    "anotherNameAndContentChange.txt: You have a conflicting pending change\n" +
+                    "contentChange2.txt: The item content has changed\n" +
+                    "deleted.txt: The item has already been deleted\n" +
+                    "branchEdit.txt: The source and target both have changes\n" +
+                    "branchDelete.txt: The item has been deleted in the target branch\n" +
+                    "Picked up _JAVA_OPTIONS: -Xmx1024M"
+        };
+
+        const results: IConflict[] = await cmd.ParseOutput(executionResult);
+        assert.equal(results.length, 9);
+        assert.equal(results[0].localPath, "contentChange.txt");
+        assert.equal(results[0].type, ConflictType.CONTENT);
+        assert.equal(results[1].localPath, "addConflict.txt");
+        assert.equal(results[1].type, ConflictType.CONTENT);
+        assert.equal(results[2].localPath, "nameChange.txt");
+        assert.equal(results[2].type, ConflictType.RENAME);
+        assert.equal(results[3].localPath, "nameAndContentChange.txt");
+        assert.equal(results[3].type, ConflictType.NAME_AND_CONTENT);
+        assert.equal(results[4].localPath, "anotherNameAndContentChange.txt");
+        assert.equal(results[4].type, ConflictType.NAME_AND_CONTENT);
+        assert.equal(results[5].localPath, "contentChange2.txt");
+        assert.equal(results[5].type, ConflictType.CONTENT);
+        assert.equal(results[6].localPath, "deleted.txt");
+        assert.equal(results[6].type, ConflictType.DELETE);
+        assert.equal(results[7].localPath, "branchEdit.txt");
+        assert.equal(results[7].type, ConflictType.MERGE);
+        assert.equal(results[8].localPath, "branchDelete.txt");
+        assert.equal(results[8].type, ConflictType.DELETE_TARGET);
+    });
+
+    //With _JAVA_OPTIONS set and there are no conflicts, _JAVA_OPTIONS is in stderr but the result we want to process is moved to stdout
+    it("should verify parse output - no conflicts - _JAVA_OPTIONS", async function() {
+        const localPath: string = "/usr/alias/repo1";
+        const cmd: FindConflicts = new FindConflicts(undefined, localPath);
+        const executionResult: IExecutionResult = {
+            exitCode: 0,
+            stdout: "There are no conflicts to resolve.\n",
+            stderr: "Picked up _JAVA_OPTIONS: -Xmx1024M\n"
+        };
+
+        const results: IConflict[] = await cmd.ParseOutput(executionResult);
+        assert.equal(results.length, 0);
+    });
+
     it("should verify parse output - errors - exit code 100", async function() {
         const localPath: string = "/usr/alias/repo 1";
         const cmd: FindConflicts = new FindConflicts(undefined, localPath);
