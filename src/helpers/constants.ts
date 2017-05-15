@@ -15,6 +15,7 @@ export class Constants {
     static ReadmeLearnMoreUrl: string = "https://aka.ms/jkapah";
     static ServerWorkspaceUrl: string = "https://github.com/Microsoft/vsts-vscode/blob/master/TFVC_README.md#what-is-the-difference-between-a-local-and-server-workspace-how-can-i-tell-which-one-im-working-with";
     static VS2015U3CSRUrl: string = "https://msdn.microsoft.com/en-us/library/mt752379.aspx";
+    static WorkspaceNotDetectedByClcUrl: string = "https://github.com/Microsoft/vsts-vscode/blob/master/TFVC_README.md#using-the-tee-clc-i-am-unable-to-access-an-existing-local-workspace-what-can-i-do";
 }
 
 export class CommandNames {
@@ -128,6 +129,7 @@ class TfvcBaseTelemetryEvents {
     static Sync: string = "sync";
     static Undo: string = "undo";
     static UndoAll: string = "undoall";
+    static WorkspaceAccessError: string = "workspaceaccesserror";
 }
 
 export class TfvcTelemetryEvents {
@@ -162,6 +164,7 @@ export class TfvcTelemetryEvents {
     static UndoClc: string = TfvcTelemetryEvents.UsingClc + "-" + TfvcBaseTelemetryEvents.Undo;
     static UndoAllExe: string = TfvcTelemetryEvents.UsingExe + "-" + TfvcBaseTelemetryEvents.UndoAll;
     static UndoAllClc: string = TfvcTelemetryEvents.UsingClc + "-" + TfvcBaseTelemetryEvents.UndoAll;
+    static ClcCannotAccessWorkspace: string = TfvcTelemetryEvents.UsingClc + "-" + TfvcBaseTelemetryEvents.WorkspaceAccessError;
 }
 
 export class WellKnownRepositoryTypes {

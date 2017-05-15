@@ -353,8 +353,12 @@ export class ExtensionManager implements Disposable {
                 });
             }
         } catch (err) {
-            Logger.LogError(err.message);
-            //For now, don't report these errors via the _feedbackClient
+            let logMsg: string = err.message;
+            if (err.stderr) { //Add stderr to logged message if we have it
+                logMsg = Utils.FormatMessage(`${logMsg} ${err.stderr}`);
+            }
+            Logger.LogError(logMsg);
+            //For now, don't report these errors via the FeedbackClient
             if (!err.tfvcErrorCode || this.shouldDisplayTfvcError(err.tfvcErrorCode)) {
                 this.setErrorStatus(err.message, undefined, false);
                 VsCodeUtils.ShowErrorMessage(err.message, ...err.messageOptions);
@@ -405,7 +409,8 @@ export class ExtensionManager implements Disposable {
         if (TfvcErrorCodes.MinVersionWarning === errorCode ||
             TfvcErrorCodes.NotFound === errorCode ||
             TfvcErrorCodes.NotAuthorizedToAccess === errorCode ||
-            TfvcErrorCodes.NotAnEnuTfCommandLine === errorCode) {
+            TfvcErrorCodes.NotAnEnuTfCommandLine === errorCode ||
+            TfvcErrorCodes.WorkspaceNotKnownToClc === errorCode) {
             return true;
         }
         return false;

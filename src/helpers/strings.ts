@@ -32,6 +32,7 @@ export class Strings {
     static NoFeedbackSent: string = "No feedback was sent.";
     static ThanksForFeedback: string = "Thanks for sending feedback!";
     static LearnMore: string = "Learn more...";
+    static MoreDetails: string = "More details...";
     static ShowMe: string = "Show Me!";
     static VS2015Update3CSR: string = "Get Latest VS 2015 Update";
 
@@ -70,6 +71,7 @@ export class Strings {
     static TfVersionWarning: string = "The configured version of TF does not meet the minimum version. You may run into errors or limitations with certain commands until you upgrade. Minimum version: ";
     static TfNoPendingChanges: string = "There are no matching pending changes.";
     static TfServerWorkspace: string = "It appears you are using a Server workspace. Currently, TFVC support is limited to Local workspaces.";
+    static ClcCannotAccessWorkspace: string = "It appears you are using the TEE CLC and are unable to access an existing workspace. The TFVC SCM Provider cannot be initialized. Click 'More details...' to learn more.";
     static UndoChanges: string = "Undo Changes";
     static NoChangesToCheckin: string = "There are no changes to check in. Changes must be added to the 'Included' section to be checked in.";
     static NoChangesToUndo: string = "There are no changes to undo.";

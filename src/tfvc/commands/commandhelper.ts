@@ -7,7 +7,7 @@
 import * as path from "path";
 
 import { parseString } from "xml2js";
-import { Constants } from "../../helpers/constants";
+import { Constants, TfvcTelemetryEvents } from "../../helpers/constants";
 import { Logger } from "../../helpers/logger";
 import { Strings } from "../../helpers/strings";
 import { Utils } from "../../helpers/utils";
@@ -80,6 +80,13 @@ export class CommandHelper {
                 message = Strings.TfServerWorkspace;
                 messageOptions = [{ title : Strings.LearnMore,
                                     url : Constants.ServerWorkspaceUrl }];
+            } else if (/TF400017: The local properties table for the local workspace/i.test(result.stderr)) {
+                //For now, we're assuming this is an indication of a workspace the CLC doesn't know about (but exists locally)
+                tfvcErrorCode = TfvcErrorCodes.WorkspaceNotKnownToClc;
+                message = Strings.ClcCannotAccessWorkspace;
+                messageOptions = [{ title : Strings.MoreDetails,
+                                    url : Constants.WorkspaceNotDetectedByClcUrl,
+                                    telemetryId: TfvcTelemetryEvents.ClcCannotAccessWorkspace }];
             } else if (showFirstError) {
                 message = result.stderr ? result.stderr : result.stdout;
             }

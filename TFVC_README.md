@@ -190,7 +190,7 @@ Studio Code Settings (**File > Preferences > Settings**):
 
 ## Frequently Asked Questions
 ### *Is it required that I have a TFVC workspace already on my local machine to use the TFVC support?*
-With release 1.116.0, yes, it is a requirement that you have an existing workspace on your local machine.
+Since release 1.116.0, yes, it is a requirement that you have an existing workspace on your local machine.
 
 ### *Can I use the Team Explorer Everywhere Command Line Client (TEE CLC) to provide the TFVC functionality on Windows?*
 Yes. If you use Eclipse or one of JetBrain's IDEs (e.g, Android Studio, IntelliJ) on Windows, then you will want to use the TEE CLC to provide
@@ -215,6 +215,15 @@ You will follow the same instructions for setting up the TEE CLC as is shown on 
 
 ### *I have workspaces created with Visual Studio. Can I use the TEE CLC to work with them?*
 This should be possible. However, you will need to make the TEE CLC aware of those workspaces by running the `tf workspaces -collection:<collection-url>` command.
+
+### *Using the TEE CLC, I am unable to access an existing local workspace. What can I do?*
+This error may mean you are attempting to access a workspace created by TF.exe from the TEE CLC. First, using the CLC, run the `tf workspaces` command as detailed [here](#i-have-workspaces-created-with-visual-studio-can-i-use-the-tee-clc-to-work-with-them) 
+to help the CLC be aware of the workspaces in the specified collection. You may also need to run the `tf workfold` command from the local folder being accessed from Visual Studio Code. Running both commands should make the TEE CLC aware of the workspace and 
+as well as verify that access to it is possible.
+
+### *My TFS server requires associating work items to a check-in via check-in policies but I can't check in with TF.exe. What can I do?*
+Unfortunately, TF.exe doesn't provide the ability to associate work items on check in. The most TF.exe can do is submit a check in *comment* with a reference to the work item (which will not actually associate the work item). In order to enable checking in to 
+servers that have check-in policies enabled, you must use the TEE CLC (which does provide support for associating work items on check-in). Follow [these instructions](#how-do-i-set-up-the-clc-on-windows) to set up the TEE CLC on Windows.
 
 ### *Where is the support for Server workspaces?*
 At this time, it's still on the backlog. The issue tracking support for Server workspaces is [here](https://github.com/Microsoft/vsts-vscode/issues/176).
