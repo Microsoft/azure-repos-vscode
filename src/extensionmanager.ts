@@ -210,15 +210,14 @@ export class ExtensionManager implements Disposable {
     private displayNoCredentialsMessage(): void {
         let error: string = Strings.NoTeamServerCredentialsRunSignin;
         let displayError: string = Strings.NoTeamServerCredentialsRunSignin;
-        let learnMoreMessageItem: IButtonMessageItem;
-        let showMeMessageItem: IButtonMessageItem;
+        const messageItems: IButtonMessageItem[] = [];
         if (this._serverContext.RepoInfo.IsTeamServices === true) {
-            learnMoreMessageItem = { title : Strings.LearnMore,
+            messageItems.push({ title : Strings.LearnMore,
                             url : Constants.TokenLearnMoreUrl,
-                            telemetryId: TelemetryEvents.TokenLearnMoreClick };
-            showMeMessageItem = { title : Strings.ShowMe,
+                            telemetryId: TelemetryEvents.TokenLearnMoreClick });
+            messageItems.push({ title : Strings.ShowMe,
                             url : Constants.TokenShowMeUrl,
-                            telemetryId: TelemetryEvents.TokenShowMeClick };
+                            telemetryId: TelemetryEvents.TokenShowMeClick });
             //Need different messages for popup message and status bar
             //Add the account name to the message to help the user
             error =  util.format(Strings.NoAccessTokenRunSignin, this._serverContext.RepoInfo.Account);
@@ -226,7 +225,7 @@ export class ExtensionManager implements Disposable {
         }
         Logger.LogError(error);
         this.setErrorStatus(error, CommandNames.Signin, false);
-        VsCodeUtils.ShowErrorMessage(displayError, learnMoreMessageItem, showMeMessageItem);
+        VsCodeUtils.ShowErrorMessage(displayError, ...messageItems);
     }
 
     private async initializeExtension(): Promise<void> {
