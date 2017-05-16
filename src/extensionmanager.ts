@@ -467,7 +467,7 @@ export class ExtensionManager implements Disposable {
         if (rootPath !== undefined) {
             Logger.LogPath = rootPath;
             Logger.LogInfo(`*** FOLDER: ${rootPath} ***`);
-            Logger.LogInfo(`version ${Constants.ExtensionVersion}`);
+            Logger.LogInfo(`${UserAgentProvider.UserAgent}`);
         } else {
             Logger.LogInfo(`*** Folder not opened ***`);
         }
