@@ -103,6 +103,8 @@ export class TfCommandLineRunner {
         }
 
         // check the version of TFVC command line
+        Logger.LogDebug(`TFVC Minimum required version: ${tfvc.minVersion}`);
+        Logger.LogDebug(`TFVC (TF.exe, TF.cmd) version: ${version}`);
         const minVersion: TfvcVersion = TfvcVersion.FromString(tfvc.minVersion);
         const curVersion: TfvcVersion = TfvcVersion.FromString(version);
         if (TfvcVersion.Compare(curVersion, minVersion) < 0) {
