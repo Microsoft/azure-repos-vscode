@@ -77,7 +77,7 @@ export class TfCommandLineRunner {
         }
 
         // Determine the min version
-        const isExe: boolean = path.extname(tfvcPath) === ".exe";
+        const isExe: boolean = path.extname(tfvcPath).toLowerCase() === ".exe";
         let minVersion: string = "14.0.4"; //CLC min version
         if (isExe) {
             minVersion = "14.102.0";  //Minimum tf.exe version
