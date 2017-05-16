@@ -225,6 +225,11 @@ as well as verify that access to it is possible.
 Unfortunately, TF.exe doesn't provide the ability to associate work items on check in. The most TF.exe can do is submit a check in *comment* with a reference to the work item (which will not actually associate the work item). In order to enable checking in to 
 servers that have check-in policies enabled, you must use the TEE CLC (which does provide support for associating work items on check-in). Follow [these instructions](#how-do-i-set-up-the-clc-on-windows) to set up the TEE CLC on Windows.
 
+### *How can I acquire TF.exe? Do I need a version of Visual Studio?*
+Yes, you do need a version of Visual Studio. While TF.exe comes with the Community, Enterprise and Professional versions of Visual Studio 2017, there is also a free, standalone "Visual Studio Team Explorer 2017" version that contains TF.exe. You can find all 
+of the versions of Visual Studio (including Team Explorer) on the [Visual Studio 2017 Downloads](https://www.visualstudio.com/downloads/) page (which needs to be expanded first). It is listed under the "Visual Studio 2017" section on that page. The release 
+notes for Team Explorer 2017 can be found [here](https://www.visualstudio.com/en-us/news/releasenotes/vs2017-relnotes-v15.1#te).
+
 ### *Where is the support for Server workspaces?*
 At this time, it's still on the backlog. The issue tracking support for Server workspaces is [here](https://github.com/Microsoft/vsts-vscode/issues/176).
 
