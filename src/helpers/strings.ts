@@ -46,6 +46,7 @@ export class Strings {
     static ProvidePassword: string = "Provide the password for username";
     static ProvideUsername: string = "Provide the username for server";
 
+    static UnsupportedWitServerVersion: string = "Work Item Tracking (WIT) functionality is disabled. WIT functionality requires TFS version 2015 Update 2 or later.";
     static UnsupportedServerVersion: string = "The Team Services extension only supports TFS version 2015 Update 2 or later. Please verify your TFS server version.";
     static UnableToRemoveCredentials: string = "Unable to remove credentials for this host. You may need to remove them manually. Host: ";
     static UnableToStoreCredentials: string = "Unable to store credentials for this host. Host: ";

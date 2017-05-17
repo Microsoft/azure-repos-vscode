@@ -10,7 +10,7 @@ import { Logger } from "../helpers/logger";
 import { SimpleWorkItem, WorkItemTrackingService } from "../services/workitemtracking";
 import { Telemetry } from "../services/telemetry";
 import { TeamServerContext} from "../contexts/servercontext";
-import { BaseQuickPickItem, WorkItemQueryQuickPickItem } from "../helpers/vscodeutils";
+import { BaseQuickPickItem, VsCodeUtils, WorkItemQueryQuickPickItem } from "../helpers/vscodeutils";
 import { TelemetryEvents, WitQueries, WitTypes } from "../helpers/constants";
 import { Strings } from "../helpers/strings";
 import { Utils } from "../helpers/utils";
@@ -49,7 +49,7 @@ export class WitClient extends BaseClient {
                 Utils.OpenUrl(newItemUrl);
             }
         } catch (err) {
-            this.handleError(err, WitClient.GetOfflinePinnedQueryStatusText(), false, "Error creating new work item");
+            this.handleWitError(err, WitClient.GetOfflinePinnedQueryStatusText(), false, "Error creating new work item");
         }
     }
 
@@ -80,7 +80,7 @@ export class WitClient extends BaseClient {
                 }
             }
         } catch (err) {
-            this.handleError(err, WitClient.GetOfflinePinnedQueryStatusText(), false, "Error showing work item queries");
+            this.handleWitError(err, WitClient.GetOfflinePinnedQueryStatusText(), false, "Error showing work item queries");
         }
     }
 
@@ -91,7 +91,7 @@ export class WitClient extends BaseClient {
             const queryText: string = await this.getPinnedQueryText();
             await this.showWorkItems(queryText);
         } catch (err) {
-            this.handleError(err, WitClient.GetOfflinePinnedQueryStatusText(), false, "Error showing pinned query work items");
+            this.handleWitError(err, WitClient.GetOfflinePinnedQueryStatusText(), false, "Error showing pinned query work items");
         }
     }
 
@@ -101,18 +101,23 @@ export class WitClient extends BaseClient {
         try {
             await this.showWorkItems(WitQueries.MyWorkItems);
         } catch (err) {
-            this.handleError(err, WitClient.GetOfflinePinnedQueryStatusText(), false, "Error showing my work items");
+            this.handleWitError(err, WitClient.GetOfflinePinnedQueryStatusText(), false, "Error showing my work items");
         }
     }
 
     public async ChooseWorkItems(): Promise<string[]> {
         Logger.LogInfo("Getting work items to choose from...");
-        const query: string = await this.getPinnedQueryText(); //gets either MyWorkItems, queryText or wiql of queryPath of PinnedQuery
-        // TODO: There isn't a way to do a multi select pick list right now, but when there is we should change this to use it.
-        const workItem: BaseQuickPickItem = await window.showQuickPick(await this.getMyWorkItems(this._serverContext.RepoInfo.TeamProject, query), { matchOnDescription: true, placeHolder: Strings.ChooseWorkItem });
-        if (workItem) {
-            return ["#" + workItem.id + " - " + workItem.description];
-        } else {
+        try {
+            const query: string = await this.getPinnedQueryText(); //gets either MyWorkItems, queryText or wiql of queryPath of PinnedQuery
+            // TODO: There isn't a way to do a multi select pick list right now, but when there is we should change this to use it.
+            const workItem: BaseQuickPickItem = await window.showQuickPick(await this.getMyWorkItems(this._serverContext.RepoInfo.TeamProject, query), { matchOnDescription: true, placeHolder: Strings.ChooseWorkItem });
+            if (workItem) {
+                return ["#" + workItem.id + " - " + workItem.description];
+            } else {
+                return [];
+            }
+        } catch (err) {
+            this.handleWitError(err, WitClient.GetOfflinePinnedQueryStatusText(), false, "Error showing my work items in order to choose (associate)");
             return [];
         }
     }
@@ -134,7 +139,7 @@ export class WitClient extends BaseClient {
         }
     }
 
-    public async GetPinnedQueryResultCount() : Promise<number> {
+    public async GetPinnedQueryResultCount(): Promise<number> {
         try {
             Logger.LogInfo("Running pinned work item query to get count (" + this._serverContext.RepoInfo.TeamProject + ")...");
             const queryText: string = await this.getPinnedQueryText();
@@ -142,7 +147,7 @@ export class WitClient extends BaseClient {
             const svc: WorkItemTrackingService = new WorkItemTrackingService(this._serverContext);
             return svc.GetQueryResultCount(this._serverContext.RepoInfo.TeamProject, queryText);
         } catch (err) {
-            this.handleError(err, WitClient.GetOfflinePinnedQueryStatusText(), false, "Error getting pinned query result count");
+            this.handleWitError(err, WitClient.GetOfflinePinnedQueryStatusText(), false, "Error getting pinned query result count");
         }
     }
 
@@ -238,6 +243,24 @@ export class WitClient extends BaseClient {
         return workItemTypes;
     }
 
+    private handleWitError(err: Error, offlineText: string, polling: boolean, infoMessage?: string): void {
+        if (err.message.includes("Failed to find api location for area: wit id:")) {
+            Telemetry.SendEvent(TelemetryEvents.UnsupportedWitServerVersion);
+            const msg: string = Strings.UnsupportedWitServerVersion;
+            if (this._statusBarItem !== undefined) {
+                this._statusBarItem.text = `$(icon octicon-bug) $(icon octicon-x)`;
+                this._statusBarItem.tooltip = msg;
+                this._statusBarItem.command = undefined; //Clear the existing command
+            }
+            if (!polling) {
+                Logger.LogError(msg);
+                VsCodeUtils.ShowErrorMessage(msg);
+            }
+        } else {
+            this.handleError(err, offlineText, polling, infoMessage);
+        }
+    }
+
     private logTelemetryForWorkItem(wit: string): void {
         switch (wit) {
             case WitTypes.Bug:
@@ -256,7 +279,7 @@ export class WitClient extends BaseClient {
             this._statusBarItem.tooltip = Strings.ViewYourPinnedQuery;
             this._statusBarItem.text = WitClient.GetPinnedQueryStatusText(numberOfItems.toString());
         }).catch((err) => {
-            this.handleError(err, WitClient.GetOfflinePinnedQueryStatusText(), true, "Failed to get pinned query count during polling");
+            this.handleWitError(err, WitClient.GetOfflinePinnedQueryStatusText(), true, "Failed to get pinned query count during polling");
         });
     }
 

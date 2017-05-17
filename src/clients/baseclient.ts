@@ -22,7 +22,7 @@ export abstract class BaseClient {
         this._statusBarItem = statusBarItem;
     }
 
-    protected handleError(err: Error, offlineText: string, polling: boolean, infoMessage?: string) : void {
+    protected handleError(err: Error, offlineText: string, polling: boolean, infoMessage?: string): void {
         const offline: boolean = Utils.IsOffline(err);
         const msg: string = Utils.GetMessageForStatusCode(err, err.message);
         const logPrefix: string = (infoMessage === undefined) ? "" : infoMessage + " ";

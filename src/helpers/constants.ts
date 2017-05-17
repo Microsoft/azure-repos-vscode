@@ -98,6 +98,7 @@ export class TelemetryEvents {
     static TokenLearnMoreClick: string = TelemetryEvents.TelemetryPrefix + "tokenlearnmoreclick";
     static TokenShowMeClick: string = TelemetryEvents.TelemetryPrefix + "tokenshowmeclick";
     static UnsupportedServerVersion: string = TelemetryEvents.TelemetryPrefix + "unsupportedversion";
+    static UnsupportedWitServerVersion: string = TelemetryEvents.TelemetryPrefix + "unsupportedwitversion";
     static ViewPullRequest: string = TelemetryEvents.TelemetryPrefix + "viewpullrequest";
     static ViewPullRequests: string = TelemetryEvents.TelemetryPrefix + "viewpullrequests";
     static ViewMyWorkItems: string = TelemetryEvents.TelemetryPrefix + "viewmyworkitems";
