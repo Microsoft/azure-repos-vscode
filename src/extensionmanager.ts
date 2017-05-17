@@ -313,8 +313,9 @@ export class ExtensionManager implements Disposable {
                             }
                         } catch (err) {
                             //TODO: With TFVC, creating a RepositoryInfo can throw (can't get project collection, can't get team project, etc.)
-                            // We get a 404 on-prem if we aren't Update 2 or later
-                            if (this._serverContext.RepoInfo.IsTeamFoundationServer === true && err.statusCode === 404) {
+                            // We get a 404 on-prem if we aren't TFS 2015 Update 2 or later and 'core id' error with TFS 2013 RTM (and likely later)
+                            if (this._serverContext.RepoInfo.IsTeamFoundationServer === true &&
+                                (err.statusCode === 404 || (err.message && err.message.indexOf("Failed to find api location for area: core id:") === 0))) {
                                 this.setErrorStatus(Strings.UnsupportedServerVersion, undefined, false);
                                 Logger.LogError(Strings.UnsupportedServerVersion);
                                 Telemetry.SendEvent(TelemetryEvents.UnsupportedServerVersion);
