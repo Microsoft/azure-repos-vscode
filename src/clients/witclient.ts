@@ -247,13 +247,13 @@ export class WitClient extends BaseClient {
         if (err.message.includes("Failed to find api location for area: wit id:")) {
             Telemetry.SendEvent(TelemetryEvents.UnsupportedWitServerVersion);
             const msg: string = Strings.UnsupportedWitServerVersion;
+            Logger.LogError(msg);
             if (this._statusBarItem !== undefined) {
                 this._statusBarItem.text = `$(icon octicon-bug) $(icon octicon-x)`;
                 this._statusBarItem.tooltip = msg;
                 this._statusBarItem.command = undefined; //Clear the existing command
             }
             if (!polling) {
-                Logger.LogError(msg);
                 VsCodeUtils.ShowErrorMessage(msg);
             }
         } else {
