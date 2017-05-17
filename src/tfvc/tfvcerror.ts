@@ -57,7 +57,7 @@ export class TfvcError {
         }
 
         this.message = this.message || data.message || Strings.TfExecFailedError;
-        this.messageOptions = data.messageOptions;
+        this.messageOptions = data.messageOptions || [];
         this.stdout = data.stdout;
         this.stderr = data.stderr;
         this.exitCode = data.exitCode;
