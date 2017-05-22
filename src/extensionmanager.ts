@@ -107,7 +107,7 @@ export class ExtensionManager implements Disposable {
                 || !this._serverContext.RepoInfo.IsTeamFoundation) {
             //If the user previously signed out (in this session of VS Code), show a message to that effect
             if (this._teamExtension.IsSignedOut) {
-                this.setErrorStatus(Strings.UserMustSignIn);
+                this.setErrorStatus(Strings.UserMustSignIn, CommandNames.Signin);
             } else {
                 this.setErrorStatus(Strings.NoRepoInformation);
             }
@@ -224,8 +224,16 @@ export class ExtensionManager implements Disposable {
             displayError = util.format(Strings.NoAccessTokenLearnMoreRunSignin, this._serverContext.RepoInfo.Account);
         }
         Logger.LogError(error);
-        this.setErrorStatus(error, CommandNames.Signin, false);
+        this.setErrorStatus(error, CommandNames.Signin);
         VsCodeUtils.ShowErrorMessage(displayError, ...messageItems);
+    }
+
+    private formatErrorLogMessage(err): string {
+        let logMsg: string = err.message;
+        if (err.stderr) { //Add stderr to logged message if we have it
+            logMsg = Utils.FormatMessage(`${logMsg} ${err.stderr}`);
+        }
+        return logMsg;
     }
 
     private async initializeExtension(): Promise<void> {
@@ -307,7 +315,7 @@ export class ExtensionManager implements Disposable {
                                 Logger.LogObject(settings);
                                 this.logDebugInformation();
                             } catch (err) {
-                                this.setErrorStatus(Utils.GetMessageForStatusCode(err, err.message), (err.statusCode === 401 ? CommandNames.Signin : undefined), false);
+                                this.setErrorStatus(Utils.GetMessageForStatusCode(err, err.message), (err.statusCode === 401 ? CommandNames.Signin : undefined));
                                 //Wrap err here to get a useful call stack
                                 this.ReportError(new Error(err), Utils.GetMessageForStatusCode(err, err.message, "Failed to get results with accountClient: "));
                             }
@@ -316,11 +324,11 @@ export class ExtensionManager implements Disposable {
                             // We get a 404 on-prem if we aren't TFS 2015 Update 2 or later and 'core id' error with TFS 2013 RTM (and likely later)
                             if (this._serverContext.RepoInfo.IsTeamFoundationServer === true &&
                                 (err.statusCode === 404 || (err.message && err.message.indexOf("Failed to find api location for area: core id:") === 0))) {
-                                this.setErrorStatus(Strings.UnsupportedServerVersion, undefined, false);
+                                this.setErrorStatus(Strings.UnsupportedServerVersion);
                                 Logger.LogError(Strings.UnsupportedServerVersion);
                                 Telemetry.SendEvent(TelemetryEvents.UnsupportedServerVersion);
                             } else {
-                                this.setErrorStatus(Utils.GetMessageForStatusCode(err, err.message), (err.statusCode === 401 ? CommandNames.Signin : undefined), false);
+                                this.setErrorStatus(Utils.GetMessageForStatusCode(err, err.message), (err.statusCode === 401 ? CommandNames.Signin : undefined));
                                 //Wrap err here to get a useful call stack
                                 this.ReportError(new Error(err), Utils.GetMessageForStatusCode(err, err.message, "Failed call with repositoryClient: "));
                             }
@@ -328,24 +336,38 @@ export class ExtensionManager implements Disposable {
                     }
 
                     // Now that everything else is ready, create the SCM provider
-                    if (this._repoContext.Type === RepositoryType.TFVC) {
-                        const tfvcContext: TfvcContext = <TfvcContext>this._repoContext;
-                        this.sendTfvcConfiguredTelemetry(tfvcContext.TfvcRepository);
-                        Logger.LogInfo(`Sent TFVC tooling telemetry`);
-                        if (!this._scmProvider) {
-                            Logger.LogDebug(`Initializing the TfvcSCMProvider`);
-                            this._scmProvider = new TfvcSCMProvider(this);
-                            await this._scmProvider.Initialize();
-                            Logger.LogDebug(`Initialized the TfvcSCMProvider`);
-                        } else {
-                            Logger.LogDebug(`Re-initializing the TfvcSCMProvider`);
-                            await this._scmProvider.Reinitialize();
-                            Logger.LogDebug(`Re-initialized the TfvcSCMProvider`);
+                    try {
+                        if (this._repoContext.Type === RepositoryType.TFVC) {
+                            const tfvcContext: TfvcContext = <TfvcContext>this._repoContext;
+                            this.sendTfvcConfiguredTelemetry(tfvcContext.TfvcRepository);
+                            Logger.LogInfo(`Sent TFVC tooling telemetry`);
+                            if (!this._scmProvider) {
+                                Logger.LogDebug(`Initializing the TfvcSCMProvider`);
+                                this._scmProvider = new TfvcSCMProvider(this);
+                                await this._scmProvider.Initialize();
+                                Logger.LogDebug(`Initialized the TfvcSCMProvider`);
+                            } else {
+                                Logger.LogDebug(`Re-initializing the TfvcSCMProvider`);
+                                await this._scmProvider.Reinitialize();
+                                Logger.LogDebug(`Re-initialized the TfvcSCMProvider`);
+                            }
+                            this.sendTfvcConnectedTelemetry(tfvcContext.TfvcRepository);
                         }
-                        this.sendTfvcConnectedTelemetry(tfvcContext.TfvcRepository);
+                    } catch (err) {
+                        Logger.LogError(`Caught an exception during Tfvc SCM Provider initialization`);
+                        const logMsg: string = this.formatErrorLogMessage(err);
+                        Logger.LogError(logMsg);
+                        if (err.tfvcErrorCode) {
+                            this.setErrorStatus(err.message);
+                            //Dispose of the Build and WIT status bar items so they don't show up (they should be re-created once a new folder is opened)
+                            this._teamExtension.cleanup();
+                            if (this.shouldDisplayTfvcError(err.tfvcErrorCode)) {
+                                VsCodeUtils.ShowErrorMessage(err.message, ...err.messageOptions);
+                            }
+                        }
                     }
                 }).fail((err) => {
-                    this.setErrorStatus(Utils.GetMessageForStatusCode(err, err.message), (err.statusCode === 401 ? CommandNames.Signin : undefined), false);
+                    this.setErrorStatus(Utils.GetMessageForStatusCode(err, err.message), (err.statusCode === 401 ? CommandNames.Signin : undefined));
                     //If we can't get a requestHandler, report the error via the feedbackclient
                     const message: string = Utils.GetMessageForStatusCode(err, err.message, "Failed to get a credential handler");
                     Logger.LogError(message);
@@ -353,14 +375,11 @@ export class ExtensionManager implements Disposable {
                 });
             }
         } catch (err) {
-            let logMsg: string = err.message;
-            if (err.stderr) { //Add stderr to logged message if we have it
-                logMsg = Utils.FormatMessage(`${logMsg} ${err.stderr}`);
-            }
+            const logMsg: string = this.formatErrorLogMessage(err);
             Logger.LogError(logMsg);
-            //For now, don't report these errors via the FeedbackClient
+            //For now, don't report these errors via the FeedbackClient (TFVC errors could result from TfvcContext creation failing)
             if (!err.tfvcErrorCode || this.shouldDisplayTfvcError(err.tfvcErrorCode)) {
-                this.setErrorStatus(err.message, undefined, false);
+                this.setErrorStatus(err.message);
                 VsCodeUtils.ShowErrorMessage(err.message, ...err.messageOptions);
             }
         }
@@ -477,13 +496,12 @@ export class ExtensionManager implements Disposable {
         this._errorMessage = undefined;
     }
 
-    private setErrorStatus(message: string, commandOnClick?: string, showRetryMessage?: boolean): void {
+    private setErrorStatus(message: string, commandOnClick?: string): void {
         this._errorMessage = message;
         if (this._teamServicesStatusBarItem !== undefined) {
-            //TODO: Should the default command be to do nothing?  Or perhaps to display the message?
-            this._teamServicesStatusBarItem.command = commandOnClick === undefined ? CommandNames.Reinitialize : commandOnClick;
-            this._teamServicesStatusBarItem.text = "Team " + `$(icon octicon-stop)`;
-            const message: string = this._errorMessage + (showRetryMessage !== undefined && showRetryMessage === true ? " " + Strings.ClickToRetryConnection : "") ;
+            //TODO: Should the default command be to display the message?
+            this._teamServicesStatusBarItem.command = commandOnClick; // undefined clears the command
+            this._teamServicesStatusBarItem.text = `Team $(icon octicon-stop)`;
             this._teamServicesStatusBarItem.tooltip = message;
             this._teamServicesStatusBarItem.show();
         }
