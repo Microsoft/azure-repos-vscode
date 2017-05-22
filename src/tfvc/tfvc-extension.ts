@@ -151,7 +151,7 @@ export class TfvcExtension  {
     public async Refresh(): Promise<void> {
         this.displayErrors(
             async () => {
-                TfvcSCMProvider.Refresh();
+                await TfvcSCMProvider.Refresh();
             },
             "Refresh");
     }

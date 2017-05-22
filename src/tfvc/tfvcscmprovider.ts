@@ -200,7 +200,7 @@ export class TfvcSCMProvider {
         );
 
         // Refresh the model now that we are done setting up
-        this._model.Refresh();
+        await this._model.Refresh();
     }
 
     private cleanup() {
