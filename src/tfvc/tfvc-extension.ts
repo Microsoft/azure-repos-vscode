@@ -342,13 +342,19 @@ export class TfvcExtension  {
         try {
             await funcToTry(prefix);
         } catch (err) {
+            let messageOptions: IButtonMessageItem[] = [];
             TfvcOutput.AppendLine(Utils.FormatMessage(`[${prefix}] ${err.message}`));
             //If we also have text in err.stdout, provide that to the output channel
             if (err.stdout) { //TODO: perhaps just for 'Checkin'? Or the CLC?
                 TfvcOutput.AppendLine(Utils.FormatMessage(`[${prefix}] ${err.stdout}`));
             }
-            const messageItem: IButtonMessageItem = { title : Strings.ShowTfvcOutput, command: TfvcCommandNames.ShowOutput };
-            VsCodeUtils.ShowErrorMessage(err.message, messageItem);
+            //If an exception provides its own messageOptions, use them
+            if (err.messageOptions && err.messageOptions.length > 0) {
+                messageOptions = err.messageOptions;
+            } else {
+                messageOptions.push({ title : Strings.ShowTfvcOutput, command: TfvcCommandNames.ShowOutput });
+            }
+            VsCodeUtils.ShowErrorMessage(err.message, ...messageOptions);
         }
     }
 
