@@ -9,7 +9,7 @@ import { Settings } from "../helpers/settings";
 import { TeamServerContext } from "../contexts/servercontext";
 
 import appInsights = require("applicationinsights");
-import uuid = require("node-uuid");
+import uuid = require("uuid");
 
 import * as os from "os";
 
