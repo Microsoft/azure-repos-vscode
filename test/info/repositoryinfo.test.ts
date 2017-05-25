@@ -21,6 +21,7 @@ describe("RepositoryInfo", function() {
         assert.isTrue(repoInfo.IsTeamFoundationServer);
         assert.isFalse(repoInfo.IsTeamServices);
         assert.equal(repoInfo.RepositoryUrl, url);
+        assert.equal(repoInfo.Protocol, "http:");
 
         // For on-prem currently, these should not be set
         assert.equal(repoInfo.CollectionId, undefined);
@@ -77,6 +78,7 @@ describe("RepositoryInfo", function() {
         const repoInfo: RepositoryInfo = new RepositoryInfo("https://account.visualstudio.com/DefaultCollection/teamproject/_git/repositoryName");
         assert.equal(repoInfo.Host, "account.visualstudio.com");
         assert.equal(repoInfo.Account, "account");
+        assert.equal(repoInfo.Protocol, "https:");
         assert.isTrue(repoInfo.IsTeamServices);
         assert.isTrue(repoInfo.IsTeamFoundation);
     });

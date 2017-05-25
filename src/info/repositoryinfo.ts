@@ -133,6 +133,9 @@ export class RepositoryInfo {
     public get IsTeamServices(): boolean {
         return this._isTeamServicesUrl;
     }
+    public get Protocol(): string {
+        return this._protocol;
+    }
     public get RepositoryId(): string {
         return this._repositoryId;
     }
