@@ -12,14 +12,14 @@ import appInsights = require("applicationinsights");
 import uuid = require("uuid");
 
 import * as os from "os";
+import * as crypto from "crypto";
 
 export class Telemetry {
     private static _appInsightsClient: Client;
     private static _serverContext: TeamServerContext;
     private static _telemetryEnabled: boolean = true;
-    private static _collectionId: string = "UNKNOWN"; //The collectionId can be updated later
     //Default to a new uuid in case the extension fails before being initialized
-    private static _userId: string = uuid.v1(); //The userId can be updated later
+    private static _userId: string =  "UNKNOWN";
     private static _sessionId: string = uuid.v4(); //The sessionId can be updated later
     private static _productionKey: string = "44267cbb-b9ba-4bce-a37a-338588aa4da3";
 
@@ -46,6 +46,8 @@ export class Telemetry {
         Telemetry._appInsightsClient = appInsights.getClient(insightsKey);
         //Need to use HTTPS with v0.15.16 of App Insights
         Telemetry._appInsightsClient.config.endpointUrl = "https://dc.services.visualstudio.com/v2/track";
+
+        Telemetry.setUserId();
 
         //Assign common properties to all telemetry sent from the default client
         Telemetry.setCommonProperties();
@@ -74,23 +76,6 @@ export class Telemetry {
         }
     }
 
-    //Updates the collectionId and userId originally set when constructed.  We need the telemetry
-    //service before we actually have collectionId and userId.  Due to fallback when vsts/info api
-    //is missing, collectionId could be undefined.
-    public static Update(collectionId: string, userId: string) {
-        Telemetry.ensureInitialized();
-
-        if (collectionId !== undefined) {
-            Telemetry._collectionId = collectionId;
-        }
-        if (userId !== undefined) {
-            Telemetry._userId = userId;
-            //If we change the userId, we also want to associate a new sessionId
-            Telemetry._sessionId = uuid.v4();
-        }
-        Telemetry.setCommonProperties();
-    }
-
     //Make sure we're calling it after initializing
     private static ensureInitialized(): void {
         if (Telemetry._appInsightsClient === undefined) {
@@ -98,11 +83,27 @@ export class Telemetry {
         }
     }
 
+    //Will generate a consistent ApplicationInsights userId
+    private static setUserId(): void {
+        let username: string = "UNKNOWN";
+        let hostname: string = "UNKNOWN";
+
+        if (os.userInfo().username) {
+            username = os.userInfo().username;
+        }
+        if (os.hostname()) {
+            hostname = os.hostname();
+        }
+
+        const value: string = `${username}@${hostname}`;
+        Telemetry._userId = crypto.createHash("sha1").update(value).digest("hex");
+    }
+
     private static setCommonProperties(): void {
         Telemetry._appInsightsClient.commonProperties = {
             "VSTS.TeamFoundationServer.IsHostedServer" : Telemetry._serverContext === undefined ? "UNKNOWN" : Telemetry._serverContext.RepoInfo.IsTeamServices.toString(),
             "VSTS.TeamFoundationServer.ServerId" : Telemetry._serverContext === undefined ? "UNKNOWN" : Telemetry._serverContext.RepoInfo.Host,
-            "VSTS.TeamFoundationServer.CollectionId": Telemetry._collectionId,
+            "VSTS.TeamFoundationServer.Protocol" : Telemetry._serverContext === undefined ? "UNKNOWN" : Telemetry._serverContext.RepoInfo.Protocol,
             "VSTS.Core.Machine.OS.Platform" : os.platform(),
             "VSTS.Core.Machine.OS.Type" : os.type(),
             "VSTS.Core.Machine.OS.Release" : os.release(),
@@ -111,10 +112,10 @@ export class Telemetry {
         };
 
         //Set the userid on the AI context so that we can get user counts in the telemetry
-        const aiUserId = Telemetry._appInsightsClient.context.keys.userId;
+        const aiUserId: string = Telemetry._appInsightsClient.context.keys.userId;
         Telemetry._appInsightsClient.context.tags[aiUserId] = Telemetry._userId;
 
-        const aiSessionId = Telemetry._appInsightsClient.context.keys.sessionId;
+        const aiSessionId: string = Telemetry._appInsightsClient.context.keys.sessionId;
         Telemetry._appInsightsClient.context.tags[aiSessionId] = Telemetry._sessionId;
     }
 }
