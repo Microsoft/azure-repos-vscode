@@ -303,8 +303,6 @@ export class ExtensionManager implements Disposable {
                                 this._serverContext.UserInfo = new UserInfo(settings.authenticatedUser.id,
                                                                             settings.authenticatedUser.providerDisplayName,
                                                                             settings.authenticatedUser.customDisplayName);
-                                //Finally, update Telemetry with the user's specific collection id and user id
-                                Telemetry.Update(this._serverContext.RepoInfo.CollectionId, this._serverContext.UserInfo.Id);
 
                                 this.initializeStatusBars();
                                 await this.initializeClients(this._repoContext.Type);
