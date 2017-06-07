@@ -74,6 +74,7 @@ export class Strings {
     static TfServerWorkspace: string = "It appears you are using a Server workspace. Currently, TFVC support is limited to Local workspaces.";
     static ClcCannotAccessWorkspace: string = "It appears you are using the TEE CLC and are unable to access an existing workspace. The TFVC SCM Provider cannot be initialized. Click 'More details...' to learn more.";
     static UndoChanges: string = "Undo Changes";
+    static DeleteFile: string = "Delete File";
     static NoChangesToCheckin: string = "There are no changes to check in. Changes must be added to the 'Included' section to be checked in.";
     static NoChangesToUndo: string = "There are no changes to undo.";
     static AllFilesUpToDate: string = "All files are up to date.";

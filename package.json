@@ -71,6 +71,10 @@
           "when": "false"
         },
         {
+          "command": "tfvc.Delete",
+          "when": "false"
+        },
+        {
           "command": "tfvc.Rename",
           "when": "false"
         },
@@ -100,6 +104,11 @@
         }
       ],
       "explorer/context": [
+        {
+          "command": "tfvc.Delete",
+          "group": "9_cutcopypaste",
+          "when": "scmProvider == tfvc"
+        },
         {
           "command": "tfvc.Rename",
           "group": "9_cutcopypaste",
@@ -388,6 +397,11 @@
       {
         "command": "tfvc.OpenFile",
         "title": "Open File",
+        "category": "TFVC"
+      },
+      {
+        "command": "tfvc.Delete",
+        "title": "Delete (TFVC)",
         "category": "TFVC"
       },
       {

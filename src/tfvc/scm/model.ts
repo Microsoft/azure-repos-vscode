@@ -12,7 +12,7 @@ import { filterEvent } from "../util";
 import { Resource } from "./resource";
 import { ResourceGroup, IncludedGroup, ExcludedGroup, ConflictsGroup } from "./resourcegroups";
 import { IConflict, IPendingChange } from "../interfaces";
-import { ConflictType, GetStatuses, Status } from "./status";
+import { ConflictType, Status } from "./status";
 import { TfvcOutput } from "../tfvcoutput";
 
 import * as _ from "underscore";
@@ -137,9 +137,6 @@ export class Model implements Disposable {
 
         // Without any server context we can't run delete or resolve commands
         if (this._repository.HasContext) {
-            // Check for any pending deletes and run 'tf delete' on each
-            await this.processDeletes(changes);
-
             // Get the list of conflicts
             //TODO: Optimize out this call unless it is needed. This call takes over 4 times longer than the status call and is unecessary most of the time.
             foundConflicts = await this._repository.FindConflicts();
@@ -174,8 +171,8 @@ export class Model implements Disposable {
                 if (_.contains(this._explicitlyExcluded, resource.resourceUri.fsPath.toLowerCase())) {
                     return excluded.push(resource);
                 }
-                //Versioned changes should always be included
-                if (resource.IsVersioned) {
+                //Versioned changes should always be included (as long as they're not deletes)
+                if (resource.IsVersioned && !resource.HasStatus(Status.DELETE)) {
                     return included.push(resource);
                 }
                 //Pending changes should be included
@@ -209,21 +206,5 @@ export class Model implements Disposable {
             result = change.localItem.toLowerCase() === path2.toLowerCase();
         }
         return result;
-    }
-
-    //When files are deleted in the VS Code Explorer, they are marked as Deleted but as candidate changes
-    //So we are looking for those and then running the Delete command on each.
-    private async processDeletes(changes: IPendingChange[]): Promise<void> {
-        const deleteCandidatePaths: string[] = [];
-        for (let index: number = 0; index < changes.length; index++) {
-            const change: IPendingChange = changes[index];
-            if (change.isCandidate && GetStatuses(change.changeType).find((e) => e === Status.DELETE)) {
-                deleteCandidatePaths.push(change.localItem);
-            }
-        }
-        if (deleteCandidatePaths && deleteCandidatePaths.length > 0) {
-            Telemetry.SendEvent(this._repository.IsExe ? TfvcTelemetryEvents.DeleteExe : TfvcTelemetryEvents.DeleteClc);
-            await this._repository.Delete(deleteCandidatePaths);
-        }
     }
 }

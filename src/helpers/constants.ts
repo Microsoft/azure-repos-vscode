@@ -43,6 +43,7 @@ export class CommandNames {
 export class TfvcCommandNames {
     static CommandPrefix: string = "tfvc.";
     static Checkin: string = TfvcCommandNames.CommandPrefix + "Checkin";
+    static Delete: string = TfvcCommandNames.CommandPrefix + "Delete";
     static Exclude: string = TfvcCommandNames.CommandPrefix + "Exclude";
     static ExcludeAll: string = TfvcCommandNames.CommandPrefix + "ExcludeAll";
     static Include: string = TfvcCommandNames.CommandPrefix + "Include";

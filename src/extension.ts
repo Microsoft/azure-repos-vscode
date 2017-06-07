@@ -38,6 +38,7 @@ export async function activate(context: ExtensionContext) {
     context.subscriptions.push(commands.registerCommand(CommandNames.Reinitialize, () => _extensionManager.Reinitialize()));
 
     // TFVC Commands
+    context.subscriptions.push(commands.registerCommand(TfvcCommandNames.Delete, (...args) => _extensionManager.RunCommand(() => _extensionManager.Tfvc.Delete(args ? args[0] : undefined))));
     context.subscriptions.push(commands.registerCommand(TfvcCommandNames.UndoAll, () => _extensionManager.RunCommand(() => _extensionManager.Tfvc.UndoAll())));
     context.subscriptions.push(commands.registerCommand(TfvcCommandNames.Undo, (...args) => _extensionManager.RunCommand(() => _extensionManager.Tfvc.Undo(args))));
     context.subscriptions.push(commands.registerCommand(TfvcCommandNames.Exclude, (...args) => _extensionManager.RunCommand(() => _extensionManager.Tfvc.Exclude(args))));

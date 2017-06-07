@@ -170,8 +170,9 @@ Access to renaming a file is provided on Visual Studio Code's File Explorer menu
 
 ![TFVC Rename](assets/tfvc-rename.png)
 
-* `Rename (TFVC)` – To properly rename a file in TFVC using the `Rename` command (instead of `Delete` and `Add`), use this option on
-Visual Studio Code's File Explorer. You will prompted for a new file name.
+* `Delete (TFVC)` – To properly delete a file in TFVC using the `Delete` command, use this option on Visual Studio Code's File Explorer. Since 1.119.0, the extension will no longer automatically promote candidate deletions to a TFVC delete.
+
+* `Rename (TFVC)` – To properly rename a file in TFVC using the `Rename` command (instead of `Delete` and `Add`), use this option on Visual Studio Code's File Explorer. You will prompted for a new file name.
 
 ## Additional Information
 ### Specifying a TFS Proxy

@@ -17,6 +17,7 @@ import { VsCodeUtils } from "../helpers/vscodeutils";
 import { IButtonMessageItem } from "../helpers/vscodeutils.interfaces";
 import { Telemetry } from "../services/telemetry";
 import { Resource } from "./scm/resource";
+import { Status } from "./scm/status";
 import { TfvcSCMProvider } from "./tfvcscmprovider";
 import { TfvcErrorCodes } from "./tfvcerror";
 import { TfvcRepository } from "./tfvcrepository";
@@ -52,6 +53,35 @@ export class TfvcExtension  {
             "Checkin");
     }
 
+    /**
+     * This command runs a delete command on the selected file.  It gets a Uri object from vscode.
+     */
+    public async Delete(uri?: Uri): Promise<void> {
+        this.displayErrors(
+            async () => {
+                if (uri) {
+                    const basename: string = path.basename(uri.fsPath);
+                    try {
+                        const message: string = `Are you sure you want to delete '${basename}'?`;
+                        if (await UIHelper.PromptForConfirmation(message, Strings.DeleteFile)) {
+                            Telemetry.SendEvent(this._repo.IsExe ? TfvcTelemetryEvents.DeleteExe : TfvcTelemetryEvents.DeleteClc);
+                            await this._repo.Delete([uri.fsPath]);
+                        }
+                    } catch (err) {
+                        //Provide a better error message if the file to be deleted isn't in the workspace (e.g., it's a new file)
+                        if (err.tfvcErrorCode && err.tfvcErrorCode === TfvcErrorCodes.FileNotInWorkspace) {
+                            this._manager.DisplayErrorMessage(`Cannot delete '${basename}' as it is not in your workspace.`);
+                        } else {
+                            throw err;
+                        }
+                    }
+                } else {
+                    this._manager.DisplayWarningMessage(Strings.CommandRequiresExplorerContext);
+                }
+            },
+            "Delete");
+    }
+
     public async Exclude(resources?: Resource[]): Promise<void> {
         this.displayErrors(
             async () => {
@@ -73,6 +103,7 @@ export class TfvcExtension  {
                 if (resources && resources.length > 0) {
                     const pathsToUnexclude: string[] = [];
                     const pathsToAdd: string[] = [];
+                    const pathsToDelete: string[] = [];
                     resources.forEach((resource) => {
                         const path: string = resource.resourceUri.fsPath;
                         //Unexclude each file passed in
@@ -82,12 +113,22 @@ export class TfvcExtension  {
                         if (!resource.IsVersioned) {
                             pathsToAdd.push(path);
                         }
+                        //If a file is a candidate change and has been deleted (e.g., outside of
+                        //the TFVC command), we need to ensure that it gets 'tf delete' run on it.
+                        if (resource.PendingChange.isCandidate && resource.HasStatus(Status.DELETE)) {
+                            pathsToDelete.push(path);
+                        }
                     });
 
                     //If we need to add files, run a single Add with those files
                     if (pathsToAdd.length > 0) {
                         Telemetry.SendEvent(this._repo.IsExe ? TfvcTelemetryEvents.AddExe : TfvcTelemetryEvents.AddClc);
                         await this._repo.Add(pathsToAdd);
+                    }
+                    //If we need to delete files, run a single Delete with those files
+                    if (pathsToDelete.length > 0) {
+                        Telemetry.SendEvent(this._repo.IsExe ? TfvcTelemetryEvents.DeleteExe : TfvcTelemetryEvents.DeleteClc);
+                        await this._repo.Delete(pathsToDelete);
                     }
 
                     //Otherwise, ensure its not in the explicitly excluded list (if it's already there)
@@ -175,7 +216,7 @@ export class TfvcExtension  {
                         } catch (err) {
                             //Provide a better error message if the file to be renamed isn't in the workspace (e.g., it's a new file)
                             if (err.tfvcErrorCode && err.tfvcErrorCode === TfvcErrorCodes.FileNotInWorkspace) {
-                                this._manager.DisplayErrorMessage(`Cannot rename ${basename} as it is not in your workspace.`);
+                                this._manager.DisplayErrorMessage(`Cannot rename '${basename}' as it is not in your workspace.`);
                             } else {
                                 throw err;
                             }
@@ -195,7 +236,7 @@ export class TfvcExtension  {
                     const localPath: string = resource.resourceUri.fsPath;
                     const resolveTypeString: string = UIHelper.GetDisplayTextForAutoResolveType(autoResolveType);
                     const basename: string = path.basename(localPath);
-                    const message: string = `Are you sure you want to resolve changes in ${basename} as ${resolveTypeString}?`;
+                    const message: string = `Are you sure you want to resolve changes in '${basename}' as ${resolveTypeString}?`;
                     if (await UIHelper.PromptForConfirmation(message, resolveTypeString)) {
                         Telemetry.SendEvent(this._repo.IsExe ? TfvcTelemetryEvents.ResolveConflictsExe : TfvcTelemetryEvents.ResolveConflictsClc);
                         await this._repo.ResolveConflicts([localPath], autoResolveType);
@@ -242,7 +283,7 @@ export class TfvcExtension  {
                     //When calling from UI, we have the uri of the resource from which the command was invoked
                     if (pathsToUndo.length > 0) {
                         const basename: string = path.basename(pathsToUndo[0]);
-                        let message: string = `Are you sure you want to undo changes to ${basename}?`;
+                        let message: string = `Are you sure you want to undo changes to '${basename}'?`;
                         if (pathsToUndo.length > 1) {
                             message = `Are you sure you want to undo changes to ${pathsToUndo.length.toString()} files?`;
                         }
