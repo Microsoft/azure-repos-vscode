@@ -32,6 +32,7 @@ export class Strings {
     static NoFeedbackSent: string = "No feedback was sent.";
     static ThanksForFeedback: string = "Thanks for sending feedback!";
     static LearnMore: string = "Learn more...";
+    static LearnMoreAboutTfvc: string = "TFVC support...";
     static MoreDetails: string = "More details...";
     static ShowMe: string = "Show Me!";
     static VS2015Update3CSR: string = "Get Latest VS 2015 Update";

@@ -227,7 +227,9 @@ You can also create a *global* pinned query which will be the default if you hav
 replacing *your-account-name* with *global* in the previous examples.
 
 ## Using External (non-Microsoft) Source Repositories
-Starting with version 1.113.0, you can now use the extension with repositories that are *not* hosted with either Team Services or Team Foundation Server. You will be able to monitor your builds (for a specific build definition) and work items that *are* hosted with either Team Services or Team Foundation Server by specifying your account information. To do this, set the following settings in VS Code. It is recommended that you set these in your Workspace Settings (and not User Settings). You will, of course, still need to authenticate (provide credentials).
+Starting with version 1.113.0, you can now use the extension with repositories that are **not** hosted with either Team Services or Team Foundation Server. You will be able to monitor your builds (for a specific build definition) and work items that *are* hosted with either Team Services or Team Foundation Server by specifying your account information. To do this, set the following settings in VS Code. It is recommended that you set these in your Workspace Settings (and not User Settings). You will, of course, still need to authenticate (provide credentials).
+
+**Note:** If you're using a Team Foundation Version Control repository, you should *not* use these settings. Have a look at the [TFVC Quick Start](TFVC_README.md#quick-start).
 
   ```javascript
     "team.remoteUrl": "https://account.visualstudio.com",

@@ -13,6 +13,7 @@ export class Constants {
     static TokenLearnMoreUrl: string = "https://aka.ms/v9r4jt";
     static TokenShowMeUrl: string = "https://aka.ms/o2wkmo";
     static ReadmeLearnMoreUrl: string = "https://aka.ms/jkapah";
+    static TfvcLearnMoreUrl: string = "https://github.com/Microsoft/vsts-vscode/blob/master/TFVC_README.md#quick-start";
     static ServerWorkspaceUrl: string = "https://github.com/Microsoft/vsts-vscode/blob/master/TFVC_README.md#what-is-the-difference-between-a-local-and-server-workspace-how-can-i-tell-which-one-im-working-with";
     static VS2015U3CSRUrl: string = "https://msdn.microsoft.com/en-us/library/mt752379.aspx";
     static WorkspaceNotDetectedByClcUrl: string = "https://github.com/Microsoft/vsts-vscode/blob/master/TFVC_README.md#using-the-tee-clc-i-am-unable-to-access-an-existing-local-workspace-what-can-i-do";
@@ -119,6 +120,7 @@ class TfvcBaseTelemetryEvents {
     static Connected: string = "connected";
     static Delete: string = "delete";
     static GetFileContent: string = "getfilecontent";
+    static LearnMoreClick: string = "learnmoreclick";
     static NameAndContentConflict: string = "nameandcontentconflict";
     static OpenFileHistory: string = "openfilehistory";
     static OpenRepositoryHistory: string = "openrepohistory";
@@ -136,6 +138,7 @@ class TfvcBaseTelemetryEvents {
 export class TfvcTelemetryEvents {
     static UsingClc: string = TfvcBaseTelemetryEvents.Clc;
     static UsingExe: string = TfvcBaseTelemetryEvents.Exe;
+    static LearnMoreClick: string = TfvcBaseTelemetryEvents.TelemetryPrefix + TfvcBaseTelemetryEvents.LearnMoreClick;
     static NameAndContentConflict: string = TfvcBaseTelemetryEvents.TelemetryPrefix + TfvcBaseTelemetryEvents.NameAndContentConflict;
     static OpenFileHistory: string = TfvcBaseTelemetryEvents.TelemetryPrefix + TfvcBaseTelemetryEvents.OpenFileHistory;
     static OpenRepositoryHistory: string = TfvcBaseTelemetryEvents.TelemetryPrefix + TfvcBaseTelemetryEvents.OpenRepositoryHistory;

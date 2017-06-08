@@ -243,32 +243,32 @@
         "team.remoteUrl": {
           "type": "string",
           "default": "",
-          "description": "Specify the url to a project collection to use when your source code repository is not hosted with Microsoft. Requires team.teamProject."
+          "description": "[Not for TFVC] Specify the url to a project collection to use when your source code repository is not hosted with Microsoft. Requires team.teamProject."
         },
         "team.teamProject": {
           "type": "string",
           "default": "",
-          "description": "Specify the team project to use when your source code repository is not hosted with Microsoft. Requires team.remoteUrl."
+          "description": "[Not for TFVC] Specify the team project to use when your source code repository is not hosted with Microsoft. Requires team.remoteUrl."
         },
         "team.buildDefinitionId": {
           "type": "number",
           "default": 0,
-          "description": "Specify the team project's build definition Id to monitor when your source code repository is not hosted with Microsoft. Requires both team.remoteUrl and team.teamProject."
+          "description": "[Not for TFVC] Specify the team project's build definition Id to monitor when your source code repository is not hosted with Microsoft. Requires both team.remoteUrl and team.teamProject."
         },
         "tfvc.location": {
           "type": "string",
           "default": "",
-          "description": "Specify the full path to the TF executable or script to use for TFVC functionality."
+          "description": "[Required for TFVC] Specify the full path to the TF executable or script to use for TFVC functionality."
         },
         "tfvc.proxy": {
           "type": "string",
           "default": "",
-          "description": "Specify the full URL (ex. http://servername:9999/proxy) to the TFS proxy to use for TFVC functionality."
+          "description": "[Optional for TFVC] Specify the full URL (ex. http://servername:9999/proxy) to the TFS proxy to use for TFVC functionality."
         },
         "tfvc.restrictWorkspace": {
           "type": "boolean",
           "default": false,
-          "description": "Restricts the TFVC workspace to the currently open VS Code workspace."
+          "description": "[Optional for TFVC] Restricts the TFVC workspace to the currently open VS Code workspace."
         }
       }
     },

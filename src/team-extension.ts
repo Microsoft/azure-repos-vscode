@@ -6,7 +6,7 @@
 
 import { scm, StatusBarAlignment, StatusBarItem, window } from "vscode";
 import { PinnedQuerySettings } from "./helpers/settings";
-import { CommandNames, Constants, TelemetryEvents, WitTypes } from "./helpers/constants";
+import { CommandNames, Constants, TelemetryEvents, TfvcTelemetryEvents, WitTypes } from "./helpers/constants";
 import { Logger } from "./helpers/logger";
 import { Strings } from "./helpers/strings";
 import { Utils } from "./helpers/utils";
@@ -105,7 +105,10 @@ export class TeamExtension  {
                 const messageItem : ButtonMessageItem = { title : Strings.LearnMore,
                                     url : Constants.ReadmeLearnMoreUrl,
                                     telemetryId: TelemetryEvents.ReadmeLearnMoreClick };
-                VsCodeUtils.ShowErrorMessage(Strings.NoRepoInformation, messageItem);
+                const tfvcInfoItem : ButtonMessageItem = { title : Strings.LearnMoreAboutTfvc,
+                                    url : Constants.TfvcLearnMoreUrl,
+                                    telemetryId: TfvcTelemetryEvents.LearnMoreClick };
+                VsCodeUtils.ShowErrorMessage(Strings.NoRepoInformation, messageItem, tfvcInfoItem);
             }
         }
     }

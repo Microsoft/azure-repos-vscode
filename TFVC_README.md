@@ -8,12 +8,20 @@ Here are the currently supported features provided by the extension:
 - Include and Exclude changes (and move files between the two states)
 - Merge conflicts from updates
 - Check-in and update local files
-- Associate work items to check-ins
 - Integrated TFVC Output window
 - Support for a TFS proxy
+- Associate work items to check-ins *(TEE CLC only)*
 - Support for **local** workspaces created with either Visual Studio, the JetBrains IDEs or Eclipse ([details](#what-is-the-difference-between-a-local-and-server-workspace-how-can-i-tell-which-one-im-working-with))
 
 ![Team Foundation Version Control Viewlet](assets/tfvc-viewlet.png)
+
+## Quick Start
+Below is a short list of steps to get up-and-running with TFVC support. Be sure to check out the other TFVC documentation on this page.
+- [Install the Team Services extension](#the-visual-studio-code-extension) for Visual Studio Code.
+- For Team Services, ensure you have a Personal Access Token (PAT) with All Scopes available. Team Foundation Server requires your domain credentials. [More info...](#authentication)
+- Ensure you have a [TF command line client installed](#tfvc-command-line-client) (either TF.exe or the TEE CLC).
+- Set the [`tfvc.location`](#configure-tfvc-support) VS Code setting to the full path of your TF command line client.
+- Open a folder containing a *Local* TFVC Workspace and sign in when prompted. [More info...](#open-a-local-tfvc-repository-folder)
 
 ## Getting Started Videos
 Below are a few videos to help get you started using TFVC quickly.
