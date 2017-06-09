@@ -4,7 +4,6 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import url = require("url");
 import { Utils } from "../helpers/utils";
 import { RepoUtils } from "../helpers/repoutils";
 import { IRepositoryContext, RepositoryType } from "./repositorycontext";
@@ -12,6 +11,7 @@ import { IRepositoryContext, RepositoryType } from "./repositorycontext";
 import * as pgc from "parse-git-config";
 import * as gri from "git-repo-info";
 import * as path from "path";
+import * as url from "url";
 
 //Gets as much information as it can regarding the Git repository without calling the server (vsts/info)
 export class GitContext implements IRepositoryContext {

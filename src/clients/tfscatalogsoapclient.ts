@@ -5,11 +5,12 @@
 "use strict";
 
 import Q = require("q");
-import url = require("url");
-import xmldoc = require("xmldoc");
 import { IRequestHandler } from "vso-node-api/interfaces/common/VsoBaseInterfaces";
 import { SoapClient } from "./soapclient";
 import { UserAgentProvider } from "../helpers/useragentprovider";
+
+import * as xmldoc from "xmldoc";
+import * as url from "url";
 
 // This class is the 'bridge' between the calling RepositoryInfoClient (which uses the
 // async/await pattern) and the SoapClient which (has to) implement the callback pattern
