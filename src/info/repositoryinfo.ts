@@ -4,10 +4,10 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import url = require("url");
 import { Logger } from "../helpers/logger";
 import { RepoUtils } from "../helpers/repoutils";
 import { UrlBuilder } from "../helpers/urlbuilder";
+import * as url from "url";
 
 //When a RepositoryInfo object is created, we have already verified whether or not it
 //is either a Team Services or Team Foundation Server repository.  With the introduction
@@ -41,6 +41,10 @@ export class RepositoryInfo {
     constructor(repositoryInfo: any);
 
     constructor (repositoryInfo: any) {
+        if (!repositoryInfo) {
+            throw new Error(`repositoryInfo is undefined`);
+        }
+
         let repositoryUrl: string = undefined;
 
         if (typeof repositoryInfo === "object") {
@@ -48,6 +52,8 @@ export class RepositoryInfo {
         } else {
             repositoryUrl = repositoryInfo;
         }
+        //Clean up repository URLs for repos that have "limited refs" enabled
+        repositoryUrl = repositoryUrl.replace("/_git/_full/", "/_git/").replace("/_git/_optimized/", "/_git/");
 
         const purl: url.Url = url.parse(repositoryUrl);
         if (purl) {

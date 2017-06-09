@@ -4,8 +4,8 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import url = require("url");
 import VsoBaseInterfaces = require("vso-node-api/interfaces/common/VsoBaseInterfaces");
+import { TeamProject, TeamProjectCollection } from "vso-node-api/interfaces/CoreInterfaces";
 import { CoreApiClient } from "./coreapiclient";
 import { Logger } from "../helpers/logger";
 import { RepoUtils } from "../helpers/repoutils";
@@ -14,8 +14,10 @@ import { IRepositoryContext, RepositoryType } from "../contexts/repositorycontex
 import { TeamServicesApi } from "./teamservicesclient";
 import { TfsCatalogSoapClient } from "./tfscatalogsoapclient";
 import { RepositoryInfo } from "../info/repositoryinfo";
-import { TeamProject, TeamProjectCollection } from "vso-node-api/interfaces/CoreInterfaces";
 import { TfvcContext } from "../contexts/tfvccontext";
+import { Telemetry } from "../services/telemetry";
+
+import * as url from "url";
 
 export class RepositoryInfoClient {
     private _handler: VsoBaseInterfaces.IRequestHandler;
@@ -35,6 +37,9 @@ export class RepositoryInfoClient {
             Logger.LogDebug(`Getting repository information for a Git repository at ${this._repoContext.RemoteUrl}`);
             repositoryClient = new TeamServicesApi(this._repoContext.RemoteUrl, [this._handler]);
             repoInfo = await repositoryClient.getVstsInfo();
+            Logger.LogDebug(`Repository information blob:`);
+            Logger.LogObject(repoInfo);
+            this.verifyRepoInfo(repoInfo, `RepoInfo was undefined for a ${RepositoryType[this._repoContext.Type]} repo`);
             repositoryInfo = new RepositoryInfo(repoInfo);
             Logger.LogDebug(`Finished getting repository information for a Git repository at ${this._repoContext.RemoteUrl}`);
             return repositoryInfo;
@@ -42,6 +47,7 @@ export class RepositoryInfoClient {
             Logger.LogDebug(`Getting repository information for a TFVC repository at ${this._repoContext.RemoteUrl}`);
             //For TFVC, the teamProjectName is retrieved by tf.cmd and set on the context
             const teamProjectName: string = this._repoContext.TeamProjectName;
+            this.verifyRepoInfo(this._repoContext.RemoteUrl, `RemoteUrl was undefined for a ${RepositoryType[this._repoContext.Type]} repo`);
             repositoryInfo = new RepositoryInfo(this._repoContext.RemoteUrl);
 
             let serverUrl: string;
@@ -125,11 +131,19 @@ export class RepositoryInfoClient {
             repoInfo = this.getTfvcRepoInfoBlob(serverUrl, collection.id, collection.name, collection.url, project.id, project.name, project.description, project.url);
             Logger.LogDebug(`Repository information blob:`);
             Logger.LogObject(repoInfo);
+            this.verifyRepoInfo(repoInfo, `RepoInfo was undefined for a ${RepositoryType[this._repoContext.Type]} repo`);
             repositoryInfo = new RepositoryInfo(repoInfo);
             Logger.LogDebug(`Finished getting repository information for the repository at ${this._repoContext.RemoteUrl}`);
             return repositoryInfo;
         }
         return repositoryInfo;
+    }
+
+    //Using to try and track down users in the scenario where repoInfo is undefined
+    private verifyRepoInfo(repoInfo: any, message: string) {
+        if (!repoInfo) {
+            Telemetry.SendException(new Error(message));
+        }
     }
 
     private splitTfvcCollectionUrl(collectionUrl: string): string[] {
