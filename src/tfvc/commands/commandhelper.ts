@@ -91,9 +91,13 @@ export class CommandHelper {
                 message = result.stderr ? result.stderr : result.stdout;
             }
 
-            //We're banking on content being in one or the other with preference to stderr
-            const logMsg: string = result.stderr ? result.stderr : result.stdout;
-            Logger.LogDebug(`TFVC errors: ${logMsg}`);
+            //Log any information we receive via either stderr or stdout
+            if (result.stderr) {
+                Logger.LogDebug(`TFVC errors (via stderr): ${result.stderr}`);
+            }
+            if (result.stdout) {
+                Logger.LogDebug(`TFVC errors (via stdout): ${result.stdout}`);
+            }
 
             throw new TfvcError({
                 message: message || Strings.TfExecFailedError,
