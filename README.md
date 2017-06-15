@@ -1,4 +1,5 @@
 # Visual Studio Team Services Extension
+![Build Status](https://mseng.visualstudio.com/_apis/public/build/definitions/b924d696-3eae-4116-8443-9a18392d8544/3167/badge?branch=master)
 ### *The extension now provides support for **Team Foundation Version Control (TFVC)**!*
 This extension allows you to connect to Team Services, manage your pull requests for your Git repositories as well as
 monitor builds and work items for your team project. It uses your local repository information to connect to either
