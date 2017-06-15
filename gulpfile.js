@@ -73,6 +73,8 @@ gulp.task('publishall', ['publishbuild'], function () {
         .pipe(gulp.dest('./out/test/contexts/testrepos'));
     gulp.src(['./test/helpers/testrepos/**/*'])
         .pipe(gulp.dest('./out/test/helpers/testrepos'));
+    gulp.src(['./patches/vso-node-api/handlers/ntlm.js'])
+        .pipe(gulp.dest('./node_modules/vso-node-api/handlers'));
 });
 
 //Tests will fail with MODULE_NOT_FOUND if I try to run 'publishBuild' before test target
