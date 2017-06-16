@@ -31,11 +31,13 @@ export class Strings {
     static SendFeedbackPrompt: string = "Enter your feedback here (1000 char limit)";
     static NoFeedbackSent: string = "No feedback was sent.";
     static ThanksForFeedback: string = "Thanks for sending feedback!";
-    static LearnMore: string = "Learn more...";
-    static LearnMoreAboutTfvc: string = "TFVC support...";
-    static MoreDetails: string = "More details...";
+    static LearnMore: string = "Learn More...";
+    static LearnMoreAboutTfvc: string = "TFVC Support...";
+    static MoreDetails: string = "More Details...";
+    static SetupTfvcSupport: string = "Set Up TFVC Support...";
     static ShowMe: string = "Show Me!";
     static VS2015Update3CSR: string = "Get Latest VS 2015 Update";
+    static DontShowAgain: string = "Don't Show Again";
 
     static ChoosePullRequest: string = "Choose a pull request";
     static ChooseWorkItem: string = "Choose a work item";

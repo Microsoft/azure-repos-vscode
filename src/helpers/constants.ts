@@ -76,6 +76,7 @@ export class SettingNames {
     static RemoteUrl: string = SettingNames.SettingsPrefix + "remoteUrl";
     static TeamProject: string = SettingNames.SettingsPrefix + "teamProject";
     static BuildDefinitionId: string = SettingNames.SettingsPrefix + "buildDefinitionId";
+    static ShowWelcomeMessage: string = SettingNames.SettingsPrefix + "showWelcomeMessage";
 }
 
 export class TelemetryEvents {
@@ -109,6 +110,7 @@ export class TelemetryEvents {
     static ViewWorkItem: string = TelemetryEvents.TelemetryPrefix + "viewworkitem";
     static ViewWorkItems: string = TelemetryEvents.TelemetryPrefix + "viewworkitems";
     static VS2015U3CSR: string = TelemetryEvents.TelemetryPrefix + "vs2015u3csr";
+    static WelcomeLearnMoreClick: string = TelemetryEvents.TelemetryPrefix + "welcomelearnmoreclick";
 }
 
 //Don't export this class. TfvcTelemetryEvents is the only one which should be used when sending telemetry
@@ -148,6 +150,7 @@ export class TfvcTelemetryEvents {
     static RenameConflict: string = TfvcBaseTelemetryEvents.TelemetryPrefix + TfvcBaseTelemetryEvents.RenameConflict;
     static RestrictWorkspace: string = TfvcBaseTelemetryEvents.TelemetryPrefix + TfvcBaseTelemetryEvents.RestrictWorkspace;
     static StartUp: string = TfvcBaseTelemetryEvents.TelemetryPrefix + TfvcBaseTelemetryEvents.StartUp;
+    static SetupTfvcSupportClick: string = TfvcBaseTelemetryEvents.TelemetryPrefix + "setuptfvcsupportclick";
     //Begin tooling-specific telemetry (tf.exe or CLC)
     static ClcConfigured: string = TfvcTelemetryEvents.UsingClc + "-" + TfvcBaseTelemetryEvents.Configured;
     static ExeConfigured: string = TfvcTelemetryEvents.UsingExe + "-" + TfvcBaseTelemetryEvents.Configured;
@@ -188,5 +191,11 @@ export class WitQueries {
 export class WitTypes {
     static Bug: string = "Bug";
     static Task: string = "Task";
+}
+
+export enum MessageTypes {
+    Error = 0,
+    Warn = 1,
+    Info = 2
 }
 /* tslint:enable:variable-name */

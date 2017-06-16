@@ -67,7 +67,7 @@ describe("ExternalContext", function() {
         const repoPath: string = path.join(__dirname, TEST_REPOS_FOLDER, repoName, DOT_GIT_FOLDER);
         const ctx: ExternalContext = new ExternalContext(repoPath);
 
-        const mock: SettingsMock = new SettingsMock(false, undefined, undefined, 1, "https://xplatalm.visualstudio.com", "L2.VSCodeExtension.RC", undefined);
+        const mock: SettingsMock = new SettingsMock(false, undefined, undefined, 1, "https://xplatalm.visualstudio.com", "L2.VSCodeExtension.RC", undefined, true);
         const initialized: Boolean = await ctx.Initialize(mock);
 
         assert.isTrue(initialized);
@@ -83,7 +83,7 @@ describe("ExternalContext", function() {
         const repoPath: string = path.join(__dirname, TEST_REPOS_FOLDER, repoName, DOT_GIT_FOLDER);
         const ctx: ExternalContext = new ExternalContext(repoPath);
 
-        const mock: SettingsMock = new SettingsMock(false, undefined, undefined, 1, undefined, "L2.VSCodeExtension.RC", undefined);
+        const mock: SettingsMock = new SettingsMock(false, undefined, undefined, 1, undefined, "L2.VSCodeExtension.RC", undefined, true);
         const initialized: Boolean = await ctx.Initialize(mock);
 
         assert.isFalse(initialized);
@@ -100,7 +100,7 @@ describe("ExternalContext", function() {
         const repoPath: string = path.join(__dirname, TEST_REPOS_FOLDER, repoName, DOT_GIT_FOLDER);
         const ctx: ExternalContext = new ExternalContext(repoPath);
 
-        const mock: SettingsMock = new SettingsMock(false, undefined, undefined, 1, "https://xplatalm.visualstudio.com", undefined, undefined);
+        const mock: SettingsMock = new SettingsMock(false, undefined, undefined, 1, "https://xplatalm.visualstudio.com", undefined, undefined, true);
         const initialized: Boolean = await ctx.Initialize(mock);
 
         assert.isFalse(initialized);
@@ -117,7 +117,7 @@ describe("ExternalContext", function() {
         const repoPath: string = path.join(__dirname, TEST_REPOS_FOLDER, repoName, DOT_GIT_FOLDER);
         const ctx: ExternalContext = new ExternalContext(repoPath);
 
-        const mock: SettingsMock = new SettingsMock(false, undefined, undefined, 1, undefined, undefined, undefined);
+        const mock: SettingsMock = new SettingsMock(false, undefined, undefined, 1, undefined, undefined, undefined, true);
         const initialized: Boolean = await ctx.Initialize(mock);
 
         assert.isFalse(initialized);

@@ -237,6 +237,10 @@ export class ExtensionManager implements Disposable {
     }
 
     private async initializeExtension(): Promise<void> {
+        //Users could install without having a folder (workspace) open
+        this._settings = new Settings(); //We need settings before showing the Welcome message
+        await this.showWelcomeMessage(); //Ensure we show the message before hooking workspace.onDidChangeConfiguration
+
         //Don't initialize if we don't have a workspace
         if (!workspace || !workspace.rootPath) {
             return;
@@ -250,7 +254,6 @@ export class ExtensionManager implements Disposable {
 
         //If Logging is enabled, the user must have used the extension before so we can enable
         //it here.  This will allow us to log errors when we begin processing TFVC commands.
-        this._settings = new Settings();
         Telemetry.Initialize(this._settings); //We don't have the serverContext just yet
         Telemetry.SendEvent(TelemetryEvents.Installed); //Send event that the extension is installed (even if not used)
         this.logStart(this._settings.LoggingLevel, workspace.rootPath);
@@ -431,6 +434,25 @@ export class ExtensionManager implements Disposable {
             return true;
         }
         return false;
+    }
+
+    //Ensure this is async (and is awaited on) so that the extension doesn't continue until user deals with message
+    private async showWelcomeMessage(): Promise<void> {
+        if (this._settings.ShowWelcomeMessage) {
+            const welcomeMessage: string = `Welcome to version ${Constants.ExtensionVersion} of the Team Services extension!`;
+            const messageItems: IButtonMessageItem[] = [];
+            messageItems.push({ title : Strings.LearnMore,
+                                url : Constants.ReadmeLearnMoreUrl,
+                                telemetryId : TelemetryEvents.WelcomeLearnMoreClick });
+            messageItems.push({ title : Strings.SetupTfvcSupport,
+                                url : Constants.TfvcLearnMoreUrl,
+                                telemetryId : TfvcTelemetryEvents.SetupTfvcSupportClick });
+            messageItems.push({ title : Strings.DontShowAgain });
+            const chosenItem: IButtonMessageItem = await VsCodeUtils.ShowInfoMessage(welcomeMessage, ...messageItems);
+            if (chosenItem && chosenItem.title === Strings.DontShowAgain) {
+                this._settings.ShowWelcomeMessage = false;
+            }
+        }
     }
 
     //Set up the initial status bars

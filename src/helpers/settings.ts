@@ -14,10 +14,15 @@ export abstract class BaseSettings {
         const value = configuration.get<T>(name, undefined);
 
         // If user specified a value, use it
-        if (value) {
+        if (value !== undefined) {
             return value;
         }
         return defaultValue;
+    }
+
+    protected writeSetting(name: string, value: any, global?: boolean): void {
+        const configuration = workspace.getConfiguration();
+        configuration.update(name, value, global);
     }
 }
 
@@ -73,6 +78,7 @@ export interface ISettings {
     RemoteUrl: string;
     TeamProject: string;
     BuildDefinitionId: number;
+    ShowWelcomeMessage: boolean;
 }
 
 export class Settings extends BaseSettings implements ISettings {
@@ -83,6 +89,7 @@ export class Settings extends BaseSettings implements ISettings {
     private _remoteUrl: string;
     private _teamProject: string;
     private _buildDefinitionId: number;
+    private _showWelcomeMessage: boolean;
 
     constructor() {
         super();
@@ -104,6 +111,7 @@ export class Settings extends BaseSettings implements ISettings {
         this._remoteUrl = this.readSetting<string>(SettingNames.RemoteUrl, undefined);
         this._teamProject = this.readSetting<string>(SettingNames.TeamProject, undefined);
         this._buildDefinitionId = this.readSetting<number>(SettingNames.BuildDefinitionId, 0);
+        this._showWelcomeMessage = this.readSetting<boolean>(SettingNames.ShowWelcomeMessage, true);
     }
 
     public get AppInsightsEnabled(): boolean {
@@ -132,5 +140,12 @@ export class Settings extends BaseSettings implements ISettings {
 
     public get BuildDefinitionId(): number {
         return this._buildDefinitionId;
+    }
+
+    public get ShowWelcomeMessage(): boolean {
+        return this._showWelcomeMessage;
+    }
+    public set ShowWelcomeMessage(value: boolean) {
+        this.writeSetting(SettingNames.ShowWelcomeMessage, value, true /*global*/);
     }
 }

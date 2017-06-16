@@ -264,6 +264,11 @@
           "default": 0,
           "description": "[Not for TFVC] Specify the team project's build definition Id to monitor when your source code repository is not hosted with Microsoft. Requires both team.remoteUrl and team.teamProject."
         },
+        "team.showWelcomeMessage": {
+          "type": "boolean",
+          "default": true,
+          "description": "Tracks whether the extension should display the Welcome message after the initial installation."
+        },
         "tfvc.location": {
           "type": "string",
           "default": "",
