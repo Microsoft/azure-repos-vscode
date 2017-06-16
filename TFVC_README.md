@@ -198,6 +198,15 @@ Studio Code Settings (**File > Preferences > Settings**):
   ```
 
 ## Frequently Asked Questions
+### *I have received the "It appears you have configured a non-English version of the TF executable. Please ensure an English version is properly configured." error message after configuring TF.exe. How can I get the extension to work properly?*
+When TF.exe is configured as the tool to communicate with your TFS server (the TEE CLC does not have this problem), it will output status messages in
+the language of the configured operating system. So if the operating system is configured for German, the status messages will be output in German. The
+extension parses the output of TF.exe to show status in the SCM Viewlet. Today, the extension expects the messages to be output in English (thus the 
+error message you received). This message is an attempt to identify the issue.
+
+While there isn't a fix (e.g, an update to TF.exe that allows it to always output English status messages), one workaround is to rename the folder on disk from where the localized resources are being loaded by TF.exe. If the folder containing the localized resources cannot be located, the .NET Framework will fallback to the resources stored in TF.exe itself (the English ones). To locate the folder that needs to be renamed, open the folder that
+contains the TF.exe you have configured. In that folder are folders such as `de`, `fr`, `it`, `es`. Simply rename that folder with another name and restart Visual Studio Code. If you would rather not update that particular installation of Visual Studio (as such a change would affect Visual Studio as well), you can install the [standalone Team Explorer 2017 version of Visual Studio](#how-can-i-acquire-tfexe-do-i-need-a-version-of-visual-studio), configure the TF.exe that ships with it and rename the folder in that instance.
+
 ### *Is it required that I have a TFVC workspace already on my local machine to use the TFVC support?*
 Since release 1.116.0, yes, it is a requirement that you have an existing workspace on your local machine.
 
