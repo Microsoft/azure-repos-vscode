@@ -9,6 +9,8 @@ import { ArgumentBuilder } from "./argumentbuilder";
 import { CommandHelper } from "./commandhelper";
 import { TfvcError, TfvcErrorCodes } from "../tfvcerror";
 import { Strings } from "../../helpers/strings";
+import { IButtonMessageItem } from "../../helpers/vscodeutils.interfaces";
+import { Constants, TfvcTelemetryEvents } from "../../helpers/constants";
 
 /**
  * This command calls the command line doing a simple call to get the help for the add command.
@@ -65,8 +67,12 @@ export class GetVersion implements ITfvcCommand<string> {
             return matches[matches.length - 1];
         } else {
             //If we can't find a version, that's pretty important. Therefore, we throw in this instance.
+            const messageOptions: IButtonMessageItem[] = [{ title : Strings.MoreDetails,
+                                url : Constants.NonEnuTfExeConfiguredUrl,
+                                telemetryId: TfvcTelemetryEvents.ExeNonEnuConfiguredMoreDetails }];
             throw new TfvcError({
                 message: Strings.NotAnEnuTfCommandLine,
+                messageOptions: messageOptions,
                 tfvcErrorCode: TfvcErrorCodes.NotAnEnuTfCommandLine
             });
         }

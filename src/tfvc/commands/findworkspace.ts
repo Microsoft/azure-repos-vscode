@@ -6,6 +6,8 @@
 
 import * as path from "path";
 import { Strings } from "../../helpers/strings";
+import { IButtonMessageItem } from "../../helpers/vscodeutils.interfaces";
+import { Constants, TfvcTelemetryEvents } from "../../helpers/constants";
 import { IArgumentProvider, IExecutionResult, ITfvcCommand, IWorkspace, IWorkspaceMapping } from "../interfaces";
 import { ArgumentBuilder } from "./argumentbuilder";
 import { CommandHelper } from "./commandhelper";
@@ -128,8 +130,12 @@ export class FindWorkspace implements ITfvcCommand<IWorkspace> {
         //So if we determine there are mappings but can't get the workspace name, we assume it's a non-ENU
         //tf executable. One example of this is German.
         if (mappings.length > 0 && !workspaceName) {
+            const messageOptions: IButtonMessageItem[] = [{ title : Strings.MoreDetails,
+                                url : Constants.NonEnuTfExeConfiguredUrl,
+                                telemetryId: TfvcTelemetryEvents.ExeNonEnuConfiguredMoreDetails }];
             throw new TfvcError( {
                 message: Strings.NotAnEnuTfCommandLine,
+                messageOptions: messageOptions,
                 tfvcErrorCode: TfvcErrorCodes.NotAnEnuTfCommandLine
              });
         }

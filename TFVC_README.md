@@ -198,7 +198,7 @@ Studio Code Settings (**File > Preferences > Settings**):
   ```
 
 ## Frequently Asked Questions
-### *I have received the "It appears you have configured a non-English version of the TF executable. Please ensure an English version is properly configured." error message after configuring TF.exe. How can I get the extension to work properly?*
+### *I received the "It appears you have configured a non-English version of the TF executable. Please ensure an English version is properly configured." error message after configuring TF.exe. How can I get the extension to work properly?*
 When TF.exe is configured as the tool to communicate with your TFS server (the TEE CLC does not have this problem), it will output status messages in
 the language of the configured operating system. So if the operating system is configured for German, the status messages will be output in German. The
 extension parses the output of TF.exe to show status in the SCM Viewlet. Today, the extension expects the messages to be output in English (thus the 

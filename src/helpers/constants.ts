@@ -17,6 +17,7 @@ export class Constants {
     static ServerWorkspaceUrl: string = "https://github.com/Microsoft/vsts-vscode/blob/master/TFVC_README.md#what-is-the-difference-between-a-local-and-server-workspace-how-can-i-tell-which-one-im-working-with";
     static VS2015U3CSRUrl: string = "https://msdn.microsoft.com/en-us/library/mt752379.aspx";
     static WorkspaceNotDetectedByClcUrl: string = "https://github.com/Microsoft/vsts-vscode/blob/master/TFVC_README.md#using-the-tee-clc-i-am-unable-to-access-an-existing-local-workspace-what-can-i-do";
+    static NonEnuTfExeConfiguredUrl: string = "https://github.com/Microsoft/vsts-vscode/blob/master/TFVC_README.md#i-received-the-it-appears-you-have-configured-a-non-english-version-of-the-tf-executable-please-ensure-an-english-version-is-properly-configured-error-message-after-configuring-tfexe-how-can-i-get-the-extension-to-work-properly";
 }
 
 export class CommandNames {
@@ -123,6 +124,7 @@ class TfvcBaseTelemetryEvents {
     static GetFileContent: string = "getfilecontent";
     static LearnMoreClick: string = "learnmoreclick";
     static NameAndContentConflict: string = "nameandcontentconflict";
+    static NonEnuConfiguredMoreDetails: string = "nonenuconfiguredmoredetails";
     static OpenFileHistory: string = "openfilehistory";
     static OpenRepositoryHistory: string = "openrepohistory";
     static RenameConflict: string = "renameconflict";
@@ -170,6 +172,7 @@ export class TfvcTelemetryEvents {
     static UndoAllExe: string = TfvcTelemetryEvents.UsingExe + "-" + TfvcBaseTelemetryEvents.UndoAll;
     static UndoAllClc: string = TfvcTelemetryEvents.UsingClc + "-" + TfvcBaseTelemetryEvents.UndoAll;
     static ClcCannotAccessWorkspace: string = TfvcTelemetryEvents.UsingClc + "-" + TfvcBaseTelemetryEvents.WorkspaceAccessError;
+    static ExeNonEnuConfiguredMoreDetails: string = TfvcTelemetryEvents.UsingExe + "-" + TfvcBaseTelemetryEvents.NonEnuConfiguredMoreDetails;
 }
 
 export class WellKnownRepositoryTypes {
