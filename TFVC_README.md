@@ -11,7 +11,7 @@ Here are the currently supported features provided by the extension:
 - Integrated TFVC Output window
 - Support for a TFS proxy
 - Associate work items to check-ins *(TEE CLC only)*
-- Support for **local** workspaces created with either Visual Studio, the JetBrains IDEs or Eclipse ([details](#what-is-the-difference-between-a-local-and-server-workspace-how-can-i-tell-which-one-im-working-with))
+- Support for **Local** workspaces created with either Visual Studio, the JetBrains IDEs or Eclipse ([details](#what-is-the-difference-between-a-local-and-server-workspace-how-can-i-tell-which-one-im-working-with))
 
 ![Team Foundation Version Control Viewlet](assets/tfvc-viewlet.png)
 
@@ -22,6 +22,7 @@ Below is a short list of steps to get up-and-running with TFVC support. Be sure 
 - Ensure you have a [TF command line client installed](#tfvc-command-line-client) (either TF.exe or the TEE CLC).
 - Set the [`tfvc.location`](#configure-tfvc-support) VS Code setting to the full path of your TF command line client.
 - Open a folder containing a *Local* TFVC Workspace and sign in when prompted. [More info...](#open-a-local-tfvc-repository-folder)
+- Set the SCM Provider to `TFVC`. [Read how...](https://code.visualstudio.com/updates/v1_13#_install-additional-scm-providers)
 
 ## Getting Started Videos
 Below are a few videos to help get you started using TFVC quickly.
