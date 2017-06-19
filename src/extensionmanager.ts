@@ -237,16 +237,18 @@ export class ExtensionManager implements Disposable {
     }
 
     private async initializeExtension(): Promise<void> {
+        //Set version of VSCode on the UserAgentProvider
+        UserAgentProvider.VSCodeVersion = version;
+
         //Users could install without having a folder (workspace) open
         this._settings = new Settings(); //We need settings before showing the Welcome message
+        Telemetry.Initialize(this._settings); //Need to initialize telemetry for showing welcome message
         await this.showWelcomeMessage(); //Ensure we show the message before hooking workspace.onDidChangeConfiguration
 
         //Don't initialize if we don't have a workspace
         if (!workspace || !workspace.rootPath) {
             return;
         }
-        //Set version of VSCode on the UserAgentProvider
-        UserAgentProvider.VSCodeVersion = version;
 
         // Create the extensions
         this._teamExtension = new TeamExtension(this);
@@ -254,7 +256,6 @@ export class ExtensionManager implements Disposable {
 
         //If Logging is enabled, the user must have used the extension before so we can enable
         //it here.  This will allow us to log errors when we begin processing TFVC commands.
-        Telemetry.Initialize(this._settings); //We don't have the serverContext just yet
         Telemetry.SendEvent(TelemetryEvents.Installed); //Send event that the extension is installed (even if not used)
         this.logStart(this._settings.LoggingLevel, workspace.rootPath);
         this._teamServicesStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, 100);
