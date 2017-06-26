@@ -500,7 +500,6 @@ export class ExtensionManager implements Disposable {
 
     private logStart(loggingLevel: string, rootPath: string): void {
         if (loggingLevel === undefined) {
-            console.log("Logging is disabled.");
             return;
         }
         Logger.SetLoggingLevel(loggingLevel);
