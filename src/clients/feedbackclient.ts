@@ -26,7 +26,7 @@ export class FeedbackClient {
                 const value: string = await window.showInputBox({ value: undefined, prompt: Strings.SendFeedbackPrompt, placeHolder: undefined, password: false });
                 if (value === undefined) {
                     const disposable = window.setStatusBarMessage(Strings.NoFeedbackSent);
-                    setInterval(() => disposable.dispose(), 1000 * 5);
+                    setTimeout(() => disposable.dispose(), 1000 * 5);
                     return;
                 }
 
@@ -35,7 +35,7 @@ export class FeedbackClient {
                 const email: string = await window.showInputBox({ value: undefined, prompt: Strings.SendEmailPrompt, placeHolder: undefined, password: false });
                 if (email === undefined) {
                     const disposable = window.setStatusBarMessage(Strings.NoFeedbackSent);
-                    setInterval(() => disposable.dispose(), 1000 * 5);
+                    setTimeout(() => disposable.dispose(), 1000 * 5);
                     return;
                 }
                 if (email) {
@@ -49,7 +49,7 @@ export class FeedbackClient {
                 Telemetry.SendFeedback(choice.id, { "VSCode.Feedback.Comment" : trimmedValue, "VSCode.Feedback.Email" : providedEmail} );
 
                 const disposable: Disposable = window.setStatusBarMessage(Strings.ThanksForFeedback);
-                setInterval(() => disposable.dispose(), 1000 * 5);
+                setTimeout(() => disposable.dispose(), 1000 * 5);
             }
         } catch (err) {
             const message: string = Utils.GetMessageForStatusCode(0, err.message, "Failed getting SendFeedback selection");
