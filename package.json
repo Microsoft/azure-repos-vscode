@@ -18,7 +18,8 @@
     "TFVC"
   ],
   "categories": [
-    "SCM Providers"
+    "SCM Providers",
+    "Other"
   ],
   "repository": {
     "type": "git",
