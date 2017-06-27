@@ -133,16 +133,22 @@
         },
         {
           "command": "team.AssociateWorkItems",
-          "group": "3_commit@1"
+          "group": "3_commit@3",
+          "when": "scmProvider == tfvc"
+        },
+        {
+          "command": "team.AssociateWorkItems",
+          "group": "3_commit@5",
+          "when": "scmProvider == git"
         },
         {
           "command": "tfvc.Checkin",
-          "group": "3_commit@2",
+          "group": "3_commit@4",
           "when": "scmProvider == tfvc"
         },
         {
           "command": "tfvc.UndoAll",
-          "group": "3_commit@3",
+          "group": "3_commit@5",
           "when": "scmProvider == tfvc"
         },
         {
