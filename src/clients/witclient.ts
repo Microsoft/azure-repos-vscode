@@ -39,7 +39,7 @@ export class WitClient extends BaseClient {
     public async CreateNewWorkItem(taskTitle: string): Promise<void> {
         try {
             Telemetry.SendEvent(TelemetryEvents.OpenNewWorkItem);
-            const selectedType: BaseQuickPickItem = await window.showQuickPick(await this.getWorkItemTypes(), { matchOnDescription: true, placeHolder: Strings.ChooseWorkItemType });
+            const selectedType: BaseQuickPickItem = await window.showQuickPick(this.getWorkItemTypes(), { matchOnDescription: true, placeHolder: Strings.ChooseWorkItemType });
             if (selectedType) {
                 Telemetry.SendEvent(TelemetryEvents.OpenNewWorkItem);
 
@@ -59,13 +59,13 @@ export class WitClient extends BaseClient {
     public async ShowMyWorkItemQueries(): Promise<void> {
         try {
             Telemetry.SendEvent(TelemetryEvents.ShowMyWorkItemQueries);
-            const query: WorkItemQueryQuickPickItem = await window.showQuickPick(await this.getMyWorkItemQueries(), { matchOnDescription: false, placeHolder: Strings.ChooseWorkItemQuery });
+            const query: WorkItemQueryQuickPickItem = await window.showQuickPick(this.getMyWorkItemQueries(), { matchOnDescription: false, placeHolder: Strings.ChooseWorkItemQuery });
             if (query) {
                 Telemetry.SendEvent(TelemetryEvents.ViewWorkItems);
                 Logger.LogInfo("Selected query is " + query.label);
                 Logger.LogInfo("Getting work items for query...");
 
-                const workItem: BaseQuickPickItem = await window.showQuickPick(await this.getMyWorkItems(this._serverContext.RepoInfo.TeamProject, query.wiql), { matchOnDescription: true, placeHolder: Strings.ChooseWorkItem });
+                const workItem: BaseQuickPickItem = await window.showQuickPick(this.getMyWorkItems(this._serverContext.RepoInfo.TeamProject, query.wiql), { matchOnDescription: true, placeHolder: Strings.ChooseWorkItem });
                 if (workItem) {
                     let url: string = undefined;
                     if (workItem.id === undefined) {
@@ -110,7 +110,7 @@ export class WitClient extends BaseClient {
         try {
             const query: string = await this.getPinnedQueryText(); //gets either MyWorkItems, queryText or wiql of queryPath of PinnedQuery
             // TODO: There isn't a way to do a multi select pick list right now, but when there is we should change this to use it.
-            const workItem: BaseQuickPickItem = await window.showQuickPick(await this.getMyWorkItems(this._serverContext.RepoInfo.TeamProject, query), { matchOnDescription: true, placeHolder: Strings.ChooseWorkItem });
+            const workItem: BaseQuickPickItem = await window.showQuickPick(this.getMyWorkItems(this._serverContext.RepoInfo.TeamProject, query), { matchOnDescription: true, placeHolder: Strings.ChooseWorkItem });
             if (workItem) {
                 return ["#" + workItem.id + " - " + workItem.description];
             } else {
@@ -124,7 +124,7 @@ export class WitClient extends BaseClient {
 
     private async showWorkItems(wiql: string): Promise<void> {
         Logger.LogInfo("Getting work items...");
-        const workItem: BaseQuickPickItem = await window.showQuickPick(await this.getMyWorkItems(this._serverContext.RepoInfo.TeamProject, wiql), { matchOnDescription: true, placeHolder: Strings.ChooseWorkItem });
+        const workItem: BaseQuickPickItem = await window.showQuickPick(this.getMyWorkItems(this._serverContext.RepoInfo.TeamProject, wiql), { matchOnDescription: true, placeHolder: Strings.ChooseWorkItem });
         if (workItem) {
             let url: string = undefined;
             if (workItem.id === undefined) {
