@@ -199,17 +199,24 @@ export class FindWorkspace implements ITfvcCommand<IWorkspace> {
     private getMapping(line: string): IWorkspaceMapping {
         if (line) {
             const cloaked: boolean = line.trim().toLowerCase().startsWith("(cloaked)");
-            const end: number = line.indexOf(":");
-            const start: number = cloaked ? line.indexOf(")") + 1 : 0;
-            if (end >= 0 && end + 1 < line.length) {
-                const serverPath: string = line.slice(start, end).trim();
-                const localPath: string = line.slice(end + 1).trim();
-                return {
-                    serverPath: serverPath,
-                    localPath: localPath,
-                    cloaked: cloaked
-                };
+            let end: number = line.indexOf(":");
+            //EXE: cloaked entries end with ':'
+            //CLC: cloaked entries *don't* end with ':'
+            if (cloaked && end === -1) {
+                end = line.length;
             }
+            const start: number = cloaked ? line.indexOf(")") + 1 : 0;
+            const serverPath: string = line.slice(start, end).trim();
+            let localPath: string;
+            //cloaked entries don't have local paths
+            if (end >= 0 && end + 1 < line.length) {
+                localPath = line.slice(end + 1).trim();
+            }
+            return {
+                serverPath: serverPath,
+                localPath: localPath,
+                cloaked: cloaked
+            };
         }
 
         return undefined;

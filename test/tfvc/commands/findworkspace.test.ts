@@ -99,6 +99,93 @@ describe("Tfvc-FindWorkspaceCommand", function() {
         assert.equal(workspace.computer, undefined);
         assert.equal(workspace.owner, undefined);
         assert.equal(workspace.mappings.length, 1);
+        assert.isFalse(workspace.mappings[0].cloaked);
+        assert.equal(workspace.mappings[0].localPath, `/path`);
+        assert.equal(workspace.mappings[0].serverPath, `$/project1`);
+    });
+
+    it("should verify parse output - no errors - cloaked folders - entire project cloaked", async function() {
+        const localPath: string = "/path/to/workspace";
+        const cmd: FindWorkspace = new FindWorkspace(localPath);
+        const executionResult: IExecutionResult = {
+            exitCode: 0,
+            stdout: "=====================================================================================================================================================\n" +
+                "Workspace:  MyWorkspace\n" +
+                "Collection: http://server:8080/tfs/\n" +
+                "$/project1: /path\n" +
+                " (cloaked) $/project2\n" +
+                "$/project3: /path3",
+            stderr: undefined
+        };
+
+        const workspace: IWorkspace = await cmd.ParseOutput(executionResult);
+        assert.equal(workspace.name, "MyWorkspace");
+        assert.equal(workspace.server, "http://server:8080/tfs/");
+        assert.equal(workspace.defaultTeamProject, "project1");
+        assert.equal(workspace.comment, undefined);
+        assert.equal(workspace.computer, undefined);
+        assert.equal(workspace.owner, undefined);
+        assert.equal(workspace.mappings.length, 3);
+        assert.isTrue(workspace.mappings[1].cloaked);
+        assert.isUndefined(workspace.mappings[1].localPath);
+        assert.equal(workspace.mappings[1].serverPath, `$/project2`);
+    });
+
+    it("should verify parse output - no errors - cloaked folders - middle project sub-folder cloaked", async function() {
+        const localPath: string = "/path/to/workspace";
+        const cmd: FindWorkspace = new FindWorkspace(localPath);
+        const executionResult: IExecutionResult = {
+            exitCode: 0,
+            stdout: "=====================================================================================================================================================\n" +
+                "Workspace:  MyWorkspace\n" +
+                "Collection: http://server:8080/tfs/\n" +
+                "$/project1: /path\n" +
+                "$/project2: /path2\n" +
+                " (cloaked) $/project2/main:\n" +
+                "$/project3: /path3",
+            stderr: undefined
+        };
+
+        const workspace: IWorkspace = await cmd.ParseOutput(executionResult);
+        assert.equal(workspace.name, "MyWorkspace");
+        assert.equal(workspace.server, "http://server:8080/tfs/");
+        assert.equal(workspace.defaultTeamProject, "project1");
+        assert.equal(workspace.comment, undefined);
+        assert.equal(workspace.computer, undefined);
+        assert.equal(workspace.owner, undefined);
+        assert.equal(workspace.mappings.length, 4);
+        assert.isTrue(workspace.mappings[2].cloaked);
+        assert.isUndefined(workspace.mappings[2].localPath);
+        assert.equal(workspace.mappings[2].serverPath, `$/project2/main`);
+    });
+
+    it("should verify parse output - no errors - cloaked folders - last project sub-folder cloaked", async function() {
+        const localPath: string = "/path/to/workspace";
+        const cmd: FindWorkspace = new FindWorkspace(localPath);
+        const executionResult: IExecutionResult = {
+            exitCode: 0,
+            stdout: "=====================================================================================================================================================\n" +
+                "Workspace:  MyWorkspace\n" +
+                "Collection: http://server:8080/tfs/\n" +
+                "$/project1: /path\n" +
+                "$/project2: /path2\n" +
+                "$/project3: /path3\n" +
+                "$/project4: /path4\n" +
+                " (cloaked) $/project4/main:",
+            stderr: undefined
+        };
+
+        const workspace: IWorkspace = await cmd.ParseOutput(executionResult);
+        assert.equal(workspace.name, "MyWorkspace");
+        assert.equal(workspace.server, "http://server:8080/tfs/");
+        assert.equal(workspace.defaultTeamProject, "project1");
+        assert.equal(workspace.comment, undefined);
+        assert.equal(workspace.computer, undefined);
+        assert.equal(workspace.owner, undefined);
+        assert.equal(workspace.mappings.length, 5);
+        assert.isTrue(workspace.mappings[4].cloaked);
+        assert.isUndefined(workspace.mappings[4].localPath);
+        assert.equal(workspace.mappings[4].serverPath, `$/project4/main`);
     });
 
     it("should verify parse output - German - no 'workspace' and 'collection'", async function() {
@@ -291,6 +378,90 @@ describe("Tfvc-FindWorkspaceCommand", function() {
         assert.equal(workspace.computer, undefined);
         assert.equal(workspace.owner, undefined);
         assert.equal(workspace.mappings.length, 1);
+    });
+
+    it("should verify parse EXE output - no errors - cloaked folders - entire project cloaked", async function() {
+        const localPath: string = "/path/to/workspace";
+        const cmd: FindWorkspace = new FindWorkspace(localPath);
+        const executionResult: IExecutionResult = {
+            exitCode: 0,
+            stdout: "=====================================================================================================================================================\n" +
+                "Workspace:  MyWorkspace\n" +
+                "Collection: http://server:8080/tfs/\n" +
+                "$/project1: /path\n" +
+                " (cloaked) $/project2\n" +
+                "$/project3: /path3",
+            stderr: undefined
+        };
+
+        const workspace: IWorkspace = await cmd.ParseExeOutput(executionResult);
+        assert.equal(workspace.name, "MyWorkspace");
+        assert.equal(workspace.server, "http://server:8080/tfs/");
+        assert.equal(workspace.defaultTeamProject, "project1");
+        assert.equal(workspace.comment, undefined);
+        assert.equal(workspace.computer, undefined);
+        assert.equal(workspace.owner, undefined);
+        assert.equal(workspace.mappings.length, 3);
+        assert.isTrue(workspace.mappings[1].cloaked);
+        assert.isUndefined(workspace.mappings[1].localPath);
+        assert.equal(workspace.mappings[1].serverPath, `$/project2`);
+    });
+
+    it("should verify parse EXE output - no errors - cloaked folders - middle project sub-folder cloaked", async function() {
+        const localPath: string = "/path/to/workspace";
+        const cmd: FindWorkspace = new FindWorkspace(localPath);
+        const executionResult: IExecutionResult = {
+            exitCode: 0,
+            stdout: "=====================================================================================================================================================\n" +
+                "Workspace:  MyWorkspace\n" +
+                "Collection: http://server:8080/tfs/\n" +
+                "$/project1: /path\n" +
+                "$/project2: /path2\n" +
+                " (cloaked) $/project2/main:\n" +
+                "$/project3: /path3",
+            stderr: undefined
+        };
+
+        const workspace: IWorkspace = await cmd.ParseExeOutput(executionResult);
+        assert.equal(workspace.name, "MyWorkspace");
+        assert.equal(workspace.server, "http://server:8080/tfs/");
+        assert.equal(workspace.defaultTeamProject, "project1");
+        assert.equal(workspace.comment, undefined);
+        assert.equal(workspace.computer, undefined);
+        assert.equal(workspace.owner, undefined);
+        assert.equal(workspace.mappings.length, 4);
+        assert.isTrue(workspace.mappings[2].cloaked);
+        assert.isUndefined(workspace.mappings[2].localPath);
+        assert.equal(workspace.mappings[2].serverPath, `$/project2/main`);
+    });
+
+    it("should verify parse EXE output - no errors - cloaked folders - last project sub-folder cloaked", async function() {
+        const localPath: string = "/path/to/workspace";
+        const cmd: FindWorkspace = new FindWorkspace(localPath);
+        const executionResult: IExecutionResult = {
+            exitCode: 0,
+            stdout: "=====================================================================================================================================================\n" +
+                "Workspace:  MyWorkspace\n" +
+                "Collection: http://server:8080/tfs/\n" +
+                "$/project1: /path\n" +
+                "$/project2: /path2\n" +
+                "$/project3: /path3\n" +
+                "$/project4: /path4\n" +
+                " (cloaked) $/project4/main:",
+            stderr: undefined
+        };
+
+        const workspace: IWorkspace = await cmd.ParseExeOutput(executionResult);
+        assert.equal(workspace.name, "MyWorkspace");
+        assert.equal(workspace.server, "http://server:8080/tfs/");
+        assert.equal(workspace.defaultTeamProject, "project1");
+        assert.equal(workspace.comment, undefined);
+        assert.equal(workspace.computer, undefined);
+        assert.equal(workspace.owner, undefined);
+        assert.equal(workspace.mappings.length, 5);
+        assert.isTrue(workspace.mappings[4].cloaked);
+        assert.isUndefined(workspace.mappings[4].localPath);
+        assert.equal(workspace.mappings[4].serverPath, `$/project4/main`);
     });
 
     it("should verify parse EXE output - German - no 'workspace' and 'collection'", async function() {
