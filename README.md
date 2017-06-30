@@ -28,9 +28,9 @@ With TFVC, the extension uses information about the current workspace to determi
 **Note:** At this time, you will need to have a ***local*** TFVC workspace already available on your local machine. More information about the difference between the two types (and how to determine which one you're using) can be found [here](TFVC_README.md#what-is-the-difference-between-a-local-and-server-workspace-how-can-i-tell-which-one-im-working-with). The issue tracking support for Server workspaces is [here](https://github.com/Microsoft/vsts-vscode/issues/176).
 
 ## Installation
-First, you will need to install [Visual Studio Code](https://code.visualstudio.com/download) `1.11.1` or later.
+First, you will need to install [Visual Studio Code](https://code.visualstudio.com/download) `1.12.0` or later.
 
-To install the extension with the latest version of Visual Studio Code (version 1.11.1 is the latest as of this writing), bring up the Visual Studio Code Command Palette (`F1`), type `install` and choose `Extensions: Install Extensions`. In the `Search Extensions in Marketplace` text box, type `team`. Find the `Visual Studio Team Services` extension published by *Microsoft* and click the `Install` button. Restart Visual Studio Code.
+To install the extension with the latest version of Visual Studio Code (version 1.13.1 is the latest as of this writing), bring up the Visual Studio Code Command Palette (`F1`), type `install` and choose `Extensions: Install Extensions`. In the `Search Extensions in Marketplace` text box, type `team`. Find the `Visual Studio Team Services` extension published by *Microsoft* and click the `Install` button. Restart Visual Studio Code.
 
 ## Authentication
 ### Visual Studio Team Services

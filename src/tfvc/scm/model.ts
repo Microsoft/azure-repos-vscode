@@ -4,7 +4,7 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import { Uri, EventEmitter, Event, Disposable, window } from "vscode";
+import { Uri, EventEmitter, Event, Disposable, ProgressLocation, window } from "vscode";
 import { Telemetry } from "../../services/telemetry";
 import { TfvcTelemetryEvents } from "../../helpers/constants";
 import { TfvcRepository } from "../tfvcrepository";
@@ -91,7 +91,7 @@ export class Model implements Disposable {
     }
 
     private async run(fn: () => Promise<void>): Promise<void> {
-        return window.withScmProgress(async () => {
+        return window.withProgress({ location: ProgressLocation.SourceControl }, async () => {
             if (fn) {
                 await fn();
             } else {
