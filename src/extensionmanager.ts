@@ -49,7 +49,7 @@ export class ExtensionManager implements Disposable {
 
     public async Initialize(): Promise<void> {
         await this.setupFileSystemWatcherOnConfig();
-        await this.initializeExtension();
+        await this.initializeExtension(false /*reinitializing*/);
 
         // Add the event listener for settings changes, then re-initialized the extension
         if (workspace) {
@@ -92,7 +92,7 @@ export class ExtensionManager implements Disposable {
     //Meant to reinitialize the extension when coming back online
     public Reinitialize(): void {
         this.cleanup(true);
-        this.initializeExtension();
+        this.initializeExtension(true /*reinitializing*/);
     }
 
     public SendFeedback(): void {
@@ -236,14 +236,16 @@ export class ExtensionManager implements Disposable {
         return logMsg;
     }
 
-    private async initializeExtension(): Promise<void> {
+    private async initializeExtension(reinitializing: boolean): Promise<void> {
         //Set version of VSCode on the UserAgentProvider
         UserAgentProvider.VSCodeVersion = version;
 
         //Users could install without having a folder (workspace) open
         this._settings = new Settings(); //We need settings before showing the Welcome message
         Telemetry.Initialize(this._settings); //Need to initialize telemetry for showing welcome message
-        await this.showWelcomeMessage(); //Ensure we show the message before hooking workspace.onDidChangeConfiguration
+        if (!reinitializing) {
+            await this.showWelcomeMessage(); //Ensure we show the message before hooking workspace.onDidChangeConfiguration
+        }
 
         //Don't initialize if we don't have a workspace
         if (!workspace || !workspace.rootPath) {
