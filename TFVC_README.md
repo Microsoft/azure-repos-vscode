@@ -247,6 +247,15 @@ workspace information in a different folder on disk. This behavior is "by-design
 Unfortunately, TF.exe doesn't provide the ability to associate work items on check in. The most TF.exe can do is submit a check in *comment* with a reference to the work item (which will not actually associate the work item). In order to enable checking in to 
 servers that have check-in policies enabled, you must use the TEE CLC (which does provide support for associating work items on check-in). Follow [these instructions](#how-do-i-set-up-the-clc-on-windows) to set up the TEE CLC on Windows.
 
+### *Many files are showing up in the TFVC Viewlet that don't show up in the Visual Studio IDE. How can I ignore them?*
+The Visual Studio IDE shows these files as 'Detected Changes' and simply displays the number of them. The TFVC Viewlet will display each file individually. See [this issue](https://github.com/Microsoft/vsts-vscode/issues/248) for an example of what you may see. To properly ignore these files,
+create a `.tfignore` file and add it to the root folder of your TFVC repository. (You will also want to check this file in.) You can find the official documentation on how to do this [here](https://www.visualstudio.com/en-us/docs/tfvc/add-files-server#customize-which-files-are-ignored-by-version-control).
+To get started easily, copy this [example file](https://www.visualstudio.com/en-us/docs/tfvc/add-files-server#tfignore-file-example), place it in the root of your repository, update it as necessary and check it in. For example, if you want to ignore all files under the `node_modules` folder, you
+would add a `\node_modules` entry to the `.tfignore` file.
+
+### *I already have Visual Studio installed. How can I determine the location of TF.exe?*
+Here's a tip from **@dsolodow** ([original comment](https://github.com/Microsoft/vsts-vscode/issues/269#issuecomment-311837077)): _When you install Visual Studio, it creates a Start Menu shortcut called "Developer Command Prompt for VS YEAR" where YEAR is 2015, 2017, etc. If you launch that, and then at that prompt run `where tf.exe` it will give you the full path to it that you can then put into the settings.json._
+
 ### *How can I acquire TF.exe? Do I need a version of Visual Studio?*
 Yes, you do need a version of Visual Studio. While TF.exe comes with the Community, Enterprise and Professional versions of Visual Studio 2017, there is also a free, standalone "Visual Studio Team Explorer 2017" version that contains TF.exe. You can find all 
 of the versions of Visual Studio (including Team Explorer) on the [Visual Studio 2017 Downloads](https://www.visualstudio.com/downloads/) page (which needs to be expanded first). It is listed under the "Visual Studio 2017" section on that page. The release 
