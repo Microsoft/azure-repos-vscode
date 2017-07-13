@@ -34,14 +34,15 @@ To install the extension with the latest version of Visual Studio Code (version 
 
 ## Authentication
 ### Visual Studio Team Services
-If you are connecting to Team Services, you will need a personal access token (PAT) to securely access your account. The latest
-version of the extension will prompt for your token and store it securely. In previous versions of the extension, you needed to create a
-token and store it in your Visual Studio Code settings.
+If you are connecting to Team Services, you will need a personal access token (PAT) to securely access your account. With the release of v1.121.0 of the extension, you have a choice of whether you would like to create a token yourself manually and provide it when prompted, or use a new experience in which you are authenticated to Team Services using your web browser. In the new experience, a personal access token is still created in your account (on your behalf) but only after you are authenticated. The created token has *All Scopes* permissions but can be updated in your profile settings. Both tokens (manual or the new experience) are stored securely on your machine.
 
-If you do not have a personal access token yet, you will need to create one on your Team Services account.
-To create the token, go [here](https://aka.ms/gtgzt4) to read how. You can also [view our video](https://youtu.be/t6gGfj8WOgg) on how to do the same.
+#### Manual Token Creation
+Should you wish to create a personal access token yourself, go [here](https://aka.ms/gtgzt4) to read how. You can also [view our video](https://youtu.be/t6gGfj8WOgg) on how to do the same.
 * Git repositories require that you create your token with the **Build (read)**, **Code (read)** and **Work items (read)** scopes to ensure full functionality. You can also use *All Scopes*, but the minimum required scopes are those listed above.
 * TFVC repositories require tokens with *All Scopes*. Anything less will cause the extension to fail.
+
+#### Browser-based Authentication
+When using the new authentication experience, you will be prompted to copy a *device code* used to identify yourself to the authentication system. Once you accept the prompt to begin authentication, your default web browser will be opened to a login page. After supplying that device code and having it verified, you will then be prompted to authenticate with Team Services normally (e.g., username and password, multi-factor authentication, etc.). Once you are authenticated to Team Services, a personal access token will be created for you and the extension will be initialized normally. To see what this experience is like, [view this video]().
 
 ### Team Foundation Server
 If you are connecting to Team Foundation Server, you will only need your NTLM credentials (domain name, account name and password). It is assumed that you have the proper permissions on the TFS Server.

@@ -24,6 +24,13 @@ export class Strings {
     static NoSourceFileForBlame: string = "A source file must be opened to show blame information.";
     static UserMustSignIn: string = "You are signed out. Please run the 'team signin' command.";
 
+    static DeviceFlowAuthenticatingToTeamServices: string = "Authenticating to Team Services (%s)...";
+    static DeviceFlowCopyCode: string = "Copy this code and then press Enter to start the authentication process";
+    static DeviceFlowManualPrompt: string = "Provide an access token manually (current experience)";
+    static DeviceFlowPrompt: string = "Authenticate and get an access token automatically (new experience)";
+    static DeviceFlowPlaceholder: string = "Choose your method of authenticating to Team Services...";
+    static ErrorRequestingToken: string = "An error occurred requesting a personal access token for %s.";
+
     static SendAFrown: string = "Send a Frown";
     static SendASmile: string = "Send a Smile";
     static SendEmailPrompt: string = "(Optional) Provide your email address";

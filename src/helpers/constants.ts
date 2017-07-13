@@ -42,6 +42,13 @@ export class CommandNames {
     static ViewPinnedQueryWorkItems: string = CommandNames.CommandPrefix + "ViewPinnedQueryWorkItems";
 }
 
+export class DeviceFlowConstants {
+    static ManualOption: string = "manual";
+    static DeviceFlowOption: string = "deviceflow";
+    static ClientId: string = "97877f11-0fc6-4aee-b1ff-febb0519dd00";
+    static RedirectUri: string = "https://java.visualstudio.com";
+}
+
 export class TfvcCommandNames {
     static CommandPrefix: string = "tfvc.";
     static Checkin: string = TfvcCommandNames.CommandPrefix + "Checkin";
@@ -82,8 +89,10 @@ export class SettingNames {
 export class TelemetryEvents {
     static TelemetryPrefix: string = Constants.ExtensionName + "/";
     static AssociateWorkItems: string = TelemetryEvents.TelemetryPrefix + "associateworkitems";
+    static DeviceFlowPat: string = TelemetryEvents.TelemetryPrefix + "deviceflowpat";
     static ExternalRepository: string = TelemetryEvents.TelemetryPrefix + "externalrepo";
     static Installed: string = TelemetryEvents.TelemetryPrefix + "installed";
+    static ManualPat: string = TelemetryEvents.TelemetryPrefix + "manualpat";
     static OpenAdditionalQueryResults: string = TelemetryEvents.TelemetryPrefix + "openaddlqueryresults";
     static OpenBlamePage: string = TelemetryEvents.TelemetryPrefix + "openblame";
     static OpenBuildSummaryPage: string = TelemetryEvents.TelemetryPrefix + "openbuildsummary";

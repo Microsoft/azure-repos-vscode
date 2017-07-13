@@ -515,10 +515,12 @@
     "parse-git-config": "^0.3.1",
     "path": "^0.12.7",
     "readable-stream": "^2.1.4",
+    "request-promise-native": "^1.0.4",
     "underscore": "^1.8.3",
     "url": "^0.11.0",
     "uuid": "^3.0.1",
     "vso-node-api": "^5.1.1",
+    "vsts-device-flow-auth": "^1.121.0",
     "winston": "2.3.1",
     "xml2js": "^0.4.17",
     "xmldoc": "^0.5.1"

@@ -4,13 +4,15 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import { scm, StatusBarAlignment, StatusBarItem, window } from "vscode";
+import { scm, StatusBarAlignment, StatusBarItem, ProgressLocation, window } from "vscode";
+import { DeviceFlowAuthenticator, DeviceFlowDetails, IDeviceFlowAuthenticationOptions, IDeviceFlowTokenOptions } from "vsts-device-flow-auth";
 import { PinnedQuerySettings } from "./helpers/settings";
-import { CommandNames, Constants, TelemetryEvents, TfvcTelemetryEvents, WitTypes } from "./helpers/constants";
+import { CommandNames, Constants, DeviceFlowConstants, TelemetryEvents, TfvcTelemetryEvents, WitTypes } from "./helpers/constants";
 import { Logger } from "./helpers/logger";
 import { Strings } from "./helpers/strings";
+import { UserAgentProvider } from "./helpers/useragentprovider";
 import { Utils } from "./helpers/utils";
-import { ButtonMessageItem, VsCodeUtils } from "./helpers/vscodeutils";
+import { BaseQuickPickItem, ButtonMessageItem, VsCodeUtils } from "./helpers/vscodeutils";
 import { RepositoryType } from "./contexts/repositorycontext";
 import { BuildClient } from "./clients/buildclient";
 import { GitClient } from "./clients/gitclient";
@@ -19,6 +21,7 @@ import { Telemetry } from "./services/telemetry";
 import { ExtensionManager } from "./extensionmanager";
 
 import * as os from "os";
+import * as util from "util";
 
 export class TeamExtension  {
     private _manager: ExtensionManager;
@@ -32,6 +35,7 @@ export class TeamExtension  {
     private _pollingTimer: NodeJS.Timer;
     private _initialTimer: NodeJS.Timer;
     private _signedOut: boolean = false;
+    private _signingIn: boolean = false;
 
     constructor(manager: ExtensionManager) {
         this._manager = manager;
@@ -63,10 +67,83 @@ export class TeamExtension  {
         return this._signedOut;
     }
 
+    //Prompts user for either manual or device-flow mechanism for acquiring a personal access token.
+    //If manual, we provide the same experience as we always have
+    //If device-flow (automatic), we provide the new 'device flow' experience
+    private async requestPersonalAccessToken(): Promise<string> {
+        const choices: BaseQuickPickItem[] = [];
+        choices.push({ label: Strings.DeviceFlowManualPrompt, description: undefined, id: DeviceFlowConstants.ManualOption });
+        choices.push({ label: Strings.DeviceFlowPrompt, description: undefined, id: DeviceFlowConstants.DeviceFlowOption });
+
+        const choice: BaseQuickPickItem = await window.showQuickPick(choices, { matchOnDescription: false, placeHolder: Strings.DeviceFlowPlaceholder });
+        if (choice) {
+            if (choice.id === DeviceFlowConstants.ManualOption) {
+                Logger.LogDebug(`Manual personal access token option chosen.`);
+                const token: string = await window.showInputBox({ value: "", prompt: `${Strings.ProvideAccessToken} (${this._manager.ServerContext.RepoInfo.Account})`, placeHolder: "", password: true });
+                if (token) {
+                    Telemetry.SendEvent(TelemetryEvents.ManualPat);
+                }
+                return token;
+            } else if (choice.id === DeviceFlowConstants.DeviceFlowOption) {
+                Logger.LogDebug(`Device flow personal access token option chosen.`);
+                const authOptions: IDeviceFlowAuthenticationOptions = {
+                    clientId: DeviceFlowConstants.ClientId,
+                    redirectUri: DeviceFlowConstants.RedirectUri,
+                    userAgent: `${UserAgentProvider.UserAgent}`
+                };
+                const tokenOptions: IDeviceFlowTokenOptions = {
+                    tokenDescription: `VSTS VSCode extension: ${this._manager.ServerContext.RepoInfo.AccountUrl} on ${os.hostname()}`
+                };
+                const dfa: DeviceFlowAuthenticator = new DeviceFlowAuthenticator(this._manager.ServerContext.RepoInfo.AccountUrl, authOptions, tokenOptions);
+                const details: DeviceFlowDetails = await dfa.GetDeviceFlowDetails();
+                //To sign in, use a web browser to open the page https://aka.ms/devicelogin and enter the code F3VXCTH2L to authenticate.
+                const value: string = await window.showInputBox({ value: details.UserCode, prompt: `${Strings.DeviceFlowCopyCode} (${details.VerificationUrl})`, placeHolder: undefined, password: false });
+                if (value) {
+                    //At this point, user has no way to cancel until our timeout expires. Before this point, they could
+                    //cancel out of the showInputBox. After that, they will need to wait for the automatic cancel to occur.
+                    Utils.OpenUrl(details.VerificationUrl);
+
+                    //FUTURE: Could we display a message that allows the user to cancel the authentication? If they escape from the
+                    //message or click Close, they wouldn't have that chance any longer. If they leave the message displaying, they
+                    //have an opportunity to cancel. However, once authenticated, we no longer have an ability to close the message
+                    //automatically or change the message that's displayed. :-/
+
+                    //FUTURE: Add a 'button' on the status bar that can be used to cancel the authentication
+
+                    //Wait for up to 5 minutes before we cancel the stauts polling (Azure's default is 900s/15 minutes)
+                    const timeout: number = 5 * 60 * 1000;
+                    /* tslint:disable:align */
+                    const timer: NodeJS.Timer = setTimeout(() => {
+                        Logger.LogDebug(`Device flow authentication canceled after ${timeout}ms.`);
+                        dfa.Cancel(true); //throw on canceling
+                    }, timeout);
+                    /* tslint:enable:align */
+
+                    //We need to await on withProgress here because we need a token before continuing forward
+                    const title: string = util.format(Strings.DeviceFlowAuthenticatingToTeamServices, details.UserCode);
+                    const token: string = await window.withProgress({ location: ProgressLocation.Window, title: title }, async () => {
+                        const accessToken: string = await dfa.WaitForPersonalAccessToken();
+                        //Since we will cancel automatically after timeout, if we _do_ get an accessToken then we need to call clearTimeout
+                        if (accessToken) {
+                            clearTimeout(timer);
+                        }
+                        return accessToken;
+                    });
+
+                    return token;
+                } else {
+                    Logger.LogDebug(`User has canceled the device flow authentication mechanism.`);
+                }
+            }
+        }
+        return undefined;
+    }
+
     public async Signin() {
         // For Signin, first we need to verify _serverContext
         if (this._manager.ServerContext !== undefined && this._manager.ServerContext.RepoInfo !== undefined && this._manager.ServerContext.RepoInfo.IsTeamFoundation === true) {
             this._signedOut = false;
+            Logger.LogDebug(`Starting sign in process`);
             if (this._manager.ServerContext.RepoInfo.IsTeamFoundationServer === true) {
                 const defaultUsername : string = this.getDefaultUsername();
                 const username: string = await window.showInputBox({ value: defaultUsername || "", prompt: Strings.ProvideUsername + " (" + this._manager.ServerContext.RepoInfo.Account + ")", placeHolder: "", password: false });
@@ -76,6 +153,7 @@ export class TeamExtension  {
                         Logger.LogInfo("Signin: Username and Password provided as authentication.");
                         this._manager.CredentialManager.StoreCredentials(this._manager.ServerContext.RepoInfo.Host, username, password).then(() => {
                             // We don't test the credentials to make sure they're good here.  Do so on the next command that's run.
+                            Logger.LogDebug(`Reinitializing after successfully storing credentials for Team Foundation Server.`);
                             this._manager.Reinitialize();
                         }).catch((err) => {
                             // TODO: Should the message direct the user to open an issue?  send feedback?
@@ -84,19 +162,31 @@ export class TeamExtension  {
                         });
                     }
                 }
-            } else if (this._manager.ServerContext.RepoInfo.IsTeamServices === true) {
-                // Until Device Flow, we can prompt for the PAT for Team Services
-                const token: string = await window.showInputBox({ value: "", prompt: Strings.ProvideAccessToken + " (" + this._manager.ServerContext.RepoInfo.Account + ")", placeHolder: "", password: true });
-                if (token !== undefined) {
-                    Logger.LogInfo("Signin: Personal Access Token provided as authentication.");
-                    this._manager.CredentialManager.StoreCredentials(this._manager.ServerContext.RepoInfo.Host, Constants.OAuth, token.trim()).then(() => {
-                        this._manager.Reinitialize();
-                    }).catch((err) => {
-                        // TODO: Should the message direct the user to open an issue?  send feedback?
-                        const msg: string = Strings.UnableToStoreCredentials + this._manager.ServerContext.RepoInfo.Host;
-                        this._manager.ReportError(err, msg, true);
-                    });
+            } else if (this._manager.ServerContext.RepoInfo.IsTeamServices === true && !this._signingIn) {
+                this._signingIn = true;
+                try {
+                    const token: string = await this.requestPersonalAccessToken();
+                    if (token !== undefined) {
+                        Logger.LogInfo(`Signin: Personal Access Token provided as authentication.`);
+                        this._manager.CredentialManager.StoreCredentials(this._manager.ServerContext.RepoInfo.Host, Constants.OAuth, token.trim()).then(() => {
+                            Logger.LogDebug(`Reinitializing after successfully storing credentials for Team Services.`);
+                            this._manager.Reinitialize();
+                        }).catch((err) => {
+                            // TODO: Should the message direct the user to open an issue?  send feedback?
+                            const msg: string = `${Strings.UnableToStoreCredentials} ${this._manager.ServerContext.RepoInfo.Host}`;
+                            this._manager.ReportError(err, msg, true);
+                        });
+                    }
+                } catch (err) {
+                    let msg: string = util.format(Strings.ErrorRequestingToken, this._manager.ServerContext.RepoInfo.AccountUrl);
+                    if (err.message) {
+                        msg = `${msg} (${err.message})`;
+                    }
+                    Logger.LogError(msg);
+                    //FUTURE: Add a ButtonMessageItem to provide additional help? Log a bug?
+                    VsCodeUtils.ShowErrorMessage(msg);
                 }
+                this._signingIn = false;
             }
         } else {
             //If _manager has an error to display, display it and forgo the other. Otherwise, show the default error message.
@@ -116,6 +206,7 @@ export class TeamExtension  {
     public Signout() {
         // For Logout, we just need to verify _serverContext and don't want to set this._errorMessage
         if (this._manager.ServerContext !== undefined && this._manager.ServerContext.RepoInfo !== undefined && this._manager.ServerContext.RepoInfo.IsTeamFoundation === true) {
+            Logger.LogDebug(`Starting sign out process`);
             this._manager.CredentialManager.RemoveCredentials(this._manager.ServerContext.RepoInfo.Host).then(() => {
                 Logger.LogInfo(`Signout: Removed credentials for host '${this._manager.ServerContext.RepoInfo.Host}'`);
             }).catch((err) => {
