@@ -42,7 +42,7 @@ Should you wish to create a personal access token yourself, go [here](https://ak
 * TFVC repositories require tokens with *All Scopes*. Anything less will cause the extension to fail.
 
 #### Browser-based Authentication
-When using the new authentication experience, you will be prompted to copy a *device code* used to identify yourself to the authentication system. Once you accept the prompt to begin authentication, your default web browser will be opened to a login page. After supplying that device code and having it verified, you will then be prompted to authenticate with Team Services normally (e.g., username and password, multi-factor authentication, etc.). Once you are authenticated to Team Services, a personal access token will be created for you and the extension will be initialized normally. To see what this experience is like, [view this video]().
+When using the new authentication experience, you will be prompted to copy a *device code* used to identify yourself to the authentication system. Once you accept the prompt to begin authentication, your default web browser will be opened to a login page. After supplying that device code and having it verified, you will then be prompted to authenticate with Team Services normally (e.g., username and password, multi-factor authentication, etc.). Once you are authenticated to Team Services, a personal access token will be created for you and the extension will be initialized normally. To see what this experience is like, [view this video](https://youtu.be/HnDNdm1WCIo).
 
 ### Team Foundation Server
 If you are connecting to Team Foundation Server, you will only need your NTLM credentials (domain name, account name and password). It is assumed that you have the proper permissions on the TFS Server.
