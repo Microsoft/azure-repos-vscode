@@ -28,7 +28,7 @@ export class ArgumentBuilder implements IArgumentProvider {
                 this.AddSwitchWithValue("collection", serverContext.RepoInfo.CollectionUrl, false);
             }
             if (serverContext.CredentialInfo) {
-                this.AddSwitchWithValue("login", serverContext.CredentialInfo.Username + "," + serverContext.CredentialInfo.Password, true);
+                this.AddSwitchWithValue("login", (serverContext.CredentialInfo.Domain ? serverContext.CredentialInfo.Domain + "\\" : "") + serverContext.CredentialInfo.Username + "," + serverContext.CredentialInfo.Password, true);
             }
         }
     }
