@@ -160,4 +160,7 @@ export class RepositoryInfo {
     public get TeamProject(): string {
         return this._teamProject;
     }
+    public get Path(): string {
+        return this._path;
+    }
 }

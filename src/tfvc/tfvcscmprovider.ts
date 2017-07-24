@@ -50,6 +50,7 @@ export class TfvcSCMProvider {
 
         try {
             const files: string[] = [];
+            const serverItems: string[] = [];
             const commitMessage: string = scm.inputBox.value;
             const workItemIds: number[] = TfvcSCMProvider.getWorkItemIdsFromMessage(commitMessage);
 
@@ -60,10 +61,12 @@ export class TfvcSCMProvider {
 
             for (let i: number = 0; i < resources.length; i++) {
                 files.push(resources[i].PendingChange.localItem);
+                serverItems.push(resources[i].PendingChange.serverItem);
             }
 
             return {
                 files: files,
+                serverItems: serverItems,
                 comment: commitMessage,
                 workItemIds: workItemIds
             };

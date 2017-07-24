@@ -33,11 +33,11 @@ export class TfvcExtension  {
         this._manager = manager;
     }
 
-    public async Checkin(): Promise<void> {
+    public async Checkin(optionalCheckinInfo?: ICheckinInfo): Promise<void> {
         this.displayErrors(
             async () => {
-                // get the checkin info from the SCM viewlet
-                const checkinInfo: ICheckinInfo = TfvcSCMProvider.GetCheckinInfo();
+                // get the checkin info from arguments or the SCM viewlet
+                const checkinInfo: ICheckinInfo = optionalCheckinInfo || TfvcSCMProvider.GetCheckinInfo();
                 if (!checkinInfo) {
                     window.showInformationMessage(Strings.NoChangesToCheckin);
                     return;
@@ -47,7 +47,9 @@ export class TfvcExtension  {
                 const changeset: string =
                     await this._repo.Checkin(checkinInfo.files, checkinInfo.comment, checkinInfo.workItemIds);
                 TfvcOutput.AppendLine(`Changeset ${changeset} checked in.`);
-                TfvcSCMProvider.ClearCheckinMessage();
+                if (!optionalCheckinInfo) {
+                    TfvcSCMProvider.ClearCheckinMessage();
+                }
                 TfvcSCMProvider.Refresh();
             },
             "Checkin");

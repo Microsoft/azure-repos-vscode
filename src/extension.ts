@@ -7,7 +7,8 @@
 import { commands, ExtensionContext } from "vscode";
 import { CommandNames, TfvcCommandNames } from "./helpers/constants";
 import { ExtensionManager } from "./extensionmanager";
-import { AutoResolveType } from "./tfvc/interfaces";
+import { AutoResolveType, ICheckinInfo } from "./tfvc/interfaces";
+import { TfvcSCMProvider } from "./tfvc/tfvcscmprovider";
 
 let _extensionManager: ExtensionManager;
 
@@ -53,4 +54,21 @@ export async function activate(context: ExtensionContext) {
     context.subscriptions.push(commands.registerCommand(TfvcCommandNames.ShowOutput, () => _extensionManager.RunCommand(() => _extensionManager.Tfvc.ShowOutput())));
     context.subscriptions.push(commands.registerCommand(TfvcCommandNames.Checkin, () => _extensionManager.RunCommand(() => _extensionManager.Tfvc.Checkin())));
     context.subscriptions.push(commands.registerCommand(TfvcCommandNames.Sync, () => _extensionManager.RunCommand(() => _extensionManager.Tfvc.Sync())));
+
+    const api = {
+        getCheckinInfo() : ICheckinInfo {
+            return TfvcSCMProvider.GetCheckinInfo();
+        },
+        getRepositoryInfo() : any {
+            return {
+                collectionId : _extensionManager.ServerContext.RepoInfo.CollectionId,
+                projectName : _extensionManager.ServerContext.RepoInfo.TeamProject,
+                path : _extensionManager.ServerContext.RepoInfo.Path
+            };
+        },
+        checkin(checkinInfo : ICheckinInfo) {
+            return _extensionManager.Tfvc.Checkin(checkinInfo);
+        }
+    };
+    return api;
 }

@@ -32,6 +32,7 @@ export interface IItemInfo {
 export interface ICheckinInfo {
     comment: string;
     files: string[];
+    serverItems: string[];
     workItemIds: number[];
 }
 
