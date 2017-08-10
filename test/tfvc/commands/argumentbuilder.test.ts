@@ -63,6 +63,19 @@ describe("Tfvc-ArgumentBuilder", function() {
         assert.equal(args.length, 4);
     });
 
+    it("should verify constructor with context - user and domain", function() {
+        context.CredentialInfo = new CredentialInfo(user, pass, "domain", "workstation");
+        const cmd: string = "mycmd";
+        const builder: ArgumentBuilder = new ArgumentBuilder(cmd, context);
+        assert.equal(builder.GetCommand(), cmd);
+        const args = builder.Build();
+        assert.equal(args[0], cmd);
+        assert.equal(args[1], "-noprompt");
+        assert.equal(args[2], "-collection:" + collectionUrl);
+        assert.equal(args[3], "-login:" + `domain\\${user}` + "," + pass);
+        assert.equal(args.length, 4);
+    });
+
     it("should verify constructor error", function() {
         assert.throws(() => new ArgumentBuilder(undefined), TfvcError, /Argument is required/);
     });
