@@ -183,9 +183,8 @@ export class TeamExtension  {
                     if (err.message) {
                         msg = `${msg} (${err.message})`;
                     }
-                    Logger.LogError(msg);
                     //FUTURE: Add a ButtonMessageItem to provide additional help? Log a bug?
-                    VsCodeUtils.ShowErrorMessage(msg);
+                    this._manager.ReportError(err, msg, true);
                 }
                 this._signingIn = false;
             }
