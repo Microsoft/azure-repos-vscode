@@ -61,8 +61,8 @@ export class TfCommandLineRunner {
         if (exists) {
             // if it exists, check to ensure that it's a file and not a folder
             const stats: fs.Stats = fs.lstatSync(tfvcPath);
-            if (!stats || !stats.isFile()) {
-                Logger.LogWarning(`TFVC ${tfvcPath} exists but isn't a file.`);
+            if (!stats || (!stats.isFile() && !stats.isSymbolicLink())) {
+                Logger.LogWarning(`TFVC ${tfvcPath} exists but isn't a file or symlink.`);
                 throw new TfvcError({
                     message: Strings.TfMissingError + tfvcPath,
                     tfvcErrorCode: TfvcErrorCodes.NotFound
