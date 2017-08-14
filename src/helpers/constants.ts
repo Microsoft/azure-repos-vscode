@@ -89,6 +89,8 @@ export class SettingNames {
 export class TelemetryEvents {
     static TelemetryPrefix: string = Constants.ExtensionName + "/";
     static AssociateWorkItems: string = TelemetryEvents.TelemetryPrefix + "associateworkitems";
+    static DeviceFlowCanceled: string = TelemetryEvents.TelemetryPrefix + "deviceflowcanceled";
+    static DeviceFlowFailed: string = TelemetryEvents.TelemetryPrefix + "deviceflowfailed";
     static DeviceFlowPat: string = TelemetryEvents.TelemetryPrefix + "deviceflowpat";
     static ExternalRepository: string = TelemetryEvents.TelemetryPrefix + "externalrepo";
     static Installed: string = TelemetryEvents.TelemetryPrefix + "installed";

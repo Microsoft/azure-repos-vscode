@@ -115,6 +115,7 @@ export class TeamExtension  {
                     /* tslint:disable:align */
                     const timer: NodeJS.Timer = setTimeout(() => {
                         Logger.LogDebug(`Device flow authentication canceled after ${timeout}ms.`);
+                        Telemetry.SendEvent(TelemetryEvents.DeviceFlowCanceled);
                         dfa.Cancel(true); //throw on canceling
                     }, timeout);
                     /* tslint:enable:align */
@@ -182,6 +183,10 @@ export class TeamExtension  {
                     let msg: string = util.format(Strings.ErrorRequestingToken, this._manager.ServerContext.RepoInfo.AccountUrl);
                     if (err.message) {
                         msg = `${msg} (${err.message})`;
+                        //If the request wasn't canceled, log a failure of the device flow auth
+                        if (err.message.indexOf("Request canceled by user") === -1) {
+                            Telemetry.SendEvent(TelemetryEvents.DeviceFlowFailed);
+                        }
                     }
                     //FUTURE: Add a ButtonMessageItem to provide additional help? Log a bug?
                     this._manager.ReportError(err, msg, true);
