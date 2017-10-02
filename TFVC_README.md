@@ -62,7 +62,7 @@ you will need to have one already installed and configured. TFVC support will no
 #### Visual Studio IDE (Windows)
 With a typical installation of Visual Studio, the Windows version of the TFVC command line client (tf.exe) is available under
 the `Program Files (x86)` folder. It will typically be placed in a location similar to
-`C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\TF.exe`. On the 2017 version of Visual Studio, it can be found in a location similar to `C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\Common7\IDE\CommonExtensions\Microsoft\TeamFoundation\Team Explorer\TF.exe`.
+`C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\TF.exe`. On the 2017 version of Visual Studio Community, it can be found in a location similar to `C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\TeamFoundation\Team Explorer\TF.exe`. Visual Studio Community can be downloaded from [here](https://www.visualstudio.com/free-developer-offers/).
 
 #### Eclipse, JetBrains IDEs (Windows, macOS, Linux)
 If you typically use Eclipse or one of the JetBrains IDEs (e.g., Android Studio, IntelliJ), you will need to download and
