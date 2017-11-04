@@ -63,6 +63,9 @@ describe("RepoUtils", function() {
         //SSH urls would be valid
         url = "ssh://mseng@mseng.visualstudio.com:22/DefaultCollection/VSOnline/_git/Java.IntelliJ/";
         assert.isTrue(RepoUtils.IsTeamFoundationServicesRepo(url));
+        //New-style SSH urls (with _ssh instead of _git) should be valid as well
+        url = "ssh://acctname@vs-ssh.visualstudio.com:22/DefaultCollection/_ssh/reponame";
+        assert.isTrue(RepoUtils.IsTeamFoundationServicesRepo(url));
     });
 
     it("should ensure Team Server urls are not valid Team Services Git urls", function() {

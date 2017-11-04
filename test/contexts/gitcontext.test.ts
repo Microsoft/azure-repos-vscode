@@ -97,7 +97,24 @@ describe("GitContext", function() {
         assert.equal(gc.Type, RepositoryType.GIT);
     });
 
-    it("should verify TeamServices origin remote cloned with ssh", function() {
+    it("should verify TeamServices origin remote cloned with old-style ssh url", function() {
+        const repoName: string = "gitrepo-old-ssh";
+        const repoPath: string = path.join(__dirname, TEST_REPOS_FOLDER, repoName, DOT_GIT_FOLDER);
+        const gc: GitContext = new GitContext(repoPath, DOT_GIT_FOLDER);
+
+        assert.equal(gc.CurrentBranch, "master");
+        assert.equal(gc.CurrentRef, "refs/heads/master");
+        assert.isTrue(gc.IsSsh);
+        assert.isTrue(gc.IsTeamFoundation);
+        assert.isTrue(gc.IsTeamServices);
+        //The remote URL is the https and no longer has port number
+        assert.equal(gc.RemoteUrl, "https://account.visualstudio.com/DefaultCollection/_git/repository");
+        assert.equal(gc.RepositoryParentFolder, path.join(__dirname, TEST_REPOS_FOLDER, repoName));
+        assert.equal(gc.RepoFolder, repoPath);
+        assert.equal(gc.Type, RepositoryType.GIT);
+    });
+
+    it("should verify TeamServices origin remote cloned with ssh", function () {
         const repoName: string = "gitrepo-ssh";
         const repoPath: string = path.join(__dirname, TEST_REPOS_FOLDER, repoName, DOT_GIT_FOLDER);
         const gc: GitContext = new GitContext(repoPath, DOT_GIT_FOLDER);

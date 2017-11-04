@@ -65,7 +65,7 @@ export class GitContext implements IRepositoryContext {
                 this._gitCurrentBranch = this._gitRepoInfo.branch;
                 this._gitCurrentRef = "refs/heads/" + this._gitCurrentBranch;
 
-                //All Team Services and TFS Git remote urls contain /_git/
+                //Check if any heuristics for TFS/VSTS URLs match
                 if (RepoUtils.IsTeamFoundationGitRepo(this._gitOriginalRemoteUrl)) {
                     const purl = url.parse(this._gitOriginalRemoteUrl);
                     if (purl) {
@@ -73,9 +73,23 @@ export class GitContext implements IRepositoryContext {
                             this._isTeamServicesUrl = true;
                             const splitHref = purl.href.split("@");
                             if (splitHref.length === 2) {  //RemoteUrl is SSH
-                                //For Team Services, default to https:// as the protocol
-                                this._gitRemoteUrl = "https://" + purl.hostname + purl.pathname;
                                 this._isSsh = true;
+                                //VSTS now has two URL modes, one with _git in the path and another with _ssh.
+                                if (purl.pathname.indexOf("/_git/") >= 0) {
+                                    //For Team Services, default to https:// as the protocol
+                                    this._gitRemoteUrl = "https://" + purl.hostname + purl.pathname;
+                                } else {
+                                    // Do a few substitutions to get the correct url:
+                                    //  * ssh:// -> https://
+                                    //  * vs-ssh -> accountname
+                                    //  * _git -> _ssh
+                                    // so ssh://account@vsts-ssh.visualstudio.com/DefaultCollection/_ssh/foo
+                                    // becomes https://account.visualstudio.com/DefaultCollection/_git/foo
+                                    const scheme = "https://";
+                                    const hostname = purl.auth + ".visualstudio.com";
+                                    const path = purl.pathname.replace("_ssh", "_git");
+                                    this._gitRemoteUrl = scheme + hostname + path;
+                                }
                             } else {
                                 this._gitRemoteUrl = this._gitOriginalRemoteUrl;
                             }
