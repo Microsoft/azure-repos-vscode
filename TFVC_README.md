@@ -88,6 +88,13 @@ To create the token, go [here](https://aka.ms/gtgzt4) to read how. You can also 
 on how to do the same.
 * TFVC repositories require tokens with *All Scopes*. Anything less will cause the extension to fail.
 
+In addition to connecting to Team Services using a personal access token (PAT), the TF.exe command line client needs
+its own access to the remote repository, otherwise TFVC will fail:
+* Open a command prompt with the correct version of TF.exe in its PATH
+* Enter "tf workspace"
+* If this opens a login prompt, enter your credentials
+* You can then close the Workspace window
+
 ### Team Foundation Server
 If you are connecting to Team Foundation Server, you will only need your NTLM credentials (domain name, account name
 and password). It is assumed that you have the proper permissions on the TFS Server.
