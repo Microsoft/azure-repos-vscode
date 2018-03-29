@@ -7,12 +7,20 @@
 import { BuildResult } from "vso-node-api/interfaces/BuildInterfaces";
 import { Strings } from "./strings";
 
-var fs = require("fs");
-var path = require("path");
-var open = require("open");
-var opener = require("opener");
+import * as fs from "fs";
+import * as path from "path";
+import * as open from "open";
+import * as opener from "opener";
 
 export class Utils {
+
+    public static FormatMessage(message: string): string {
+        if (message) {
+            //Replace newlines with spaces
+            return message.replace(/\r\n/g, " ").replace(/\n/g, " ").trim();
+        }
+        return message;
+    }
 
     //gitDir provided for unit testing purposes
     public static FindGitFolder(startingPath: string, gitDir?: string): string {

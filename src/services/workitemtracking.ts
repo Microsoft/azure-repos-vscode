@@ -12,6 +12,7 @@ import { QueryExpand, QueryHierarchyItem, QueryResultType, Wiql, WorkItem,
          WorkItemTypeReference } from "vso-node-api/interfaces/WorkItemTrackingInterfaces";
 import { TeamServerContext } from "../contexts/servercontext";
 import { CredentialManager } from "../helpers/credentialmanager";
+import { UrlBuilder } from "../helpers/urlbuilder";
 
 export class WorkItemTrackingService {
     private _witApi: IWorkItemTrackingApi;
@@ -22,8 +23,10 @@ export class WorkItemTrackingService {
 
     //Returns a Promise containing the WorkItem that was created
     public async CreateWorkItem(context: TeamServerContext, itemType: string, taskTitle: string): Promise<WorkItem> {
-        let newWorkItem = [{ op: "add", path: "/fields/" + WorkItemFields.Title, value: taskTitle }];
+        const newWorkItem = [{ op: "add", path: "/fields/" + WorkItemFields.Title, value: taskTitle }];
+        /* tslint:disable:no-null-keyword */
         return await this._witApi.createWorkItem(null, newWorkItem, context.RepoInfo.TeamProject, itemType, false, false);
+        /* tslint:enable:no-null-keyword */
     }
 
     //Returns a Promise containing an array of SimpleWorkItems based on the passed in wiql
@@ -43,18 +46,18 @@ export class WorkItemTrackingService {
 
     //Returns a Promise containing the array of work item types available for the team project
     public async GetWorkItemTypes(teamProject: string): Promise<WorkItemType[]> {
-        let types: WorkItemType[] = await this._witApi.getWorkItemTypes(teamProject);
-        let workItemTypes: WorkItemType[] = [];
-        let hiddenTypes: WorkItemTypeReference[] = [];
-        types.forEach(type => {
+        const types: WorkItemType[] = await this._witApi.getWorkItemTypes(teamProject);
+        const workItemTypes: WorkItemType[] = [];
+        const hiddenTypes: WorkItemTypeReference[] = [];
+        types.forEach((type) => {
             workItemTypes.push(type);
         });
-        let category: WorkItemTypeCategory = await this._witApi.getWorkItemTypeCategory(teamProject, "Microsoft.HiddenCategory");
-        category.workItemTypes.forEach(hiddenType => {
+        const category: WorkItemTypeCategory = await this._witApi.getWorkItemTypeCategory(teamProject, "Microsoft.HiddenCategory");
+        category.workItemTypes.forEach((hiddenType) => {
             hiddenTypes.push(hiddenType);
         });
-        let filteredTypes: WorkItemType[] = workItemTypes.filter(function (el) {
-            for (let index = 0; index < hiddenTypes.length; index++) {
+        const filteredTypes: WorkItemType[] = workItemTypes.filter(function (el) {
+            for (let index: number = 0; index < hiddenTypes.length; index++) {
                 if (el.name === hiddenTypes[index].name) {
                     return false;
                 }
@@ -64,10 +67,10 @@ export class WorkItemTrackingService {
         return filteredTypes;
     }
 
-    //Returns a Promise containing a SimpleWorkItem representing the work item specifid by teamProject and id
-    public async GetWorkItemById(teamProject: string, id: string): Promise<SimpleWorkItem> {
-        let workItem: WorkItem = await this._witApi.getWorkItem(parseInt(id), [WorkItemFields.Id, WorkItemFields.Title]);
-        let result: SimpleWorkItem = new SimpleWorkItem();
+    //Returns a Promise containing a SimpleWorkItem representing the work item specified by id
+    public async GetWorkItemById(id: string): Promise<SimpleWorkItem> {
+        const workItem: WorkItem = await this._witApi.getWorkItem(parseInt(id), [WorkItemFields.Id, WorkItemFields.Title]);
+        const result: SimpleWorkItem = new SimpleWorkItem();
         result.id = workItem.id.toString();
         result.label = workItem.fields[WorkItemFields.Title];
         return result;
@@ -76,7 +79,7 @@ export class WorkItemTrackingService {
     //Returns a Promise containing an array of SimpleWorkItems that are the results of the passed in wiql
     private async execWorkItemQuery(teamProject: string, wiql: Wiql): Promise<SimpleWorkItem[]> {
         //Querying WIT requires a TeamContext
-        let teamContext: TeamContext = {
+        const teamContext: TeamContext = {
             projectId: undefined,
             project: teamProject,
             teamId: undefined,
@@ -84,8 +87,8 @@ export class WorkItemTrackingService {
         };
 
         // Execute the wiql and get the work item ids
-        let queryResult: WorkItemQueryResult = await this._witApi.queryByWiql(wiql, teamContext);
-        let results: SimpleWorkItem[] = [];
+        const queryResult: WorkItemQueryResult = await this._witApi.queryByWiql(wiql, teamContext);
+        const results: SimpleWorkItem[] = [];
         let workItemIds: number[] = [];
         if (queryResult.queryResultType === QueryResultType.WorkItem) {
             workItemIds = queryResult.workItems.map(function(w) {return w.id; });
@@ -100,16 +103,20 @@ export class WorkItemTrackingService {
             workItemIds = workItemIds.slice(0, WorkItemTrackingService.MaxResults);
         }
 
-        let workItems: WorkItem[] = await this._witApi.getWorkItems(workItemIds,
-                                                                    [WorkItemFields.Id, WorkItemFields.Title, WorkItemFields.WorkItemType],
-                                                                    null,
-                                                                    WorkItemExpand.None);
+        /* tslint:disable:no-null-keyword */
+        const workItems: WorkItem[] = await this._witApi.getWorkItems(workItemIds,
+                                                                      [WorkItemFields.Id, WorkItemFields.Title, WorkItemFields.WorkItemType],
+                                                                      null,
+                                                                      WorkItemExpand.None);
+        /* tslint:enable:no-null-keyword */
+
         //Keep original sort order that wiql specified
-        for (let index = 0; index < workItemIds.length; index++) {
-            let item: WorkItem = workItems.find(i => i.id === workItemIds[index]);
+        for (let index: number = 0; index < workItemIds.length; index++) {
+            const item: WorkItem = workItems.find((i) => i.id === workItemIds[index]);
+            const id: string = item.id.toString();
             results.push({
-                id: item.fields[WorkItemFields.Id],
-                label: item.fields[WorkItemFields.Id] + "  [" + item.fields[WorkItemFields.WorkItemType] + "]",
+                id: id,
+                label: `${id} [${item.fields[WorkItemFields.WorkItemType]}]`,
                 description: item.fields[WorkItemFields.Title]
             });
         }
@@ -119,7 +126,7 @@ export class WorkItemTrackingService {
 
      public async GetQueryResultCount(teamProject: string, wiql: string): Promise<number> {
         //Querying WIT requires a TeamContext
-        let teamContext: TeamContext = {
+        const teamContext: TeamContext = {
             projectId: undefined,
             project: teamProject,
             teamId: undefined,
@@ -127,21 +134,21 @@ export class WorkItemTrackingService {
         };
 
         // Execute the wiql and get count of results
-        let queryResult: WorkItemQueryResult = await this._witApi.queryByWiql({ query: wiql}, teamContext);
+        const queryResult: WorkItemQueryResult = await this._witApi.queryByWiql({ query: wiql}, teamContext);
         //If a Promise is returned here, then() will return that Promise
         //If not, it will wrap the value within a Promise and return that
         return queryResult.workItems.length;
     }
 
     //Construct the url to the individual work item edit page
-    public static GetEditWorkItemUrl(teamProjectUrl: string, workItemId: string) : string {
-        return this.GetWorkItemsBaseUrl(teamProjectUrl) + "/edit/" + workItemId;
+    public static GetEditWorkItemUrl(teamProjectUrl: string, workItemId: string): string {
+        return UrlBuilder.Join(WorkItemTrackingService.GetWorkItemsBaseUrl(teamProjectUrl), "edit", workItemId);
     }
 
     //Construct the url to the creation page for new work item type
     public static GetNewWorkItemUrl(teamProjectUrl: string, issueType: string, title?: string, assignedTo?: string) : string {
         //This form will redirect to the form below so let's use this one
-        let url: string = this.GetWorkItemsBaseUrl(teamProjectUrl) + "/create/" + issueType;
+        let url: string = UrlBuilder.Join(WorkItemTrackingService.GetWorkItemsBaseUrl(teamProjectUrl), "create", issueType);
         let separator: string = "?";
         if (title !== undefined) {
             //title may need to be encoded (issues if first character is '#', for instance)
@@ -156,13 +163,13 @@ export class WorkItemTrackingService {
     }
 
     //Construct the url to the particular query results page
-    public static GetMyQueryResultsUrl(teamProjectUrl: string, folderName: string, queryName: string) : string {
-        return this.GetWorkItemsBaseUrl(teamProjectUrl) + "?path=" + encodeURIComponent(folderName + "/" + queryName) + "&_a=query";
+    public static GetMyQueryResultsUrl(teamProjectUrl: string, folderName: string, queryName: string): string {
+        return UrlBuilder.AddQueryParams(WorkItemTrackingService.GetWorkItemsBaseUrl(teamProjectUrl), `path=${encodeURIComponent(folderName + "/" + queryName)}`, `_a=query`);
     }
 
     //Returns the base url for work items
-    public static GetWorkItemsBaseUrl(teamProjectUrl: string) {
-        return teamProjectUrl + "/_workitems";
+    public static GetWorkItemsBaseUrl(teamProjectUrl: string): string {
+        return UrlBuilder.Join(teamProjectUrl, "_workitems");
     }
 
 /* tslint:disable:variable-name */

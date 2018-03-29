@@ -7,7 +7,7 @@
 	ignorecase = true
 	hideDotFiles = dotGitOnly
 [remote "origin"]
-	url = ssh://account@account.visualstudio.com:22/DefaultCollection/_git/repository
+	url = ssh://account@vs-ssh.visualstudio.com:22/DefaultCollection/_ssh/repository
 	fetch = +refs/heads/*:refs/remotes/origin/*
 [branch "master"]
 	remote = origin

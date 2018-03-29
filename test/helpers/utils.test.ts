@@ -8,25 +8,25 @@ import { assert, expect } from "chai";
 const path = require("path");
 
 import { BuildResult } from "vso-node-api/interfaces/BuildInterfaces";
-import { Utils }  from "../../src/helpers/utils";
-import { Strings }  from "../../src/helpers/strings";
+import { Utils } from "../../src/helpers/utils";
+import { Strings } from "../../src/helpers/strings";
 
 describe("Utils", function() {
-    let TEST_REPOS_FOLDER: string = "testrepos";
-    let DOT_GIT_FOLDER: string = "dotgit";
+    const TEST_REPOS_FOLDER: string = "testrepos";
+    const DOT_GIT_FOLDER: string = "dotgit";
 
     beforeEach(function() {
         //
     });
 
     it("should verify IsOffline", function() {
-        let reason = { code: "ENOENT" };
+        let reason: any = { code: "ENOENT" };
         assert.isTrue(Utils.IsOffline(reason));
         reason = { code: "ENOTFOUND" };
         assert.isTrue(Utils.IsOffline(reason));
         reason = { code: "EAI_AGAIN" };
         assert.isTrue(Utils.IsOffline(reason));
-        let reason2 = { statusCode: "ENOENT" };
+        let reason2: any = { statusCode: "ENOENT" };
         assert.isTrue(Utils.IsOffline(reason2));
         reason2 = { statusCode: "ENOTFOUND" };
         assert.isTrue(Utils.IsOffline(reason2));
@@ -37,98 +37,98 @@ describe("Utils", function() {
     });
 
     it("should verify IsUnauthorized", function() {
-        let reason = { code: 401 };
+        const reason = { code: 401 };
         assert.isTrue(Utils.IsUnauthorized(reason));
-        let reason2 = { statusCode: 401 };
+        const reason2 = { statusCode: 401 };
         assert.isTrue(Utils.IsUnauthorized(reason2));
         //If no reason, isUnauthorized should be false
         assert.isFalse(Utils.IsUnauthorized(undefined));
     });
 
     it("should verify GetMessageForStatusCode with 401", function() {
-        let reason = { code: "401" };
-        let message: string = Utils.GetMessageForStatusCode(reason);
+        const reason = { code: "401" };
+        const message: string = Utils.GetMessageForStatusCode(reason);
         assert.equal(message, Strings.StatusCode401);
     });
 
     it("should verify GetMessageForStatusCode for offline - ENOENT", function() {
-        let reason = { code: "ENOENT" };
-        let message: string = Utils.GetMessageForStatusCode(reason);
+        const reason = { code: "ENOENT" };
+        const message: string = Utils.GetMessageForStatusCode(reason);
         assert.equal(message, Strings.StatusCodeOffline);
     });
 
     it("should verify GetMessageForStatusCode for offline - ENOTFOUND", function() {
-        let reason = { code: "ENOTFOUND" };
-        let message: string = Utils.GetMessageForStatusCode(reason);
+        const reason = { code: "ENOTFOUND" };
+        const message: string = Utils.GetMessageForStatusCode(reason);
         assert.equal(message, Strings.StatusCodeOffline);
     });
 
     it("should verify GetMessageForStatusCode for offline - EAI_AGAIN", function() {
-        let reason = { code: "EAI_AGAIN" };
-        let message: string = Utils.GetMessageForStatusCode(reason);
+        const reason = { code: "EAI_AGAIN" };
+        const message: string = Utils.GetMessageForStatusCode(reason);
         assert.equal(message, Strings.StatusCodeOffline);
     });
 
     it("should verify GetMessageForStatusCode for proxy - ECONNRESET", function() {
-        let reason = { code: "ECONNRESET" };
+        const reason = { code: "ECONNRESET" };
         process.env.HTTP_PROXY = "vsts-vscode unit tests";
-        let message: string = Utils.GetMessageForStatusCode(reason);
+        const message: string = Utils.GetMessageForStatusCode(reason);
         process.env.HTTP_PROXY = "";
         assert.equal(message, Strings.ProxyUnreachable);
     });
 
     it("should verify GetMessageForStatusCode for proxy - ECONNREFUSED", function() {
-        let reason = { code: "ECONNREFUSED" };
+        const reason = { code: "ECONNREFUSED" };
         process.env.HTTP_PROXY = "vsts-vscode unit tests";
-        let message: string = Utils.GetMessageForStatusCode(reason);
+        const message: string = Utils.GetMessageForStatusCode(reason);
         process.env.HTTP_PROXY = "";
         assert.equal(message, Strings.ProxyUnreachable);
     });
 
     it("should verify GetMessageForStatusCode for no proxy - ECONNRESET", function() {
-        let reason = { code: "ECONNRESET" };
+        const reason = { code: "ECONNRESET" };
         process.env.HTTP_PROXY = "";
-        let message: string = Utils.GetMessageForStatusCode(reason, "default message");
+        const message: string = Utils.GetMessageForStatusCode(reason, "default message");
         assert.equal(message, "default message");
     });
 
     it("should verify GetMessageForStatusCode for no proxy - ECONNREFUSED", function() {
-        let reason = { code: "ECONNREFUSED" };
+        const reason = { code: "ECONNREFUSED" };
         process.env.HTTP_PROXY = "";
-        let message: string = Utils.GetMessageForStatusCode(reason, "default message");
+        const message: string = Utils.GetMessageForStatusCode(reason, "default message");
         assert.equal(message, "default message");
     });
 
     it("should verify GetMessageForStatusCode for 404", function() {
-        let reason = { statusCode: "404" };
-        let msg = "This should be the message that is returned.";
+        const reason = { statusCode: "404" };
+        const msg = "This should be the message that is returned.";
 
-        let message: string = Utils.GetMessageForStatusCode(reason, msg);
+        const message: string = Utils.GetMessageForStatusCode(reason, msg);
         assert.equal(message, msg);
     });
 
     it("should verify GetMessageForStatusCode for 401 with prefix", function() {
-        let reason = { statusCode: "401" };
-        let msg = Strings.StatusCode401;
-        let prefix: string = "PREFIX:";
+        const reason = { statusCode: "401" };
+        const msg = Strings.StatusCode401;
+        const prefix: string = "PREFIX:";
 
-        let message: string = Utils.GetMessageForStatusCode(reason, msg, prefix);
+        const message: string = Utils.GetMessageForStatusCode(reason, msg, prefix);
         assert.equal(message, prefix + " " + msg);
     });
 
     it("should verify FindGitFolder with subfolder", function() {
-        let repoName: string = "gitreposubfolder";
-        let repoPath: string = path.join(__dirname, TEST_REPOS_FOLDER, repoName, "folder", "subfolder");
+        const repoName: string = "gitreposubfolder";
+        const repoPath: string = path.join(__dirname, TEST_REPOS_FOLDER, repoName, "folder", "subfolder");
         // Pass in DOT_GIT_FOLDER to find our test repo folder
-        let actualRepoPath: string = Utils.FindGitFolder(repoPath, DOT_GIT_FOLDER);
+        const actualRepoPath: string = Utils.FindGitFolder(repoPath, DOT_GIT_FOLDER);
         // Although we started with a subfolder in the repository, ensure we get the DOT_GIT_FOLDER
         assert.equal(actualRepoPath, path.join(__dirname, TEST_REPOS_FOLDER, repoName, DOT_GIT_FOLDER));
     });
 
     it("should verify FindGitFolder with no found .git folder", function() {
-        let repoPath: string = __dirname;
+        const repoPath: string = __dirname;
         //We need use DOT_GIT_FOLDER here since the test resides in a .git repository
-        let actualRepoPath: string = Utils.FindGitFolder(repoPath, DOT_GIT_FOLDER);
+        const actualRepoPath: string = Utils.FindGitFolder(repoPath, DOT_GIT_FOLDER);
         assert.isUndefined(actualRepoPath);
     });
 
@@ -142,8 +142,8 @@ describe("Utils", function() {
     });
 
     it("should verify IsProxyEnabled", function() {
-        let httpProxy: string = process.env.HTTP_PROXY;
-        let httpsProxy: string = process.env.HTTPS_PROXY;
+        const httpProxy: string = process.env.HTTP_PROXY;
+        const httpsProxy: string = process.env.HTTPS_PROXY;
         try {
             process.env.HTTP_PROXY = "vsts-vscode unit tests";
             assert.isTrue(Utils.IsProxyEnabled());
@@ -164,16 +164,16 @@ describe("Utils", function() {
     });
 
     it("should verify IsProxyIssue", function() {
-        let httpProxy: string = process.env.HTTP_PROXY;
+        const httpProxy: string = process.env.HTTP_PROXY;
         try {
             process.env.HTTP_PROXY = "vsts-vscode unit tests";
-            let reason = { code: "ECONNRESET" };
+            let reason: any = { code: "ECONNRESET" };
             assert.isTrue(Utils.IsProxyIssue(reason));
-            let reason2 = { statusCode: "ECONNRESET" };
+            let reason2: any = { statusCode: "ECONNRESET" };
             assert.isTrue(Utils.IsProxyIssue(reason2));
-            let reason3 = { code: "ECONNREFUSED" };
+            let reason3: any = { code: "ECONNREFUSED" };
             assert.isTrue(Utils.IsProxyIssue(reason3));
-            let reason4 = { statusCode: "ECONNREFUSED" };
+            let reason4: any = { statusCode: "ECONNREFUSED" };
             assert.isTrue(Utils.IsProxyIssue(reason4));
             //With proxy enabled, an undefined message should be false
             assert.isFalse(Utils.IsProxyIssue(undefined));

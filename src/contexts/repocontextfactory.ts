@@ -26,11 +26,11 @@ export class RepositoryContextFactory {
             //Check for Git next since it should be faster to determine and this code will
             //be called on Reinitialize (when config changes, for example)
             repoContext = new GitContext(path);
-            initialized = await repoContext.Initialize(settings);
+            initialized = await repoContext.Initialize();
             if (!repoContext || repoContext.IsTeamFoundation === false || !initialized) {
                 //Check if we have a TFVC repository
                 repoContext = new TfvcContext(path);
-                initialized = await repoContext.Initialize(settings);
+                initialized = await repoContext.Initialize();
                 if (!initialized) {
                     return undefined;
                 }
@@ -45,12 +45,12 @@ export class RepositoryContextFactory {
 
     /**
      * This method allows the ExtensionManager the ability to update the repository context it obtained with the server context information
-     * it has. This provides one source for TFVC classes like Tfvc and Repository. 
+     * it has. This provides one source for TFVC classes like Tfvc and Repository.
      * This method doesn't do anything for other types of repository contexts.
      */
     public static UpdateRepositoryContext(currentRepo: IRepositoryContext, serverContext: TeamServerContext): IRepositoryContext {
         if (currentRepo && currentRepo instanceof TfvcContext) {
-            let context: TfvcContext = <TfvcContext>currentRepo;
+            const context: TfvcContext = <TfvcContext>currentRepo;
             context.TfvcRepository = TfCommandLineRunner.CreateRepository(serverContext, context.RepoFolder);
         }
         return currentRepo;

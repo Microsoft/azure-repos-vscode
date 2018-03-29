@@ -17,12 +17,12 @@ export class CoreApiService {
     }
 
     //Get the
-    public async GetProjectCollection(collectionName: string) : Promise<TeamProjectCollection> {
+    public async GetProjectCollection(collectionName: string): Promise<TeamProjectCollection> {
         return await this._coreApi.getProjectCollection(collectionName);
     }
 
     //Get the
-    public async GetTeamProject(projectName: string) : Promise<TeamProject> {
+    public async GetTeamProject(projectName: string): Promise<TeamProject> {
         return await this._coreApi.getProject(projectName, false, false);
     }
 

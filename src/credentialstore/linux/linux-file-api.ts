@@ -8,10 +8,10 @@ import { FileTokenStorage } from "./file-token-storage";
 import { Credential } from "../credential";
 import { ICredentialStore } from "../interfaces/icredentialstore";
 
-var Q = require("q");
-var os = require("os");
-var path = require("path");
-var _ = require("underscore");
+import * as Q from "q";
+import * as os from "os";
+import * as path from "path";
+import * as _ from "underscore";
 
 /*
     Provides the ICredentialStore API on top of file-based storage.
@@ -32,13 +32,13 @@ export class LinuxFileApi implements ICredentialStore {
     }
 
     public GetCredential(service: string) : Q.Promise<Credential> {
-        let deferred: Q.Deferred<Credential> = Q.defer();
+        const deferred: Q.Deferred<Credential> = Q.defer<Credential>();
 
         this.loadCredentials().then((entries) => {
             // Find the entry I want based on service
-            let entryArray: Array<any> = _.where(entries, { service: service });
+            const entryArray: Array<any> = _.where(entries, { service: service });
             if (entryArray !== undefined && entryArray.length > 0) {
-                let credential: Credential = this.createCredential(entryArray[0]);
+                const credential: Credential = this.createCredential(entryArray[0]);
                 deferred.resolve(credential);
             } else {
                 deferred.resolve(undefined);
@@ -51,14 +51,14 @@ export class LinuxFileApi implements ICredentialStore {
     }
 
     public SetCredential(service: string, username: string, password: string) : Q.Promise<void> {
-        let deferred: Q.Deferred<void> = Q.defer();
+        const deferred: Q.Deferred<void> = Q.defer<void>();
 
         this.loadCredentials().then((entries) => {
             // Remove any entries that are the same as the one I'm about to add
-            let existingEntries = _.reject(entries, function(elem) {
+            const existingEntries = _.reject(entries, function(elem) {
                 return elem.username === username && elem.service === service;
             });
-            let newEntry = {
+            const newEntry = {
                 username: username,
                 password: password,
                 service: service
@@ -76,16 +76,16 @@ export class LinuxFileApi implements ICredentialStore {
     }
 
     public RemoveCredential(service: string) : Q.Promise<void> {
-        let deferred: Q.Deferred<void> = Q.defer();
+        const deferred: Q.Deferred<void> = Q.defer<void>();
 
         this.loadCredentials().then((entries) => {
             // Find the entry being asked to be removed; if found, remove it, save the remaining list
-            let existingEntries = _.reject(entries, function(elem) {
+            const existingEntries = _.reject(entries, function(elem) {
                 return elem.service === service;
             });
-            // TODO: RemoveEntries doesn't do anything with first arg.  For now, do nothing to
+            // TODO: RemoveEntries doesn't do anything with second arg.  For now, do nothing to
             // the api as I'm wrapping it in all its glory.  Could consider later.
-            this._fts.RemoveEntries(undefined, existingEntries).then(() => {
+            this._fts.RemoveEntries(existingEntries /*, undefined*/).then(() => {
                 deferred.resolve(undefined);
             }).catch((err) => {
                 deferred.reject(err);
@@ -98,13 +98,13 @@ export class LinuxFileApi implements ICredentialStore {
     }
 
     public getCredentialByName(service: string, username: string) : Q.Promise<Credential> {
-        let deferred: Q.Deferred<Credential> = Q.defer();
+        const deferred: Q.Deferred<Credential> = Q.defer<Credential>();
 
         this.loadCredentials().then((entries) => {
             // Find the entry I want based on service and username
-            let entryArray: Array<any> = _.where(entries, { service: service, username: username });
+            const entryArray: Array<any> = _.where(entries, { service: service, username: username });
             if (entryArray !== undefined && entryArray.length > 0) {
-                let credential: Credential = this.createCredential(entryArray[0]);
+                const credential: Credential = this.createCredential(entryArray[0]);
                 deferred.resolve(credential);
             } else {
                 deferred.resolve(undefined);
@@ -117,20 +117,20 @@ export class LinuxFileApi implements ICredentialStore {
     }
 
     public removeCredentialByName(service: string, username: string) : Q.Promise<void> {
-        let deferred: Q.Deferred<void> = Q.defer();
+        const deferred: Q.Deferred<void> = Q.defer<void>();
 
         this.loadCredentials().then((entries) => {
             // Find the entry being asked to be removed; if found, remove it, save the remaining list
-            let existingEntries = _.reject(entries, function(elem) {
+            const existingEntries = _.reject(entries, function(elem) {
                 if (username === "*") {
                     return elem.service === service;
                 } else {
                     return elem.username === username && elem.service === service;
                 }
             });
-            // TODO: RemoveEntries doesn't do anything with first arg.  For now, do nothing to
+            // TODO: RemoveEntries doesn't do anything with second arg.  For now, do nothing to
             // the api as I'm wrapping it in all its glory.  Could consider later.
-            this._fts.RemoveEntries(undefined, existingEntries).then(() => {
+            this._fts.RemoveEntries(existingEntries /*, undefined*/).then(() => {
                 deferred.resolve(undefined);
             }).catch((err) => {
                 deferred.reject(err);
@@ -147,7 +147,7 @@ export class LinuxFileApi implements ICredentialStore {
     }
 
     private loadCredentials() : Q.Promise<any> {
-        let deferred: Q.Deferred<void> = Q.defer();
+        const deferred: Q.Deferred<void> = Q.defer<void>();
 
         this._fts.LoadEntries().then((entries) => {
             deferred.resolve(entries);

@@ -7,7 +7,11 @@
         "removeComments": false,
         "lib": [
             "es6"
-        ]
+        ],
+        "allowJs": true,
+        "noUnusedParameters": true,
+        "noUnusedLocals": true,
+        "forceConsistentCasingInFileNames": true
     },
     "include": [
         "src/**/*",

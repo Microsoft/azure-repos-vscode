@@ -15,16 +15,14 @@ import { IRepositoryContext, RepositoryType } from "../contexts/repositorycontex
 import { TeamServerContext} from "../contexts/servercontext";
 import { GitVcService, PullRequestScore } from "../services/gitvc";
 import { Telemetry } from "../services/telemetry";
+import { BaseClient } from "./baseclient";
 
-var path = require("path");
+import * as path from "path";
 
-export class GitClient {
-    private _serverContext: TeamServerContext;
-    private _statusBarItem: StatusBarItem;
+export class GitClient extends BaseClient {
 
     constructor(context: TeamServerContext, statusBarItem: StatusBarItem) {
-        this._serverContext = context;
-        this._statusBarItem = statusBarItem;
+        super(context, statusBarItem);
     }
 
     //Initial method to display, select and navigate to my pull requests
@@ -32,7 +30,7 @@ export class GitClient {
         Telemetry.SendEvent(TelemetryEvents.ViewPullRequests);
 
         try {
-            let request: BaseQuickPickItem = await window.showQuickPick(this.getMyPullRequests(), { matchOnDescription: true, placeHolder: Strings.ChoosePullRequest });
+            const request: BaseQuickPickItem = await window.showQuickPick(this.getMyPullRequests(), { matchOnDescription: true, placeHolder: Strings.ChoosePullRequest });
             if (request) {
                 Telemetry.SendEvent(TelemetryEvents.ViewPullRequest);
                 let discUrl: string = undefined;
@@ -45,7 +43,7 @@ export class GitClient {
                 Utils.OpenUrl(discUrl);
             }
         } catch (err) {
-            this.handleError(err, "Error selecting pull request from QuickPick");
+            this.handleError(err, GitClient.GetOfflinePullRequestStatusText(), false, "Error selecting pull request from QuickPick");
         }
     }
 
@@ -54,7 +52,7 @@ export class GitClient {
         this.ensureGitContext(context);
         let url: string = undefined;
 
-        let editor = window.activeTextEditor;
+        const editor = window.activeTextEditor;
         if (editor) {
             Telemetry.SendEvent(TelemetryEvents.OpenBlamePage);
 
@@ -67,7 +65,7 @@ export class GitClient {
             Logger.LogInfo("OpenBlame: " + url);
             Utils.OpenUrl(url);
         } else {
-            let msg: string = Utils.GetMessageForStatusCode(0, Strings.NoSourceFileForBlame);
+            const msg: string = Utils.GetMessageForStatusCode(0, Strings.NoSourceFileForBlame);
             Logger.LogError(msg);
             VsCodeUtils.ShowErrorMessage(msg);
         }
@@ -78,7 +76,7 @@ export class GitClient {
         this.ensureGitContext(context);
         let historyUrl: string = undefined;
 
-        let editor = window.activeTextEditor;
+        const editor = window.activeTextEditor;
         if (!editor) {
             Telemetry.SendEvent(TelemetryEvents.OpenRepositoryHistory);
 
@@ -102,43 +100,35 @@ export class GitClient {
     public OpenNewPullRequest(remoteUrl: string, currentBranch: string): void {
         Telemetry.SendEvent(TelemetryEvents.OpenNewPullRequest);
 
-        let url: string = GitVcService.GetCreatePullRequestUrl(remoteUrl, currentBranch);
+        const url: string = GitVcService.GetCreatePullRequestUrl(remoteUrl, currentBranch);
         Logger.LogInfo("CreatePullRequestPage: " + url);
-        Utils.OpenUrl(url);
-    }
-
-    public OpenPullRequestsPage(): void {
-        Telemetry.SendEvent(TelemetryEvents.OpenPullRequestsPage);
-
-        let url: string = GitVcService.GetPullRequestsUrl(this._serverContext.RepoInfo.RepositoryUrl);
-        Logger.LogInfo("OpenPullRequestsPage: " + url);
         Utils.OpenUrl(url);
     }
 
     public async PollMyPullRequests(): Promise<void> {
         try {
-            let requests: BaseQuickPickItem[] = await this.getMyPullRequests();
+            const requests: BaseQuickPickItem[] = await this.getMyPullRequests();
             this._statusBarItem.tooltip = Strings.BrowseYourPullRequests;
             //Remove the default Strings.BrowseYourPullRequests item from the calculation
-            this._statusBarItem.text = GitClient.GetPullRequestStatusText(requests.length - 1);
+            this._statusBarItem.text = GitClient.GetPullRequestStatusText((requests.length - 1).toString());
         } catch (err) {
-            this.handleError(err, "Attempting to poll my pull requests", true);
+            this.handleError(err, GitClient.GetOfflinePullRequestStatusText(), true, "Attempting to poll my pull requests");
         }
     }
 
     private async getMyPullRequests(): Promise<BaseQuickPickItem[]> {
-        let requestItems: BaseQuickPickItem[] = [];
-        let requestIds: number[] = [];
+        const requestItems: BaseQuickPickItem[] = [];
+        const requestIds: number[] = [];
 
         Logger.LogInfo("Getting pull requests that I requested...");
-        let svc: GitVcService = new GitVcService(this._serverContext);
-        let myPullRequests: GitPullRequest[] = await svc.GetPullRequests(this._serverContext.RepoInfo.RepositoryId, this._serverContext.UserInfo.Id, undefined, PullRequestStatus.Active);
-        let icon: string = "octicon-search";
-        let label: string = `$(icon ${icon}) `;
+        const svc: GitVcService = new GitVcService(this._serverContext);
+        const myPullRequests: GitPullRequest[] = await svc.GetPullRequests(this._serverContext.RepoInfo.RepositoryId, this._serverContext.UserInfo.Id, undefined, PullRequestStatus.Active);
+        const icon: string = "octicon-search";
+        const label: string = `$(icon ${icon}) `;
         requestItems.push({ label: label + Strings.BrowseYourPullRequests, description: undefined, id: undefined });
 
-        myPullRequests.forEach(pr => {
-            let score: PullRequestScore = GitVcService.GetPullRequestScore(pr);
+        myPullRequests.forEach((pr) => {
+            const score: PullRequestScore = GitVcService.GetPullRequestScore(pr);
             requestItems.push(this.getPullRequestLabel(pr.createdBy.displayName, pr.title, pr.description, pr.pullRequestId.toString(), score));
             requestIds.push(pr.pullRequestId);
         });
@@ -146,9 +136,9 @@ export class GitClient {
 
         Logger.LogInfo("Getting pull requests for which I'm a reviewer...");
         //Go get the active pull requests that I'm a reviewer for
-        let myReviewPullRequests: GitPullRequest[] = await svc.GetPullRequests(this._serverContext.RepoInfo.RepositoryId, undefined, this._serverContext.UserInfo.Id, PullRequestStatus.Active);
-        myReviewPullRequests.forEach(pr => {
-            let score: PullRequestScore = GitVcService.GetPullRequestScore(pr);
+        const myReviewPullRequests: GitPullRequest[] = await svc.GetPullRequests(this._serverContext.RepoInfo.RepositoryId, undefined, this._serverContext.UserInfo.Id, PullRequestStatus.Active);
+        myReviewPullRequests.forEach((pr) => {
+            const score: PullRequestScore = GitVcService.GetPullRequestScore(pr);
             if (requestIds.indexOf(pr.pullRequestId) < 0) {
                 requestItems.push(this.getPullRequestLabel(pr.createdBy.displayName, pr.title, pr.description, pr.pullRequestId.toString(), score));
             }
@@ -156,7 +146,7 @@ export class GitClient {
         Logger.LogInfo("Retrieved " + myReviewPullRequests.length + " pull requests that I'm the reviewer");
 
         //Remove the default Strings.BrowseYourPullRequests item from the calculation
-        this._statusBarItem.text = GitClient.GetPullRequestStatusText(requestItems.length - 1);
+        this._statusBarItem.text = GitClient.GetPullRequestStatusText((requestItems.length - 1).toString());
         this._statusBarItem.tooltip = Strings.BrowseYourPullRequests;
         this._statusBarItem.command = CommandNames.GetPullRequests;
 
@@ -174,54 +164,21 @@ export class GitClient {
         } else if (score === PullRequestScore.NoResponse) {
             scoreIcon = "octicon-git-pull-request";
         }
-        let scoreLabel: string = `$(icon ${scoreIcon}) `;
+        const scoreLabel: string = `$(icon ${scoreIcon}) `;
 
         return { label: scoreLabel + " (" + displayName + ") " + title, description: description, id: id };
     }
 
-    private handleError(reason: any, infoMessage?: string, polling?: boolean) : void {
-        let offline: boolean = Utils.IsOffline(reason);
-        let msg: string = Utils.GetMessageForStatusCode(reason, reason.message);
-        let logPrefix: string = (infoMessage === undefined) ? "" : infoMessage + " ";
-
-        //When polling, we never display an error, we only log it (no telemetry either)
-        if (polling === true) {
-            Logger.LogError(logPrefix + msg);
-            if (offline === true) {
-                if (this._statusBarItem !== undefined) {
-                    this._statusBarItem.text = GitClient.GetOfflinePullRequestStatusText();
-                    this._statusBarItem.tooltip = Strings.StatusCodeOffline + " " + Strings.ClickToRetryConnection;
-                    this._statusBarItem.command = CommandNames.RefreshPollingStatus;
-                }
-            } else {
-                //Could happen if PAT doesn't have proper permissions
-                if (this._statusBarItem !== undefined) {
-                    this._statusBarItem.text = GitClient.GetOfflinePullRequestStatusText();
-                    this._statusBarItem.tooltip = msg;
-                }
-            }
-        //If we aren't polling, we always log an error and, optionally, send telemetry
-        } else {
-            let logMessage: string = logPrefix + msg;
-            if (offline === true) {
-                Logger.LogError(logMessage);
-            } else {
-                Logger.LogError(logMessage);
-                Telemetry.SendException(logMessage);
-            }
-            VsCodeUtils.ShowErrorMessage(msg);
-        }
-    }
-
     public static GetOfflinePullRequestStatusText() : string {
-        return `$(icon octicon-git-pull-request) ` + `???`;
+        return `$(icon octicon-git-pull-request) ???`;
     }
 
     //Sets the text on the pull request status bar
-    public static GetPullRequestStatusText(total: number) : string {
-        let octipullrequest: string = "octicon-git-pull-request";
-
-        return `$(icon ${octipullrequest}) ` + total.toString();
+    public static GetPullRequestStatusText(total?: string) : string {
+        if (!total) {
+            return `$(icon octicon-git-pull-request) $(icon octicon-dash)`;
+        }
+        return `$(icon octicon-git-pull-request) ${total.toString()}`;
     }
 
     //Ensure that we don't accidentally send non-Git (e.g., TFVC) contexts to the Git client

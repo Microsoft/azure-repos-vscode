@@ -28,7 +28,7 @@ export class ArgumentBuilder implements IArgumentProvider {
                 this.AddSwitchWithValue("collection", serverContext.RepoInfo.CollectionUrl, false);
             }
             if (serverContext.CredentialInfo) {
-                this.AddSwitchWithValue("login", serverContext.CredentialInfo.Username + "," + serverContext.CredentialInfo.Password, true);
+                this.AddSwitchWithValue("login", (serverContext.CredentialInfo.Domain ? serverContext.CredentialInfo.Domain + "\\" : "") + serverContext.CredentialInfo.Username + "," + serverContext.CredentialInfo.Password, true);
             }
         }
     }
@@ -54,7 +54,7 @@ export class ArgumentBuilder implements IArgumentProvider {
     }
 
     public AddSwitch(switchName: string): ArgumentBuilder {
-        return this.AddSwitchWithValue(switchName, null, false);
+        return this.AddSwitchWithValue(switchName, undefined, false);
     }
 
     public AddSwitchWithValue(switchName: string, switchValue: string, isSecret: boolean): ArgumentBuilder {

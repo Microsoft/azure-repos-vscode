@@ -48,9 +48,9 @@ export class ResolveConflicts implements ITfvcCommand<IConflict[]> {
      * Resolved /Users/leantk/tfvc-tfs/tfsTest_01/addFold/testHere2 as KeepYours
      */
     public async ParseOutput(executionResult: IExecutionResult): Promise<IConflict[]> {
-        CommandHelper.ProcessErrors(this.GetArguments().GetCommand(), executionResult);
+        CommandHelper.ProcessErrors(executionResult);
 
-        let conflicts: IConflict[] = [];
+        const conflicts: IConflict[] = [];
         const lines: string[] = CommandHelper.SplitIntoLines(executionResult.stdout, true, true);
         for (let i: number = 0; i < lines.length; i++) {
             const line: string = lines[i];
@@ -59,7 +59,8 @@ export class ResolveConflicts implements ITfvcCommand<IConflict[]> {
             if (startIndex >= 0 && endIndex > startIndex) {
                 conflicts.push({
                     localPath: line.slice(startIndex + "Resolved ".length, endIndex),
-                    type: ConflictType.RESOLVED
+                    type: ConflictType.RESOLVED,
+                    message: line
                 });
             }
         }

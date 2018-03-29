@@ -4,9 +4,10 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import url = require("url");
 import { Logger } from "../helpers/logger";
 import { RepoUtils } from "../helpers/repoutils";
+import { UrlBuilder } from "../helpers/urlbuilder";
+import * as url from "url";
 
 //When a RepositoryInfo object is created, we have already verified whether or not it
 //is either a Team Services or Team Foundation Server repository.  With the introduction
@@ -40,6 +41,10 @@ export class RepositoryInfo {
     constructor(repositoryInfo: any);
 
     constructor (repositoryInfo: any) {
+        if (!repositoryInfo) {
+            throw new Error(`repositoryInfo is undefined`);
+        }
+
         let repositoryUrl: string = undefined;
 
         if (typeof repositoryInfo === "object") {
@@ -47,9 +52,11 @@ export class RepositoryInfo {
         } else {
             repositoryUrl = repositoryInfo;
         }
+        //Clean up repository URLs for repos that have "limited refs" enabled
+        repositoryUrl = repositoryUrl.replace("/_git/_full/", "/_git/").replace("/_git/_optimized/", "/_git/");
 
-        let purl = url.parse(repositoryUrl);
-        if (purl != null) {
+        const purl: url.Url = url.parse(repositoryUrl);
+        if (purl) {
             this._host = purl.host;
             this._hostName = purl.hostname;
             this._path = purl.path;
@@ -60,7 +67,7 @@ export class RepositoryInfo {
 
             this._repositoryUrl = repositoryUrl;
             if (RepoUtils.IsTeamFoundationServicesRepo(repositoryUrl)) {
-                let splitHost = this._host.split(".");
+                const splitHost = this._host.split(".");
                 this._account = splitHost[0];
                 this._isTeamServicesUrl = true;
                 Logger.LogDebug("_isTeamServicesUrl: true");
@@ -115,7 +122,7 @@ export class RepositoryInfo {
         }
         //While leaving the actual data alone, check for 'collection in the domain'
         if (this._account.toLowerCase() !== this._collection.toLowerCase()) {
-            return this.AccountUrl + "/" + this._collection;
+            return UrlBuilder.Join(this.AccountUrl, this._collection);
         } else {
             return this.AccountUrl;
         }
@@ -132,6 +139,9 @@ export class RepositoryInfo {
     public get IsTeamServices(): boolean {
         return this._isTeamServicesUrl;
     }
+    public get Protocol(): string {
+        return this._protocol;
+    }
     public get RepositoryId(): string {
         return this._repositoryId;
     }
@@ -145,7 +155,7 @@ export class RepositoryInfo {
         if (this._teamProject === undefined) {
             return undefined;
         }
-        return this.CollectionUrl + "/" + this._teamProject;
+        return UrlBuilder.Join(this.CollectionUrl, this._teamProject);
     }
     public get TeamProject(): string {
         return this._teamProject;

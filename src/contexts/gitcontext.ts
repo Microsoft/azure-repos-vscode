@@ -4,15 +4,14 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import url = require("url");
 import { Utils } from "../helpers/utils";
 import { RepoUtils } from "../helpers/repoutils";
 import { IRepositoryContext, RepositoryType } from "./repositorycontext";
-import { ISettings } from "../helpers/settings";
 
-var pgc = require("parse-git-config");
-var gri = require("git-repo-info");
-var path = require("path");
+import * as pgc from "parse-git-config";
+import * as gri from "git-repo-info";
+import * as path from "path";
+import * as url from "url";
 
 //Gets as much information as it can regarding the Git repository without calling the server (vsts/info)
 export class GitContext implements IRepositoryContext {
@@ -50,7 +49,7 @@ export class GitContext implements IRepositoryContext {
                 this._gitConfig = pgc.sync(syncObj);
 
                 /* tslint:disable:quotemark */
-                let remote: any = this._gitConfig['remote "origin"'];
+                const remote: any = this._gitConfig['remote "origin"'];
                 /* tslint:enable:quotemark */
                 if (remote === undefined) {
                     return;
@@ -66,17 +65,31 @@ export class GitContext implements IRepositoryContext {
                 this._gitCurrentBranch = this._gitRepoInfo.branch;
                 this._gitCurrentRef = "refs/heads/" + this._gitCurrentBranch;
 
-                //All Team Services and TFS Git remote urls contain /_git/
+                //Check if any heuristics for TFS/VSTS URLs match
                 if (RepoUtils.IsTeamFoundationGitRepo(this._gitOriginalRemoteUrl)) {
-                    let purl = url.parse(this._gitOriginalRemoteUrl);
-                    if (purl != null) {
+                    const purl = url.parse(this._gitOriginalRemoteUrl);
+                    if (purl) {
                         if (RepoUtils.IsTeamFoundationServicesRepo(this._gitOriginalRemoteUrl)) {
                             this._isTeamServicesUrl = true;
-                            let splitHref = purl.href.split("@");
+                            const splitHref = purl.href.split("@");
                             if (splitHref.length === 2) {  //RemoteUrl is SSH
-                                //For Team Services, default to https:// as the protocol
-                                this._gitRemoteUrl = "https://" + purl.hostname + purl.pathname;
                                 this._isSsh = true;
+                                //VSTS now has two URL modes, one with _git in the path and another with _ssh.
+                                if (purl.pathname.indexOf("/_git/") >= 0) {
+                                    //For Team Services, default to https:// as the protocol
+                                    this._gitRemoteUrl = "https://" + purl.hostname + purl.pathname;
+                                } else {
+                                    // Do a few substitutions to get the correct url:
+                                    //  * ssh:// -> https://
+                                    //  * vs-ssh -> accountname
+                                    //  * _git -> _ssh
+                                    // so ssh://account@vsts-ssh.visualstudio.com/DefaultCollection/_ssh/foo
+                                    // becomes https://account.visualstudio.com/DefaultCollection/_git/foo
+                                    const scheme = "https://";
+                                    const hostname = purl.auth + ".visualstudio.com";
+                                    const path = purl.pathname.replace("_ssh", "_git");
+                                    this._gitRemoteUrl = scheme + hostname + path;
+                                }
                             } else {
                                 this._gitRemoteUrl = this._gitOriginalRemoteUrl;
                             }
@@ -100,7 +113,7 @@ export class GitContext implements IRepositoryContext {
     }
 
     //constructor already initializes the GitContext
-    public async Initialize(settings: ISettings): Promise<boolean> {
+    public async Initialize(): Promise<boolean> {
         return true;
     }
 

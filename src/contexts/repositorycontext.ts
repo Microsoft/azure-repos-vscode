@@ -17,7 +17,7 @@ export interface IRepositoryContext {
     Type: RepositoryType;
 
     //Added Initialize() so TFVC could call tf.cmd async
-    Initialize(settings: ISettings): Promise<boolean>;
+    Initialize(settings?: ISettings): Promise<boolean>;
 
     IsSsh: boolean;
     IsTeamFoundation: boolean;

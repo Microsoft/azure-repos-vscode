@@ -4,14 +4,14 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import { SCMResourceDecorations, Uri } from "vscode";
+import { SourceControlResourceDecorations, Uri } from "vscode";
 import { ConflictType, Status } from "./status";
 import * as path from "path";
 
 export class DecorationProvider {
     private static _iconsRootPath: string = path.join(path.dirname(__dirname), "..", "..", "resources", "icons");
 
-    public static getDecorations(statuses: Status[], conflictType?: ConflictType): SCMResourceDecorations {
+    public static getDecorations(statuses: Status[], conflictType?: ConflictType): SourceControlResourceDecorations {
         const status: Status = this.getDominantStatus(statuses);
         const light = { iconPath: DecorationProvider.getIconPath(status, "light") };
         const dark = { iconPath: DecorationProvider.getIconPath(status, "dark") };

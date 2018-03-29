@@ -4,10 +4,11 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import { MessageItem, QuickPickItem, Range, window } from "vscode";
-import { Constants } from "./constants";
-
-import Q = require("q");
+import { commands, MessageItem, QuickPickItem, Range, window } from "vscode";
+import { Constants, MessageTypes } from "./constants";
+import { IButtonMessageItem } from "./vscodeutils.interfaces";
+import { Utils } from "./utils";
+import { Telemetry } from "../services/telemetry";
 
 export class BaseQuickPickItem implements QuickPickItem {
     label: string;
@@ -19,56 +20,80 @@ export class WorkItemQueryQuickPickItem extends BaseQuickPickItem {
     wiql: string;
 }
 
-export class UrlMessageItem implements MessageItem {
+//Any changes to ButtonMessageItem must be reflected in IButtonMessageItem
+export class ButtonMessageItem implements MessageItem, IButtonMessageItem {
     title: string;
-    url: string;
-    telemetryId: string;
+    url?: string;
+    command?: string;
+    telemetryId?: string;
 }
 
 export class VsCodeUtils {
-
     //Returns the trimmed value if there's an activeTextEditor and a selection
     public static GetActiveSelection(): string {
-        let editor = window.activeTextEditor;
+        const editor = window.activeTextEditor;
         if (!editor) {
             return undefined;
         }
 
         // Make sure that the selection is not empty and it is a single line
-        let selection = editor.selection;
+        const selection = editor.selection;
         if (selection.isEmpty || !selection.isSingleLine) {
             return undefined;
         }
 
-        let range = new Range(selection.start.line, selection.start.character, selection.end.line, selection.end.character);
-        let value = editor.document.getText(range).trim();
+        const range = new Range(selection.start.line, selection.start.character, selection.end.line, selection.end.character);
+        const value = editor.document.getText(range).trim();
 
         return value;
     }
 
-    public static ShowErrorMessage(message: string) {
-        window.showErrorMessage("(" + Constants.ExtensionName + ") " + message);
+    public static async ShowErrorMessage(message: string, ...urlMessageItem: IButtonMessageItem[]): Promise<IButtonMessageItem> {
+        return this.showMessage(message, MessageTypes.Error, ...urlMessageItem);
     }
 
-    //Allow ability to show additional buttons with the message and return any chosen one via Promise
-    public static ShowErrorMessageWithOptions(message: string, ...urlMessageItem: UrlMessageItem[]) : Q.Promise<UrlMessageItem> {
-        let promiseToReturn: Q.Promise<UrlMessageItem>;
-        let deferred = Q.defer<UrlMessageItem>();
-        promiseToReturn = deferred.promise;
+    public static async ShowInfoMessage(message: string, ...urlMessageItem: IButtonMessageItem[]): Promise<IButtonMessageItem> {
+        return this.showMessage(message, MessageTypes.Info, ...urlMessageItem);
+    }
+
+    public static async ShowWarningMessage(message: string): Promise<IButtonMessageItem> {
+        return this.showMessage(message, MessageTypes.Warn);
+    }
+
+    //We have a single method to display either simple messages (with no options) or messages
+    //that have multiple buttons that can run commands, open URLs, send telemetry, etc.
+    private static async showMessage(message: string, type: MessageTypes, ...urlMessageItem: IButtonMessageItem[]): Promise<IButtonMessageItem> {
+        //The following "cast" allows us to pass our own type around (and not reference "vscode" via an import)
+        const messageItems: ButtonMessageItem[] = <ButtonMessageItem[]>urlMessageItem;
+        const messageToDisplay: string = `(${Constants.ExtensionName}) ${Utils.FormatMessage(message)}`;
 
         //Use the typescript spread operator to pass the rest parameter to showErrorMessage
-        window.showErrorMessage("(" + Constants.ExtensionName + ") " + message, ...urlMessageItem).then((item) => {
-            if (item) {
-                deferred.resolve(item);
-            } else {
-                deferred.resolve(undefined);
+        let chosenItem: IButtonMessageItem;
+        switch (type) {
+            case MessageTypes.Error:
+                chosenItem = await window.showErrorMessage(messageToDisplay, ...messageItems);
+                break;
+            case MessageTypes.Info:
+                chosenItem = await window.showInformationMessage(messageToDisplay, ...messageItems);
+                break;
+            case MessageTypes.Warn:
+                chosenItem = await window.showWarningMessage(messageToDisplay, ...messageItems);
+                break;
+            default:
+                break;
+        }
+
+        if (chosenItem) {
+            if (chosenItem.url) {
+                Utils.OpenUrl(chosenItem.url);
             }
-        });
-
-        return promiseToReturn;
-    }
-
-    public static ShowWarningMessage(message: string) {
-        window.showWarningMessage("(" + Constants.ExtensionName + ") " + message);
+            if (chosenItem.telemetryId) {
+                Telemetry.SendEvent(chosenItem.telemetryId);
+            }
+            if (chosenItem.command) {
+                commands.executeCommand<void>(chosenItem.command);
+            }
+        }
+        return chosenItem;
     }
 }

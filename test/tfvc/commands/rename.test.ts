@@ -15,11 +15,11 @@ import { CredentialInfo } from "../../../src/info/credentialinfo";
 import { RepositoryInfo } from "../../../src/info/repositoryinfo";
 
 describe("Tfvc-RenameCommand", function() {
-    let serverUrl: string = "http://server:8080/tfs";
-    let repoUrl: string = "http://server:8080/tfs/collection1/_git/repo1";
-    let collectionUrl: string = "http://server:8080/tfs/collection1";
-    let user: string = "user1";
-    let pass: string = "pass1";
+    const serverUrl: string = "http://server:8080/tfs";
+    const repoUrl: string = "http://server:8080/tfs/collection1/_git/repo1";
+    const collectionUrl: string = "http://server:8080/tfs/collection1";
+    const user: string = "user1";
+    const pass: string = "pass1";
     let context: TeamServerContext;
 
     beforeEach(function() {
@@ -43,123 +43,123 @@ describe("Tfvc-RenameCommand", function() {
     });
 
     it("should verify constructor - windows", function() {
-        let startPath: string = "c:\\repos\\Tfvc.L2VSCodeExtension.RC\\";
-        let sourcePath: string = path.join(startPath, "README.md");
-        let destinationPath: string = path.join(startPath, "READU.md");
+        const startPath: string = "c:\\repos\\Tfvc.L2VSCodeExtension.RC\\";
+        const sourcePath: string = path.join(startPath, "README.md");
+        const destinationPath: string = path.join(startPath, "READU.md");
         new Rename(undefined, sourcePath, destinationPath);
     });
 
     it("should verify constructor - mac/linux", function() {
-        let startPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/";
-        let sourcePath: string = path.join(startPath, "README.md");
-        let destinationPath: string = path.join(startPath, "READU.md");
+        const startPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/";
+        const sourcePath: string = path.join(startPath, "README.md");
+        const destinationPath: string = path.join(startPath, "READU.md");
         new Rename(undefined, sourcePath, destinationPath);
     });
 
     it("should verify constructor with context", function() {
-        let startPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/";
-        let sourcePath: string = path.join(startPath, "README.md");
-        let destinationPath: string = path.join(startPath, "READU.md");
+        const startPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/";
+        const sourcePath: string = path.join(startPath, "README.md");
+        const destinationPath: string = path.join(startPath, "READU.md");
         new Rename(context, sourcePath, destinationPath);
     });
 
     it("should verify constructor - no destination path", function() {
-        let startPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/";
-        let sourcePath: string = path.join(startPath, "README.md");
+        const startPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/";
+        const sourcePath: string = path.join(startPath, "README.md");
         assert.throws(() => new Rename(undefined, sourcePath, undefined), TfvcError, /Argument is required/);
     });
 
     it("should verify constructor - no source path", function() {
-        let startPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/";
-        let destinationPath: string = path.join(startPath, "READU.md");
+        const startPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/";
+        const destinationPath: string = path.join(startPath, "READU.md");
         assert.throws(() => new Rename(undefined, undefined, destinationPath), TfvcError, /Argument is required/);
     });
 
     it("should verify GetOptions", function() {
-        let cmd: Rename = new Rename(context, "sourcePath", "destinationPath");
+        const cmd: Rename = new Rename(context, "sourcePath", "destinationPath");
         assert.deepEqual(cmd.GetOptions(), {});
     });
 
     it("should verify GetExeOptions", function() {
-        let cmd: Rename = new Rename(context, "sourcePath", "destinationPath");
+        const cmd: Rename = new Rename(context, "sourcePath", "destinationPath");
         assert.deepEqual(cmd.GetExeOptions(), {});
     });
 
     it("should verify arguments", function() {
-        let startPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/";
-        let sourcePath: string = path.join(startPath, "README.md");
-        let destinationPath: string = path.join(startPath, "READU.md");
+        const startPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/";
+        const sourcePath: string = path.join(startPath, "README.md");
+        const destinationPath: string = path.join(startPath, "READU.md");
 
-        let cmd: Rename = new Rename(context, sourcePath, destinationPath);
+        const cmd: Rename = new Rename(context, sourcePath, destinationPath);
 
         assert.equal(cmd.GetArguments().GetArgumentsForDisplay(), "rename -noprompt -collection:" + collectionUrl + " ******** " + sourcePath + " " + destinationPath);
     });
 
     it("should verify GetExeArguments", function() {
-        let startPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/";
-        let sourcePath: string = path.join(startPath, "README.md");
-        let destinationPath: string = path.join(startPath, "READU.md");
+        const startPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/";
+        const sourcePath: string = path.join(startPath, "README.md");
+        const destinationPath: string = path.join(startPath, "READU.md");
 
-        let cmd: Rename = new Rename(context, sourcePath, destinationPath);
+        const cmd: Rename = new Rename(context, sourcePath, destinationPath);
 
         assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "rename -noprompt ******** " + sourcePath + " " + destinationPath);
     });
 
     it("should verify parse output - no output", async function() {
-        let startPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/";
-        let sourcePath: string = path.join(startPath, "README.md");
-        let destinationPath: string = path.join(startPath, "READU.md");
+        const startPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/";
+        const sourcePath: string = path.join(startPath, "README.md");
+        const destinationPath: string = path.join(startPath, "READU.md");
 
-        let cmd: Rename = new Rename(context, sourcePath, destinationPath);
-        let executionResult: IExecutionResult = {
+        const cmd: Rename = new Rename(context, sourcePath, destinationPath);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: undefined,
             stderr: undefined
         };
 
-        let result: string = await cmd.ParseOutput(executionResult);
+        const result: string = await cmd.ParseOutput(executionResult);
         assert.equal(result, "");
     });
 
     it("should verify parse output - single line", async function() {
-        let startPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/";
-        let sourcePath: string = path.join(startPath, "README.md");
-        let destinationPath: string = path.join(startPath, "READU.md");
+        const startPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/";
+        const sourcePath: string = path.join(startPath, "README.md");
+        const destinationPath: string = path.join(startPath, "READU.md");
 
-        let cmd: Rename = new Rename(context, sourcePath, destinationPath);
-        let executionResult: IExecutionResult = {
+        const cmd: Rename = new Rename(context, sourcePath, destinationPath);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: `READU.md`,
             stderr: undefined
         };
 
-        let result: string = await cmd.ParseOutput(executionResult);
+        const result: string = await cmd.ParseOutput(executionResult);
         assert.equal(result, "READU.md");
     });
 
     it("should verify parse output - with path", async function() {
-        let startPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/";
-        let sourcePath: string = path.join(startPath, "README.md");
-        let destinationPath: string = path.join(startPath, "READU.md");
+        const startPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/";
+        const sourcePath: string = path.join(startPath, "README.md");
+        const destinationPath: string = path.join(startPath, "READU.md");
 
-        let cmd: Rename = new Rename(context, sourcePath, destinationPath);
-        let executionResult: IExecutionResult = {
+        const cmd: Rename = new Rename(context, sourcePath, destinationPath);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: `${startPath}:\nREADU.md`,
             stderr: undefined
         };
 
-        let result: string = await cmd.ParseOutput(executionResult);
+        const result: string = await cmd.ParseOutput(executionResult);
         assert.equal(result, destinationPath);
     });
 
     it("should verify parse output - source file not in workspace", async function() {
-        let startPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/";
-        let sourcePath: string = path.join(startPath, "README.md");
-        let destinationPath: string = path.join(startPath, "READU.md");
+        const startPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/";
+        const sourcePath: string = path.join(startPath, "README.md");
+        const destinationPath: string = path.join(startPath, "READU.md");
 
-        let cmd: Rename = new Rename(context, sourcePath, destinationPath);
-        let executionResult: IExecutionResult = {
+        const cmd: Rename = new Rename(context, sourcePath, destinationPath);
+        const executionResult: IExecutionResult = {
             exitCode: 100,
             stdout: undefined,
             stderr: `The item ${sourcePath} could not be found in your workspace, or you do not have permission to access it.\n`
@@ -169,18 +169,17 @@ describe("Tfvc-RenameCommand", function() {
             await cmd.ParseOutput(executionResult);
         } catch (err) {
             assert.equal(err.exitCode, 100);
-            assert.equal(err.tfvcCommand, "rename");
             assert.equal(err.tfvcErrorCode, TfvcErrorCodes.FileNotInWorkspace);
         }
     });
 
-    it("should verify parse output - error exit code, stdout", async function() {
-        let startPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/";
-        let sourcePath: string = path.join(startPath, "README.md");
-        let destinationPath: string = path.join(startPath, "READU.md");
+    it("should verify parse output - error exit code", async function() {
+        const startPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/";
+        const sourcePath: string = path.join(startPath, "README.md");
+        const destinationPath: string = path.join(startPath, "READU.md");
 
-        let cmd: Rename = new Rename(context, sourcePath, destinationPath);
-        let executionResult: IExecutionResult = {
+        const cmd: Rename = new Rename(context, sourcePath, destinationPath);
+        const executionResult: IExecutionResult = {
             exitCode: 42,
             stdout: "Something bad this way comes.",
             stderr: undefined
@@ -190,9 +189,7 @@ describe("Tfvc-RenameCommand", function() {
             await cmd.ParseOutput(executionResult);
         } catch (err) {
             assert.equal(err.exitCode, 42);
-            assert.equal(err.tfvcCommand, "rename");
             assert.isTrue(err.message.startsWith(Strings.TfExecFailedError));
-            assert.isTrue(err.stdout.startsWith("Something bad this way comes."));
         }
     });
 
@@ -201,60 +198,60 @@ describe("Tfvc-RenameCommand", function() {
      ***********************************************************************************************/
 
     it("should verify parse EXE output - no output", async function() {
-        let startPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/";
-        let sourcePath: string = path.join(startPath, "README.md");
-        let destinationPath: string = path.join(startPath, "READU.md");
+        const startPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/";
+        const sourcePath: string = path.join(startPath, "README.md");
+        const destinationPath: string = path.join(startPath, "READU.md");
 
-        let cmd: Rename = new Rename(context, sourcePath, destinationPath);
-        let executionResult: IExecutionResult = {
+        const cmd: Rename = new Rename(context, sourcePath, destinationPath);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: undefined,
             stderr: undefined
         };
 
-        let result: string = await cmd.ParseExeOutput(executionResult);
+        const result: string = await cmd.ParseExeOutput(executionResult);
         assert.equal(result, "");
     });
 
     it("should verify parse EXE output - single line", async function() {
-        let startPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/";
-        let sourcePath: string = path.join(startPath, "README.md");
-        let destinationPath: string = path.join(startPath, "READU.md");
+        const startPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/";
+        const sourcePath: string = path.join(startPath, "README.md");
+        const destinationPath: string = path.join(startPath, "READU.md");
 
-        let cmd: Rename = new Rename(context, sourcePath, destinationPath);
-        let executionResult: IExecutionResult = {
+        const cmd: Rename = new Rename(context, sourcePath, destinationPath);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: `READU.md`,
             stderr: undefined
         };
 
-        let result: string = await cmd.ParseExeOutput(executionResult);
+        const result: string = await cmd.ParseExeOutput(executionResult);
         assert.equal(result, "READU.md");
     });
 
     it("should verify parse EXE output - with path", async function() {
-        let startPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/";
-        let sourcePath: string = path.join(startPath, "README.md");
-        let destinationPath: string = path.join(startPath, "READU.md");
+        const startPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/";
+        const sourcePath: string = path.join(startPath, "README.md");
+        const destinationPath: string = path.join(startPath, "READU.md");
 
-        let cmd: Rename = new Rename(context, sourcePath, destinationPath);
-        let executionResult: IExecutionResult = {
+        const cmd: Rename = new Rename(context, sourcePath, destinationPath);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: `${startPath}:\nREADU.md`,
             stderr: undefined
         };
 
-        let result: string = await cmd.ParseExeOutput(executionResult);
+        const result: string = await cmd.ParseExeOutput(executionResult);
         assert.equal(result, destinationPath);
     });
 
     it("should verify parse EXE output - source file not in workspace", async function() {
-        let startPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/";
-        let sourcePath: string = path.join(startPath, "README.md");
-        let destinationPath: string = path.join(startPath, "READU.md");
+        const startPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/";
+        const sourcePath: string = path.join(startPath, "README.md");
+        const destinationPath: string = path.join(startPath, "READU.md");
 
-        let cmd: Rename = new Rename(context, sourcePath, destinationPath);
-        let executionResult: IExecutionResult = {
+        const cmd: Rename = new Rename(context, sourcePath, destinationPath);
+        const executionResult: IExecutionResult = {
             exitCode: 100,
             stdout: undefined,
             stderr: `The item ${sourcePath} could not be found in your workspace, or you do not have permission to access it.\n`
@@ -264,18 +261,17 @@ describe("Tfvc-RenameCommand", function() {
             await cmd.ParseExeOutput(executionResult);
         } catch (err) {
             assert.equal(err.exitCode, 100);
-            assert.equal(err.tfvcCommand, "rename");
             assert.equal(err.tfvcErrorCode, TfvcErrorCodes.FileNotInWorkspace);
         }
     });
 
-    it("should verify parse EXE output - error exit code, stdout", async function() {
-        let startPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/";
-        let sourcePath: string = path.join(startPath, "README.md");
-        let destinationPath: string = path.join(startPath, "READU.md");
+    it("should verify parse EXE output - error exit code", async function() {
+        const startPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/";
+        const sourcePath: string = path.join(startPath, "README.md");
+        const destinationPath: string = path.join(startPath, "READU.md");
 
-        let cmd: Rename = new Rename(context, sourcePath, destinationPath);
-        let executionResult: IExecutionResult = {
+        const cmd: Rename = new Rename(context, sourcePath, destinationPath);
+        const executionResult: IExecutionResult = {
             exitCode: 42,
             stdout: "Something bad this way comes.",
             stderr: undefined
@@ -285,9 +281,7 @@ describe("Tfvc-RenameCommand", function() {
             await cmd.ParseExeOutput(executionResult);
         } catch (err) {
             assert.equal(err.exitCode, 42);
-            assert.equal(err.tfvcCommand, "rename");
             assert.isTrue(err.message.startsWith(Strings.TfExecFailedError));
-            assert.isTrue(err.stdout.startsWith("Something bad this way comes."));
         }
     });
 });

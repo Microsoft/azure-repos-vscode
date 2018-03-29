@@ -6,7 +6,7 @@
 
 import { assert } from "chai";
 
-import { BuildService }  from "../../src/services/build";
+import { BuildService } from "../../src/services/build";
 
 describe("BuildService", function() {
 
@@ -15,7 +15,7 @@ describe("BuildService", function() {
     });
 
     it("should verify GetBuildDefinitionsUrl", function() {
-        let url: string = "https://account.visualstudio.com/DefaultCollection/project";
+        const url: string = "https://account.visualstudio.com/DefaultCollection/project";
 
         //The new definitions experience is behind a feature flag
         //assert.equal(BuildService.GetBuildDefinitionsUrl(url), url + "/_build/definitions");
@@ -23,21 +23,21 @@ describe("BuildService", function() {
     });
 
     it("should verify GetBuildDefinitionUrl", function() {
-        let url: string = "https://account.visualstudio.com/DefaultCollection/project";
-        let arg: string = "42";
+        const url: string = "https://account.visualstudio.com/DefaultCollection/project";
+        const arg: string = "42";
 
         assert.equal(BuildService.GetBuildDefinitionUrl(url, arg), url + "/_build#_a=completed&definitionId=" + arg);
     });
 
     it("should verify GetBuildSummaryUrl", function() {
-        let url: string = "https://account.visualstudio.com/DefaultCollection/project";
-        let arg: string = "42";
+        const url: string = "https://account.visualstudio.com/DefaultCollection/project";
+        const arg: string = "42";
 
         assert.equal(BuildService.GetBuildSummaryUrl(url, arg), url + "/_build/index?buildId=" + arg + "&_a=summary");
     });
 
     it("should verify GetBuildsUrl", function() {
-        let url: string = "https://account.visualstudio.com/DefaultCollection/project";
+        const url: string = "https://account.visualstudio.com/DefaultCollection/project";
 
         assert.equal(BuildService.GetBuildsUrl(url), url + "/_build");
     });

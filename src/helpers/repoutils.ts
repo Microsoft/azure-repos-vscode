@@ -20,11 +20,27 @@
 //that a url is NOT either a TFS or Team Services repository.  So it is up to the caller to only
 //instantiate this class if we know we should have either a TFS or Team Services repository.
 export class RepoUtils {
-    //Checks to see if url contains /_git/ signifying a Team Foundation Git repository
+    //Checks a handful of heuristics to see if the url provided is a TFS or VSTS repo
     public static IsTeamFoundationGitRepo(url: string): boolean {
-        if (url && url.toLowerCase().indexOf("/_git/") >= 0) {
+        if (!url) {
+            return false;
+        }
+
+        const asLower = url.toLowerCase();
+
+        // TFS uses /_git/ in all repository paths
+        const containsUnderGit = asLower.indexOf("/_git/") >= 0;
+        if (containsUnderGit) {
             return true;
         }
+
+        // VSTS uses /_ssh/ after visualstudio.com in all repository paths
+        const underSSHIndex = asLower.indexOf("/_ssh/");
+        const visualstudioDotComIndex = asLower.indexOf(".visualstudio.com");
+        if (visualstudioDotComIndex >= 0 && underSSHIndex >= visualstudioDotComIndex) {
+            return true;
+        }
+
         return false;
     }
 

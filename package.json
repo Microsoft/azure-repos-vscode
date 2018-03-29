@@ -1,8 +1,8 @@
 {
   "name": "team",
   "displayName": "Visual Studio Team Services",
-  "description": "Connect to Team Services, monitor your builds and manage your pull requests and work items for your source repositories",
-  "version": "1.113.0",
+  "description": "Connect to Team Services including Team Foundation Version Control (TFVC). Monitor your builds and manage your pull requests and work items for your TFVC or Git source repositories.",
+  "version": "1.122.0",
   "publisher": "ms-vsts",
   "icon": "assets/team.png",
   "markdown": "standard",
@@ -11,13 +11,14 @@
     "theme": "dark"
   },
   "keywords": [
+    "VSTS",
     "Team Foundation Server",
     "Team Services",
-    "Visual Studio Online",
     "Visual Studio Team Services",
-    "VSTS"
+    "TFVC"
   ],
   "categories": [
+    "SCM Providers",
     "Other"
   ],
   "repository": {
@@ -28,7 +29,7 @@
   "license": "SEE LICENSE IN LICENSE.txt",
   "homepage": "https://github.com/Microsoft/vsts-vscode/blob/master/README.md",
   "engines": {
-    "vscode": "^1.7.0"
+    "vscode": "^1.12.0"
   },
   "enableProposedApi": false,
   "activationEvents": [
@@ -37,51 +38,127 @@
   "main": "./out/src/extension",
   "contributes": {
     "menus": {
+      "commandPalette": [
+        {
+          "command": "team.OpenBlamePage",
+          "when": "scmProvider != tfvc"
+        },
+        {
+          "command": "tfvc.Undo",
+          "when": "false"
+        },
+        {
+          "command": "tfvc.UndoAll",
+          "when": "false"
+        },
+        {
+          "command": "tfvc.ResolveTakeTheirs",
+          "when": "false"
+        },
+        {
+          "command": "tfvc.ResolveKeepYours",
+          "when": "false"
+        },
+        {
+          "command": "tfvc.Include",
+          "when": "false"
+        },
+        {
+          "command": "tfvc.Exclude",
+          "when": "false"
+        },
+        {
+          "command": "tfvc.Checkin",
+          "when": "false"
+        },
+        {
+          "command": "tfvc.Delete",
+          "when": "false"
+        },
+        {
+          "command": "tfvc.Rename",
+          "when": "false"
+        },
+        {
+          "command": "tfvc.Open",
+          "when": "false"
+        },
+        {
+          "command": "tfvc.OpenFile",
+          "when": "false"
+        },
+        {
+          "command": "tfvc.OpenDiff",
+          "when": "false"
+        },
+        {
+          "command": "tfvc.Refresh",
+          "when": "scmProvider == tfvc"
+        },
+        {
+          "command": "tfvc.ShowOutput",
+          "when": "scmProvider == tfvc"
+        },
+        {
+          "command": "tfvc.Sync",
+          "when": "scmProvider == tfvc"
+        }
+      ],
       "explorer/context": [
         {
-          "command" : "tfvc.Rename",
+          "command": "tfvc.Delete",
+          "group": "9_cutcopypaste",
+          "when": "scmProvider == tfvc"
+        },
+        {
+          "command": "tfvc.Rename",
           "group": "9_cutcopypaste",
           "when": "scmProvider == tfvc"
         }
       ],
       "scm/title": [
         {
-          "command" : "team.AssociateWorkItems",
-          "group": "3_commit@4"
-        },
-        {
-          "command" : "tfvc.Checkin",
+          "command": "tfvc.Checkin",
           "group": "navigation@1",
           "when": "scmProvider == tfvc"
         },
         {
-          "command" : "tfvc.Refresh",
+          "command": "tfvc.Refresh",
           "group": "navigation@2",
           "when": "scmProvider == tfvc"
         },
         {
-          "command" : "tfvc.Sync",
+          "command": "tfvc.Sync",
           "group": "1_sync@1",
           "when": "scmProvider == tfvc"
         },
         {
-          "command" : "tfvc.Undo",
-          "group": "1_sync@2",
-          "when": "scmProvider == tfvc"
-        },
-        {
-          "command" : "tfvc.Checkin",
+          "command": "team.AssociateWorkItems",
           "group": "3_commit@3",
           "when": "scmProvider == tfvc"
         },
-
         {
-          "command" : "tfvc.ShowOutput",
+          "command": "team.AssociateWorkItems",
+          "group": "3_commit@5",
+          "when": "scmProvider == git"
+        },
+        {
+          "command": "tfvc.Checkin",
+          "group": "3_commit@4",
+          "when": "scmProvider == tfvc"
+        },
+        {
+          "command": "tfvc.UndoAll",
+          "group": "3_commit@5",
+          "when": "scmProvider == tfvc"
+        },
+        {
+          "command": "tfvc.ShowOutput",
           "group": "5_output",
           "when": "scmProvider == tfvc"
         }
       ],
-      "scm/resource/context": [
+      "scm/resourceState/context": [
         {
           "command": "tfvc.OpenDiff",
           "when": "scmProvider == tfvc",
@@ -95,17 +172,17 @@
         {
           "command": "tfvc.Undo",
           "when": "scmProvider == tfvc && scmResourceGroup != conflicts",
-          "group": "1_modification@1"
+          "group": "3_commit@1"
         },
         {
           "command": "tfvc.Include",
           "when": "scmProvider == tfvc && scmResourceGroup == excluded",
-          "group": "1_modification@2"
+          "group": "1_modification@1"
         },
         {
           "command": "tfvc.Exclude",
           "when": "scmProvider == tfvc && scmResourceGroup == included",
-          "group": "1_modification@2"
+          "group": "1_modification@1"
         },
         {
           "command": "tfvc.ResolveTakeTheirs",
@@ -119,7 +196,12 @@
         },
         {
           "command": "tfvc.Undo",
-          "when": "scmProvider == tfvc && scmResourceGroup != conflicts",
+          "when": "scmProvider == tfvc && scmResourceGroup == conflicts",
+          "group": "9_cutcopypaste"
+        },
+        {
+          "command": "tfvc.Undo",
+          "when": "scmProvider == tfvc",
           "group": "inline@1"
         },
         {
@@ -135,12 +217,12 @@
         {
           "command": "tfvc.ResolveTakeTheirs",
           "when": "scmProvider == tfvc && scmResourceGroup == conflicts",
-          "group": "inline@1"
+          "group": "inline@2"
         },
         {
           "command": "tfvc.ResolveKeepYours",
           "when": "scmProvider == tfvc && scmResourceGroup == conflicts",
-          "group": "inline@2"
+          "group": "inline@3"
         }
       ]
     },
@@ -160,7 +242,13 @@
         },
         "team.pinnedQueries": {
           "type": "array",
-          "default": [ { "account": "", "queryText": "", "queryPath": "" }],
+          "default": [
+            {
+              "account": "",
+              "queryText": "",
+              "queryPath": ""
+            }
+          ],
           "description": "Specify the account and either the queryText or queryPath of the query you'd like to monitor.  If specified, queryText is preferred over queryPath."
         },
         "team.pollingInterval": {
@@ -171,27 +259,37 @@
         "team.remoteUrl": {
           "type": "string",
           "default": "",
-          "description": "Specify the url to a project collection to use when your source code repository is not hosted with Microsoft. Requires team.teamProject."
+          "description": "[Not for TFVC] Specify the url to a project collection to use when your source code repository is not hosted with Microsoft. Requires team.teamProject."
         },
         "team.teamProject": {
           "type": "string",
           "default": "",
-          "description": "Specify the team project to use when your source code repository is not hosted with Microsoft. Requires team.remoteUrl."
+          "description": "[Not for TFVC] Specify the team project to use when your source code repository is not hosted with Microsoft. Requires team.remoteUrl."
         },
         "team.buildDefinitionId": {
           "type": "number",
           "default": 0,
-          "description": "Specify the team project's build definition Id to monitor when your source code repository is not hosted with Microsoft. Requires both team.remoteUrl and team.teamProject."
+          "description": "[Not for TFVC] Specify the team project's build definition Id to monitor when your source code repository is not hosted with Microsoft. Requires both team.remoteUrl and team.teamProject."
+        },
+        "team.showWelcomeMessage": {
+          "type": "boolean",
+          "default": true,
+          "description": "Tracks whether the extension should display the Welcome message after the initial installation."
         },
         "tfvc.location": {
           "type": "string",
           "default": "",
-          "description": "Specify the full path to the TF executable or script to use for TFVC functionality."
+          "description": "[Required for TFVC] Specify the full path to the TF executable or script to use for TFVC functionality."
         },
         "tfvc.proxy": {
           "type": "string",
           "default": "",
-          "description": "Specify the full URL (ex. http://servername:9999/proxy) to the TFS proxy to use for TFVC functionality."
+          "description": "[Optional for TFVC] Specify the full URL (ex. http://servername:9999/proxy) to the TFS proxy to use for TFVC functionality."
+        },
+        "tfvc.restrictWorkspace": {
+          "type": "boolean",
+          "default": false,
+          "description": "[Optional for TFVC] Restricts the TFVC workspace to the currently open VS Code workspace."
         }
       }
     },
@@ -238,7 +336,7 @@
       },
       {
         "command": "team.OpenBuildSummaryPage",
-        "title": "View Build summary",
+        "title": "View Build Summary",
         "category": "Team"
       },
       {
@@ -273,7 +371,7 @@
       },
       {
         "command": "tfvc.Checkin",
-        "title": "Checkin",
+        "title": "Check In",
         "category": "TFVC",
         "icon": {
           "light": "resources/icons/light/check.svg",
@@ -299,6 +397,11 @@
         }
       },
       {
+        "command": "tfvc.Open",
+        "title": "Open",
+        "category": "TFVC"
+      },
+      {
         "command": "tfvc.OpenDiff",
         "title": "Open Diff",
         "category": "TFVC"
@@ -306,6 +409,11 @@
       {
         "command": "tfvc.OpenFile",
         "title": "Open File",
+        "category": "TFVC"
+      },
+      {
+        "command": "tfvc.Delete",
+        "title": "Delete (TFVC)",
         "category": "TFVC"
       },
       {
@@ -358,6 +466,11 @@
           "light": "resources/icons/light/clean.svg",
           "dark": "resources/icons/dark/clean.svg"
         }
+      },
+      {
+        "command": "tfvc.UndoAll",
+        "title": "Undo All",
+        "category": "TFVC"
       }
     ]
   },
@@ -366,46 +479,50 @@
     "postinstall": "node ./node_modules/vscode/bin/install"
   },
   "devDependencies": {
+    "@types/applicationinsights": "0.15.33",
+    "@types/chai": "^3.4.1",
+    "@types/mocha": "^2.2.32",
+    "@types/node": "^6.0.40",
+    "@types/q": "^0.0.32",
+    "@types/uuid": "^2.0.29",
+    "@types/winston": "2.3.1",
+    "@types/xml2js": "^0.0.32",
+    "@types/xmldoc": "^0.5.0",
     "chai": "^3.4.1",
     "del": "^2.2.0",
     "gulp": "^3.9.0",
     "gulp-istanbul": "^1.1.1",
     "gulp-mocha": "^3.0.1",
     "gulp-sourcemaps": "^2.4.0",
-    "gulp-tslint": "^3.2.0",
+    "gulp-tslint": "^7.1.0",
     "gulp-typescript": "^3.1.4",
     "gulp-util": "^3.0.7",
     "mocha-junit-reporter": "^1.12.0",
     "should": "^8.1.1",
-    "tslint": "^2.5.0",
-    "typescript": "^2.1.5",
+    "tslint": "^4.0.0",
+    "typescript": "2.3.4",
     "vscode": "^1.0.0",
     "vsts-task-lib": "^0.9.18",
-    "yargs": "^5.0.0",
-    "@types/applicationinsights": "0.15.33",
-    "@types/chai": "^3.4.1",
-    "@types/mocha": "^2.2.32",
-    "@types/node": "^6.0.40",
-    "@types/node-uuid": "^6.0.26-alpha",
-    "@types/q": "^0.0.32",
-    "@types/winston": "^2.1.1",
-    "@types/xml2js": "^0.0.32"
+    "yargs": "^5.0.0"
   },
   "dependencies": {
     "applicationinsights": "0.15.16",
     "event-stream": "^3.3.2",
     "fs": "0.0.2",
     "git-repo-info": "^1.1.2",
-    "node-uuid": "^1.4.7",
     "open": "0.0.5",
     "opener": "^1.4.1",
     "parse-git-config": "^0.3.1",
     "path": "^0.12.7",
     "readable-stream": "^2.1.4",
+    "request-promise-native": "^1.0.4",
     "underscore": "^1.8.3",
     "url": "^0.11.0",
+    "uuid": "^3.0.1",
     "vso-node-api": "^5.1.1",
-    "winston": "^2.1.1",
-    "xml2js": "^0.4.17"
+    "vsts-device-flow-auth": "^1.121.0",
+    "winston": "2.3.1",
+    "xml2js": "^0.4.17",
+    "xmldoc": "^0.5.1"
   }
 }

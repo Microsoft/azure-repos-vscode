@@ -10,14 +10,19 @@ import { Logger } from "../helpers/logger";
 
 export abstract class BaseSettings {
     protected readSetting<T>(name: string, defaultValue:T): T {
-        let configuration = workspace.getConfiguration();
-        let value = configuration.get<T>(name, undefined);
+        const configuration = workspace.getConfiguration();
+        const value = configuration.get<T>(name, undefined);
 
         // If user specified a value, use it
-        if (value !== undefined && value !== null) {
+        if (value !== undefined) {
             return value;
         }
         return defaultValue;
+    }
+
+    protected writeSetting(name: string, value: any, global?: boolean): void {
+        const configuration = workspace.getConfiguration();
+        configuration.update(name, value, global);
     }
 }
 
@@ -38,12 +43,12 @@ export class PinnedQuerySettings extends BaseSettings {
     }
 
     private getPinnedQuery(account: string) : IPinnedQuery {
-        let pinnedQueries = this.readSetting<IPinnedQuery[]>(SettingNames.PinnedQueries, undefined);
+        const pinnedQueries = this.readSetting<IPinnedQuery[]>(SettingNames.PinnedQueries, undefined);
         if (pinnedQueries !== undefined) {
             Logger.LogDebug("Found pinned queries in user configuration settings.");
             let global: IPinnedQuery = undefined;
-            for (var index = 0; index < pinnedQueries.length; index++) {
-                let element = pinnedQueries[index];
+            for (let index: number = 0; index < pinnedQueries.length; index++) {
+                const element = pinnedQueries[index];
                 if (element.account === account ||
                     element.account === account + ".visualstudio.com") {
                     return element;
@@ -65,44 +70,6 @@ export class PinnedQuerySettings extends BaseSettings {
     }
 }
 
-//FUTURE: The AccountSettings class can be remove in VNEXT (documentation was removed in 1.104; Aug 2016)
-export class AccountSettings extends BaseSettings {
-    private _teamServicesPersonalAccessToken: string;
-
-    constructor(account: string) {
-        super();
-        // Storing PATs by account in the configuration settings to make switching between accounts easier
-        this._teamServicesPersonalAccessToken = this.getAccessToken(account);
-    }
-
-    private getAccessToken(account: string) : string {
-        let tokens: any = this.readSetting<any[]>(SettingNames.AccessTokens, undefined);
-        if (tokens !== undefined) {
-            Logger.LogDebug("Found access tokens in user configuration settings.");
-            let global: string = undefined;
-            for (var index = 0; index < tokens.length; index++) {
-                let element: any = tokens[index];
-                if (element.account === account ||
-                    element.account === account + ".visualstudio.com") {
-                    return element.token;
-                } else if (element.account === "global") {
-                    global = element.token;
-                }
-            }
-            if (global !== undefined) {
-                Logger.LogDebug("No account-specific token found, using global token.");
-                return global;
-            }
-        }
-        Logger.LogDebug("No account-specific token or global token found.");
-        return undefined;
-    }
-
-    public get TeamServicesPersonalAccessToken() : string {
-        return this._teamServicesPersonalAccessToken;
-    }
-}
-
 export interface ISettings {
     AppInsightsEnabled: boolean;
     AppInsightsKey: string;
@@ -111,6 +78,7 @@ export interface ISettings {
     RemoteUrl: string;
     TeamProject: string;
     BuildDefinitionId: number;
+    ShowWelcomeMessage: boolean;
 }
 
 export class Settings extends BaseSettings implements ISettings {
@@ -121,14 +89,15 @@ export class Settings extends BaseSettings implements ISettings {
     private _remoteUrl: string;
     private _teamProject: string;
     private _buildDefinitionId: number;
+    private _showWelcomeMessage: boolean;
 
     constructor() {
         super();
 
-        let loggingLevel = SettingNames.LoggingLevel;
+        const loggingLevel = SettingNames.LoggingLevel;
         this._loggingLevel = this.readSetting<string>(loggingLevel, undefined);
 
-        let pollingInterval = SettingNames.PollingInterval;
+        const pollingInterval = SettingNames.PollingInterval;
         this._pollingInterval = this.readSetting<number>(pollingInterval, 5);
         Logger.LogDebug("Polling interval value (minutes): " + this._pollingInterval.toString());
         // Ensure a minimum value when an invalid value is set
@@ -142,6 +111,7 @@ export class Settings extends BaseSettings implements ISettings {
         this._remoteUrl = this.readSetting<string>(SettingNames.RemoteUrl, undefined);
         this._teamProject = this.readSetting<string>(SettingNames.TeamProject, undefined);
         this._buildDefinitionId = this.readSetting<number>(SettingNames.BuildDefinitionId, 0);
+        this._showWelcomeMessage = this.readSetting<boolean>(SettingNames.ShowWelcomeMessage, true);
     }
 
     public get AppInsightsEnabled(): boolean {
@@ -170,5 +140,12 @@ export class Settings extends BaseSettings implements ISettings {
 
     public get BuildDefinitionId(): number {
         return this._buildDefinitionId;
+    }
+
+    public get ShowWelcomeMessage(): boolean {
+        return this._showWelcomeMessage;
+    }
+    public set ShowWelcomeMessage(value: boolean) {
+        this.writeSetting(SettingNames.ShowWelcomeMessage, value, true /*global*/);
     }
 }

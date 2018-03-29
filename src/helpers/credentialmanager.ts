@@ -5,12 +5,11 @@
 "use strict";
 
 import { IRequestHandler } from "vso-node-api/interfaces/common/VsoBaseInterfaces";
-import { Constants } from "../helpers/constants";
 import { CredentialInfo } from "../info/credentialinfo";
 import { TeamServerContext } from "../contexts/servercontext";
 import { CredentialStore } from "../credentialstore/credentialstore";
 
-var Q = require("q");
+import * as Q from "q";
 
 export class CredentialManager {
     private static _credentialHandler: IRequestHandler;
@@ -26,32 +25,15 @@ export class CredentialManager {
         return CredentialManager._credentialHandler;
     }
 
-    public GetCredentials(context: TeamServerContext, teamServicesToken: string) : Q.Promise<CredentialInfo> {
-        let deferred: Q.Deferred<CredentialInfo> = Q.defer();
+    public GetCredentials(context: TeamServerContext) : Q.Promise<CredentialInfo> {
+        const deferred: Q.Deferred<CredentialInfo> = Q.defer<CredentialInfo>();
 
         this.getCredentials(context).then((credInfo: CredentialInfo) => {
             if (credInfo !== undefined) {
-                // Prefer the settings file until folks remove the entry.  So even though we'll store
-                // it if it isn't present, use the settings until they remove it.  Otherwise, if they
-                // update it, we'll never use the update.
-                if (teamServicesToken !== undefined) {
-                    credInfo = new CredentialInfo(teamServicesToken);
-                }
                 CredentialManager._credentialHandler = credInfo.CredentialHandler;
                 deferred.resolve(credInfo);
             } else {
-                // If I find credentials in settings, store them (migrate them from settings to storage).
-                if (teamServicesToken !== undefined) {
-                    this.StoreCredentials(context.RepoInfo.Host, Constants.OAuth, teamServicesToken).then(() => {
-                        credInfo = new CredentialInfo(teamServicesToken);
-                        CredentialManager._credentialHandler = credInfo.CredentialHandler;
-                        deferred.resolve(credInfo);
-                    }).catch((reason) => {
-                        deferred.reject(reason);
-                    });
-                } else {
-                    deferred.resolve(undefined);
-                }
+                deferred.resolve(undefined);
             }
         }).catch((reason) => {
             deferred.reject(reason);
@@ -60,7 +42,7 @@ export class CredentialManager {
     }
 
     public RemoveCredentials(account: string) : Q.Promise<void> {
-        let deferred: Q.Deferred<void> = Q.defer();
+        const deferred: Q.Deferred<void> = Q.defer<void>();
 
         this._credentialStore.RemoveCredential(account).then(() => {
             deferred.resolve(undefined);
@@ -71,7 +53,7 @@ export class CredentialManager {
     }
 
     public StoreCredentials(account: string, username: string, password: string) : Q.Promise<void> {
-        let deferred: Q.Deferred<void> = Q.defer();
+        const deferred: Q.Deferred<void> = Q.defer<void>();
 
         this._credentialStore.SetCredential(account, username, password).then(() => {
             deferred.resolve(undefined);
@@ -82,7 +64,7 @@ export class CredentialManager {
     }
 
     private getCredentials(context:TeamServerContext) : Q.Promise<CredentialInfo> {
-        let deferred: Q.Deferred<CredentialInfo> = Q.defer();
+        const deferred: Q.Deferred<CredentialInfo> = Q.defer<CredentialInfo>();
 
         this._credentialStore.GetCredential(context.RepoInfo.Host).then((cred) => {
             if (cred !== undefined) {
@@ -91,7 +73,7 @@ export class CredentialManager {
                 } else if (context.RepoInfo.IsTeamFoundationServer) {
                     let domain: string;
                     let user: string = cred.Username;
-                    let pair = user.split("\\");
+                    const pair: string[] = user.split("\\");
                     if (pair.length > 1) {
                         domain = pair[0];
                         user = pair[pair.length - 1];

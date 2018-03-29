@@ -56,9 +56,9 @@ export class GetInfo implements ITfvcCommand<IItemInfo[]> {
      */
     public async ParseOutput(executionResult: IExecutionResult): Promise<IItemInfo[]> {
         // Throw if any errors are found in stderr or if exitcode is not 0
-        CommandHelper.ProcessErrors(this.GetArguments().GetCommand(), executionResult);
+        CommandHelper.ProcessErrors(executionResult);
 
-        let itemInfos: IItemInfo[] = [];
+        const itemInfos: IItemInfo[] = [];
         if (!executionResult.stdout) {
             return itemInfos;
         }
@@ -101,13 +101,11 @@ export class GetInfo implements ITfvcCommand<IItemInfo[]> {
 
         // If all of the info objects are "empty" let's report an error
         if (itemInfos.length > 0 &&
-            itemInfos.length === itemInfos.filter(info => info.localItem === undefined).length) {
+            itemInfos.length === itemInfos.filter((info) => info.localItem === undefined).length) {
             throw new TfvcError({
                 message: Strings.NoMatchesFound,
-                tfvcErrorCode: TfvcErrorCodes.TfvcNoItemsMatch,
-                exitCode: executionResult.exitCode,
-                stdout: executionResult.stdout,
-                stderr: executionResult.stderr
+                tfvcErrorCode: TfvcErrorCodes.NoItemsMatch,
+                exitCode: executionResult.exitCode
             });
         }
 

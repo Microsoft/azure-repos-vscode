@@ -4,11 +4,10 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import { SCMResourceGroup } from "vscode";
 import { Strings } from "../../helpers/strings";
 import { Resource } from "./resource";
 
-export class ResourceGroup implements SCMResourceGroup {
+export abstract class ResourceGroup {
     get id(): string { return this._id; }
     get label(): string { return this._label; }
     get resources(): Resource[] { return this._resources; }
@@ -28,7 +27,6 @@ export class ConflictsGroup extends ResourceGroup {
 }
 
 export class IncludedGroup extends ResourceGroup {
-
     static readonly ID = "included";
 
     constructor(resources: Resource[]) {
@@ -37,7 +35,6 @@ export class IncludedGroup extends ResourceGroup {
 }
 
 export class ExcludedGroup extends ResourceGroup {
-
     static readonly ID = "excluded";
 
     constructor(resources: Resource[]) {

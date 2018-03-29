@@ -7,8 +7,11 @@
 import * as path from "path";
 
 import { parseString } from "xml2js";
+import { Constants, TfvcTelemetryEvents } from "../../helpers/constants";
 import { Logger } from "../../helpers/logger";
 import { Strings } from "../../helpers/strings";
+import { Utils } from "../../helpers/utils";
+import { IButtonMessageItem } from "../../helpers/vscodeutils.interfaces";
 import { TfvcError, TfvcErrorCodes } from "../tfvcerror";
 import { IExecutionResult } from "../interfaces";
 
@@ -38,19 +41,20 @@ export class CommandHelper {
         return false;
     }
 
-    public static ProcessErrors(command: string, result: IExecutionResult, showFirstError?: boolean): void {
+    public static ProcessErrors(result: IExecutionResult): void {
         if (result.exitCode) {
             let tfvcErrorCode: string = TfvcErrorCodes.UnknownError;
             let message: string;
+            let messageOptions: IButtonMessageItem[] = [];
 
             if (/Authentication failed/.test(result.stderr)) {
                 tfvcErrorCode = TfvcErrorCodes.AuthenticationFailed;
-            } else if (/workspace could not be determined/.test(result.stderr) ||
-                       /The workspace could not be determined from any argument paths or the current working directory/.test(result.stderr) || // CLC error
-                       /Unable to determine the source control server/.test(result.stderr)) { // EXE error
+            } else if (/workspace could not be determined/i.test(result.stderr) ||
+                       /The workspace could not be determined from any argument paths or the current working directory/i.test(result.stderr) || // CLC error
+                       /Unable to determine the source control server/i.test(result.stderr)) { // EXE error
                 tfvcErrorCode = TfvcErrorCodes.NotATfvcRepository;
                 message = Strings.NoWorkspaceMappings;
-            } else if (/Repository not found/.test(result.stderr)) {
+            } else if (/Repository not found/i.test(result.stderr)) {
                 tfvcErrorCode = TfvcErrorCodes.RepositoryNotFound;
             } else if (/project collection URL to use could not be determined/i.test(result.stderr)) {
                 tfvcErrorCode = TfvcErrorCodes.NotATfvcRepository;
@@ -58,26 +62,46 @@ export class CommandHelper {
             } else if (/Access denied connecting.*authenticating as OAuth/i.test(result.stderr)) {
                 tfvcErrorCode = TfvcErrorCodes.AuthenticationFailed;
                 message = Strings.TokenNotAllScopes;
-            } else if (/'java' is not recognized as an internal or external command/.test(result.stderr)) {
-                tfvcErrorCode = TfvcErrorCodes.TfvcNotFound;
+            } else if (/'java' is not recognized as an internal or external command/i.test(result.stderr)) {
+                tfvcErrorCode = TfvcErrorCodes.NotFound;
                 message = Strings.TfInitializeFailureError;
+            } else if (/Error occurred during initialization of VM/i.test(result.stdout)) {
+                //Example: "Error occurred during initialization of VM\nCould not reserve enough space for 2097152KB object heap\n"
+                //This one occurs with the error message in stdout!
+                tfvcErrorCode = TfvcErrorCodes.NotFound;
+                message = `${Strings.TfInitializeFailureError} (${Utils.FormatMessage(result.stdout)})`;
             } else if (/There is no working folder mapping/i.test(result.stderr)) {
                 tfvcErrorCode = TfvcErrorCodes.FileNotInMappings;
             } else if (/could not be found in your workspace, or you do not have permission to access it./i.test(result.stderr)) {
                 tfvcErrorCode = TfvcErrorCodes.FileNotInWorkspace;
-            } else if (showFirstError) {
-                message = result.stderr ? result.stderr : result.stdout;
+            } else if (/TF30063: You are not authorized to access/i.test(result.stderr)) {
+                //For now, we're assuming this is an indication of a Server workspace
+                tfvcErrorCode = TfvcErrorCodes.NotAuthorizedToAccess;
+                message = Strings.TfServerWorkspace;
+                messageOptions = [{ title : Strings.LearnMore,
+                                    url : Constants.ServerWorkspaceUrl }];
+            } else if (/TF400017: The local properties table for the local workspace/i.test(result.stderr)) {
+                //For now, we're assuming this is an indication of a workspace the CLC doesn't know about (but exists locally)
+                tfvcErrorCode = TfvcErrorCodes.WorkspaceNotKnownToClc;
+                message = Strings.ClcCannotAccessWorkspace;
+                messageOptions = [{ title : Strings.MoreDetails,
+                                    url : Constants.WorkspaceNotDetectedByClcUrl,
+                                    telemetryId: TfvcTelemetryEvents.ClcCannotAccessWorkspace }];
             }
 
-            Logger.LogDebug(`TFVC errors: ${result.stderr}`);
+            //Log any information we receive via either stderr or stdout
+            if (result.stderr) {
+                Logger.LogDebug(`TFVC errors (via stderr): ${result.stderr}`);
+            }
+            if (result.stdout) {
+                Logger.LogDebug(`TFVC errors (via stdout): ${result.stdout}`);
+            }
 
             throw new TfvcError({
                 message: message || Strings.TfExecFailedError,
-                stdout: result.stdout,
-                stderr: result.stderr,
+                messageOptions: messageOptions,
                 exitCode: result.exitCode,
-                tfvcErrorCode: tfvcErrorCode,
-                tfvcCommand: command
+                tfvcErrorCode: tfvcErrorCode
             });
         }
     }
@@ -88,10 +112,10 @@ export class CommandHelper {
     public static GetChangesetNumber(stdout: string): string {
         // parse output for changeset number
         if (stdout) {
-            let prefix: string = "Changeset #";
-            let start: number = stdout.indexOf(prefix) + prefix.length;
+            const prefix: string = "Changeset #";
+            const start: number = stdout.indexOf(prefix) + prefix.length;
             if (start >= 0) {
-                let end: number = stdout.indexOf(" ", start);
+                const end: number = stdout.indexOf(" ", start);
                 if (end > start) {
                     return stdout.slice(start, end);
                 }
@@ -123,7 +147,7 @@ export class CommandHelper {
             lines = lines.splice(index);
         }
         if (filterEmptyLines) {
-            lines = lines.filter(e => e.trim() !== "");
+            lines = lines.filter((e) => e.trim() !== "");
         }
         return lines;
     }

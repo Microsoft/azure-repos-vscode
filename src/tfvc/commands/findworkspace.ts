@@ -5,6 +5,8 @@
 "use strict";
 
 import { Strings } from "../../helpers/strings";
+import { IButtonMessageItem } from "../../helpers/vscodeutils.interfaces";
+import { Constants, TfvcTelemetryEvents } from "../../helpers/constants";
 import { IArgumentProvider, IExecutionResult, ITfvcCommand, IWorkspace, IWorkspaceMapping } from "../interfaces";
 import { ArgumentBuilder } from "./argumentbuilder";
 import { CommandHelper } from "./commandhelper";
@@ -18,16 +20,26 @@ import { TfvcError, TfvcErrorCodes } from "../tfvcerror";
  */
 export class FindWorkspace implements ITfvcCommand<IWorkspace> {
     private _localPath: string;
+    private _restrictWorkspace: boolean;
 
-    public constructor(localPath: string) {
+    public constructor(localPath: string, restrictWorkspace: boolean = false) {
         CommandHelper.RequireStringArgument(localPath, "localPath");
         this._localPath = localPath;
+        this._restrictWorkspace = restrictWorkspace;
     }
 
     public GetArguments(): IArgumentProvider {
         // Due to a bug in the CLC this command "requires" the login switch although the creds are never used
-        return new ArgumentBuilder("workfold")
-            .AddSwitchWithValue("login", "fake,fake", true);
+        const builder: ArgumentBuilder = new ArgumentBuilder("workfold");
+        //If desired, restrict the workspace to the localPath (VS Code's current workspace)
+        if (this._restrictWorkspace) {
+            //With TEE, I got an error when passing "login", "fake,fake" and the path at the same time.
+                // A client error occurred: Error refreshing cached workspace WorkspaceInfo (*snip*) from server:
+                // Access denied connecting to TFS server http://java-tfs2015:8081/ (authenticating as fake)
+            //TF.exe is fine without the fake login when a localPath is provided
+            return builder.Add(this._localPath);
+        }
+        return builder.AddSwitchWithValue("login", "fake,fake", true);
     }
 
     public GetOptions(): any {
@@ -45,7 +57,7 @@ export class FindWorkspace implements ITfvcCommand<IWorkspace> {
      */
     public async ParseOutput(executionResult: IExecutionResult): Promise<IWorkspace> {
         // Throw if any errors are found in stderr or if exitcode is not 0
-        CommandHelper.ProcessErrors(this.GetArguments().GetCommand(), executionResult);
+        CommandHelper.ProcessErrors(executionResult);
 
         const stdout = executionResult.stdout;
         if (!stdout) {
@@ -57,7 +69,7 @@ export class FindWorkspace implements ITfvcCommand<IWorkspace> {
         let workspaceName: string = "";
         let collectionUrl: string = "";
         let equalsLineFound: boolean = false;
-        let mappings: IWorkspaceMapping[] = [];
+        const mappings: IWorkspaceMapping[] = [];
         let teamProject: string = undefined;
 
         for (let i: number = 0; i <= lines.length; i++) {
@@ -83,6 +95,9 @@ export class FindWorkspace implements ITfvcCommand<IWorkspace> {
                 const mapping: IWorkspaceMapping = this.getMapping(line);
                 if (mapping) {
                     mappings.push(mapping);
+                    //If we're restricting workspaces, tf.exe will return the proper (single) folder. While TEE will
+                    //return all of the mapped folders (so we have to find the right one based on the folder name passed in)
+                    //We will do that further down but this sets up the default for that scenario.
                     if (!teamProject) {
                         teamProject = this.getTeamProject(mapping.serverPath);
                     }
@@ -95,11 +110,37 @@ export class FindWorkspace implements ITfvcCommand<IWorkspace> {
                 tfvcErrorCode: TfvcErrorCodes.NotATfvcRepository
              });
         }
+        //If we're restricting the workspace, find the proper teamProject name
+        if (this._restrictWorkspace) {
+            for (let i: number = 0; i < mappings.length; i++) {
+                const isWithin: boolean = this.pathIsWithin(this._localPath, mappings[i].localPath);
+                if (isWithin) {
+                    const project: string = this.getTeamProject(mappings[i].serverPath); //maintain case in serverPath
+                    teamProject = project;
+                    break;
+                }
+            }
+        }
+        //If there are mappings but no workspace name, the term 'workspace' couldn't be parsed. According to Bing
+        //translate, other than Klingon, no other supported language translates 'workspace' as 'workspace'.
+        //So if we determine there are mappings but can't get the workspace name, we assume it's a non-ENU
+        //tf executable. One example of this is German.
+        if (mappings.length > 0 && !workspaceName) {
+            const messageOptions: IButtonMessageItem[] = [{ title : Strings.MoreDetails,
+                                url : Constants.NonEnuTfExeConfiguredUrl,
+                                telemetryId: TfvcTelemetryEvents.ExeNonEnuConfiguredMoreDetails }];
+            throw new TfvcError( {
+                message: Strings.NotAnEnuTfCommandLine,
+                messageOptions: messageOptions,
+                tfvcErrorCode: TfvcErrorCodes.NotAnEnuTfCommandLine
+             });
+        }
 
+        //Decode collectionURL and teamProject here (for cases like 'Collection: http://java-tfs2015:8081/tfs/spaces%20in%20the%20name')
         const workspace: IWorkspace = {
             name: workspaceName,
-            server: collectionUrl,
-            defaultTeamProject: teamProject,
+            server: decodeURI(collectionUrl),
+            defaultTeamProject: decodeURI(teamProject),
             mappings: mappings
         };
 
@@ -124,7 +165,7 @@ export class FindWorkspace implements ITfvcCommand<IWorkspace> {
      * $/tfsTest_01: D:\tmp\test
      */
     public async ParseExeOutput(executionResult: IExecutionResult): Promise<IWorkspace> {
-        let workspace: IWorkspace = await this.ParseOutput(executionResult);
+        const workspace: IWorkspace = await this.ParseOutput(executionResult);
         if (workspace && workspace.name) {
             // The workspace name includes the user name, so let's fix that
             const lastOpenParenIndex: number = workspace.name.lastIndexOf(" (");
@@ -158,17 +199,24 @@ export class FindWorkspace implements ITfvcCommand<IWorkspace> {
     private getMapping(line: string): IWorkspaceMapping {
         if (line) {
             const cloaked: boolean = line.trim().toLowerCase().startsWith("(cloaked)");
-            const end: number = line.indexOf(":");
-            const start: number = cloaked ? line.indexOf(")") + 1 : 0;
-            if (end >= 0 && end + 1 < line.length) {
-                const serverPath: string = line.slice(start, end).trim();
-                const localPath: string = line.slice(end + 1).trim();
-                return {
-                    serverPath: serverPath,
-                    localPath: localPath,
-                    cloaked: cloaked
-                };
+            let end: number = line.indexOf(":");
+            //EXE: cloaked entries end with ':'
+            //CLC: cloaked entries *don't* end with ':'
+            if (cloaked && end === -1) {
+                end = line.length;
             }
+            const start: number = cloaked ? line.indexOf(")") + 1 : 0;
+            const serverPath: string = line.slice(start, end).trim();
+            let localPath: string;
+            //cloaked entries don't have local paths
+            if (end >= 0 && end + 1 < line.length) {
+                localPath = line.slice(end + 1).trim();
+            }
+            return {
+                serverPath: serverPath,
+                localPath: localPath,
+                cloaked: cloaked
+            };
         }
 
         return undefined;
@@ -190,5 +238,33 @@ export class FindWorkspace implements ITfvcCommand<IWorkspace> {
         }
 
         return "";
+    }
+
+    //Checks to see if the openedPath (in VS Code) is within the workspacePath
+    //specified in the workspace. The funcation needs to ensure we get the
+    //"best" (most specific) match.
+    private pathIsWithin(openedPath: string, workspacePath: string): boolean {
+        //Replace all backslashes with forward slashes on both paths
+        openedPath = openedPath.replace(/\\/g, "/");
+        workspacePath = workspacePath.replace(/\\/g, "/");
+
+        //Add trailing separators to ensure they're included in the lastIndexOf
+        //(e.g., to ensure we match "/path2" with "/path2" and not "/path2" with "/path" first)
+        openedPath = this.addTrailingSeparator(openedPath, "/");
+        workspacePath = this.addTrailingSeparator(workspacePath, "/");
+
+        //Lowercase both paths (TFVC should be case-insensitive)
+        openedPath = openedPath.toLowerCase();
+        workspacePath = workspacePath.toLowerCase();
+
+        return openedPath.startsWith(workspacePath);
+    };
+
+    //If the path doesn't end with a separator, add one
+    private addTrailingSeparator(path: string, separator: string): string {
+        if (path[path.length - 1] !== separator) {
+            return path += separator;
+        }
+        return path;
     }
 }

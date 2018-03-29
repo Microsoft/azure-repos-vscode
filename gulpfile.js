@@ -27,28 +27,7 @@ function errorHandler(err) {
     process.exit(1);
 }
 
-gulp.task('tslint-src', function () {
-    return gulp.src(['./src/**/*.ts'])
-        .pipe(tslint())
-        .pipe(tslint.report('prose', { emitError: true}))
-        .on('error', errorHandler);
-});
-
-gulp.task('tslint-test', function () {
-    return gulp.src(['./test/**/*.ts'])
-        .pipe(tslint())
-        .pipe(tslint.report('prose', { emitError: true}))
-        .on('error', errorHandler);
-});
-
-gulp.task('tslint-test-integration', function () {
-    return gulp.src(['./test-integration/**/*.ts'])
-        .pipe(tslint())
-        .pipe(tslint.report('prose', { emitError: true}))
-        .on('error', errorHandler);
-});
-
-gulp.task('clean', ['tslint-src', 'tslint-test', 'tslint-test-integration'], function (done) {
+gulp.task('clean', function (done) {
     return del(['out/**', '!out', '!out/src/credentialstore/linux', '!out/src/credentialstore/osx', '!out/src/credentialstore/win32'], done);
 });
 
@@ -75,7 +54,14 @@ gulp.task('build', ['copyresources'], function () {
         .pipe(gulp.dest('./out'));
 });
 
-gulp.task('publishbuild', ['build'], function () {
+gulp.task('tslint', ['build'], function () {
+    return gulp.src(['./src/**/*.ts', './test/**/*.ts', './test-integration/**/*.ts'])
+        .pipe(tslint({ configuration: "tslint.json", formatter: "verbose" }))
+        .pipe(tslint.report({ emitError: true, summarizeFailureOutput: true }))
+        .on('error', errorHandler);
+});
+
+gulp.task('publishbuild', ['tslint'], function () {
     gulp.src(['./src/credentialstore/**/*.js'])
         .pipe(gulp.dest('./out/src/credentialstore'));
     gulp.src(['./src/credentialstore/bin/win32/*'])
@@ -87,6 +73,8 @@ gulp.task('publishall', ['publishbuild'], function () {
         .pipe(gulp.dest('./out/test/contexts/testrepos'));
     gulp.src(['./test/helpers/testrepos/**/*'])
         .pipe(gulp.dest('./out/test/helpers/testrepos'));
+    gulp.src(['./patches/vso-node-api/handlers/ntlm.js'])
+        .pipe(gulp.dest('./node_modules/vso-node-api/handlers'));
 });
 
 //Tests will fail with MODULE_NOT_FOUND if I try to run 'publishBuild' before test target
@@ -110,15 +98,20 @@ gulp.task('test-coverage', function() {
         ,'!out/src/extension.js'
         ,'!out/src/extensionmanager.js'
         ,'!out/src/team-extension.js'
+        ,'!out/src/clients/baseclient.js'
         ,'!out/src/clients/buildclient.js'
         ,'!out/src/clients/coreapiclient.js'
         ,'!out/src/clients/feedbackclient.js'
         ,'!out/src/clients/gitclient.js'
+        ,'!out/src/clients/httpclient.js'
         ,'!out/src/clients/repositoryinfoclient.js'
+        ,'!out/src/clients/soapclient.js'
+        ,'!out/src/clients/tfscatalogsoapclient.js'
         ,'!out/src/clients/witclient.js'
         ,'!out/src/contexts/repocontextfactory.js'
         ,'!out/src/contexts/tfvccontext.js'
         ,'!out/src/helpers/settings.js'
+        ,'!out/src/helpers/vscodeutils.interfaces.js'
         ,'!out/src/helpers/vscodeutils.js'
         ,'!out/src/services/telemetry.js'
         ,'!out/src/services/coreapi.js'
@@ -173,6 +166,14 @@ gulp.task('packageonly', function (cb) {
 
 gulp.task('package', ['publishall'], function (cb) {
   exec('vsce package', function (err, stdout, stderr) {
+    console.log(stdout);
+    console.log(stderr);
+    cb(err);
+  });
+});
+
+gulp.task('vsce-version', function (cb) {
+  exec('vsce -Version', function (err, stdout, stderr) {
     console.log(stdout);
     console.log(stderr);
     cb(err);

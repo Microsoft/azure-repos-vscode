@@ -5,15 +5,14 @@
 "use strict";
 
 import { assert } from "chai";
-const path = require("path");
+import * as path from "path";
 
-import { GitContext }  from "../../src/contexts/gitcontext";
+import { GitContext } from "../../src/contexts/gitcontext";
 import { RepositoryType } from "../../src/contexts/repositorycontext";
-import { SettingsMock } from "./contexthelper";
 
 describe("GitContext", function() {
-    let TEST_REPOS_FOLDER: string = "testrepos";
-    let DOT_GIT_FOLDER: string = "dotgit";
+    const TEST_REPOS_FOLDER: string = "testrepos";
+    const DOT_GIT_FOLDER: string = "dotgit";
 
     beforeEach(function() {
         // console.log("__dirname: " + __dirname);
@@ -21,7 +20,7 @@ describe("GitContext", function() {
 
     it("should verify all undefined properties for undefined GitContext path", function() {
         //Verify an undefined path does not set any values
-        let gc: GitContext = new GitContext(undefined);
+        const gc: GitContext = new GitContext(undefined);
 
         assert.equal(gc.CurrentBranch, undefined);
         assert.equal(gc.RemoteUrl, undefined);
@@ -31,7 +30,7 @@ describe("GitContext", function() {
 
     it("should verify undefined values for invalid GitContext path", function() {
         //Actually pass a value to constructor (instead of undefined), values should be undefined
-        let gc: GitContext = new GitContext(__dirname + "invalid");
+        const gc: GitContext = new GitContext(__dirname + "invalid");
 
         assert.equal(gc.CurrentBranch, undefined);
         assert.equal(gc.RemoteUrl, undefined);
@@ -40,15 +39,19 @@ describe("GitContext", function() {
     });
 
     it("should verify initialize returns true", async function() {
-        let gc: GitContext = new GitContext(__dirname);
-        let mock: SettingsMock = new SettingsMock(false, undefined, undefined, 1, "https://xplatalm.visualstudio.com", "L2.VSCodeExtension.RC", undefined);
-        assert.isTrue(await gc.Initialize(mock));
+        const gc: GitContext = new GitContext(__dirname);
+        assert.isTrue(await gc.Initialize());
+    });
+
+    it("should cover dispose", async function() {
+        const gc: GitContext = new GitContext(__dirname);
+        gc.dispose();
     });
 
     it("should verify repository with an empty origin remote", function() {
-        let repoName: string = "emptyconfig";
-        let repoPath: string = path.join(__dirname, TEST_REPOS_FOLDER, repoName, DOT_GIT_FOLDER);
-        let gc: GitContext = new GitContext(repoPath, DOT_GIT_FOLDER);
+        const repoName: string = "emptyconfig";
+        const repoPath: string = path.join(__dirname, TEST_REPOS_FOLDER, repoName, DOT_GIT_FOLDER);
+        const gc: GitContext = new GitContext(repoPath, DOT_GIT_FOLDER);
 
         assert.equal(gc.CurrentBranch, undefined);
         assert.equal(gc.CurrentRef, undefined);
@@ -62,9 +65,9 @@ describe("GitContext", function() {
     });
 
     it("should verify GitHub origin remote", function() {
-        let repoName: string = "githubrepo";
-        let repoPath: string = path.join(__dirname, TEST_REPOS_FOLDER, repoName, DOT_GIT_FOLDER);
-        let gc: GitContext = new GitContext(repoPath, DOT_GIT_FOLDER);
+        const repoName: string = "githubrepo";
+        const repoPath: string = path.join(__dirname, TEST_REPOS_FOLDER, repoName, DOT_GIT_FOLDER);
+        const gc: GitContext = new GitContext(repoPath, DOT_GIT_FOLDER);
 
         assert.equal(gc.CurrentBranch, "master");
         assert.equal(gc.CurrentRef, "refs/heads/master");
@@ -78,9 +81,9 @@ describe("GitContext", function() {
     });
 
     it("should verify TeamServices origin remote", function() {
-        let repoName: string = "gitrepo";
-        let repoPath: string = path.join(__dirname, TEST_REPOS_FOLDER, repoName, DOT_GIT_FOLDER);
-        let gc: GitContext = new GitContext(repoPath, DOT_GIT_FOLDER);
+        const repoName: string = "gitrepo";
+        const repoPath: string = path.join(__dirname, TEST_REPOS_FOLDER, repoName, DOT_GIT_FOLDER);
+        const gc: GitContext = new GitContext(repoPath, DOT_GIT_FOLDER);
 
         assert.equal(gc.CurrentBranch, "jeyou/approved-pr");
         assert.equal(gc.CurrentRef, "refs/heads/jeyou/approved-pr");
@@ -94,10 +97,27 @@ describe("GitContext", function() {
         assert.equal(gc.Type, RepositoryType.GIT);
     });
 
-    it("should verify TeamServices origin remote cloned with ssh", function() {
-        let repoName: string = "gitrepo-ssh";
-        let repoPath: string = path.join(__dirname, TEST_REPOS_FOLDER, repoName, DOT_GIT_FOLDER);
-        let gc: GitContext = new GitContext(repoPath, DOT_GIT_FOLDER);
+    it("should verify TeamServices origin remote cloned with old-style ssh url", function() {
+        const repoName: string = "gitrepo-old-ssh";
+        const repoPath: string = path.join(__dirname, TEST_REPOS_FOLDER, repoName, DOT_GIT_FOLDER);
+        const gc: GitContext = new GitContext(repoPath, DOT_GIT_FOLDER);
+
+        assert.equal(gc.CurrentBranch, "master");
+        assert.equal(gc.CurrentRef, "refs/heads/master");
+        assert.isTrue(gc.IsSsh);
+        assert.isTrue(gc.IsTeamFoundation);
+        assert.isTrue(gc.IsTeamServices);
+        //The remote URL is the https and no longer has port number
+        assert.equal(gc.RemoteUrl, "https://account.visualstudio.com/DefaultCollection/_git/repository");
+        assert.equal(gc.RepositoryParentFolder, path.join(__dirname, TEST_REPOS_FOLDER, repoName));
+        assert.equal(gc.RepoFolder, repoPath);
+        assert.equal(gc.Type, RepositoryType.GIT);
+    });
+
+    it("should verify TeamServices origin remote cloned with ssh", function () {
+        const repoName: string = "gitrepo-ssh";
+        const repoPath: string = path.join(__dirname, TEST_REPOS_FOLDER, repoName, DOT_GIT_FOLDER);
+        const gc: GitContext = new GitContext(repoPath, DOT_GIT_FOLDER);
 
         assert.equal(gc.CurrentBranch, "master");
         assert.equal(gc.CurrentRef, "refs/heads/master");
@@ -112,9 +132,9 @@ describe("GitContext", function() {
     });
 
     it("should verify TeamFoundationServer origin remote", function() {
-        let repoName: string = "tfsrepo";
-        let repoPath: string = path.join(__dirname, TEST_REPOS_FOLDER, repoName, DOT_GIT_FOLDER);
-        let gc: GitContext = new GitContext(repoPath, DOT_GIT_FOLDER);
+        const repoName: string = "tfsrepo";
+        const repoPath: string = path.join(__dirname, TEST_REPOS_FOLDER, repoName, DOT_GIT_FOLDER);
+        const gc: GitContext = new GitContext(repoPath, DOT_GIT_FOLDER);
 
         assert.equal(gc.CurrentBranch, "master");
         assert.equal(gc.CurrentRef, "refs/heads/master");
@@ -128,9 +148,9 @@ describe("GitContext", function() {
     });
 
     it("should verify TeamFoundationServer origin remote cloned with ssh", function() {
-        let repoName: string = "tfsrepo-ssh";
-        let repoPath: string = path.join(__dirname, TEST_REPOS_FOLDER, repoName, DOT_GIT_FOLDER);
-        let gc: GitContext = new GitContext(repoPath, DOT_GIT_FOLDER);
+        const repoName: string = "tfsrepo-ssh";
+        const repoPath: string = path.join(__dirname, TEST_REPOS_FOLDER, repoName, DOT_GIT_FOLDER);
+        const gc: GitContext = new GitContext(repoPath, DOT_GIT_FOLDER);
 
         assert.equal(gc.CurrentBranch, "master");
         assert.equal(gc.CurrentRef, "refs/heads/master");

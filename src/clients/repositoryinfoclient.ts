@@ -4,16 +4,20 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import url = require("url");
 import VsoBaseInterfaces = require("vso-node-api/interfaces/common/VsoBaseInterfaces");
+import { TeamProject, TeamProjectCollection } from "vso-node-api/interfaces/CoreInterfaces";
 import { CoreApiClient } from "./coreapiclient";
 import { Logger } from "../helpers/logger";
 import { RepoUtils } from "../helpers/repoutils";
 import { Strings } from "../helpers/strings";
 import { IRepositoryContext, RepositoryType } from "../contexts/repositorycontext";
 import { TeamServicesApi } from "./teamservicesclient";
+import { TfsCatalogSoapClient } from "./tfscatalogsoapclient";
 import { RepositoryInfo } from "../info/repositoryinfo";
-import { TeamProject, TeamProjectCollection } from "vso-node-api/interfaces/CoreInterfaces";
+import { TfvcContext } from "../contexts/tfvccontext";
+import { Telemetry } from "../services/telemetry";
+
+import * as url from "url";
 
 export class RepositoryInfoClient {
     private _handler: VsoBaseInterfaces.IRequestHandler;
@@ -33,17 +37,22 @@ export class RepositoryInfoClient {
             Logger.LogDebug(`Getting repository information for a Git repository at ${this._repoContext.RemoteUrl}`);
             repositoryClient = new TeamServicesApi(this._repoContext.RemoteUrl, [this._handler]);
             repoInfo = await repositoryClient.getVstsInfo();
+            Logger.LogDebug(`Repository information blob:`);
+            Logger.LogObject(repoInfo);
+            this.verifyRepoInfo(repoInfo, `RepoInfo was undefined for a ${RepositoryType[this._repoContext.Type]} repo`);
             repositoryInfo = new RepositoryInfo(repoInfo);
+            Logger.LogDebug(`Finished getting repository information for a Git repository at ${this._repoContext.RemoteUrl}`);
             return repositoryInfo;
         } else if (this._repoContext.Type === RepositoryType.TFVC || this._repoContext.Type === RepositoryType.EXTERNAL) {
             Logger.LogDebug(`Getting repository information for a TFVC repository at ${this._repoContext.RemoteUrl}`);
             //For TFVC, the teamProjectName is retrieved by tf.cmd and set on the context
-            let teamProjectName: string = this._repoContext.TeamProjectName;
+            const teamProjectName: string = this._repoContext.TeamProjectName;
+            this.verifyRepoInfo(this._repoContext.RemoteUrl, `RemoteUrl was undefined for a ${RepositoryType[this._repoContext.Type]} repo`);
             repositoryInfo = new RepositoryInfo(this._repoContext.RemoteUrl);
 
             let serverUrl: string;
             let collectionName: string;
-            let isTeamServices: boolean = RepoUtils.IsTeamFoundationServicesRepo(this._repoContext.RemoteUrl);
+            const isTeamServices: boolean = RepoUtils.IsTeamFoundationServicesRepo(this._repoContext.RemoteUrl);
             if (isTeamServices) {
                 // The Team Services collection is ALWAYS defaultCollection, and both the url with defaultcollection
                 // and the url without defaultCollection will validate just fine. However, it expects you to refer to
@@ -52,63 +61,100 @@ export class RepositoryInfoClient {
                 // If validation fails, we return false.
                 collectionName = repositoryInfo.Account;
                 serverUrl = `https://${repositoryInfo.Account}.visualstudio.com/`;
-                let valid: boolean = await this.validateTfvcCollectionUrl(serverUrl, this._handler);
+                const valid: boolean = await this.validateTfvcCollectionUrl(serverUrl);
                 if (!valid) {
-                    let error: string = `Unable to validate the Team Services TFVC repository. Collection name: '${collectionName}', Url: '${serverUrl}'`;
-                    Logger.LogDebug(error);
-                    throw new Error(`${Strings.UnableToValidateTeamServicesTfvcRepository} Collection name: '${collectionName}', Url: '${serverUrl}'`);
+                    const errorMsg: string = `${Strings.UnableToValidateTeamServicesCollection} Collection name: '${collectionName}', Url: '${serverUrl}'`;
+                    Logger.LogDebug(errorMsg);
+                    throw new Error(errorMsg);
                 }
                 Logger.LogDebug(`Successfully validated the Team Services TFVC repository. Collection name: '${collectionName}', 'Url: ${serverUrl}'`);
-            } else {
+            } else { //This could be either a TFVC context or an External context
                 serverUrl = this._repoContext.RemoteUrl;
                 // A full Team Foundation Server collection url is required for the validate call to succeed.
                 // So we try the url given. If that fails, we assume it is a server Url and the collection is
                 // the defaultCollection. If that assumption fails we return false.
-                if (this.validateTfvcCollectionUrl(serverUrl, this._handler)) {
-                    let parts: string[] = this.splitTfvcCollectionUrl(serverUrl);
+                Logger.LogDebug(`Starting the validation of the collection. Url: '${serverUrl}'`);
+                let valid: boolean = await this.validateTfvcCollectionUrl(serverUrl);
+                if (valid) {
+                    const parts: string[] = this.splitTfvcCollectionUrl(serverUrl);
                     serverUrl = parts[0];
                     collectionName = parts[1];
-                    Logger.LogDebug(`Validated the TFS TFVC repository. Collection name: '${collectionName}', Url: '${serverUrl}'`);
+                    Logger.LogDebug(`Validated the collection and splitting Url and Collection name. Collection name: '${collectionName}', Url: '${serverUrl}'`);
                 } else {
-                    Logger.LogDebug(`Unable to validate the TFS TFVC repository. Url: '${serverUrl}'  Attempting with DefaultCollection...`);
+                    Logger.LogDebug(`Unable to validate the collection. Url: '${serverUrl}' Attempting validation assuming 'DefaultCollection'...`);
                     collectionName = "DefaultCollection";
-                    if (!this.validateTfvcCollectionUrl(url.resolve(serverUrl, collectionName), this._handler)) {
-                        Logger.LogDebug(`Unable to validate the TFS TFVC repository with DefaultCollection.`);
-                        throw new Error(Strings.UnableToValidateTfvcRepositoryWithDefaultCollection);
+                    const remoteUrl: string = url.resolve(serverUrl, collectionName);
+                    valid = await this.validateTfvcCollectionUrl(remoteUrl);
+                    if (!valid) {
+                        Logger.LogDebug(Strings.UnableToValidateCollectionAssumingDefaultCollection);
+                        throw new Error(Strings.UnableToValidateCollectionAssumingDefaultCollection);
                     }
-                    Logger.LogDebug(`Validated the TFS TFVC repository with DefaultCollection`);
+                    //Since we validated with the default collection, we need to update the repo context's RemoteUrl
+                    if (this._repoContext.Type === RepositoryType.TFVC) {
+                        const tfvcContext: TfvcContext = <TfvcContext>this._repoContext;
+                        tfvcContext.RemoteUrl = remoteUrl;
+                    }
+                    Logger.LogDebug(`Validated the collection assuming 'DefaultCollection'.`);
                 }
             }
 
-            let coreApiClient: CoreApiClient = new CoreApiClient();
-            //The following call works for VSTS, TFS 2017 and TFS 2015U3 (multiple collections, spaces in the name)
+            const coreApiClient: CoreApiClient = new CoreApiClient();
+            let collection: TeamProjectCollection;
             Logger.LogDebug(`Getting project collection...  url: '${serverUrl}', and collection name: '${collectionName}'`);
-            let collection: TeamProjectCollection = await coreApiClient.GetProjectCollection(serverUrl, collectionName);
+            if (isTeamServices) {
+                //The following call works for VSTS, TFS 2017 and TFS 2015U3 (multiple collections, spaces in the name), just not for non-admins on-prem (!)
+                Logger.LogDebug(`Using REST to get the project collection information`);
+                collection = await coreApiClient.GetProjectCollection(serverUrl, collectionName);
+            } else {
+                Logger.LogDebug(`Using SOAP to get the project collection information`);
+                // When called on-prem without admin privileges: Error: Failed Request: Forbidden(403) - Access Denied: Jeff Young (TFS) needs the following permission(s) to perform this action: Edit instance-level information
+                const tfsClient: TfsCatalogSoapClient = new TfsCatalogSoapClient(serverUrl, [this._handler]);
+                collection = await tfsClient.GetProjectCollection(collectionName);
+                if (!collection) {
+                    const error: string = `Using SOAP, could not find a project collection object for ${collectionName} at ${serverUrl}`;
+                    Logger.LogDebug(error);
+                    throw new Error(error);
+                }
+            }
             Logger.LogDebug(`Found a project collection for url: '${serverUrl}' and collection name: '${collection.name}'.`);
 
             Logger.LogDebug(`Getting team project...  Url: '${serverUrl}', collection name: '${collection.name}', and project: '${teamProjectName}'`);
             //For a Team Services collection, ignore the collectionName
-            let resolvedRemoteUrl: string = url.resolve(serverUrl, isTeamServices ? "" : collection.name);
-            let project: TeamProject = await this.getProjectFromServer(coreApiClient, resolvedRemoteUrl, teamProjectName);
+            const resolvedRemoteUrl: string = url.resolve(serverUrl, isTeamServices ? "" : collection.name);
+
+            //Delay the check for a teamProjectName (don't fail here).  If we don't have one, that's OK for TFVC
+            //functionality.  We need to disable Team Services functionality if we can't find a team project later.
+            const project: TeamProject = await this.getProjectFromServer(coreApiClient, resolvedRemoteUrl, teamProjectName);
             Logger.LogDebug(`Found a team project for url: '${serverUrl}', collection name: '${collection.name}', and project id: '${project.id}'`);
 
             //Now, create the JSON blob to send to new RepositoryInfo(repoInfo);
             repoInfo = this.getTfvcRepoInfoBlob(serverUrl, collection.id, collection.name, collection.url, project.id, project.name, project.description, project.url);
+            Logger.LogDebug(`Repository information blob:`);
+            Logger.LogObject(repoInfo);
+            this.verifyRepoInfo(repoInfo, `RepoInfo was undefined for a ${RepositoryType[this._repoContext.Type]} repo`);
             repositoryInfo = new RepositoryInfo(repoInfo);
+            Logger.LogDebug(`Finished getting repository information for the repository at ${this._repoContext.RemoteUrl}`);
             return repositoryInfo;
         }
         return repositoryInfo;
     }
 
+    //Using to try and track down users in the scenario where repoInfo is undefined
+    private verifyRepoInfo(repoInfo: any, message: string) {
+        if (!repoInfo) {
+            Telemetry.SendException(new Error(message));
+        }
+    }
+
     private splitTfvcCollectionUrl(collectionUrl: string): string[] {
-        let result: string[] = [ , ];
+        const result: string[] = [ , ];
         if (!collectionUrl) {
             return result;
         }
 
         // Now find the TRUE last separator (before the collection name)
-        let trimmedUrl: string = this.trimTrailingSeparators(collectionUrl);
-        let index: number = trimmedUrl.lastIndexOf("/");
+        const trimmedUrl: string = this.trimTrailingSeparators(collectionUrl);
+        const index: number = trimmedUrl.lastIndexOf("/");
         if (index >= 0) {
             // result0 is the server url without the collection name
             result[0] = trimmedUrl.substring(0, index + 1);
@@ -168,13 +214,13 @@ export class RepositoryInfoClient {
         return coreApiClient.GetTeamProject(remoteUrl, teamProjectName);
     }
 
-    private async validateTfvcCollectionUrl(serverUrl: string, handler: VsoBaseInterfaces.IRequestHandler): Promise<boolean> {
+    private async validateTfvcCollectionUrl(serverUrl: string): Promise<boolean> {
         try {
-            let repositoryClient: TeamServicesApi = new TeamServicesApi(serverUrl, [this._handler]);
+            const repositoryClient: TeamServicesApi = new TeamServicesApi(serverUrl, [this._handler]);
             await repositoryClient.validateTfvcCollectionUrl();
             return true;
         } catch (err) {
-            if (err.errorCode === "404") {
+            if (err.statusCode === 404) {
                 return false;
             } else {
                 throw err;

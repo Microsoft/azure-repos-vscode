@@ -14,7 +14,6 @@ import { CommandHelper } from "./commandhelper";
  * It returns a list of all files undone.
  * undo [/recursive] <itemSpec>...
  */
-//TODO: Add an Undo All?
 export class Undo implements ITfvcCommand<string[]> {
     private _serverContext: TeamServerContext;
     private _itemPaths: string[];
@@ -26,6 +25,12 @@ export class Undo implements ITfvcCommand<string[]> {
     }
 
     public GetArguments(): IArgumentProvider {
+        // If exactly 1 and it is our wildcard, undo all
+        if (this._itemPaths.length === 1 && this._itemPaths[0] === "*") {
+            return new ArgumentBuilder("undo", this._serverContext)
+                .Add(".")
+                .AddSwitch("recursive");
+        }
         return new ArgumentBuilder("undo", this._serverContext)
             .AddAll(this._itemPaths);
     }
@@ -48,27 +53,27 @@ export class Undo implements ITfvcCommand<string[]> {
         //  * All of the files have no pending changes (exitCode === 100)
         //If some of the files have no pending changes, we want to process the ones that did.
         //If all of the files have no pending changes, return []
-        //Otherwise, we assume some error occurred so let that be thrown.
+        //Otherwise, we assume some error occurred so allow that to be thrown.
         if (executionResult.exitCode !== 0) {
             //Remove any entries for which there were no pending changes
-            lines = lines.filter(e => !e.startsWith("No pending changes "));
+            lines = lines.filter((e) => !e.startsWith("No pending changes "));
             if (executionResult.exitCode === 100 && lines.length === 0) {
                 //All of the files had no pending changes, return []
                 return [];
             } else if (executionResult.exitCode !== 1) {
-                //Otherwise, some other error occurred, let that be thrown.
-                CommandHelper.ProcessErrors(this.GetArguments().GetCommand(), executionResult);
+                //Otherwise, some other error occurred, const that be thrown.
+                CommandHelper.ProcessErrors(executionResult);
             }
         }
 
-        let filesUndone: string[] = [];
+        const filesUndone: string[] = [];
         let path: string = "";
         for (let index: number = 0; index < lines.length; index++) {
-            let line: string = lines[index];
+            const line: string = lines[index];
             if (CommandHelper.IsFilePath(line)) {
                 path = line;
             } else if (line) {
-                let file: string = this.getFileFromLine(line);
+                const file: string = this.getFileFromLine(line);
                 filesUndone.push(CommandHelper.GetFilePath(path, file));
             }
         }
@@ -90,7 +95,7 @@ export class Undo implements ITfvcCommand<string[]> {
     //line could be 'Undoing edit: file1.txt', 'Undoing add: file1.txt'
     private getFileFromLine(line: string): string {
         const prefix: string = ": "; //"Undoing edit: ", "Undoing add: ", etc.
-        let idx: number = line.indexOf(prefix);
+        const idx: number = line.indexOf(prefix);
         if (idx > 0) {
             return line.substring(idx + prefix.length);
         }

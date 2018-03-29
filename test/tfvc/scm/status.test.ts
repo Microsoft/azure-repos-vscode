@@ -6,7 +6,7 @@
 
 import { expect } from "chai";
 
-import { GetStatuses, Status }  from "../../../src/tfvc/scm/status";
+import { GetStatuses, Status } from "../../../src/tfvc/scm/status";
 
 describe("Tfvc-Version", function() {
     beforeEach(function() {

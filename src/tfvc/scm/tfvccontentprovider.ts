@@ -8,6 +8,8 @@
 import { workspace, Uri, Disposable, Event, EventEmitter } from "vscode";
 import { TfvcSCMProvider } from "../tfvcscmprovider";
 import { TfvcRepository } from "../tfvcrepository";
+import { TfvcTelemetryEvents } from "../../helpers/constants";
+import { Telemetry } from "../../services/telemetry";
 
 export class TfvcContentProvider {
     private _tfvcRepository: TfvcRepository;
@@ -44,12 +46,14 @@ export class TfvcContentProvider {
         }
 
         // If path is a server path, we need to fix the format
-        if (path && path.startsWith("\\$\\")) {
+        // First option is Windows, second is Mac
+        if (path && (path.startsWith("\\$\\") || path.startsWith("/$/"))) {
             // convert "/$/proj/folder/file" to "$/proj/folder/file";
             path = uri.path.slice(1);
         }
 
         try {
+            Telemetry.SendEvent(this._tfvcRepository.IsExe ? TfvcTelemetryEvents.GetFileContentExe : TfvcTelemetryEvents.GetFileContentClc);
             const contents: string = await this._tfvcRepository.GetFileContent(path, versionSpec);
             return contents;
         } catch (err) {
@@ -59,7 +63,7 @@ export class TfvcContentProvider {
 
     dispose(): void {
         if (this._disposables) {
-            this._disposables.forEach(d => d.dispose());
+            this._disposables.forEach((d) => d.dispose());
             this._disposables = [];
         }
     }

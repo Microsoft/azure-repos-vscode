@@ -12,7 +12,7 @@ import { CommandHelper } from "./commandhelper";
 
 /**
  * This command finds conflicts existing in the workspace by calling tf resolve -preview
- * 
+ *
  * tf resolve [itemspec]
  * [/auto:(AutoMerge|TakeTheirs|KeepYours|OverwriteLocal|DeleteConflict|KeepYoursRenameTheirs)]
  * [/preview] [(/overridetype:overridetype | /converttotype:converttype] [/recursive] [/newname:path] [/noprompt] [/login:username, [password]]
@@ -48,18 +48,32 @@ export class FindConflicts implements ITfvcCommand<IConflict[]> {
     public async ParseOutput(executionResult: IExecutionResult): Promise<IConflict[]> {
         // Any exit code other than 0 or 1 means that something went wrong, so simply throw the error
         if (executionResult.exitCode !== 0 && executionResult.exitCode !== 1) {
-            CommandHelper.ProcessErrors(this.GetArguments().GetCommand(), executionResult);
+            CommandHelper.ProcessErrors(executionResult);
         }
 
-        let conflicts: IConflict[] = [];
-        const lines: string[] = CommandHelper.SplitIntoLines(executionResult.stderr, false, true);
+        const conflicts: IConflict[] = [];
+        //"Picked up _JAVA_OPTIONS: -Xmx1024M"
+        let outputToProcess: string = executionResult.stderr;
+        if (outputToProcess && outputToProcess.includes("_JAVA_OPTIONS")) {
+            //When you don't need _JAVA_OPTIONS set, the results we want are always in stderr (this is the default case)
+            //With _JAVA_OPTIONS set and there are no conflicts, _JAVA_OPTIONS is in stderr but the result we want to process is moved to stdout
+            //With _JAVA_OPTIONS set and there are conflicts, _JAVA_OPTIONS will appear in stderr along with the results also in stderr (and stdout will be empty)
+            if (executionResult.stdout && executionResult.stdout.length > 0) {
+                outputToProcess = executionResult.stdout;
+            }
+        }
+        const lines: string[] = CommandHelper.SplitIntoLines(outputToProcess, false, true);
         for (let i: number = 0; i < lines.length; i++) {
             const line: string = lines[i];
+            if (line.includes("_JAVA_OPTIONS")) {
+                continue; //This is not a conflict
+            }
             const colonIndex: number = line.lastIndexOf(":");
             if (colonIndex >= 0) {
                 const localPath: string = line.slice(0, colonIndex);
                 let type: ConflictType = ConflictType.CONTENT;
-                if (/You have a conflicting pending change/i.test(line)) {
+                if (/You have a conflicting pending change/i.test(line) ||
+                    /A newer version exists on the server/i.test(line)) {
                     // This is the ambiguous response given by the EXE.
                     // We will assume it is both a name and content change for now.
                     type = ConflictType.NAME_AND_CONTENT;
@@ -70,14 +84,16 @@ export class FindConflicts implements ITfvcCommand<IConflict[]> {
                 } else if (/The source and target both have changes/i.test(line)) {
                     type = ConflictType.MERGE;
                 } else if (/The item has already been deleted/i.test(line) ||
-                           /The item has been deleted in the source branch/i.test(line)) {
+                           /The item has been deleted in the source branch/i.test(line) ||
+                           /The item has been deleted from the server/i.test(line)) {
                     type = ConflictType.DELETE;
                 } else if (/The item has been deleted in the target branch/i.test(line)) {
                     type = ConflictType.DELETE_TARGET;
                 }
                 conflicts.push({
                     localPath: localPath,
-                    type: type
+                    type: type,
+                    message: line
                 });
             }
         }

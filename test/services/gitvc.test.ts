@@ -7,7 +7,7 @@
 import { assert } from "chai";
 
 import { GitPullRequest, PullRequestAsyncStatus } from "vso-node-api/interfaces/GitInterfaces";
-import { GitVcService, PullRequestScore }  from "../../src/services/gitvc";
+import { GitVcService, PullRequestScore } from "../../src/services/gitvc";
 
 describe("GitVcService", function() {
 
@@ -16,50 +16,50 @@ describe("GitVcService", function() {
     });
 
     it("should verify GetCreatePullRequestUrl", function() {
-        let url: string = "https://account.visualstudio.com/DefaultCollection/project";
-        let branch: string = "branch";
+        const url: string = "https://account.visualstudio.com/DefaultCollection/project";
+        const branch: string = "branch";
 
         assert.equal(GitVcService.GetCreatePullRequestUrl(url, branch), url + "/pullrequests#_a=createnew&sourceRef=" + branch);
     });
 
     it("should verify GetFileBlameUrl", function() {
-        let url: string = "https://account.visualstudio.com/DefaultCollection/project";
-        let file: string = "team-extension.ts";
-        let branch: string = "branch";
+        const url: string = "https://account.visualstudio.com/DefaultCollection/project";
+        const file: string = "team-extension.ts";
+        const branch: string = "branch";
 
         assert.equal(GitVcService.GetFileBlameUrl(url, file, branch), url + "#path=" + file + "&version=GB" + branch + "&annotate=true");
     });
 
     it("should verify GetFileHistoryUrl", function() {
-        let url: string = "https://account.visualstudio.com/DefaultCollection/project";
-        let file: string = "team-extension.ts";
-        let branch: string = "branch";
+        const url: string = "https://account.visualstudio.com/DefaultCollection/project";
+        const file: string = "team-extension.ts";
+        const branch: string = "branch";
 
         assert.equal(GitVcService.GetFileHistoryUrl(url, file, branch), url + "#path=" + file + "&version=GB" + branch + "&_a=history");
     });
 
     it("should verify GetPullRequestDiscussionUrl", function() {
-        let repositoryUrl: string = "https://account.visualstudio.com/DefaultCollection/_git/project";
-        let id: string = "42";
+        const repositoryUrl: string = "https://account.visualstudio.com/DefaultCollection/_git/project";
+        const id: string = "42";
 
         assert.equal(GitVcService.GetPullRequestDiscussionUrl(repositoryUrl, id), repositoryUrl + "/pullrequest/" + id + "?view=discussion");
     });
 
     it("should verify GetPullRequestsUrl", function() {
-        let repositoryUrl: string = "https://account.visualstudio.com/DefaultCollection/_git/project";
+        const repositoryUrl: string = "https://account.visualstudio.com/DefaultCollection/_git/project";
 
         assert.equal(GitVcService.GetPullRequestsUrl(repositoryUrl), repositoryUrl + "/pullrequests");
     });
 
     it("should verify GetPullRequestDiscussionUrl", function() {
-        let repositoryUrl: string = "https://account.visualstudio.com/DefaultCollection/_git/project";
-        let branch: string = "branch";
+        const repositoryUrl: string = "https://account.visualstudio.com/DefaultCollection/_git/project";
+        const branch: string = "branch";
 
         assert.equal(GitVcService.GetRepositoryHistoryUrl(repositoryUrl, branch), repositoryUrl + "/history" + "?itemVersion=GB" + branch + "&_a=history");
     });
 
     it("should verify failed pull request score", function() {
-        let pullRequest: GitPullRequest = {
+        const pullRequest: GitPullRequest = {
             mergeStatus: PullRequestAsyncStatus.Conflicts,
             _links: undefined,
             closedDate: undefined,

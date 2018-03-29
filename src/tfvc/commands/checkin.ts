@@ -80,7 +80,7 @@ export class Checkin implements ITfvcCommand<string> {
      */
     public async ParseOutput(executionResult: IExecutionResult): Promise<string> {
         if (executionResult.exitCode === 100) {
-            CommandHelper.ProcessErrors(this.GetArguments().GetCommand(), executionResult, true);
+            CommandHelper.ProcessErrors(executionResult);
         } else {
             return CommandHelper.GetChangesetNumber(executionResult.stdout);
         }

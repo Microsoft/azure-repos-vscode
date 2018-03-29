@@ -1,4 +1,4 @@
-#Visual Studio Team Services Extension Contributor Guide
+# Visual Studio Team Services Extension Contributor Guide
 The instructions below will help you set up your development environment to contribute to this repository.
 Make sure you've already cloned the repo.  :smile:
 

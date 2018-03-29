@@ -5,15 +5,15 @@
 "use strict";
 
 import { assert } from "chai";
-const path = require("path");
+import * as path from "path";
 
 import { RepositoryType } from "../../src/contexts/repositorycontext";
-import { ExternalContext }  from "../../src/contexts/externalcontext";
-import { SettingsMock }  from "./contexthelper";
+import { ExternalContext } from "../../src/contexts/externalcontext";
+import { SettingsMock } from "./contexthelper";
 
 describe("ExternalContext", function() {
-    let TEST_REPOS_FOLDER: string = "testrepos";
-    let DOT_GIT_FOLDER: string = "dotgit";
+    const TEST_REPOS_FOLDER: string = "testrepos";
+    const DOT_GIT_FOLDER: string = "dotgit";
 
     beforeEach(function() {
         // console.log("__dirname: " + __dirname);
@@ -21,7 +21,7 @@ describe("ExternalContext", function() {
 
     it("should verify all undefined properties for undefined rootPath", function() {
         //Verify an undefined path does not set any values
-        let ctx: ExternalContext = new ExternalContext(undefined);
+        const ctx: ExternalContext = new ExternalContext(undefined);
 
         assert.equal(ctx.CurrentRef, undefined);
         assert.equal(ctx.CurrentBranch, undefined);
@@ -36,10 +36,10 @@ describe("ExternalContext", function() {
     });
 
     it("should verify values for valid rootPath path", function() {
-        let repoName: string = "gitrepo";
-        let repoPath: string = path.join(__dirname, TEST_REPOS_FOLDER, repoName, DOT_GIT_FOLDER);
-        //let gc: GitContext = new GitContext(repoPath, DOT_GIT_FOLDER);
-        let ctx: ExternalContext = new ExternalContext(repoPath);
+        const repoName: string = "gitrepo";
+        const repoPath: string = path.join(__dirname, TEST_REPOS_FOLDER, repoName, DOT_GIT_FOLDER);
+        //const gc: GitContext = new GitContext(repoPath, DOT_GIT_FOLDER);
+        const ctx: ExternalContext = new ExternalContext(repoPath);
 
         assert.equal(ctx.CurrentRef, undefined);
         assert.equal(ctx.CurrentBranch, undefined);
@@ -54,13 +54,21 @@ describe("ExternalContext", function() {
         assert.equal(ctx.RepoFolder, repoPath);
     });
 
-    it("should verify values for valid rootPath path and settings", async function() {
-        let repoName: string = "gitrepo";
-        let repoPath: string = path.join(__dirname, TEST_REPOS_FOLDER, repoName, DOT_GIT_FOLDER);
-        let ctx: ExternalContext = new ExternalContext(repoPath);
+    it("should cover dispose", function() {
+        const repoName: string = "gitrepo";
+        const repoPath: string = path.join(__dirname, TEST_REPOS_FOLDER, repoName, DOT_GIT_FOLDER);
+        //const gc: GitContext = new GitContext(repoPath, DOT_GIT_FOLDER);
+        const ctx: ExternalContext = new ExternalContext(repoPath);
+        ctx.dispose();
+    });
 
-        let mock: SettingsMock = new SettingsMock(false, undefined, undefined, 1, "https://xplatalm.visualstudio.com", "L2.VSCodeExtension.RC", undefined);
-        let initialized: Boolean = await ctx.Initialize(mock);
+    it("should verify values for valid rootPath path and settings", async function() {
+        const repoName: string = "gitrepo";
+        const repoPath: string = path.join(__dirname, TEST_REPOS_FOLDER, repoName, DOT_GIT_FOLDER);
+        const ctx: ExternalContext = new ExternalContext(repoPath);
+
+        const mock: SettingsMock = new SettingsMock(false, undefined, undefined, 1, "https://xplatalm.visualstudio.com", "L2.VSCodeExtension.RC", undefined, true);
+        const initialized: Boolean = await ctx.Initialize(mock);
 
         assert.isTrue(initialized);
         assert.isTrue(ctx.IsTeamServices);
@@ -71,12 +79,12 @@ describe("ExternalContext", function() {
     });
 
     it("should verify initialize is false for missing RemoteUrl", async function() {
-        let repoName: string = "gitrepo";
-        let repoPath: string = path.join(__dirname, TEST_REPOS_FOLDER, repoName, DOT_GIT_FOLDER);
-        let ctx: ExternalContext = new ExternalContext(repoPath);
+        const repoName: string = "gitrepo";
+        const repoPath: string = path.join(__dirname, TEST_REPOS_FOLDER, repoName, DOT_GIT_FOLDER);
+        const ctx: ExternalContext = new ExternalContext(repoPath);
 
-        let mock: SettingsMock = new SettingsMock(false, undefined, undefined, 1, undefined, "L2.VSCodeExtension.RC", undefined);
-        let initialized: Boolean = await ctx.Initialize(mock);
+        const mock: SettingsMock = new SettingsMock(false, undefined, undefined, 1, undefined, "L2.VSCodeExtension.RC", undefined, true);
+        const initialized: Boolean = await ctx.Initialize(mock);
 
         assert.isFalse(initialized);
         assert.isFalse(ctx.IsSsh);
@@ -88,12 +96,12 @@ describe("ExternalContext", function() {
     });
 
     it("should verify initialize is false for missing TeamProject", async function() {
-        let repoName: string = "gitrepo";
-        let repoPath: string = path.join(__dirname, TEST_REPOS_FOLDER, repoName, DOT_GIT_FOLDER);
-        let ctx: ExternalContext = new ExternalContext(repoPath);
+        const repoName: string = "gitrepo";
+        const repoPath: string = path.join(__dirname, TEST_REPOS_FOLDER, repoName, DOT_GIT_FOLDER);
+        const ctx: ExternalContext = new ExternalContext(repoPath);
 
-        let mock: SettingsMock = new SettingsMock(false, undefined, undefined, 1, "https://xplatalm.visualstudio.com", undefined, undefined);
-        let initialized: Boolean = await ctx.Initialize(mock);
+        const mock: SettingsMock = new SettingsMock(false, undefined, undefined, 1, "https://xplatalm.visualstudio.com", undefined, undefined, true);
+        const initialized: Boolean = await ctx.Initialize(mock);
 
         assert.isFalse(initialized);
         assert.isFalse(ctx.IsSsh);
@@ -105,12 +113,12 @@ describe("ExternalContext", function() {
     });
 
     it("should verify initialize is false for missing RemoteUrl and TeamProject", async function() {
-        let repoName: string = "gitrepo";
-        let repoPath: string = path.join(__dirname, TEST_REPOS_FOLDER, repoName, DOT_GIT_FOLDER);
-        let ctx: ExternalContext = new ExternalContext(repoPath);
+        const repoName: string = "gitrepo";
+        const repoPath: string = path.join(__dirname, TEST_REPOS_FOLDER, repoName, DOT_GIT_FOLDER);
+        const ctx: ExternalContext = new ExternalContext(repoPath);
 
-        let mock: SettingsMock = new SettingsMock(false, undefined, undefined, 1, undefined, undefined, undefined);
-        let initialized: Boolean = await ctx.Initialize(mock);
+        const mock: SettingsMock = new SettingsMock(false, undefined, undefined, 1, undefined, undefined, undefined, true);
+        const initialized: Boolean = await ctx.Initialize(mock);
 
         assert.isFalse(initialized);
         assert.isFalse(ctx.IsSsh);

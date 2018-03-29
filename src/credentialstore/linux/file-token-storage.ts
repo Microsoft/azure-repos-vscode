@@ -4,9 +4,9 @@
 *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-var Q = require("q");
-var fs = require("fs");
-var path = require("path");
+import * as Q from "q";
+import * as fs from "fs";
+import * as path from "path";
 
 /*
     Provides storage of credentials in a file on the local file system.
@@ -22,7 +22,7 @@ export class FileTokenStorage {
     }
 
     public AddEntries(newEntries: Array<any>, existingEntries: Array<any>) : Q.Promise<void> {
-        let entries: Array<any> = existingEntries.concat(newEntries);
+        const entries: Array<any> = existingEntries.concat(newEntries);
         return this.saveEntries(entries);
     }
 
@@ -31,12 +31,12 @@ export class FileTokenStorage {
     }
 
     public LoadEntries() : Q.Promise<any> {
-        let deferred: Q.Deferred<any> = Q.defer();
+        const deferred: Q.Deferred<any> = Q.defer();
         let entries: Array<any> = [];
         let err: any;
 
         try {
-            let content: string = fs.readFileSync(this._filename);
+            const content: string = fs.readFileSync(this._filename, {encoding: "utf8", flag: "r"});
             entries = JSON.parse(content);
             deferred.resolve(entries);
         } catch (ex) {
@@ -52,21 +52,21 @@ export class FileTokenStorage {
         return deferred.promise;
     }
 
-    public RemoveEntries(entriesToRemove: Array<any>, entriesToKeep: Array<any>) : Q.Promise<void> {
+    public RemoveEntries(entriesToKeep: Array<any> /*, entriesToRemove?: Array<any>*/) : Q.Promise<void> {
         return this.saveEntries(entriesToKeep);
     }
 
     private saveEntries(entries: Array<any>) : Q.Promise<void> {
-        let defer: Q.Deferred<void> = Q.defer();
+        const defer: Q.Deferred<void> = Q.defer<void>();
 
-        let writeOptions = {
+        const writeOptions = {
             encoding: "utf8",
             mode: 384, // Permission 0600 - owner read/write, nobody else has access
             flag: "w"
         };
 
         // If the path we want to store in doesn't exist, create it
-        let folder: string = path.dirname(this._filename);
+        const folder: string = path.dirname(this._filename);
         if (!fs.existsSync(folder)) {
             fs.mkdirSync(folder);
         }

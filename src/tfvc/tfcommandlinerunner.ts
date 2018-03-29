@@ -6,8 +6,10 @@
 
 import * as cp from "child_process";
 import { TeamServerContext } from "../contexts/servercontext";
+import { Constants, TelemetryEvents } from "../helpers/constants";
 import { Logger } from "../helpers/logger";
 import { Strings } from "../helpers/strings";
+import { IButtonMessageItem } from "../helpers/vscodeutils.interfaces";
 import { IDisposable, toDisposable, dispose } from "./util";
 import { IArgumentProvider, IExecutionResult, ITfCommandLine } from "./interfaces";
 import { TfvcError, TfvcErrorCodes } from "./tfvcerror";
@@ -15,10 +17,8 @@ import { TfvcRepository } from "./tfvcrepository";
 import { TfvcSettings } from "./tfvcsettings";
 import { TfvcVersion } from "./tfvcversion";
 import { TfvcOutput } from "./tfvcoutput";
-import { Telemetry } from "../services/telemetry";
-import { TfvcTelemetryEvents } from "../helpers/constants";
 
-var _ = require("underscore");
+import * as _ from "underscore";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -32,17 +32,17 @@ export class TfCommandLineRunner {
      */
     public static CreateRepository(serverContext: TeamServerContext, repositoryRootFolder: string, env: any = {}): TfvcRepository {
         const tfvc: ITfCommandLine = TfCommandLineRunner.GetCommandLine();
-        return new TfvcRepository(serverContext, tfvc, repositoryRootFolder, env);
+        return new TfvcRepository(serverContext, tfvc, repositoryRootFolder, env, tfvc.isExe);
     }
 
     public static GetCommandLine(localPath?: string): ITfCommandLine {
         Logger.LogDebug(`TFVC Creating Tfvc object with localPath='${localPath}'`);
         // Get Proxy from settings
-        const settings = new TfvcSettings();
-        const proxy = settings.Proxy;
+        const settings: TfvcSettings = new TfvcSettings();
+        const proxy: string = settings.Proxy;
         Logger.LogDebug(`Using TFS proxy: ${proxy}`);
 
-        let tfvcPath = localPath;
+        let tfvcPath: string = localPath;
         if (!tfvcPath) {
             // get the location from settings
             tfvcPath = settings.Location;
@@ -51,39 +51,36 @@ export class TfCommandLineRunner {
                 Logger.LogWarning(`TFVC Couldn't find where the TF command lives on disk.`);
                 throw new TfvcError({
                     message: Strings.TfvcLocationMissingError,
-                    tfvcErrorCode: TfvcErrorCodes.TfvcLocationMissing
+                    tfvcErrorCode: TfvcErrorCodes.LocationMissing
                 });
             }
         }
 
         // check to make sure that the file exists in that location
-        let exists: boolean = fs.existsSync(tfvcPath);
+        const exists: boolean = fs.existsSync(tfvcPath);
         if (exists) {
             // if it exists, check to ensure that it's a file and not a folder
             const stats: fs.Stats = fs.lstatSync(tfvcPath);
-            if (!stats || !stats.isFile()) {
-                Logger.LogWarning(`TFVC ${tfvcPath} exists but isn't a file.`);
+            if (!stats || (!stats.isFile() && !stats.isSymbolicLink())) {
+                Logger.LogWarning(`TFVC ${tfvcPath} exists but isn't a file or symlink.`);
                 throw new TfvcError({
-                    message: Strings.TfMissingError + tfvcPath,
-                    tfvcErrorCode: TfvcErrorCodes.TfvcNotFound
+                    message: Strings.TfMissingError,
+                    tfvcErrorCode: TfvcErrorCodes.NotFound
                 });
             }
         } else {
             Logger.LogWarning(`TFVC ${tfvcPath} does not exist.`);
             throw new TfvcError({
-                message: Strings.TfMissingError + tfvcPath,
-                tfvcErrorCode: TfvcErrorCodes.TfvcNotFound
+                message: Strings.TfMissingError,
+                tfvcErrorCode: TfvcErrorCodes.NotFound
             });
         }
 
         // Determine the min version
-        const isExe: boolean = path.extname(tfvcPath) === ".exe";
+        const isExe: boolean = path.extname(tfvcPath).toLowerCase() === ".exe";
         let minVersion: string = "14.0.4"; //CLC min version
         if (isExe) {
-            minVersion = "14.0.0";  //Minimum tf.exe version
-            Telemetry.SendEvent(TfvcTelemetryEvents.UsingExe);
-        } else {
-            Telemetry.SendEvent(TfvcTelemetryEvents.UsingClc);
+            minVersion = "14.102.0";  //Minimum tf.exe version
         }
 
         return {
@@ -98,7 +95,7 @@ export class TfCommandLineRunner {
      * This method checks the version of the CLC against the minimum version that we expect.
      * It throws an error if the version does not meet or exceed the minimum.
      */
-    public static CheckVersion(tfvc: ITfCommandLine, version: string) {
+    public static CheckVersion(tfvc: ITfCommandLine, version: string): void {
         if (!version) {
             // If the version isn't set just return
             Logger.LogDebug(`TFVC CheckVersion called without a version.`);
@@ -106,13 +103,23 @@ export class TfCommandLineRunner {
         }
 
         // check the version of TFVC command line
+        Logger.LogDebug(`TFVC Minimum required version: ${tfvc.minVersion}`);
+        Logger.LogDebug(`TFVC (TF.exe, TF.cmd) version: ${version}`);
         const minVersion: TfvcVersion = TfvcVersion.FromString(tfvc.minVersion);
         const curVersion: TfvcVersion = TfvcVersion.FromString(version);
         if (TfvcVersion.Compare(curVersion, minVersion) < 0) {
             Logger.LogWarning(`TFVC ${version} is less that the min version of ${tfvc.minVersion}.`);
+            let options: IButtonMessageItem[] = [];
+            if (tfvc.isExe) {
+                //Provide more information on how to update tf.exe to the minimum version required
+                options =  [{ title : Strings.VS2015Update3CSR,
+                            url : Constants.VS2015U3CSRUrl,
+                            telemetryId: TelemetryEvents.VS2015U3CSR }];
+            }
             throw new TfvcError({
-                message: Strings.TfVersionWarning + minVersion.ToString(),
-                tfvcErrorCode: TfvcErrorCodes.TfvcMinVersionWarning
+                message: `${Strings.TfVersionWarning}${minVersion.ToString()}`,
+                messageOptions: options,
+                tfvcErrorCode: TfvcErrorCodes.MinVersionWarning
             });
         }
     }
@@ -236,16 +243,16 @@ export class TfCommandLineRunner {
                 once(child, "error", e);
                 once(child, "exit", c);
             }),
-            new Promise<string>(c => {
+            new Promise<string>((c) => {
                 const buffers: string[] = [];
-                on(child.stdout, "data", b => {
+                on(child.stdout, "data", (b) => {
                     buffers.push(b);
                 });
                 once(child.stdout, "close", () => {
                     let stdout: string = buffers.join("");
                     if (isExe) {
                         // TF.exe repeats the command line as part of the standard out when using the @ response file options
-                        // So, we look for the noprompt option to let us know where that line is so we can strip it off
+                        // So, we look for the noprompt option to allow us to know where that line is so we can strip it off
                         const start: number = stdout.indexOf("-noprompt");
                         if (start >= 0) {
                             const end: number = stdout.indexOf("\n", start);
@@ -255,9 +262,9 @@ export class TfCommandLineRunner {
                     c(stdout);
                 });
             }),
-            new Promise<string>(c => {
+            new Promise<string>((c) => {
                 const buffers: string[] = [];
-                on(child.stderr, "data", b => buffers.push(b));
+                on(child.stderr, "data", (b) => buffers.push(b));
                 once(child.stderr, "close", () => c(buffers.join("")));
             })
         ]);

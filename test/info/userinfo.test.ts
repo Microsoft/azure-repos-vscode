@@ -11,7 +11,7 @@ import { UserInfo } from "../../src/info/userinfo";
 describe("UserInfo", function() {
 
     it("should verify the constructor sets the proper values", function() {
-        let user: UserInfo = new UserInfo("id", "providerDisplayName", "customDisplayName");
+        const user: UserInfo = new UserInfo("id", "providerDisplayName", "customDisplayName");
         assert.equal(user.Id, "id");
         assert.equal(user.ProviderDisplayName, "providerDisplayName");
         assert.equal(user.CustomDisplayName, "customDisplayName");

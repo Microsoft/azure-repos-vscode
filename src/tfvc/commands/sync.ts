@@ -12,7 +12,7 @@ import { CommandHelper } from "./commandhelper";
 /**
  * This command gets the latest version of one or more files or folders
  * (we add the switch nosummary to make sure that errors only print once)
- * 
+ *
  * tf get [itemspec] [/version:versionspec] [/all] [/overwrite] [/force] [/remap]
  * [/recursive] [/preview] [/noautoresolve] [/noprompt]
  * [/login:username,[password]]
@@ -50,14 +50,14 @@ export class Sync implements ITfvcCommand<ISyncResults> {
      * D:\tmp\test:
      * Getting addFold
      * Getting addFold-branch
-     * 
+     *
      * D:\tmp\test\addFold-branch:
      * Getting testHereRename.txt
-     * 
+     *
      * D:\tmp\test\addFold:
      * Getting testHere3
      * Getting testHereRename7.txt
-     * 
+     *
      * D:\tmp\test:
      * Getting Rename2.txt
      * Getting test3.txt
@@ -68,7 +68,7 @@ export class Sync implements ITfvcCommand<ISyncResults> {
     public async ParseOutput(executionResult: IExecutionResult): Promise<ISyncResults> {
         // Any exit code other than 0 or 1 means that something went wrong, so simply throw the error
         if (executionResult.exitCode !== 0 && executionResult.exitCode !== 1) {
-            CommandHelper.ProcessErrors(this.GetArguments().GetCommand(), executionResult);
+            CommandHelper.ProcessErrors(executionResult);
         }
 
         // Check for up to date message (slightly different in EXE and CLC)
@@ -84,8 +84,8 @@ export class Sync implements ITfvcCommand<ISyncResults> {
             const itemResults: ISyncItemResult[] = this.getItemResults(executionResult.stdout);
             const errorMessages: ISyncItemResult[] = this.getErrorMessages(executionResult.stderr);
             return {
-                hasConflicts: errorMessages.filter(err => err.syncType === SyncType.Conflict).length > 0,
-                hasErrors: errorMessages.filter(err => err.syncType !== SyncType.Conflict).length > 0,
+                hasConflicts: errorMessages.filter((err) => err.syncType === SyncType.Conflict).length > 0,
+                hasErrors: errorMessages.filter((err) => err.syncType !== SyncType.Conflict).length > 0,
                 itemResults: itemResults.concat(errorMessages)
             };
         }
@@ -112,15 +112,15 @@ export class Sync implements ITfvcCommand<ISyncResults> {
     }
 
     private getItemResults(stdout: string): ISyncItemResult[] {
-        let itemResults: ISyncItemResult[] = [];
+        const itemResults: ISyncItemResult[] = [];
         let folderPath: string = "";
         const lines: string[] = CommandHelper.SplitIntoLines(stdout, true, true);
-        for (let i = 0; i < lines.length; i++) {
+        for (let i: number = 0; i < lines.length; i++) {
             const line = lines[i];
             if (CommandHelper.IsFilePath(line)) {
                 folderPath = line;
             } else if (line) {
-                let sr: ISyncItemResult = this.getSyncResultFromLine(folderPath, line);
+                const sr: ISyncItemResult = this.getSyncResultFromLine(folderPath, line);
                 if (sr) {
                     itemResults.push(sr);
                 }
@@ -151,14 +151,14 @@ export class Sync implements ITfvcCommand<ISyncResults> {
                 itemPath: CommandHelper.GetFilePath(folderPath, line.slice("Deleting ".length).trim())
             };
         } else if (line.startsWith("Conflict ")) {
-            let dashIndex = line.lastIndexOf("-");
+            const dashIndex = line.lastIndexOf("-");
             newResult = {
                 syncType: SyncType.Conflict,
                 itemPath: CommandHelper.GetFilePath(folderPath, line.slice("Conflict ".length, dashIndex).trim()),
                 message: line.slice(dashIndex + 1).trim()
             };
         } else if (line.startsWith("Warning ")) {
-            let dashIndex = line.lastIndexOf("-");
+            const dashIndex = line.lastIndexOf("-");
             newResult = {
                 syncType: SyncType.Warning,
                 itemPath: CommandHelper.GetFilePath(folderPath, line.slice("Warning ".length, dashIndex).trim()),
@@ -166,7 +166,7 @@ export class Sync implements ITfvcCommand<ISyncResults> {
             };
         } else {
             // This must be an error. Usually of the form "filename - message" or "filename cannot be deleted reason"
-            let index = line.lastIndexOf("-");
+            let index: number = line.lastIndexOf("-");
             if (index >= 0) {
                 newResult = {
                     syncType: SyncType.Error,
@@ -197,9 +197,9 @@ export class Sync implements ITfvcCommand<ISyncResults> {
      * D:\tmp\vscodeBugBash\folder1 cannot be deleted because it is not empty.
      */
     private getErrorMessages(stderr: string): ISyncItemResult[] {
-        let errorMessages: ISyncItemResult[] = [];
+        const errorMessages: ISyncItemResult[] = [];
         const lines: string[] = CommandHelper.SplitIntoLines(stderr, false, true);
-        for (let i = 0; i < lines.length; i++) {
+        for (let i: number = 0; i < lines.length; i++) {
             // stderr doesn't get any file path lines, so the files will all be just the filenames
             errorMessages.push(this.getSyncResultFromLine("", lines[i]));
         }

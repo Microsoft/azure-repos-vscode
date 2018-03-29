@@ -5,7 +5,7 @@
 "use strict";
 
 import { assert } from "chai";
-import { Logger, LoggingLevel }  from "../../src/helpers/logger";
+import { Logger, LoggingLevel } from "../../src/helpers/logger";
 
 describe("Logger", function() {
 
@@ -46,8 +46,8 @@ describe("Logger", function() {
     });
 
     it("should ensure getNow()", function() {
-        let now: string = Logger.Now;  //calls private getNow()
-        let date: number = Date.parse(now);
+        const now: string = Logger.Now;  //calls private getNow()
+        const date: number = Date.parse(now);
         assert.isDefined(date);
     });
 

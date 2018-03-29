@@ -15,11 +15,11 @@ import { CredentialInfo } from "../../../src/info/credentialinfo";
 import { RepositoryInfo } from "../../../src/info/repositoryinfo";
 
 describe("Tfvc-GetInfoCommand", function() {
-    let serverUrl: string = "http://server:8080/tfs";
-    let repoUrl: string = "http://server:8080/tfs/collection1/_git/repo1";
-    let collectionUrl: string = "http://server:8080/tfs/collection1";
-    let user: string = "user1";
-    let pass: string = "pass1";
+    const serverUrl: string = "http://server:8080/tfs";
+    const repoUrl: string = "http://server:8080/tfs/collection1/_git/repo1";
+    const collectionUrl: string = "http://server:8080/tfs/collection1";
+    const user: string = "user1";
+    const pass: string = "pass1";
     let context: TeamServerContext;
 
     beforeEach(function() {
@@ -43,12 +43,12 @@ describe("Tfvc-GetInfoCommand", function() {
     });
 
     it("should verify constructor", function() {
-        let localPaths: string[] = ["/path/to/workspace"];
+        const localPaths: string[] = ["/path/to/workspace"];
         new GetInfo(undefined, localPaths);
     });
 
     it("should verify constructor with context", function() {
-        let localPaths: string[] = ["/path/to/workspace"];
+        const localPaths: string[] = ["/path/to/workspace"];
         new GetInfo(context, localPaths);
     });
 
@@ -57,62 +57,62 @@ describe("Tfvc-GetInfoCommand", function() {
     });
 
     it("should verify GetOptions", function() {
-        let localPaths: string[] = ["/path/to/workspace"];
-        let cmd: GetInfo = new GetInfo(undefined, localPaths);
+        const localPaths: string[] = ["/path/to/workspace"];
+        const cmd: GetInfo = new GetInfo(undefined, localPaths);
         assert.deepEqual(cmd.GetOptions(), {});
     });
 
     it("should verify GetExeOptions", function() {
-        let localPaths: string[] = ["/path/to/workspace"];
-        let cmd: GetInfo = new GetInfo(undefined, localPaths);
+        const localPaths: string[] = ["/path/to/workspace"];
+        const cmd: GetInfo = new GetInfo(undefined, localPaths);
         assert.deepEqual(cmd.GetExeOptions(), {});
     });
 
     it("should verify arguments", function() {
-        let localPaths: string[] = ["/path/to/workspace"];
-        let cmd: GetInfo = new GetInfo(undefined, localPaths);
+        const localPaths: string[] = ["/path/to/workspace"];
+        const cmd: GetInfo = new GetInfo(undefined, localPaths);
 
         assert.equal(cmd.GetArguments().GetArgumentsForDisplay(), "info -noprompt " + localPaths[0]);
     });
 
     it("should verify arguments with context", function() {
-        let localPaths: string[] = ["/path/to/workspace"];
-        let cmd: GetInfo = new GetInfo(context, localPaths);
+        const localPaths: string[] = ["/path/to/workspace"];
+        const cmd: GetInfo = new GetInfo(context, localPaths);
 
         assert.equal(cmd.GetArguments().GetArgumentsForDisplay(), "info -noprompt -collection:" + collectionUrl + " ******** " + localPaths[0]);
     });
 
     it("should verify GetExeArguments", function() {
-        let localPaths: string[] = ["/path/to/workspace"];
-        let cmd: GetInfo = new GetInfo(undefined, localPaths);
+        const localPaths: string[] = ["/path/to/workspace"];
+        const cmd: GetInfo = new GetInfo(undefined, localPaths);
 
         assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "info -noprompt " + localPaths[0]);
     });
 
     it("should verify GetExeArguments with context", function() {
-        let localPaths: string[] = ["/path/to/workspace"];
-        let cmd: GetInfo = new GetInfo(context, localPaths);
+        const localPaths: string[] = ["/path/to/workspace"];
+        const cmd: GetInfo = new GetInfo(context, localPaths);
 
         assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "info -noprompt -collection:" + collectionUrl + " ******** " + localPaths[0]);
     });
 
     it("should verify parse output - no output", async function() {
-        let localPaths: string[] = ["/path/to/workspace"];
-        let cmd: GetInfo = new GetInfo(undefined, localPaths);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/path/to/workspace"];
+        const cmd: GetInfo = new GetInfo(undefined, localPaths);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: undefined,
             stderr: undefined
         };
 
-        let itemInfos: IItemInfo[] = await cmd.ParseOutput(executionResult);
+        const itemInfos: IItemInfo[] = await cmd.ParseOutput(executionResult);
         assert.equal(itemInfos.length, 0);
     });
 
     it("should verify parse output - single item", async function() {
-        let localPaths: string[] = ["/path/to/workspace"];
-        let cmd: GetInfo = new GetInfo(undefined, localPaths);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/path/to/workspace"];
+        const cmd: GetInfo = new GetInfo(undefined, localPaths);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: "Local information:\n" +
                     "Local path:  /path/to/file.txt\n" +
@@ -133,7 +133,7 @@ describe("Tfvc-GetInfoCommand", function() {
             stderr: undefined
         };
 
-        let itemInfos: IItemInfo[] = await cmd.ParseOutput(executionResult);
+        const itemInfos: IItemInfo[] = await cmd.ParseOutput(executionResult);
         assert.equal(itemInfos.length, 1);
         assert.equal(itemInfos[0].localItem, "/path/to/file.txt");
         assert.equal(itemInfos[0].serverItem, "$/TFVC_1/file.txt");
@@ -150,9 +150,9 @@ describe("Tfvc-GetInfoCommand", function() {
     });
 
     it("should verify parse output - multiple items", async function() {
-        let localPaths: string[] = ["/path/to/workspace/file.txt", "/path/to/workspace/file2.txt"];
-        let cmd: GetInfo = new GetInfo(undefined, localPaths);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/path/to/workspace/file.txt", "/path/to/workspace/file2.txt"];
+        const cmd: GetInfo = new GetInfo(undefined, localPaths);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: "Local information:\n" +
                     "Local path:  /path/to/file.txt\n" +
@@ -190,7 +190,7 @@ describe("Tfvc-GetInfoCommand", function() {
             stderr: undefined
         };
 
-        let itemInfos: IItemInfo[] = await cmd.ParseOutput(executionResult);
+        const itemInfos: IItemInfo[] = await cmd.ParseOutput(executionResult);
         assert.equal(itemInfos.length, 2);
         assert.equal(itemInfos[0].localItem, "/path/to/file.txt");
         assert.equal(itemInfos[0].serverItem, "$/TFVC_1/file.txt");
@@ -219,9 +219,9 @@ describe("Tfvc-GetInfoCommand", function() {
     });
 
     it("should verify parse output - multiple items with errors", async function() {
-        let localPaths: string[] = ["/path/to/workspace/file.txt", "nomatch", "/path/to/workspace/file2.txt"];
-        let cmd: GetInfo = new GetInfo(undefined, localPaths);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/path/to/workspace/file.txt", "nomatch", "/path/to/workspace/file2.txt"];
+        const cmd: GetInfo = new GetInfo(undefined, localPaths);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: "Local information:\n" +
                     "Local path:  /path/to/file.txt\n" +
@@ -261,7 +261,7 @@ describe("Tfvc-GetInfoCommand", function() {
             stderr: undefined
         };
 
-        let itemInfos: IItemInfo[] = await cmd.ParseOutput(executionResult);
+        const itemInfos: IItemInfo[] = await cmd.ParseOutput(executionResult);
         assert.equal(itemInfos.length, 3);
         assert.equal(itemInfos[0].localItem, "/path/to/file.txt");
         assert.equal(itemInfos[0].serverItem, "$/TFVC_1/file.txt");
@@ -291,9 +291,9 @@ describe("Tfvc-GetInfoCommand", function() {
     });
 
     it("should verify parse output - all errors", async function() {
-        let localPaths: string[] = ["/path/to/workspace/file.txt", "/path/to/workspace/file2.txt"];
-        let cmd: GetInfo = new GetInfo(undefined, localPaths);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/path/to/workspace/file.txt", "/path/to/workspace/file2.txt"];
+        const cmd: GetInfo = new GetInfo(undefined, localPaths);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: "No items match /path/to/workspace/file.txt\n" +
                     "\n" +
@@ -305,7 +305,7 @@ describe("Tfvc-GetInfoCommand", function() {
             await cmd.ParseExeOutput(executionResult);
         } catch (err) {
             assert.isTrue(err.message.startsWith(Strings.NoMatchesFound));
-            assert.equal(err.tfvcErrorCode, TfvcErrorCodes.TfvcNoItemsMatch);
+            assert.equal(err.tfvcErrorCode, TfvcErrorCodes.NoItemsMatch);
         }
     });
 
@@ -314,22 +314,22 @@ describe("Tfvc-GetInfoCommand", function() {
      ***********************************************************************************************/
 
     it("should verify parse EXE output - no output", async function() {
-        let localPaths: string[] = ["/path/to/workspace"];
-        let cmd: GetInfo = new GetInfo(undefined, localPaths);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/path/to/workspace"];
+        const cmd: GetInfo = new GetInfo(undefined, localPaths);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: undefined,
             stderr: undefined
         };
 
-        let itemInfos: IItemInfo[] = await cmd.ParseExeOutput(executionResult);
+        const itemInfos: IItemInfo[] = await cmd.ParseExeOutput(executionResult);
         assert.equal(itemInfos.length, 0);
     });
 
     it("should verify parse EXE output - single item", async function() {
-        let localPaths: string[] = ["/path/to/workspace"];
-        let cmd: GetInfo = new GetInfo(undefined, localPaths);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/path/to/workspace"];
+        const cmd: GetInfo = new GetInfo(undefined, localPaths);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: "Local information:\n" +
                     "Local path:  /path/to/file.txt\n" +
@@ -350,7 +350,7 @@ describe("Tfvc-GetInfoCommand", function() {
             stderr: undefined
         };
 
-        let itemInfos: IItemInfo[] = await cmd.ParseExeOutput(executionResult);
+        const itemInfos: IItemInfo[] = await cmd.ParseExeOutput(executionResult);
         assert.equal(itemInfos.length, 1);
         assert.equal(itemInfos[0].localItem, "/path/to/file.txt");
         assert.equal(itemInfos[0].serverItem, "$/TFVC_1/file.txt");
@@ -367,9 +367,9 @@ describe("Tfvc-GetInfoCommand", function() {
     });
 
     it("should verify parse EXE output - multiple items", async function() {
-        let localPaths: string[] = ["/path/to/workspace/file.txt", "/path/to/workspace/file2.txt"];
-        let cmd: GetInfo = new GetInfo(undefined, localPaths);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/path/to/workspace/file.txt", "/path/to/workspace/file2.txt"];
+        const cmd: GetInfo = new GetInfo(undefined, localPaths);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: "Local information:\n" +
                     "Local path:  /path/to/file.txt\n" +
@@ -406,7 +406,7 @@ describe("Tfvc-GetInfoCommand", function() {
             stderr: undefined
         };
 
-        let itemInfos: IItemInfo[] = await cmd.ParseExeOutput(executionResult);
+        const itemInfos: IItemInfo[] = await cmd.ParseExeOutput(executionResult);
         assert.equal(itemInfos.length, 2);
         assert.equal(itemInfos[0].localItem, "/path/to/file.txt");
         assert.equal(itemInfos[0].serverItem, "$/TFVC_1/file.txt");
@@ -435,9 +435,9 @@ describe("Tfvc-GetInfoCommand", function() {
     });
 
     it("should verify parse EXE output - multiple items with errors", async function() {
-        let localPaths: string[] = ["/path/to/workspace/file.txt", "nomatch", "/path/to/workspace/file2.txt"];
-        let cmd: GetInfo = new GetInfo(undefined, localPaths);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/path/to/workspace/file.txt", "nomatch", "/path/to/workspace/file2.txt"];
+        const cmd: GetInfo = new GetInfo(undefined, localPaths);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: "Local information:\n" +
                     "Local path:  /path/to/file.txt\n" +
@@ -475,7 +475,7 @@ describe("Tfvc-GetInfoCommand", function() {
             stderr: undefined
         };
 
-        let itemInfos: IItemInfo[] = await cmd.ParseExeOutput(executionResult);
+        const itemInfos: IItemInfo[] = await cmd.ParseExeOutput(executionResult);
         assert.equal(itemInfos.length, 3);
         assert.equal(itemInfos[0].localItem, "/path/to/file.txt");
         assert.equal(itemInfos[0].serverItem, "$/TFVC_1/file.txt");
@@ -505,9 +505,9 @@ describe("Tfvc-GetInfoCommand", function() {
     });
 
     it("should verify parse EXE output - all errors", async function() {
-        let localPaths: string[] = ["/path/to/workspace/file.txt", "/path/to/workspace/file2.txt"];
-        let cmd: GetInfo = new GetInfo(undefined, localPaths);
-        let executionResult: IExecutionResult = {
+        const localPaths: string[] = ["/path/to/workspace/file.txt", "/path/to/workspace/file2.txt"];
+        const cmd: GetInfo = new GetInfo(undefined, localPaths);
+        const executionResult: IExecutionResult = {
             exitCode: 0,
             stdout: "No items match /path/to/workspace/file.txt\n" +
                     "No items match /path/to/workspace/file2.txt\n",
@@ -518,7 +518,7 @@ describe("Tfvc-GetInfoCommand", function() {
             await cmd.ParseExeOutput(executionResult);
         } catch (err) {
             assert.isTrue(err.message.startsWith(Strings.NoMatchesFound));
-            assert.equal(err.tfvcErrorCode, TfvcErrorCodes.TfvcNoItemsMatch);
+            assert.equal(err.tfvcErrorCode, TfvcErrorCodes.NoItemsMatch);
         }
     });
 });

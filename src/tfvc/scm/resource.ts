@@ -6,14 +6,15 @@
 
 import * as path from "path";
 
-import { SCMResource, SCMResourceDecorations, Uri } from "vscode";
+import { Command, SourceControlResourceState, SourceControlResourceDecorations, Uri } from "vscode";
 import { IConflict, IPendingChange } from "../interfaces";
 import { TfvcSCMProvider } from "../tfvcscmprovider";
 import { ConflictType, GetStatuses, Status } from "./status";
 import { DecorationProvider } from "./decorationprovider";
 import { Strings } from "../../helpers/strings";
+import { TfvcCommandNames } from "../../helpers/constants";
 
-export class Resource implements SCMResource {
+export class Resource implements SourceControlResourceState {
     private _uri: Uri;
     private _statuses: Status[];
     private _change: IPendingChange;
@@ -36,7 +37,7 @@ export class Resource implements SCMResource {
     public get ConflictType(): ConflictType { return this._conflictType; }
 
     public HasStatus(status: Status): boolean {
-        return this._statuses.findIndex(s => s === status) >= 0;
+        return this._statuses.findIndex((s) => s === status) >= 0;
     }
 
     get IsVersioned(): boolean { return this._version !== "0"; }
@@ -82,10 +83,14 @@ export class Resource implements SCMResource {
         return "";
     }
 
-    /* Implement SCMResource */
-    get uri(): Uri { return this._uri; }
-    get decorations(): SCMResourceDecorations {
+    /* Implement SourceControlResourceState */
+    get resourceUri(): Uri { return this._uri; }
+    get decorations(): SourceControlResourceDecorations {
         // TODO Add conflict type to the resource constructor and pass it here
         return DecorationProvider.getDecorations(this._statuses);
+    }
+    //Set the command to invoke when a Resource is selected in the viewlet
+    get command(): Command {
+        return { command: TfvcCommandNames.Open, title: "Open", arguments: [this] };
     }
 }
