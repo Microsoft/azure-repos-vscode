@@ -154,7 +154,9 @@ describe("Tfvc-ResolveConflictsCommand", function() {
             await cmd.ParseOutput(executionResult);
         } catch (err) {
             assert.equal(err.exitCode, 100);
+            assert.equal(err.tfvcCommand, "resolve");
             assert.isTrue(err.message.startsWith(Strings.TfExecFailedError));
+            assert.isTrue(err.stdout.startsWith("Something bad this way comes."));
         }
     });
 
@@ -206,7 +208,63 @@ describe("Tfvc-ResolveConflictsCommand", function() {
             await cmd.ParseExeOutput(executionResult);
         } catch (err) {
             assert.equal(err.exitCode, 100);
+            assert.equal(err.tfvcCommand, "resolve");
             assert.isTrue(err.message.startsWith(Strings.TfExecFailedError));
+            assert.isTrue(err.stdout.startsWith("Something bad this way comes."));
+        }
+    });
+
+    /***********************************************************************************************
+     * The methods below are duplicates of the parse output methods but call the parseExeOutput.
+     ***********************************************************************************************/
+
+    it("should verify parse EXE output - no output", async function() {
+        const localPaths: string[] = ["/usr/alias/repo1/file.txt"];
+        const cmd: ResolveConflicts = new ResolveConflicts(undefined, localPaths, AutoResolveType.KeepYours);
+        const executionResult: IExecutionResult = {
+            exitCode: 0,
+            stdout: undefined,
+            stderr: undefined
+        };
+
+        const results: IConflict[] = await cmd.ParseExeOutput(executionResult);
+        assert.equal(results.length, 0);
+    });
+
+    it("should verify parse EXE output - no errors", async function() {
+        const localPaths: string[] = ["/usr/alias/repo1/file.txt", "/usr/alias/repo1/file2.txt"];
+        const cmd: ResolveConflicts = new ResolveConflicts(undefined, localPaths, AutoResolveType.KeepYours);
+        const executionResult: IExecutionResult = {
+            exitCode: 0,
+            stdout: "Resolved /usr/alias/repo1/file.txt as KeepYours\n" +
+                    "Resolved /usr/alias/repo1/file2.txt as KeepYours",
+            stderr: undefined
+        };
+
+        const results: IConflict[] = await cmd.ParseExeOutput(executionResult);
+        assert.equal(results.length, 2);
+        assert.equal(results[0].localPath, "/usr/alias/repo1/file.txt");
+        assert.equal(results[0].type, ConflictType.RESOLVED);
+        assert.equal(results[1].localPath, "/usr/alias/repo1/file2.txt");
+        assert.equal(results[1].type, ConflictType.RESOLVED);
+    });
+
+    it("should verify parse EXE output - errors - exit code 100", async function() {
+        const localPaths: string[] = ["/usr/alias/repo1/file.txt"];
+        const cmd: ResolveConflicts = new ResolveConflicts(undefined, localPaths, AutoResolveType.KeepYours);
+        const executionResult: IExecutionResult = {
+            exitCode: 100,
+            stdout: "Something bad this way comes.",
+            stderr: undefined
+        };
+
+        try {
+            await cmd.ParseExeOutput(executionResult);
+        } catch (err) {
+            assert.equal(err.exitCode, 100);
+            assert.equal(err.tfvcCommand, "resolve");
+            assert.equal(err.message.indexOf(Strings.TfExecFailedError), 0);
+            assert.equal(err.stdout.indexOf("Something bad this way comes."), 0);
         }
     });
 });

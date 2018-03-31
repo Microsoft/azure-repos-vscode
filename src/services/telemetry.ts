@@ -95,7 +95,7 @@ export class Telemetry {
             hostname = os.hostname();
         }
 
-        const value: string = `${username}@${hostname}-VSTS`;
+        const value: string = `${username}@${hostname}`;
         Telemetry._userId = crypto.createHash("sha1").update(value).digest("hex");
     }
 

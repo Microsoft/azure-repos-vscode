@@ -55,7 +55,7 @@ export class GetFileContent implements ITfvcCommand<string> {
         }
 
         // Throw if any OTHER errors are found in stderr or if exitcode is not 0
-        CommandHelper.ProcessErrors(executionResult);
+        CommandHelper.ProcessErrors(this.GetArguments().GetCommand(), executionResult);
 
         // Split the lines to take advantage of the WARNing skip logic and rejoin them to return
         const lines: string[] = CommandHelper.SplitIntoLines(executionResult.stdout);

@@ -30,12 +30,23 @@ export class FeedbackClient {
                     return;
                 }
 
+                //User does not need to provide any feedback text
+                let providedEmail: string = "";
+                const email: string = await window.showInputBox({ value: undefined, prompt: Strings.SendEmailPrompt, placeHolder: undefined, password: false });
+                if (email === undefined) {
+                    const disposable = window.setStatusBarMessage(Strings.NoFeedbackSent);
+                    setTimeout(() => disposable.dispose(), 1000 * 5);
+                    return;
+                }
+                if (email) {
+                    providedEmail = email;
+                }
                 //This feedback will go no matter whether Application Insights is enabled or not.
                 let trimmedValue: string = value.trim();
                 if (trimmedValue.length > 1000) {
                     trimmedValue = trimmedValue.substring(0, 1000);
                 }
-                Telemetry.SendFeedback(choice.id, { "VSCode.Feedback.Comment" : trimmedValue } );
+                Telemetry.SendFeedback(choice.id, { "VSCode.Feedback.Comment" : trimmedValue, "VSCode.Feedback.Email" : providedEmail} );
 
                 const disposable: Disposable = window.setStatusBarMessage(Strings.ThanksForFeedback);
                 setTimeout(() => disposable.dispose(), 1000 * 5);

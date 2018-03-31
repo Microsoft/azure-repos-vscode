@@ -68,7 +68,7 @@ export class Sync implements ITfvcCommand<ISyncResults> {
     public async ParseOutput(executionResult: IExecutionResult): Promise<ISyncResults> {
         // Any exit code other than 0 or 1 means that something went wrong, so simply throw the error
         if (executionResult.exitCode !== 0 && executionResult.exitCode !== 1) {
-            CommandHelper.ProcessErrors(executionResult);
+            CommandHelper.ProcessErrors(this.GetArguments().GetCommand(), executionResult);
         }
 
         // Check for up to date message (slightly different in EXE and CLC)

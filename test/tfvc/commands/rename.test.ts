@@ -169,11 +169,12 @@ describe("Tfvc-RenameCommand", function() {
             await cmd.ParseOutput(executionResult);
         } catch (err) {
             assert.equal(err.exitCode, 100);
+            assert.equal(err.tfvcCommand, "rename");
             assert.equal(err.tfvcErrorCode, TfvcErrorCodes.FileNotInWorkspace);
         }
     });
 
-    it("should verify parse output - error exit code", async function() {
+    it("should verify parse output - error exit code, stdout", async function() {
         const startPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/";
         const sourcePath: string = path.join(startPath, "README.md");
         const destinationPath: string = path.join(startPath, "READU.md");
@@ -189,7 +190,9 @@ describe("Tfvc-RenameCommand", function() {
             await cmd.ParseOutput(executionResult);
         } catch (err) {
             assert.equal(err.exitCode, 42);
+            assert.equal(err.tfvcCommand, "rename");
             assert.isTrue(err.message.startsWith(Strings.TfExecFailedError));
+            assert.isTrue(err.stdout.startsWith("Something bad this way comes."));
         }
     });
 
@@ -261,11 +264,12 @@ describe("Tfvc-RenameCommand", function() {
             await cmd.ParseExeOutput(executionResult);
         } catch (err) {
             assert.equal(err.exitCode, 100);
+            assert.equal(err.tfvcCommand, "rename");
             assert.equal(err.tfvcErrorCode, TfvcErrorCodes.FileNotInWorkspace);
         }
     });
 
-    it("should verify parse EXE output - error exit code", async function() {
+    it("should verify parse EXE output - error exit code, stdout", async function() {
         const startPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/";
         const sourcePath: string = path.join(startPath, "README.md");
         const destinationPath: string = path.join(startPath, "READU.md");
@@ -281,7 +285,9 @@ describe("Tfvc-RenameCommand", function() {
             await cmd.ParseExeOutput(executionResult);
         } catch (err) {
             assert.equal(err.exitCode, 42);
+            assert.equal(err.tfvcCommand, "rename");
             assert.isTrue(err.message.startsWith(Strings.TfExecFailedError));
+            assert.isTrue(err.stdout.startsWith("Something bad this way comes."));
         }
     });
 });

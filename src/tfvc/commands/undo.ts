@@ -62,7 +62,7 @@ export class Undo implements ITfvcCommand<string[]> {
                 return [];
             } else if (executionResult.exitCode !== 1) {
                 //Otherwise, some other error occurred, const that be thrown.
-                CommandHelper.ProcessErrors(executionResult);
+                CommandHelper.ProcessErrors(this.GetArguments().GetCommand(), executionResult);
             }
         }
 
