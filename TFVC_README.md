@@ -92,6 +92,11 @@ on how to do the same.
 If you are connecting to Team Foundation Server, you will only need your NTLM credentials (domain name, account name
 and password). It is assumed that you have the proper permissions on the TFS Server.
 
+If you need to use Basic Auth in place of NTLM, you can add the following entry to Settings (**File > Preferences > Settings**):
+```javascript
+    "tfvc.forceBasicAuth": true
+```
+
 ## Configure TFVC Support
 To configure TFVC support, you must provide the location to the TF command line client used by the extension to perform
 TFVC actions. To set this location, add the following entry to Settings (**File > Preferences > Settings**):

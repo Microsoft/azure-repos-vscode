@@ -290,6 +290,11 @@
           "type": "boolean",
           "default": false,
           "description": "[Optional for TFVC] Restricts the TFVC workspace to the currently open VS Code workspace."
+        },
+        "tfvc.forceBasicAuth": {
+          "type": "boolean",
+          "default": false,
+          "description": "[Optional for TFVC] Forces Basic Auth when username/password are provided (in place of NTLM)."
         }
       }
     },

@@ -9,6 +9,7 @@ import { getBasicHandler } from "vso-node-api/WebApi";
 import { getNtlmHandler } from "vso-node-api/WebApi";
 import { Constants } from "../helpers/constants";
 import { UserAgentProvider } from "../helpers/useragentprovider";
+import { TfvcSettings } from "../tfvc/tfvcsettings";
 
 // This class creates an IRequestHandler so we can send our own custom user-agent string
 export class ExtensionRequestHandler implements IRequestHandler {
@@ -23,12 +24,19 @@ export class ExtensionRequestHandler implements IRequestHandler {
 
     constructor(username: string, password?: string, domain?: string, workstation?: string) {
         if (username !== undefined && password !== undefined) {
-            // NTLM (we don't support Basic auth)
-            this._username = username;
-            this._password = password;
-            this._domain = domain;
-            this._workstation = workstation;
-            this._credentialHandler = getNtlmHandler(this._username, this._password, this._domain, this._workstation);
+            const settings = new TfvcSettings();
+
+            if (settings.ForceBasicAuth) {
+                this._username = username;
+                this._password = password;
+                this._credentialHandler = getBasicHandler(this._username, this._password);
+            } else {
+                this._username = username;
+                this._password = password;
+                this._domain = domain;
+                this._workstation = workstation;
+                this._credentialHandler = getNtlmHandler(this._username, this._password, this._domain, this._workstation);
+            }
         } else {
             // Personal Access Token
             this._username = Constants.OAuth;

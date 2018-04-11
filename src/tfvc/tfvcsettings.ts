@@ -14,6 +14,7 @@ export class TfvcSettings extends BaseSettings {
     private _location: string;
     private _proxy: string;
     private _restrictWorkspace: boolean;
+    private _forceBasicAuth: boolean;
 
     constructor() {
         super();
@@ -29,6 +30,7 @@ export class TfvcSettings extends BaseSettings {
         }
         this._proxy = this.readSetting<string>(SettingNames.Proxy, undefined);
         this._restrictWorkspace = this.readSetting<boolean>(SettingNames.RestrictWorkspace, false);
+        this._forceBasicAuth = this.readSetting<boolean>(SettingNames.ForceBasicAuth, false);
     }
 
     public get Location(): string {
@@ -42,10 +44,15 @@ export class TfvcSettings extends BaseSettings {
     public get RestrictWorkspace(): boolean {
         return this._restrictWorkspace;
     }
+
+    public get ForceBasicAuth(): boolean {
+        return this._forceBasicAuth;
+    }
 }
 
 class SettingNames {
     public static get Location(): string { return "tfvc.location"; }
     public static get Proxy(): string { return "tfvc.proxy"; }
     public static get RestrictWorkspace(): string { return "tfvc.restrictWorkspace"; }
+    public static get ForceBasicAuth(): string { return "tfvc.forceBasicAuth"; }
 }

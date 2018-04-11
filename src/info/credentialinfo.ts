@@ -16,7 +16,7 @@ export class CredentialInfo {
 
     constructor(username: string, password?: string, domain?: string, workstation?: string) {
         if (username !== undefined && password !== undefined) {
-            // NTLM (we don't support Basic auth)
+            // NTLM or Basic Auth depending on the `tfvc.forceBasicAuth` setting
             this._credentialHandler = new ExtensionRequestHandler(username, password, domain, workstation);
         } else {
             // Personal Access Token
