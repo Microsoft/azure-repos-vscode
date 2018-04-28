@@ -196,6 +196,74 @@ describe("Tfvc-DeleteCommand", function() {
         assert.equal(filesDeleted.length, 2);
     });
 
+    it("should verify parse output - error exit code", async function() {
+        const noChangesPaths: string[] = [path.join("folder1", "file1.txt"), path.join("folder2", "file2.txt")];
+        const localPaths: string[] = noChangesPaths;
+        const cmd: Delete = new Delete(undefined, localPaths);
+        const executionResult: IExecutionResult = {
+            exitCode: 42,
+            stdout: "Something bad this way comes.",
+            stderr: undefined
+        };
+
+        try {
+            await cmd.ParseOutput(executionResult);
+        } catch (err) {
+            assert.equal(err.exitCode, 42);
+            assert.equal(err.tfvcCommand, "delete");
+            assert.isTrue(err.message.startsWith("Something bad this way comes."));
+            assert.isTrue(err.stdout.startsWith("Something bad this way comes."));
+        }
+    });
+
+    // TF203069: $/L2.VSCodeExtension.RC/folder1/folder2 could not be deleted because that change conflicts with one or more other pending changes to that item. To delete it, undo all pending changes to that item, delete it, and then check in the change.
+    // No arguments matched any files to delete.
+    it("should verify parse output - deletion conflict - error exit code", async function() {
+        const noChangesPaths: string[] = [path.join("folder1", "folder2")];
+        const localPaths: string[] = noChangesPaths;
+        const cmd: Delete = new Delete(undefined, localPaths);
+        const executionResult: IExecutionResult = {
+            exitCode: 100,
+            stdout: "// TF203069: $/L2.VSCodeExtension.RC/folder1/folder2 could not be deleted because that change " +
+                "conflicts with one or more other pending changes to that item. To delete it, undo all pending changes " +
+                "to that item, delete it, and then check in the change.\n" +
+                "No arguments matched any files to delete.\n",
+            stderr: undefined
+        };
+
+        try {
+            await cmd.ParseOutput(executionResult);
+        } catch (err) {
+            assert.equal(err.exitCode, 100);
+            assert.equal(err.tfvcCommand, "delete");
+            assert.isAtLeast(err.stdout.indexOf("TF203069: "), 0);
+            assert.isAtLeast(err.stdout.indexOf("No arguments matched any files to delete"), 0);
+        }
+    });
+
+    //The item C:\repos\Tfvc.L2VSCodeExtension.RC\folder1\folder2\foo.txt could not be found in your workspace, or you do not have permission to access it.
+    //No arguments matched any files to delete.
+    it("should verify parse output - delete a file that doesn't exist - error exit code", async function() {
+        const noChangesPaths: string[] = [path.join("folder1", "folder2", "foo.txt")];
+        const localPaths: string[] = noChangesPaths;
+        const cmd: Delete = new Delete(undefined, localPaths);
+        const executionResult: IExecutionResult = {
+            exitCode: 100,
+            stdout: "The item C:\\repos\\Tfvc.L2VSCodeExtension.RC\\folder1\\folder2\\foo.txt could not be found in your workspace, or you do not have permission to access it.\n" +
+                "No arguments matched any files to delete.\n",
+            stderr: undefined
+        };
+
+        try {
+            await cmd.ParseOutput(executionResult);
+        } catch (err) {
+            assert.equal(err.exitCode, 100);
+            assert.equal(err.tfvcCommand, "delete");
+            assert.isAtLeast(err.stdout.indexOf("could not be found in your workspace"), 0);
+            assert.isAtLeast(err.stdout.indexOf("No arguments matched any files to delete"), 0);
+        }
+    });
+
 //
 //
 //
@@ -294,5 +362,73 @@ describe("Tfvc-DeleteCommand", function() {
         const filesDeleted: string[] = await cmd.ParseExeOutput(executionResult);
         assert.isDefined(filesDeleted);
         assert.equal(filesDeleted.length, 2);
+    });
+
+    it("should verify parse Exe output - error exit code", async function() {
+        const noChangesPaths: string[] = [path.join("folder1", "file1.txt"), path.join("folder2", "file2.txt")];
+        const localPaths: string[] = noChangesPaths;
+        const cmd: Delete = new Delete(undefined, localPaths);
+        const executionResult: IExecutionResult = {
+            exitCode: 42,
+            stdout: "Something bad this way comes.",
+            stderr: undefined
+        };
+
+        try {
+            await cmd.ParseExeOutput(executionResult);
+        } catch (err) {
+            assert.equal(err.exitCode, 42);
+            assert.equal(err.tfvcCommand, "delete");
+            assert.isTrue(err.message.startsWith("Something bad this way comes."));
+            assert.isTrue(err.stdout.startsWith("Something bad this way comes."));
+        }
+    });
+
+    // TF203069: $/L2.VSCodeExtension.RC/folder1/folder2 could not be deleted because that change conflicts with one or more other pending changes to that item. To delete it, undo all pending changes to that item, delete it, and then check in the change.
+    // No arguments matched any files to delete.
+    it("should verify parse Exe output - deletion conflict - error exit code", async function() {
+        const noChangesPaths: string[] = [path.join("folder1", "folder2")];
+        const localPaths: string[] = noChangesPaths;
+        const cmd: Delete = new Delete(undefined, localPaths);
+        const executionResult: IExecutionResult = {
+            exitCode: 100,
+            stdout: "// TF203069: $/L2.VSCodeExtension.RC/folder1/folder2 could not be deleted because that change " +
+                "conflicts with one or more other pending changes to that item. To delete it, undo all pending changes " +
+                "to that item, delete it, and then check in the change.\n" +
+                "No arguments matched any files to delete.\n",
+            stderr: undefined
+        };
+
+        try {
+            await cmd.ParseExeOutput(executionResult);
+        } catch (err) {
+            assert.equal(err.exitCode, 100);
+            assert.equal(err.tfvcCommand, "delete");
+            assert.isAtLeast(err.stdout.indexOf("TF203069: "), 0);
+            assert.isAtLeast(err.stdout.indexOf("No arguments matched any files to delete"), 0);
+        }
+    });
+
+    //The item C:\repos\Tfvc.L2VSCodeExtension.RC\folder1\folder2\foo.txt could not be found in your workspace, or you do not have permission to access it.
+    //No arguments matched any files to delete.
+    it("should verify parse Exe output - delete a file that doesn't exist - error exit code", async function() {
+        const noChangesPaths: string[] = [path.join("folder1", "folder2", "foo.txt")];
+        const localPaths: string[] = noChangesPaths;
+        const cmd: Delete = new Delete(undefined, localPaths);
+        const executionResult: IExecutionResult = {
+            exitCode: 100,
+            stdout: "The item C:\\repos\\Tfvc.L2VSCodeExtension.RC\\folder1\\folder2\\foo.txt could not be found in your workspace, or you do not have permission to access it.\n" +
+                "No arguments matched any files to delete.\n",
+            stderr: undefined
+        };
+
+        try {
+            await cmd.ParseExeOutput(executionResult);
+        } catch (err) {
+            assert.equal(err.exitCode, 100);
+            assert.equal(err.tfvcCommand, "delete");
+            assert.isAtLeast(err.stdout.indexOf("could not be found in your workspace"), 0);
+            assert.isAtLeast(err.stdout.indexOf("No arguments matched any files to delete"), 0);
+        }
     });
 });

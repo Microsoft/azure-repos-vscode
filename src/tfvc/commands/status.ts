@@ -61,7 +61,7 @@ export class Status implements ITfvcCommand<IPendingChange[]> {
      */
     public async ParseOutput(executionResult: IExecutionResult): Promise<IPendingChange[]> {
         // Throw if any errors are found in stderr or if exitcode is not 0
-        CommandHelper.ProcessErrors(executionResult);
+        CommandHelper.ProcessErrors(this.GetArguments().GetCommand(), executionResult);
 
         const changes: IPendingChange[] = [];
         const xml: string = CommandHelper.TrimToXml(executionResult.stdout);
@@ -132,7 +132,7 @@ export class Status implements ITfvcCommand<IPendingChange[]> {
     */
     public async ParseExeOutput(executionResult: IExecutionResult): Promise<IPendingChange[]> {
         // Throw if any errors are found in stderr or if exitcode is not 0
-        CommandHelper.ProcessErrors(executionResult);
+        CommandHelper.ProcessErrors(this.GetArguments().GetCommand(), executionResult);
 
         const changes: IPendingChange[] = [];
         if (!executionResult.stdout) {

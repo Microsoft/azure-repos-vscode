@@ -47,7 +47,7 @@ export class GetVersion implements ITfvcCommand<string> {
 
     private async getVersion(executionResult: IExecutionResult, expression: RegExp): Promise<string> {
         // Throw if any errors are found in stderr or if exitcode is not 0
-        CommandHelper.ProcessErrors(executionResult);
+        CommandHelper.ProcessErrors(this.GetArguments().GetCommand(), executionResult);
 
         //Find just the version number and return it. Ex. Microsoft (R) TF - Team Foundation Version Control Tool, Version 14.102.25619.0
         //Spanish tf.exe example: "Microsoft (R) TF - Herramienta Control de versiones de Team Foundation, versi�n 14.102.25619.0"

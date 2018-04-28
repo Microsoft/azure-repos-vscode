@@ -84,7 +84,7 @@ describe("Tfvc-CommandHelper", function() {
             stdout: undefined,
             stderr: undefined
         };
-        CommandHelper.ProcessErrors(result);
+        CommandHelper.ProcessErrors("cmd", result, false);
     });
 
     it("should verify ProcessErrors - bad exit code only", function() {
@@ -94,10 +94,12 @@ describe("Tfvc-CommandHelper", function() {
             stderr: undefined
         };
         try {
-            CommandHelper.ProcessErrors(result);
+            CommandHelper.ProcessErrors("cmd", result, false);
         } catch (err) {
             assert.equal(err.exitCode, 100);
+            assert.equal(err.tfvcCommand, "cmd");
             assert.isTrue(err.message.startsWith(Strings.TfExecFailedError));
+            assert.equal(err.stdout, undefined);
         }
     });
 
@@ -108,11 +110,13 @@ describe("Tfvc-CommandHelper", function() {
             stderr: "Authentication failed"
         };
         try {
-            CommandHelper.ProcessErrors(result);
+            CommandHelper.ProcessErrors("cmd", result, false);
         } catch (err) {
             assert.equal(err.exitCode, 100);
+            assert.equal(err.tfvcCommand, "cmd");
             assert.equal(err.tfvcErrorCode, TfvcErrorCodes.AuthenticationFailed);
             assert.isTrue(err.message.startsWith(Strings.TfExecFailedError));
+            assert.equal(err.stdout, undefined);
         }
     });
 
@@ -123,11 +127,13 @@ describe("Tfvc-CommandHelper", function() {
             stderr: "workspace could not be determined"
         };
         try {
-            CommandHelper.ProcessErrors(result);
+            CommandHelper.ProcessErrors("cmd", result, false);
         } catch (err) {
             assert.equal(err.exitCode, 100);
+            assert.equal(err.tfvcCommand, "cmd");
             assert.equal(err.tfvcErrorCode, TfvcErrorCodes.NotATfvcRepository);
             assert.isTrue(err.message.startsWith(Strings.NoWorkspaceMappings));
+            assert.equal(err.stdout, undefined);
         }
     });
 
@@ -138,11 +144,13 @@ describe("Tfvc-CommandHelper", function() {
             stderr: "workspace could not be determined"
         };
         try {
-            CommandHelper.ProcessErrors(result);
+            CommandHelper.ProcessErrors("cmd", result, false);
         } catch (err) {
             assert.equal(err.exitCode, 100);
+            assert.equal(err.tfvcCommand, "cmd");
             assert.equal(err.tfvcErrorCode, TfvcErrorCodes.NotATfvcRepository);
             assert.isTrue(err.message.startsWith(Strings.NoWorkspaceMappings));
+            assert.equal(err.stdout, undefined);
         }
     });
 
@@ -153,11 +161,13 @@ describe("Tfvc-CommandHelper", function() {
             stderr: "Repository not found"
         };
         try {
-            CommandHelper.ProcessErrors(result);
+            CommandHelper.ProcessErrors("cmd", result, false);
         } catch (err) {
             assert.equal(err.exitCode, 100);
+            assert.equal(err.tfvcCommand, "cmd");
             assert.equal(err.tfvcErrorCode, TfvcErrorCodes.RepositoryNotFound);
             assert.isTrue(err.message.startsWith(Strings.TfExecFailedError));
+            assert.equal(err.stdout, undefined);
         }
     });
 
@@ -168,11 +178,13 @@ describe("Tfvc-CommandHelper", function() {
             stderr: "project collection URL to use could not be determined"
         };
         try {
-            CommandHelper.ProcessErrors(result);
+            CommandHelper.ProcessErrors("cmd", result, false);
         } catch (err) {
             assert.equal(err.exitCode, 100);
+            assert.equal(err.tfvcCommand, "cmd");
             assert.equal(err.tfvcErrorCode, TfvcErrorCodes.NotATfvcRepository);
             assert.isTrue(err.message.startsWith(Strings.NotATfvcRepository));
+            assert.equal(err.stdout, undefined);
         }
     });
 
@@ -183,11 +195,13 @@ describe("Tfvc-CommandHelper", function() {
             stderr: "Access denied connecting: some other text: authenticating as OAuth"
         };
         try {
-            CommandHelper.ProcessErrors(result);
+            CommandHelper.ProcessErrors("cmd", result, false);
         } catch (err) {
             assert.equal(err.exitCode, 100);
+            assert.equal(err.tfvcCommand, "cmd");
             assert.equal(err.tfvcErrorCode, TfvcErrorCodes.AuthenticationFailed);
             assert.isTrue(err.message.startsWith(Strings.TokenNotAllScopes));
+            assert.equal(err.stdout, undefined);
         }
     });
 
@@ -198,11 +212,13 @@ describe("Tfvc-CommandHelper", function() {
             stderr: "'java' is not recognized as an internal or external command"
         };
         try {
-            CommandHelper.ProcessErrors(result);
+            CommandHelper.ProcessErrors("cmd", result, false);
         } catch (err) {
             assert.equal(err.exitCode, 100);
+            assert.equal(err.tfvcCommand, "cmd");
             assert.equal(err.tfvcErrorCode, TfvcErrorCodes.NotFound);
             assert.isTrue(err.message.startsWith(Strings.TfInitializeFailureError));
+            assert.equal(err.stdout, undefined);
         }
     });
 
@@ -213,11 +229,13 @@ describe("Tfvc-CommandHelper", function() {
             stderr: "There is no working folder mapping"
         };
         try {
-            CommandHelper.ProcessErrors(result);
+            CommandHelper.ProcessErrors("cmd", result, false);
         } catch (err) {
             assert.equal(err.exitCode, 100);
+            assert.equal(err.tfvcCommand, "cmd");
             assert.equal(err.tfvcErrorCode, TfvcErrorCodes.FileNotInMappings);
             assert.isTrue(err.message.startsWith(Strings.TfExecFailedError));
+            assert.equal(err.stdout, undefined);
         }
     });
 
@@ -228,11 +246,13 @@ describe("Tfvc-CommandHelper", function() {
             stderr: "could not be found in your workspace, or you do not have permission to access it."
         };
         try {
-            CommandHelper.ProcessErrors(result);
+            CommandHelper.ProcessErrors("cmd", result, false);
         } catch (err) {
             assert.equal(err.exitCode, 100);
+            assert.equal(err.tfvcCommand, "cmd");
             assert.equal(err.tfvcErrorCode, TfvcErrorCodes.FileNotInWorkspace);
             assert.isTrue(err.message.startsWith(Strings.TfExecFailedError));
+            assert.equal(err.stdout, undefined);
         }
     });
 
@@ -243,13 +263,49 @@ describe("Tfvc-CommandHelper", function() {
             stderr: "TF30063: You are not authorized to access anything because I said so"
         };
         try {
-            CommandHelper.ProcessErrors(result);
+            CommandHelper.ProcessErrors("cmd", result, false);
         } catch (err) {
             assert.equal(err.exitCode, 100);
+            assert.equal(err.tfvcCommand, "cmd");
             assert.equal(err.tfvcErrorCode, TfvcErrorCodes.NotAuthorizedToAccess);
             assert.isTrue(err.message.startsWith(Strings.TfServerWorkspace));
             assert.isDefined(err.messageOptions);
-            assert.isTrue(err.messageOptions.length === 1);
+            assert.isTrue(err.messageOptions.length  === 1);
+            assert.equal(err.stdout, undefined);
+        }
+    });
+
+    it("should verify ProcessErrors - showFirstError - stderr", function() {
+        const result: IExecutionResult = {
+            exitCode: 100,
+            stdout: undefined,
+            stderr: "something bad"
+        };
+        try {
+            CommandHelper.ProcessErrors("cmd", result, true);
+        } catch (err) {
+            assert.equal(err.exitCode, 100);
+            assert.equal(err.tfvcCommand, "cmd");
+            assert.equal(err.tfvcErrorCode, TfvcErrorCodes.UnknownError);
+            assert.isTrue(err.message.startsWith("something bad"));
+            assert.equal(err.stdout, undefined);
+        }
+    });
+
+    it("should verify ProcessErrors - showFirstError - stdout", function() {
+        const result: IExecutionResult = {
+            exitCode: 100,
+            stdout: "something bad",
+            stderr: undefined
+        };
+        try {
+            CommandHelper.ProcessErrors("cmd", result, true);
+        } catch (err) {
+            assert.equal(err.exitCode, 100);
+            assert.equal(err.tfvcCommand, "cmd");
+            assert.equal(err.tfvcErrorCode, TfvcErrorCodes.UnknownError);
+            assert.isTrue(err.message.startsWith("something bad"));
+            assert.equal(err.stdout, "something bad");
         }
     });
 

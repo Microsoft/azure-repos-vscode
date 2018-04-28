@@ -42,7 +42,7 @@ export class Add implements ITfvcCommand<string[]> {
     public async ParseOutput(executionResult: IExecutionResult): Promise<string[]> {
         // Any exit code other than 0 or 1 means that something went wrong, so simply throw the error
         if (executionResult.exitCode !== 0 && executionResult.exitCode !== 1) {
-            CommandHelper.ProcessErrors(executionResult);
+            CommandHelper.ProcessErrors(this.GetArguments().GetCommand(), executionResult);
         }
 
         let lines: string[] = CommandHelper.SplitIntoLines(executionResult.stdout, false, true /*filterEmptyLines*/);

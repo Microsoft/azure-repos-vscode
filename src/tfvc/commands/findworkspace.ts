@@ -57,7 +57,7 @@ export class FindWorkspace implements ITfvcCommand<IWorkspace> {
      */
     public async ParseOutput(executionResult: IExecutionResult): Promise<IWorkspace> {
         // Throw if any errors are found in stderr or if exitcode is not 0
-        CommandHelper.ProcessErrors(executionResult);
+        CommandHelper.ProcessErrors(this.GetArguments().GetCommand(), executionResult);
 
         const stdout = executionResult.stdout;
         if (!stdout) {

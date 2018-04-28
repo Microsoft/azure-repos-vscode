@@ -48,7 +48,7 @@ export class ResolveConflicts implements ITfvcCommand<IConflict[]> {
      * Resolved /Users/leantk/tfvc-tfs/tfsTest_01/addFold/testHere2 as KeepYours
      */
     public async ParseOutput(executionResult: IExecutionResult): Promise<IConflict[]> {
-        CommandHelper.ProcessErrors(executionResult);
+        CommandHelper.ProcessErrors(this.GetArguments().GetCommand(), executionResult);
 
         const conflicts: IConflict[] = [];
         const lines: string[] = CommandHelper.SplitIntoLines(executionResult.stdout, true, true);

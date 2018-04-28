@@ -181,7 +181,9 @@ describe("Tfvc-GetFileContentCommand", function() {
             await cmd.ParseOutput(executionResult);
         } catch (err) {
             assert.equal(err.exitCode, 42);
+            assert.equal(err.tfvcCommand, "print");
             assert.isTrue(err.message.startsWith(Strings.TfExecFailedError));
+            assert.isTrue(err.stdout.startsWith("Something bad this way comes."));
         }
     });
 
@@ -212,7 +214,10 @@ describe("Tfvc-GetFileContentCommand", function() {
             await cmd.ParseExeOutput(executionResult);
         } catch (err) {
             assert.equal(err.exitCode, 42);
+            //ParseExeOutput calls GetArguments via ParseOutput (so 'print' is returned instead of 'view')
+            assert.equal(err.tfvcCommand, "print");
             assert.isTrue(err.message.startsWith(Strings.TfExecFailedError));
+            assert.isTrue(err.stdout.startsWith("Something bad this way comes."));
         }
     });
 

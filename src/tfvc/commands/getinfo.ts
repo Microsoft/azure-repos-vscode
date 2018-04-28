@@ -56,7 +56,7 @@ export class GetInfo implements ITfvcCommand<IItemInfo[]> {
      */
     public async ParseOutput(executionResult: IExecutionResult): Promise<IItemInfo[]> {
         // Throw if any errors are found in stderr or if exitcode is not 0
-        CommandHelper.ProcessErrors(executionResult);
+        CommandHelper.ProcessErrors(this.GetArguments().GetCommand(), executionResult);
 
         const itemInfos: IItemInfo[] = [];
         if (!executionResult.stdout) {
@@ -105,7 +105,9 @@ export class GetInfo implements ITfvcCommand<IItemInfo[]> {
             throw new TfvcError({
                 message: Strings.NoMatchesFound,
                 tfvcErrorCode: TfvcErrorCodes.NoItemsMatch,
-                exitCode: executionResult.exitCode
+                exitCode: executionResult.exitCode,
+                stdout: executionResult.stdout,
+                stderr: executionResult.stderr
             });
         }
 
