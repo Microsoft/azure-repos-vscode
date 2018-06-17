@@ -15,19 +15,23 @@ export class ArgumentBuilder implements IArgumentProvider {
     private _arguments: string[] = [];
     private _secretArgumentIndexes: number[] = [];
 
-    public constructor(command: string, serverContext?: TeamServerContext, skipCollectionOption?: boolean) {
+    public constructor(command: string, serverContext?: TeamServerContext, skipCollectionOption?: boolean, isExe?: boolean) {
         if (!command) {
             throw TfvcError.CreateArgumentMissingError("command");
         }
         this.Add(command);
-        this.AddSwitch("noprompt");
+        if (isExe) {
+            this.AddSwitch("prompt");
+        } else {
+            this.AddSwitch("noprompt");
+        }
 
         if (serverContext && serverContext.RepoInfo && serverContext.RepoInfo.CollectionUrl) {
             if (!skipCollectionOption) {
                 //TODO decode URI since CLC does not expect encoded collection urls
                 this.AddSwitchWithValue("collection", serverContext.RepoInfo.CollectionUrl, false);
             }
-            if (serverContext.CredentialInfo) {
+            if (serverContext.CredentialInfo && !isExe) {
                 this.AddSwitchWithValue("login", (serverContext.CredentialInfo.Domain ? serverContext.CredentialInfo.Domain + "\\" : "") + serverContext.CredentialInfo.Username + "," + serverContext.CredentialInfo.Password, true);
             }
         }
@@ -55,6 +59,17 @@ export class ArgumentBuilder implements IArgumentProvider {
 
     public AddSwitch(switchName: string): ArgumentBuilder {
         return this.AddSwitchWithValue(switchName, undefined, false);
+    }
+
+    public RemoveSwitch(switchName: string): ArgumentBuilder {
+        const index: number = this._arguments.lastIndexOf("-" + switchName);
+        if (index !== -1) {
+            for (let i: number = index; i < this._arguments.length - 1; i++ ) {
+                this._arguments[i] = this._arguments[i + 1];
+            }
+            this._arguments.pop();
+        }
+        return this;
     }
 
     public AddSwitchWithValue(switchName: string, switchValue: string, isSecret: boolean): ArgumentBuilder {

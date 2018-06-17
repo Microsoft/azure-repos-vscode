@@ -69,7 +69,7 @@ export class ResolveConflicts implements ITfvcCommand<IConflict[]> {
     }
 
     public GetExeArguments(): IArgumentProvider {
-        const builder: ArgumentBuilder = new ArgumentBuilder("resolve", this._serverContext, true /* skipCollectionOption */)
+        const builder: ArgumentBuilder = new ArgumentBuilder("resolve", this._serverContext, true /* skipCollectionOption */, true /* isExe */)
             .AddAll(this._itemPaths)
             .AddSwitchWithValue("auto", AutoResolveType[this._autoResolveType], false);
         return builder;

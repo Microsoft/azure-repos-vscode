@@ -104,28 +104,28 @@ describe("Tfvc-GetFileContentCommand", function() {
         const localPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/README.md";
         const cmd: GetFileContent = new GetFileContent(undefined, localPath);
 
-        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "view -noprompt " + localPath);
+        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "view -prompt " + localPath);
     });
 
     it("should verify GetExeArguments with context", function() {
         const localPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/README.md";
         const cmd: GetFileContent = new GetFileContent(context, localPath);
 
-        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "view -noprompt -collection:" + collectionUrl + " ******** " + localPath);
+        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "view -prompt -collection:" + collectionUrl + " " + localPath);
     });
 
     it("should verify GetExeArguments + versionSpec", function() {
         const localPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/README.md";
         const cmd: GetFileContent = new GetFileContent(undefined, localPath, "42");
 
-        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "view -noprompt " + localPath + " -version:42");
+        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "view -prompt " + localPath + " -version:42");
     });
 
     it("should verify GetExeArguments + versionSpec with context", function() {
         const localPath: string = "/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/README.md";
         const cmd: GetFileContent = new GetFileContent(context, localPath, "42");
 
-        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "view -noprompt -collection:" + collectionUrl + " ******** " + localPath + " -version:42");
+        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "view -prompt -collection:" + collectionUrl + " " + localPath + " -version:42");
     });
 
     it("should verify parse output - single file - no errors", async function() {

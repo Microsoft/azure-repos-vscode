@@ -67,7 +67,7 @@ export class Add implements ITfvcCommand<string[]> {
     }
 
     public GetExeArguments(): IArgumentProvider {
-        return new ArgumentBuilder("add", this._serverContext, true /* skipCollectionOption */)
+        return new ArgumentBuilder("add", this._serverContext, true /* skipCollectionOption */, true /* isExe */)
             .AddAll(this._itemPaths);
     }
 

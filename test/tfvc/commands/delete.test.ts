@@ -83,7 +83,7 @@ describe("Tfvc-DeleteCommand", function() {
         const localPaths: string[] = ["/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/README.md"];
         const cmd: Delete = new Delete(undefined, localPaths);
 
-        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "delete -noprompt " + localPaths[0]);
+        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "delete -prompt " + localPaths[0]);
     });
 
     it("should verify arguments with context", function() {
@@ -97,7 +97,7 @@ describe("Tfvc-DeleteCommand", function() {
         const localPaths: string[] = ["/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/README.md"];
         const cmd: Delete = new Delete(context, localPaths);
 
-        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "delete -noprompt ******** " + localPaths[0]);
+        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "delete -prompt " + localPaths[0]);
     });
 
     it("should verify parse output - single file - no errors", async function() {

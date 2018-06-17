@@ -102,7 +102,7 @@ describe("Tfvc-RenameCommand", function() {
 
         const cmd: Rename = new Rename(context, sourcePath, destinationPath);
 
-        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "rename -noprompt ******** " + sourcePath + " " + destinationPath);
+        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "rename -prompt " + sourcePath + " " + destinationPath);
     });
 
     it("should verify parse output - no output", async function() {

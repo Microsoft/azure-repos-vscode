@@ -80,7 +80,7 @@ export class Delete implements ITfvcCommand<string[]> {
     }
 
     public GetExeArguments(): IArgumentProvider {
-        return new ArgumentBuilder("delete", this._serverContext, true /* skipCollectionOption */)
+        return new ArgumentBuilder("delete", this._serverContext, true /* skipCollectionOption */, true /* isExe */)
             .AddAll(this._itemPaths);
     }
 

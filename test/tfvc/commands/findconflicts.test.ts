@@ -79,7 +79,7 @@ describe("Tfvc-FindConflictsCommand", function() {
         const localPath: string = "/usr/alias/repo1";
         const cmd: FindConflicts = new FindConflicts(undefined, localPath);
 
-        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "resolve -noprompt " + localPath + " -recursive -preview");
+        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "resolve -prompt " + localPath + " -recursive -preview");
     });
 
     it("should verify arguments with context", function() {
@@ -93,7 +93,7 @@ describe("Tfvc-FindConflictsCommand", function() {
         const localPath: string = "/usr/alias/repo1";
         const cmd: FindConflicts = new FindConflicts(context, localPath);
 
-        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "resolve -noprompt ******** " + localPath + " -recursive -preview");
+        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "resolve -prompt " + localPath + " -recursive -preview");
     });
 
     it("should verify parse output - no output", async function() {

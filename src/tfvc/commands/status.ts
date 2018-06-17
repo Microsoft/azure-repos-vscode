@@ -88,7 +88,7 @@ export class Status implements ITfvcCommand<IPendingChange[]> {
 
     public GetExeArguments(): IArgumentProvider {
         //return this.GetArguments();
-        const builder: ArgumentBuilder = new ArgumentBuilder("status", this._serverContext)
+        const builder: ArgumentBuilder = new ArgumentBuilder("status", this._serverContext, false /* skipCollectionOption */, true /* isExe */)
             .AddSwitchWithValue("format", "detailed", false)
             .AddSwitch("recursive");
 

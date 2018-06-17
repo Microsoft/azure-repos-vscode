@@ -76,7 +76,7 @@ export class Rename implements ITfvcCommand<string> {
     }
 
     public GetExeArguments(): IArgumentProvider {
-        return new ArgumentBuilder("rename", this._serverContext, true /* skipCollectionOption */)
+        return new ArgumentBuilder("rename", this._serverContext, true /* skipCollectionOption */, true /* isExe */)
             .Add(this._sourcePath)
             .Add(this._destinationPath);
     }

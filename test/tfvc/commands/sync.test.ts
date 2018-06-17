@@ -93,21 +93,21 @@ describe("Tfvc-SyncCommand", function() {
         const localPaths: string[] = ["/usr/alias/repo1"];
         const cmd: Sync = new Sync(undefined, localPaths, false);
 
-        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "get -noprompt -nosummary " + localPaths[0]);
+        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "get -prompt -nosummary " + localPaths[0]);
     });
 
     it("should verify getExeArguments with context", function() {
         const localPaths: string[] = ["/usr/alias/repo1"];
         const cmd: Sync = new Sync(context, localPaths, false);
 
-        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "get -noprompt ******** -nosummary " + localPaths[0]);
+        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "get -prompt -nosummary " + localPaths[0]);
     });
 
     it("should verify getExeArguments with context and recursive", function() {
         const localPaths: string[] = ["/usr/alias/repo1"];
         const cmd: Sync = new Sync(context, localPaths, true);
 
-        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "get -noprompt ******** -nosummary " + localPaths[0] + " -recursive");
+        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "get -prompt -nosummary " + localPaths[0] + " -recursive");
     });
 
     it("should verify parse output - no output", async function() {

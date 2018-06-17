@@ -92,7 +92,7 @@ describe("Tfvc-CheckinCommand", function() {
         const files: string[] = ["/path/to/workspace/file.txt"];
         const cmd: Checkin = new Checkin(context, files);
 
-        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "checkin -noprompt ******** " + files[0]);
+        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "checkin -noprompt " + files[0]);
     });
 
     it("should verify arguments with workitems", function() {
@@ -107,7 +107,7 @@ describe("Tfvc-CheckinCommand", function() {
         const cmd: Checkin = new Checkin(context, files, undefined, [1, 2, 3]);
 
         //Note that no associate option should be here (tf.exe doesn't support it)
-        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "checkin -noprompt ******** " + files[0]);
+        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "checkin -noprompt " + files[0]);
     });
 
     it("should verify arguments with comment", function() {
@@ -121,7 +121,7 @@ describe("Tfvc-CheckinCommand", function() {
         const files: string[] = ["/path/to/workspace/file.txt"];
         const cmd: Checkin = new Checkin(context, files, "a comment\nthat has\r\nmultiple lines");
 
-        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "checkin -noprompt ******** " + files[0] + " -comment:a comment that has multiple lines");
+        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "checkin -noprompt " + files[0] + " -comment:a comment that has multiple lines");
     });
 
     it("should verify arguments with all params", function() {
@@ -136,7 +136,7 @@ describe("Tfvc-CheckinCommand", function() {
         const cmd: Checkin = new Checkin(context, files, "a comment", [1, 2, 3]);
 
         //Note that no associate option should be here (tf.exe doesn't support it)
-        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "checkin -noprompt ******** " + files[0] + " -comment:a comment");
+        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "checkin -noprompt " + files[0] + " -comment:a comment");
     });
 
     it("should verify parse output - no output", async function() {

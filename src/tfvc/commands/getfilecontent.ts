@@ -63,7 +63,7 @@ export class GetFileContent implements ITfvcCommand<string> {
     }
 
     public GetExeArguments(): IArgumentProvider {
-        const builder: ArgumentBuilder = new ArgumentBuilder("view", this._serverContext)
+        const builder: ArgumentBuilder = new ArgumentBuilder("view", this._serverContext, false /* skipCollectionOption */, true /* isExe */)
             .Add(this._localPath);
         if (this._versionSpec) {
             builder.AddSwitchWithValue("version", this._versionSpec, false);

@@ -83,7 +83,7 @@ describe("Tfvc-AddCommand", function() {
         const localPaths: string[] = ["/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/README.md"];
         const cmd: Add = new Add(undefined, localPaths);
 
-        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "add -noprompt " + localPaths[0]);
+        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "add -prompt " + localPaths[0]);
     });
 
     it("should verify arguments with context", function() {
@@ -97,7 +97,7 @@ describe("Tfvc-AddCommand", function() {
         const localPaths: string[] = ["/usr/alias/repos/Tfvc.L2VSCodeExtension.RC/README.md"];
         const cmd: Add = new Add(context, localPaths);
 
-        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "add -noprompt ******** " + localPaths[0]);
+        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "add -prompt " + localPaths[0]);
     });
 
     it("should verify parse output - no files to add", async function() {

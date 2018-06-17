@@ -92,7 +92,7 @@ export class Sync implements ITfvcCommand<ISyncResults> {
     }
 
     public GetExeArguments(): IArgumentProvider {
-        const builder: ArgumentBuilder = new ArgumentBuilder("get", this._serverContext, true /* skipCollectionOption */)
+        const builder: ArgumentBuilder = new ArgumentBuilder("get", this._serverContext, true /* skipCollectionOption */, true /* isExe */)
             .AddSwitch("nosummary")
             .AddAll(this._itemPaths);
 

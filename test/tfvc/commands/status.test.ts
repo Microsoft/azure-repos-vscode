@@ -82,7 +82,7 @@ describe("Tfvc-StatusCommand", function() {
         const localPaths: string[] = ["/path/to/workspace"];
         const cmd: Status = new Status(undefined, true, localPaths);
 
-        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "status -noprompt -format:detailed -recursive " + localPaths[0]);
+        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "status -prompt -format:detailed -recursive " + localPaths[0]);
     });
 
     it("should verify arguments - no paths", function() {
@@ -94,7 +94,7 @@ describe("Tfvc-StatusCommand", function() {
     it("should verify Exe arguments - no paths", function() {
         const cmd: Status = new Status(undefined, true);
 
-        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "status -noprompt -format:detailed -recursive");
+        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "status -prompt -format:detailed -recursive");
     });
 
     it("should verify arguments - multiple paths", function() {
@@ -108,7 +108,7 @@ describe("Tfvc-StatusCommand", function() {
         const localPaths: string[] = ["/path/to/workspace", "/path/to/workspace2"];
         const cmd: Status = new Status(undefined, true, localPaths);
 
-        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "status -noprompt -format:detailed -recursive " + localPaths[0] + " " + localPaths[1]);
+        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "status -prompt -format:detailed -recursive " + localPaths[0] + " " + localPaths[1]);
     });
 
     it("should verify arguments with context", function() {
@@ -122,7 +122,7 @@ describe("Tfvc-StatusCommand", function() {
         const localPaths: string[] = ["/path/to/workspace"];
         const cmd: Status = new Status(context, true, localPaths);
 
-        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "status -noprompt -collection:" + collectionUrl + " ******** -format:detailed -recursive " + localPaths[0]);
+        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "status -prompt -collection:" + collectionUrl + " -format:detailed -recursive " + localPaths[0]);
     });
 
     it("should verify parse output - no output", async function() {

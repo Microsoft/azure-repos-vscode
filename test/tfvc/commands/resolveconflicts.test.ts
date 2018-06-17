@@ -93,21 +93,21 @@ describe("Tfvc-ResolveConflictsCommand", function() {
         const localPaths: string[] = ["/usr/alias/repo1/file.txt"];
         const cmd: ResolveConflicts = new ResolveConflicts(undefined, localPaths, AutoResolveType.KeepYours);
 
-        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "resolve -noprompt " + localPaths[0] + " -auto:KeepYours");
+        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "resolve -prompt " + localPaths[0] + " -auto:KeepYours");
     });
 
     it("should verify GetExeArguments with context", function() {
         const localPaths: string[] = ["/usr/alias/repo1/file.txt"];
         const cmd: ResolveConflicts = new ResolveConflicts(context, localPaths, AutoResolveType.KeepYours);
 
-        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "resolve -noprompt ******** " + localPaths[0] + " -auto:KeepYours");
+        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "resolve -prompt " + localPaths[0] + " -auto:KeepYours");
     });
 
     it("should verify GetExeArguments with TakeTheirs", function() {
         const localPaths: string[] = ["/usr/alias/repo1/file.txt"];
         const cmd: ResolveConflicts = new ResolveConflicts(context, localPaths, AutoResolveType.TakeTheirs);
 
-        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "resolve -noprompt ******** " + localPaths[0] + " -auto:TakeTheirs");
+        assert.equal(cmd.GetExeArguments().GetArgumentsForDisplay(), "resolve -prompt " + localPaths[0] + " -auto:TakeTheirs");
     });
 
     it("should verify parse output - no output", async function() {

@@ -102,7 +102,7 @@ export class FindConflicts implements ITfvcCommand<IConflict[]> {
     }
 
     public GetExeArguments(): IArgumentProvider {
-        const builder: ArgumentBuilder = new ArgumentBuilder("resolve", this._serverContext, true /* skipCollectionOption */)
+        const builder: ArgumentBuilder = new ArgumentBuilder("resolve", this._serverContext, true /* skipCollectionOption */, true /* isExe */)
             .Add(this._itemPath)
             .AddSwitch("recursive")
             .AddSwitch("preview");
