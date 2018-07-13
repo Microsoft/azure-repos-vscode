@@ -1,0 +1,37 @@
+import com.android.builder.core.BuilderConstants;
+apply plugin: 'com.android.library'
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.minSdkVersion
+        versionName VERSION_NAME
+    }
+    
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+
+    dexOptions {
+        preDexLibraries = !rootProject.ext.ci
+    }
+}
+
+dependencies {
+    testCompile 'junit:junit:4.12'
+    testCompile "org.robolectric:robolectric:3.0"
+}
+
+android.libraryVariants.all { variant ->
+    def name = variant.buildType.name
+    if (!BuilderConstants.DEBUG.equals(name)) {
+        def task = project.tasks.create "jar${name.capitalize()}", Jar
+        task.dependsOn variant.javaCompile
+        task.from variant.javaCompile.destinationDir
+        artifacts.add('archives', task);
+    }
+}
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
