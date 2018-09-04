@@ -1,0 +1,12 @@
+public class Shape: ModelObject {
+    dynamic var x: Float = 0
+    dynamic var y: Float = 0
+    dynamic var width: Float = 100
+    dynamic var height: Float = 100
+    dynamic var color: UIColor = UIColor.redColor()
+}
+
+public class Canvas: ModelObject {
+    dynamic var name: String?
+    dynamic var shapes = [Shape]()
+}

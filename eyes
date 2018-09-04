@@ -1,0 +1,4 @@
+// Observe property changes on models without queueing them up
+model.observeChangeImmediately(self) { ... }
+model.observeChangeImmediately(self, key: "width") { ... }
+model.observeChangeImmediately(self, keys: ["width", "height"]) { ... }

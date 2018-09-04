@@ -1,0 +1,9 @@
+[submodule "Jetstream/Signals"]
+	path = Jetstream/Signals
+url=https://github.com/artman/Signals.git
+[submodule "Jetstream/starscream"]
+	path = Jetstream/starscream
+url=https://github.com/daltoniam/starscream.git
+[submodule "Jetstream/Starscream"]
+	path = Jetstream/Starscream
+	url = https://github.com/daltoniam/Starscream.git

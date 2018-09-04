@@ -1,132 +1,134 @@
-# Visual Studio Team Services Extension Contributor Guide
-The instructions below will help you set up your development environment to contribute to this repository.
-Make sure you've already cloned the repo.  :smile:
+# Contributing to Appium Desktop
 
-## Ways to Contribute
-Interested in contributing to the vsts-vscode project? There are plenty of ways to contribute, all of which help make the project better.
-* Submit a [bug report](https://github.com/Microsoft/vsts-vscode/issues/new) or [feature request](https://github.com/Microsoft/vsts-vscode/issues/new) through the Issue Tracker
-* Review the [source code changes](https://github.com/Microsoft/vsts-vscode/pulls)
-* Submit a code fix for a bug (see `Submitting Pull Requests` below)
-* Participate in [discussions](https://github.com/Microsoft/vsts-vscode/issues)
+There are a lot of different ways to contribute to Appium Desktop. See below to
+learn more about how Appium Desktop is developed and for everything you can do
+and the processes to follow for each contribution method.  Note that no matter
+how you contribute, your participation is governed by our [Code of
+Conduct](CONDUCT.md).
 
-## Set up Node, npm and gulp
+## Overview
 
-### Node and npm
-**Windows and Mac OSX**: Download and install node from [nodejs.org](http://nodejs.org/)
+Appium Desktop is an [Electron](http://electron.atom.io) app. Electron apps
+have a basic architecture that consists of a _main_ process (which runs
+Node.js) and possibly many _renderer_ processes (essentially browser windows
+which display HTML/CSS and can run JS---this is where the UI lives).
+Interactions between the two types of process are made possible by a built-in
+interprocess communication (IPC) mechanism.
 
-**Linux**: Install [using package manager](https://nodejs.org/en/download/package-manager/)
+For the UI, Appium Desktop is built using
+[React](https://facebook.github.io/react/) and [Redux](http://redux.js.org) for
+managing UI state and interactions, with [Ant
+Design](https://ant.design/docs/react/introduce) for various UI components.
 
-From a terminal ensure at least node 5.4.1 and npm 3:
-```bash
-$ node -v && npm -v
-v5.9.0
-3.8.2
-```
-**Note**: To get npm version 3.8.2, you may need to update npm after installing node.  To do that:
-```bash
-[sudo] npm install npm -g
-```
+Why did we decide to go this route?
 
-### Gulp
-Install gulp
-```bash
-[sudo] npm install gulp -g
-```
-From the root of the repo, install all of the build dependencies:
-```bash
-[sudo] npm install --greedy
-```
+* Electron bundles apps for any platform
+* Appium is written in JS so it's a nice way to stick with that as the main language; we can rely on Appium's community to maintain this app and follow Appium's coding standards
+* Using web technologies to build a UI is a skill that many people have, whereas building native UIs is more esoteric
+* Because Electron's main process runs in Node, we can import Appium as a strict dependency rather than be forced to manage it as a subprocess. This is great for speed and error handling
+* It's fun!
 
-### Install the Visual Studio Code Extension Manager (VSCE)
-Before packaging via gulp, ensure that you have the "vsce" tool installed globally.  Otherwise, the package step will fail.
+Credits where credit is due: for the project's tooling, we started with
+[electron-react-boilerplate](https://github.com/chentsulin/electron-react-boilerplate),
+which comes with an excellent set of helpers scripts, many of which we still
+use in an unmodified fashion. Many thanks to that project!
 
-From the root of the repo, run:
-```bash
-[sudo] npm install vsce -g
-```
+### Setting up
 
-## Build
-To build the extension, run the following from the root of the repo:
+0. Clone the repo
+0. Install dependencies (`npm install`)
+
+### Doing Development
+
+There is a handy script for preparing the code and launching a development version of the app:
 
 ```bash
-gulp
+npm run dev
 ```
-This command will create the out\src and out\test folders at the root of the repository. 
 
-## Tests
-Tests should be run with changes.  Before you run tests, make sure you have built the extension.  Run the following from the root of the repo:
+This launches both the app and a development server which feeds UI code changes to the app as you make them (this is called 'hot reload'). In most cases, if you're simply making UI changes, you won't need to relaunch the app in order to see them reflected. If you do, simply kill this script and start again.
+
+Another important thing to do before committing is to run a lint tool on your code:
 
 ```bash
-gulp test
+npm run lint
 ```
-To run the tests within Visual Studio Code, change the debug profile to "Launch Tests" and press `F5`.
 
-## Package
-The package command will package the extension into a Visual Studio extension installer (.vsix file).
-It will also transpile the TypeScript into the out\src and out\test folders.
+Finally, you might want to run the app in a non-development mode in order to make sure that everything works as expected if you were to publish:
 
-From the root of the repo:
 ```bash
-gulp package
-```
-The VSIX package will be created in the root of the repository.
-
-## Code Structure
-The code is structured between the Visual Studio Code extension file, the Team Services extension object, and the clients, contexts, helpers and services.
-
-### Visual Studio Code Extension file
-This is the file with the code called by Visual Studio Code to bootstrap the extension.  **extension.ts** should be thin and delegate to the Team Services Extension object.
-
-### Team Services Extension object
-This is the object intended to have small methods that call to the feature-specific clients that manipulate the UI and make calls to Team Services via the service objects.  When adding new commands, the functions that are called should be defined here.
-
-### Clients
-These are the clients used to talk to the services (see Services below).  The clients can manipulate the UI but should be the only objects calling the feature-specific services.
-
-### Contexts
-* Git - This context is meant to contain the client-side Git configuration information
-* Server - This context is meant to contain the server-side information needed when making calls to Team Services
-
-### Helpers
-These are classes used to define constants, a logger, settings (configuration), strings and various utility functions.
-
-### Info
-These are classes used to hold data about particular objects (credentials, repository and user).
-
-### Services
-All of the communication to Team Services should be done via services found in this folder.  These services should not know anything about the client-side types used to manipulate the Visual Studio Code UI.  The Q Promise APIs found in the vso-node-api package is the model used in this extension.
-
-## Debugging
-To debug the extension, make sure you've installed all of the npm packages as instructed earlier.  Then, open the root of the repository in Visual Studio Code and press F5.  If you have the extension already installed, you'll need to uninstall it via the Command Palette and try again.
-
-During debugging, you may want to control how often polling occurs for build status and pull request updates.  Or you may want to turn on debug console and `winston` logging.  The [README.md](README.md) file has instructions on how to change those settings.
-
-## Code Styles
-1. The various gulp commands will run `tslint` and flag any errors.  Please ensure that the code stays clean.
-2. All source files must have the following lines at the top:
-```
- /*---------------------------------------------------------------------------------------------
- *  Copyright (c) Microsoft Corporation. All rights reserved.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
-```
-3. We keep LF line-endings on the server. Please set the `core.safecrlf` git config property to true.
-```
-git config core.safecrlf true
+npm run build  # prepare resources
+npm start  # start a production version of the app
 ```
 
-## Contribution License Agreement
-In order to contribute, you will need to sign a [Contributor License Agreement](https://cla.microsoft.com/).
+### Running tests
 
-## Code of Conduct
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+To run unit tests, run the command
 
-## Submitting Pull Requests
-We welcome pull requests!  Fork this repo and send us your contributions.  Go [here](https://help.github.com/articles/using-pull-requests/) to get familiar with GitHub pull requests.
+```bash
+npm test
+```
 
-Before submitting your request, ensure that both `gulp` and `gulp test` succeed.
+Before running e2e tests, run the command
 
-**UPDATE**: With a recent commit, integration tests were added under the *test-integration* folder.  These tests are run by the CI build and the results are reported back to any pull request as a "build check".  The
-integration tests are not runnable outside of the CI build without setting up additional infrastructure.  As such, it isn't required that a contributor run these tests before submitting the pull request.
-However, if an issue arises that breaks the integration tests, please file an issue and I'll follow up as quickly as possible.  Note that the build for this repo is set to build every night and runs unit
-and integration tests at that time.
+```bash
+npm run package-e2e-test
+```
+
+This will create builds in the `release/` folder that are specific for e2e testing. This only needs to be run whenever you make changes to the application.
+
+To run the e2e tests call 
+
+```bash
+npm run e2e
+```
+
+### Packaging and Releasing
+
+Appium Desktop uses [Electron Builder](https://github.com/electron-userland/electron-builder/) to build app. Read this document for instructions on how to set up your local environment so that you can build and package the app: https://github.com/electron-userland/electron-builder/wiki/Multi-Platform-Build
+
+To package the app for your platform, run:
+
+```bash
+npm run package
+```
+
+To package the app for _all_ platforms, run:
+
+```bash
+npm run package-all
+```
+
+This will build the apps with the latest version of electron and put the various app packages in `release/`.
+
+```bash
+npm version <VERSION_TYPE>
+```
+
+This will increment the version and push a new tag. This will trigger AppVeyor and Travis CI to run a CI
+build process and then publish the assets (.dmg, .exe, .AppImage) to GitHub releases which will contain a
+draft of the new release.
+
+Appium Desktop follows the same npm versioning workflow but isn't published to NPM.
+
+* [Travis CI dashboard](https://travis-ci.org/appium/appium-desktop/)
+* [AppVeyor dashboard](https://ci.appveyor.com/project/appium/appium-desktop)
+
+## Submitting changes to the Appium Desktop code or docs
+
+Fork the project, make a change, and send a pull request! Please have a look at
+our [Style Guide](https://github.com/appium/appium/blob/master/docs/en/contributing-to-appium/style-guide-2.0.md) before
+getting to work.  Please make sure functional tests pass before
+sending a pull request; for more information on how to run tests, keep reading!
+
+Make sure you read and follow the setup instructions in the README first. And note
+that all participation in the Appium community (including code submissions) is
+governed by our [Code of Conduct](CONDUCT.md).
+
+Finally, before we accept your code, you will need to have signed our Contributor License Agreement.
+Instructions will be given by the GitHub Bot when you make a pull request.
+
+### Submit bug reports or feature requests
+
+Just use the GitHub issue tracker to submit your bug reports and feature
+requests. If you are submitting a bug report, please follow the [issue template](https://github.com/appium/appium-desktop/issues/new).

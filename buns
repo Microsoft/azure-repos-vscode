@@ -1,0 +1,1266 @@
+ Jetstream.xcodeproj/project.pbxproj 
++1 −3 
+ JetstreamTests/ChangeSetQueueTests.swift 
++1 −2 
+ JetstreamTests/ChangeSetTests.swift 
++1 −2 
+ JetstreamTests/ClientTests.swift 
++1 −3 
+ JetstreamTests/ConstraintTests.swift 
++1 −1 
+ JetstreamTests/DependencyTests.swift 
++1 −1 
+ JetstreamTests/ImmediatePropertyListeners.swift 
++1 −1 
+ JetstreamTests/ModelObjectTests.swift 
++1 −0 
+ JetstreamTests/ModelValueTests.swift 
++1 −1 
+ JetstreamTests/PropertyListenerTests.swift 
++1 −1 
+ JetstreamTests/ScopePauseTests.swift 
++1 −1 
+ JetstreamTests/ScopeTests.swift 
++1 −2 
+ JetstreamTests/StateMessageTests.swift 
++1 −1 
+ JetstreamTests/SyncFragmentTests.swift 
++0 −1 
+ JetstreamTests/TestHelpers.swift 
++1 −1 
+ JetstreamTests/TestModels.swift 
++1 −1 
+ JetstreamTests/TestTransportAdapter.swift 
++1 −2 
+ JetstreamTests/TransactionTests.swift 
++1 −1 
+ JetstreamTests/TreeChangeTests.swift 
+View  
+58 Jetstream.xcodeproj/project.pbxproj 
+ 
+@@ -8,12 +8,9 @@
+
+
+ 
+  
+
+
+ 
+ /* Begin PBXBuildFile section */ 
+
+
+ 
+ 		11372DDF1A573DD200FBA922 /* Constraint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11372DDE1A573DD200FBA922 /* Constraint.swift */; }; 
+
+
+ 
+-		11A348441A5768C8009B2794 /* Constraint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11372DDE1A573DD200FBA922 /* Constraint.swift */; }; 
+
+
+ 
+ 		11D7C7951A6C60CE00F3B7DA /* Jetstream.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 722555F619F819D90016D8F8 /* Jetstream.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; }; 
+
+
+ 
+ 		72126CAC1A311F480006CD29 /* Signal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72126CAB1A311F480006CD29 /* Signal.swift */; }; 
+
+
+ 
+ 		72126CAE1A311F620006CD29 /* WebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72126CAD1A311F620006CD29 /* WebSocket.swift */; }; 
+
+
+ 
+-		72126CAF1A3121410006CD29 /* WebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72126CAD1A311F620006CD29 /* WebSocket.swift */; }; 
+
+
+ 
+-		72126CB01A3121410006CD29 /* Signal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72126CAB1A311F480006CD29 /* Signal.swift */; }; 
+
+
+ 
+ 		722555FC19F819D90016D8F8 /* Jetstream.h in Headers */ = {isa = PBXBuildFile; fileRef = 722555FB19F819D90016D8F8 /* Jetstream.h */; settings = {ATTRIBUTES = (Public, ); }; }; 
+
+
+ 
+ 		7225560219F819DA0016D8F8 /* Jetstream.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 722555F619F819D90016D8F8 /* Jetstream.framework */; }; 
+
+
+ 
+ 		7225565D19F81B040016D8F8 /* Client.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7225564619F81B040016D8F8 /* Client.swift */; }; 
+ 
+@@ -37,34 +34,10 @@
+
+
+ 
+ 		7225567119F81B040016D8F8 /* ChangeSetQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7225565A19F81B040016D8F8 /* ChangeSetQueue.swift */; }; 
+
+
+ 
+ 		7225567219F81B040016D8F8 /* Transport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7225565B19F81B040016D8F8 /* Transport.swift */; }; 
+
+
+ 
+ 		7225567319F81B040016D8F8 /* WebsocketTransportAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7225565C19F81B040016D8F8 /* WebsocketTransportAdapter.swift */; }; 
+
+
+ 
+-		7225567419F81B430016D8F8 /* Client.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7225564619F81B040016D8F8 /* Client.swift */; }; 
+
+
+ 
+-		7225567619F81B430016D8F8 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7225564819F81B040016D8F8 /* Constants.swift */; }; 
+
+
+ 
+-		7225567819F81B430016D8F8 /* Functions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7225564A19F81B040016D8F8 /* Functions.swift */; }; 
+
+
+ 
+-		7225567919F81B430016D8F8 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7225564B19F81B040016D8F8 /* Logging.swift */; }; 
+
+
+ 
+-		7225567A19F81B430016D8F8 /* NetworkMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7225564C19F81B040016D8F8 /* NetworkMessage.swift */; }; 
+
+
+ 
+-		7225567B19F81B430016D8F8 /* ModelObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7225564D19F81B040016D8F8 /* ModelObject.swift */; }; 
+
+
+ 
+-		7225567C19F81B430016D8F8 /* ModelValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7225564E19F81B040016D8F8 /* ModelValue.swift */; }; 
+
+
+ 
+-		7225567D19F81B430016D8F8 /* PingMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7225564F19F81B040016D8F8 /* PingMessage.swift */; }; 
+
+
+ 
+-		7225567E19F81B430016D8F8 /* ReplyMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7225565019F81B040016D8F8 /* ReplyMessage.swift */; }; 
+
+
+ 
+-		7225567F19F81B430016D8F8 /* Scope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7225565119F81B040016D8F8 /* Scope.swift */; }; 
+
+
+ 
+-		7225568019F81B430016D8F8 /* ScopeFetchMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7225565219F81B040016D8F8 /* ScopeFetchMessage.swift */; }; 
+
+
+ 
+-		7225568119F81B430016D8F8 /* ScopeStateMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7225565319F81B040016D8F8 /* ScopeStateMessage.swift */; }; 
+
+
+ 
+-		7225568219F81B430016D8F8 /* ScopeSyncMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7225565419F81B040016D8F8 /* ScopeSyncMessage.swift */; }; 
+
+
+ 
+-		7225568319F81B430016D8F8 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7225565519F81B040016D8F8 /* Session.swift */; }; 
+
+
+ 
+-		7225568419F81B430016D8F8 /* SessionCreateMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7225565619F81B040016D8F8 /* SessionCreateMessage.swift */; }; 
+
+
+ 
+-		7225568519F81B430016D8F8 /* SessionCreateReplyMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7225565719F81B040016D8F8 /* SessionCreateReplyMessage.swift */; }; 
+
+
+ 
+-		7225568619F81B430016D8F8 /* SyncFragment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7225565819F81B040016D8F8 /* SyncFragment.swift */; }; 
+
+
+ 
+-		7225568719F81B430016D8F8 /* ChangeSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7225565919F81B040016D8F8 /* ChangeSet.swift */; }; 
+
+
+ 
+-		7225568819F81B430016D8F8 /* ChangeSetQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7225565A19F81B040016D8F8 /* ChangeSetQueue.swift */; }; 
+
+
+ 
+-		7225568919F81B430016D8F8 /* Transport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7225565B19F81B040016D8F8 /* Transport.swift */; }; 
+
+
+ 
+-		7225568A19F81B430016D8F8 /* WebsocketTransportAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7225565C19F81B040016D8F8 /* WebsocketTransportAdapter.swift */; }; 
+
+
+ 
+ 		723A39791A042A1E00FD47A0 /* ScopeSyncReplyMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 723A39781A042A1E00FD47A0 /* ScopeSyncReplyMessage.swift */; }; 
+
+
+ 
+ 		723A397F1A0446CB00FD47A0 /* ScopeFetchReplyMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 723A397E1A0446CB00FD47A0 /* ScopeFetchReplyMessage.swift */; }; 
+
+
+ 
+-		723A39801A07F8E900FD47A0 /* ScopeFetchReplyMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 723A397E1A0446CB00FD47A0 /* ScopeFetchReplyMessage.swift */; }; 
+
+
+ 
+-		723A39811A07F8E900FD47A0 /* ScopeSyncReplyMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 723A39781A042A1E00FD47A0 /* ScopeSyncReplyMessage.swift */; }; 
+
+
+ 
+ 		72EFCC3919F9B6700054BC18 /* test.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 72EFCC3819F9B6700054BC18 /* test.jpg */; }; 
+
+
+ 
+ 		72F379BA1BA270FE000BAA80 /* SSLSecurity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72F379B91BA270FE000BAA80 /* SSLSecurity.swift */; settings = {ASSET_TAGS = (); }; }; 
+
+
+ 
+-		72FCB1BE1BA271E4002817E0 /* SSLSecurity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72F379B91BA270FE000BAA80 /* SSLSecurity.swift */; settings = {ASSET_TAGS = (); }; }; 
+
+
+ 
+ 		72FCB1BF1BA271F0002817E0 /* ChangeSetQueueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7216634E19F83FD3007704D2 /* ChangeSetQueueTests.swift */; settings = {ASSET_TAGS = (); }; }; 
+
+
+ 
+ 		72FCB1C01BA271F0002817E0 /* ChangeSetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7225561E19F81AA10016D8F8 /* ChangeSetTests.swift */; settings = {ASSET_TAGS = (); }; }; 
+
+
+ 
+ 		72FCB1C11BA271F0002817E0 /* ClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11F8D82E1A9133F400653B6D /* ClientTests.swift */; settings = {ASSET_TAGS = (); }; }; 
+ 
+@@ -321,6 +294,7 @@
+
+
+ 
+ 				7225561419F81AA10016D8F8 /* DependencyTests.swift */, 
+
+
+ 
+ 				7225561619F81AA10016D8F8 /* ImmediatePropertyListeners.swift */, 
+
+
+ 
+ 				7225561719F81AA10016D8F8 /* ModelObjectTests.swift */, 
+
+
+ 
++				720B11CE1ADC28DB004A5D09 /* ModelValueTests.swift */, 
+
+
+ 
+ 				7225561819F81AA10016D8F8 /* PropertyListenerTests.swift */, 
+
+
+ 
+ 				72A10BF11A38B9CC00FE7CEE /* ScopePauseTests.swift */, 
+
+
+ 
+ 				7225561919F81AA10016D8F8 /* ScopeTests.swift */, 
+ 
+@@ -330,10 +304,9 @@
+
+
+ 
+ 				7225561F19F81AA10016D8F8 /* TreeChangeTests.swift */, 
+
+
+ 
+ 				7225568D19F81BE20016D8F8 /* Helpers */, 
+
+
+ 
+ 				7225568E19F81BF10016D8F8 /* Models */, 
+
+
+ 
+-				11F8D83A1A91458E00653B6D /* Transports */, 
+
+
+ 
+ 				72EFCC3719F9B64D0054BC18 /* Resources */, 
+
+
+ 
+ 				7225560619F819DA0016D8F8 /* Supporting Files */, 
+
+
+ 
+-				720B11CE1ADC28DB004A5D09 /* ModelValueTests.swift */, 
+
+
+ 
++				11F8D83A1A91458E00653B6D /* Transports */, 
+
+
+ 
+ 			); 
+
+
+ 
+ 			path = JetstreamTests; 
+
+
+ 
+ 			sourceTree = "<group>"; 
+ 
+@@ -592,49 +565,22 @@
+
+
+ 
+ 			isa = PBXSourcesBuildPhase; 
+
+
+ 
+ 			buildActionMask = 2147483647; 
+
+
+ 
+ 			files = ( 
+
+
+ 
+-				7225568319F81B430016D8F8 /* Session.swift in Sources */, 
+
+
+ 
+-				7225568919F81B430016D8F8 /* Transport.swift in Sources */, 
+
+
+ 
+ 				72FCB1C31BA271F0002817E0 /* DependencyTests.swift in Sources */, 
+
+
+ 
+-				72126CB01A3121410006CD29 /* Signal.swift in Sources */, 
+
+
+ 
+ 				72FCB1CD1BA271F0002817E0 /* TransactionTests.swift in Sources */, 
+
+
+ 
+-				7225568219F81B430016D8F8 /* ScopeSyncMessage.swift in Sources */, 
+
+
+ 
+-				7225568119F81B430016D8F8 /* ScopeStateMessage.swift in Sources */, 
+
+
+ 
+-				723A39801A07F8E900FD47A0 /* ScopeFetchReplyMessage.swift in Sources */, 
+
+
+ 
+ 				72FCB1D01BA271F8002817E0 /* TestModels.swift in Sources */, 
+
+
+ 
+-				7225568419F81B430016D8F8 /* SessionCreateMessage.swift in Sources */, 
+
+
+ 
+-				7225567619F81B430016D8F8 /* Constants.swift in Sources */, 
+
+
+ 
+ 				72FCB1C21BA271F0002817E0 /* ConstraintTests.swift in Sources */, 
+
+
+ 
+ 				72FCB1C51BA271F0002817E0 /* ModelObjectTests.swift in Sources */, 
+
+
+ 
+ 				72FCB1C41BA271F0002817E0 /* ImmediatePropertyListeners.swift in Sources */, 
+
+
+ 
+ 				72FCB1CA1BA271F0002817E0 /* ScopeTests.swift in Sources */, 
+
+
+ 
+ 				72FCB1CC1BA271F0002817E0 /* SyncFragmentTests.swift in Sources */, 
+
+
+ 
+ 				72FCB1C01BA271F0002817E0 /* ChangeSetTests.swift in Sources */, 
+
+
+ 
+ 				72FCB1C81BA271F0002817E0 /* PropertyListenerTests.swift in Sources */, 
+
+
+ 
+-				7225567A19F81B430016D8F8 /* NetworkMessage.swift in Sources */, 
+
+
+ 
+-				72126CAF1A3121410006CD29 /* WebSocket.swift in Sources */, 
+
+
+ 
+ 				72FCB1BF1BA271F0002817E0 /* ChangeSetQueueTests.swift in Sources */, 
+
+
+ 
+-				7225567B19F81B430016D8F8 /* ModelObject.swift in Sources */, 
+
+
+ 
+-				7225568019F81B430016D8F8 /* ScopeFetchMessage.swift in Sources */, 
+
+
+ 
+-				7225567919F81B430016D8F8 /* Logging.swift in Sources */, 
+
+
+ 
+-				7225567419F81B430016D8F8 /* Client.swift in Sources */, 
+
+
+ 
+ 				72FCB1C11BA271F0002817E0 /* ClientTests.swift in Sources */, 
+
+
+ 
+-				7225568519F81B430016D8F8 /* SessionCreateReplyMessage.swift in Sources */, 
+
+
+ 
+-				11A348441A5768C8009B2794 /* Constraint.swift in Sources */, 
+
+
+ 
+-				723A39811A07F8E900FD47A0 /* ScopeSyncReplyMessage.swift in Sources */, 
+
+
+ 
+ 				72FCB1CB1BA271F0002817E0 /* StateMessageTests.swift in Sources */, 
+
+
+ 
+-				7225568719F81B430016D8F8 /* ChangeSet.swift in Sources */, 
+
+
+ 
+-				7225567D19F81B430016D8F8 /* PingMessage.swift in Sources */, 
+
+
+ 
+-				7225567E19F81B430016D8F8 /* ReplyMessage.swift in Sources */, 
+
+
+ 
+-				7225567F19F81B430016D8F8 /* Scope.swift in Sources */, 
+
+
+ 
+ 				72FCB1C91BA271F0002817E0 /* ScopePauseTests.swift in Sources */, 
+
+
+ 
+ 				72FCB1CE1BA271F0002817E0 /* TreeChangeTests.swift in Sources */, 
+
+
+ 
+-				7225567819F81B430016D8F8 /* Functions.swift in Sources */, 
+
+
+ 
+-				72FCB1BE1BA271E4002817E0 /* SSLSecurity.swift in Sources */, 
+
+
+ 
+ 				72FCB1CF1BA271F4002817E0 /* TestHelpers.swift in Sources */, 
+
+
+ 
+-				7225567C19F81B430016D8F8 /* ModelValue.swift in Sources */, 
+
+
+ 
+-				7225568619F81B430016D8F8 /* SyncFragment.swift in Sources */, 
+
+
+ 
+-				7225568819F81B430016D8F8 /* ChangeSetQueue.swift in Sources */, 
+
+
+ 
+-				7225568A19F81B430016D8F8 /* WebsocketTransportAdapter.swift in Sources */, 
+
+
+ 
+ 				72FCB1D21BA271FF002817E0 /* ModelValueTests.swift in Sources */, 
+
+
+ 
+ 				72FCB1D11BA271FB002817E0 /* TestTransportAdapter.swift in Sources */, 
+
+
+ 
+ 			); 
+ 
+
+View  
+4 JetstreamTests/ChangeSetQueueTests.swift 
+ 
+@@ -22,10 +22,8 @@
+
+
+ 
+ //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+
+
+ 
+ //  THE SOFTWARE. 
+
+
+ 
+  
+
+
+ 
+-import Foundation 
+
+
+ 
+-import UIKit 
+
+
+ 
+ import XCTest 
+
+
+ 
+-import Jetstream 
+
+
+ 
++@testable import Jetstream 
+
+
+ 
+  
+
+
+ 
+ class ChangeSetQueueTests: XCTestCase { 
+
+
+ 
+     var root = TestModel() 
+ 
+
+View  
+3 JetstreamTests/ChangeSetTests.swift 
+ 
+@@ -22,9 +22,8 @@
+
+
+ 
+ //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+
+
+ 
+ //  THE SOFTWARE. 
+
+
+ 
+  
+
+
+ 
+-import Foundation 
+
+
+ 
+-import UIKit 
+
+
+ 
+ import XCTest 
+
+
+ 
++@testable import Jetstream 
+
+
+ 
+  
+
+
+ 
+ class ChangeSetTests: XCTestCase { 
+
+
+ 
+     var root = TestModel() 
+ 
+
+View  
+3 JetstreamTests/ClientTests.swift 
+ 
+@@ -22,9 +22,8 @@
+
+
+ 
+ //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+
+
+ 
+ //  THE SOFTWARE. 
+
+
+ 
+  
+
+
+ 
+-import Foundation 
+
+
+ 
+-import UIKit 
+
+
+ 
+ import XCTest 
+
+
+ 
++@testable import Jetstream 
+
+
+ 
+  
+
+
+ 
+ class ClientTests: XCTestCase { 
+
+
+ 
+     func testOnWaitingRepliesCountChanged() { 
+ 
+
+View  
+4 JetstreamTests/ConstraintTests.swift 
+ 
+@@ -22,10 +22,8 @@
+
+
+ 
+ //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+
+
+ 
+ //  THE SOFTWARE. 
+
+
+ 
+  
+
+
+ 
+-import Foundation 
+
+
+ 
+-import UIKit 
+
+
+ 
+ import XCTest 
+
+
+ 
+-import Jetstream 
+
+
+ 
++@testable import Jetstream 
+
+
+ 
+  
+
+
+ 
+ class ConstraintTests: XCTestCase { 
+
+
+ 
+     func testMultipleMatching() { 
+ 
+
+View  
+2 JetstreamTests/DependencyTests.swift 
+ 
+@@ -22,8 +22,8 @@
+
+
+ 
+ //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+
+
+ 
+ //  THE SOFTWARE. 
+
+
+ 
+  
+
+
+ 
+-import Foundation 
+
+
+ 
+ import XCTest 
+
+
+ 
++@testable import Jetstream 
+
+
+ 
+  
+
+
+ 
+ class DependencyTests: XCTestCase { 
+
+
+ 
+     var testModel = TestModel() 
+ 
+
+View  
+2 JetstreamTests/ImmediatePropertyListeners.swift 
+ 
+@@ -22,8 +22,8 @@
+
+
+ 
+ //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+
+
+ 
+ //  THE SOFTWARE. 
+
+
+ 
+  
+
+
+ 
+-import UIKit 
+
+
+ 
+ import XCTest 
+
+
+ 
++@testable import Jetstream 
+
+
+ 
+  
+
+
+ 
+ class ImmediatePropertyListenerTests: XCTestCase { 
+
+
+ 
+     func testSpecificPropertyListeners() { 
+ 
+
+View  
+2 JetstreamTests/ModelObjectTests.swift 
+ 
+@@ -22,8 +22,8 @@
+
+
+ 
+ //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+
+
+ 
+ //  THE SOFTWARE. 
+
+
+ 
+  
+
+
+ 
+-import UIKit 
+
+
+ 
+ import XCTest 
+
+
+ 
++@testable import Jetstream 
+
+
+ 
+  
+
+
+ 
+ class ModelObjectTests: XCTestCase { 
+
+
+ 
+     func testModelProperties() { 
+ 
+
+View  
+1 JetstreamTests/ModelValueTests.swift 
+ 
+@@ -7,6 +7,7 @@
+
+
+ 
+ // 
+
+
+ 
+  
+
+
+ 
+ import XCTest 
+
+
+ 
++@testable import Jetstream 
+
+
+ 
+  
+
+
+ 
+ class ModelValueTests: XCTestCase { 
+
+
+ 
+      
+ 
+
+View  
+2 JetstreamTests/PropertyListenerTests.swift 
+ 
+@@ -22,8 +22,8 @@
+
+
+ 
+ //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+
+
+ 
+ //  THE SOFTWARE. 
+
+
+ 
+  
+
+
+ 
+-import UIKit 
+
+
+ 
+ import XCTest 
+
+
+ 
++@testable import Jetstream 
+
+
+ 
+  
+
+
+ 
+ class PropertyListenerTests: XCTestCase { 
+
+
+ 
+     func testGenericPropertyListeners() { 
+ 
+
+View  
+2 JetstreamTests/ScopePauseTests.swift 
+ 
+@@ -22,8 +22,8 @@
+
+
+ 
+ //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+
+
+ 
+ //  THE SOFTWARE. 
+
+
+ 
+  
+
+
+ 
+-import UIKit 
+
+
+ 
+ import XCTest 
+
+
+ 
++@testable import Jetstream 
+
+
+ 
+  
+
+
+ 
+ class ScopePauseTest: XCTestCase { 
+
+
+ 
+     var root = TestModel() 
+ 
+
+View  
+2 JetstreamTests/ScopeTests.swift 
+ 
+@@ -22,8 +22,8 @@
+
+
+ 
+ //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+
+
+ 
+ //  THE SOFTWARE. 
+
+
+ 
+  
+
+
+ 
+-import UIKit 
+
+
+ 
+ import XCTest 
+
+
+ 
++@testable import Jetstream 
+
+
+ 
+  
+
+
+ 
+ class ScopeTests: XCTestCase { 
+
+
+ 
+     var parent = TestModel() 
+ 
+
+View  
+3 JetstreamTests/StateMessageTests.swift 
+ 
+@@ -22,9 +22,8 @@
+
+
+ 
+ //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+
+
+ 
+ //  THE SOFTWARE. 
+
+
+ 
+  
+
+
+ 
+-import UIKit 
+
+
+ 
+ import XCTest 
+
+
+ 
+-import Jetstream 
+
+
+ 
++@testable import Jetstream 
+
+
+ 
+  
+
+
+ 
+ class StateMessageTests: XCTestCase { 
+
+
+ 
+     var root = TestModel() 
+ 
+
+View  
+2 JetstreamTests/SyncFragmentTests.swift 
+ 
+@@ -22,8 +22,8 @@
+
+
+ 
+ //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+
+
+ 
+ //  THE SOFTWARE. 
+
+
+ 
+  
+
+
+ 
+-import UIKit 
+
+
+ 
+ import XCTest 
+
+
+ 
++@testable import Jetstream 
+
+
+ 
+  
+
+
+ 
+ class SyncFragmentTests: XCTestCase { 
+
+
+ 
+     var parent = TestModel() 
+ 
+
+View  
+1 JetstreamTests/TestHelpers.swift 
+ 
+@@ -22,7 +22,6 @@
+
+
+ 
+ //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+
+
+ 
+ //  THE SOFTWARE. 
+
+
+ 
+  
+
+
+ 
+-import Foundation 
+
+
+ 
+ import XCTest 
+
+
+ 
+  
+
+
+ 
+ public func delayTest(test: XCTestCase, delay: Double, callback: () -> ()) { 
+ 
+
+View  
+2 JetstreamTests/TestModels.swift 
+ 
+@@ -22,7 +22,7 @@
+
+
+ 
+ //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+
+
+ 
+ //  THE SOFTWARE. 
+
+
+ 
+  
+
+
+ 
+-import Jetstream 
+
+
+ 
++@testable import Jetstream 
+
+
+ 
+  
+
+
+ 
+ @objc enum TestType: Int { 
+
+
+ 
+     case Normal 
+ 
+
+View  
+2 JetstreamTests/TestTransportAdapter.swift 
+ 
+@@ -22,7 +22,7 @@
+
+
+ 
+ //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+
+
+ 
+ //  THE SOFTWARE. 
+
+
+ 
+  
+
+
+ 
+-import Foundation 
+
+
+ 
++@testable import Jetstream 
+
+
+ 
+  
+
+
+ 
+ class TestConnectionOptions: ConnectionOptions { 
+
+
+ 
+     var url: NSURL { return NSURL(string: "http://localhost")! } 
+ 
+
+View  
+3 JetstreamTests/TransactionTests.swift 
+ 
+@@ -22,9 +22,8 @@
+
+
+ 
+ //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+
+
+ 
+ //  THE SOFTWARE. 
+
+
+ 
+  
+
+
+ 
+-import Foundation 
+
+
+ 
+-import UIKit 
+
+
+ 
+ import XCTest 
+
+
+ 
++@testable import Jetstream 
+
+
+ 
+  
+
+
+ 
+ class TransactionTests: XCTestCase { 
+
+
+ 
+     var root = TestModel() 
+ 
+
+View  
+2 JetstreamTests/TreeChangeTests.swift 
+ 
+@@ -22,8 +22,8 @@
+
+
+ 
+ //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+
+
+ 
+ //  THE SOFTWARE. 
+
+
+ 
+  
+
+
+ 
+-import UIKit 
+
+
+ 
+ import XCTest 
+
+
+ 
++@testable import Jetstream 
+
+
+ 
+  
+
+
+ 
+ class TreeChangeTests: XCTestCase { 
+
+
+ 
+     var parent = TestModel() 
+ 
