@@ -63,10 +63,11 @@ export class GitVcService {
     }
 
     //Today, simply craft a url to the create pull request web page
-    //https://account.visualstudio.com/DefaultCollection/project/_git/VSCode.Health/pullrequests#_a=createnew&sourceRef=master
+    //https://account.visualstudio.com/DefaultCollection/project/_git/VSCode.Health/pullrequestscreate&sourceRef=master
     public static GetCreatePullRequestUrl(remoteUrl: string, currentBranch: string): string {
+        let pullRequestCreateUrl = UrlBuilder.Join(remoteUrl, "pullrequestcreate");
         const branch: string = encodeURIComponent(currentBranch);
-        return UrlBuilder.AddHashes(GitVcService.GetPullRequestsUrl(remoteUrl), `_a=createnew`, `sourceRef=${branch}`);
+        return UrlBuilder.AddQueryParams(pullRequestCreateUrl, `sourceRef=${branch}`);
     }
 
     //Construct the url to the view pull request (discussion view)
