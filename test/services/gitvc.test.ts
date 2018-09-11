@@ -18,8 +18,9 @@ describe("GitVcService", function() {
     it("should verify GetCreatePullRequestUrl", function() {
         const url: string = "https://account.visualstudio.com/DefaultCollection/project";
         const branch: string = "branch";
+        const createUrl = GitVcService.GetCreatePullRequestUrl(url, branch);
 
-        assert.equal(GitVcService.GetCreatePullRequestUrl(url, branch), url + "/pullrequests#_a=createnew&sourceRef=" + branch);
+        assert.equal(createUrl, url + "/pullrequestcreate?sourceRef=" + branch);
     });
 
     it("should verify GetFileBlameUrl", function() {
