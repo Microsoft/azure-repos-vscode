@@ -30,7 +30,7 @@ With TFVC, the extension uses information about the current workspace to determi
 ## Installation
 First, you will need to install [Visual Studio Code](https://code.visualstudio.com/download) `1.12.0` or later.
 
-To install the extension with the latest version of Visual Studio Code (version 1.13.1 is the latest as of this writing), bring up the Visual Studio Code Command Palette (`F1`), type `install` and choose `Extensions: Install Extensions`. In the `Search Extensions in Marketplace` text box, type `team`. Find the `Azure Repos` extension published by *Microsoft* and click the `Install` button. Restart Visual Studio Code.
+To install the extension with the latest version of Visual Studio Code (version 1.13.1 is the latest as of this writing), bring up the Visual Studio Code Command Palette (`F1`), type `install` and choose `Extensions: Install Extensions`. In the `Search Extensions in Marketplace` text box, type `azure`. Find the `Azure Repos` extension published by *Microsoft* and click the `Install` button. Restart Visual Studio Code.
 
 ## Authentication
 ### Azure DevOps Services
