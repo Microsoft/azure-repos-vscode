@@ -35,7 +35,26 @@ export class Utils {
             gitPath = path.join(currentPath, gitDir || ".git");
 
             if (fs.existsSync(gitPath)) {
-              return gitPath;
+                if (fs.lstatSync(gitPath).isDirectory()) {
+                    return gitPath;
+                } else {
+                    let contents: string = fs.readFileSync(gitPath, "utf8");
+                    const match = /gitdir: (.+)$/m.exec(contents);
+                    if (match !== null) {
+                        let next: string = match[1];
+                        gitPath = path.resolve(currentPath, next);
+                        next = path.join(gitPath, "commondir");
+                        if (fs.existsSync(next)) {
+                            contents = fs.readFileSync(next, "utf8");
+                            gitPath = path.resolve(gitPath, contents);
+                            if (fs.existsSync(gitPath) && fs.lstatSync(gitPath).isDirectory()) {
+                                return gitPath;
+                            }
+                        } else {
+                            return gitPath;
+                        }
+                    }
+                }
             }
 
             lastPath = currentPath;

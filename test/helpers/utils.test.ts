@@ -125,6 +125,16 @@ describe("Utils", function() {
         assert.equal(actualRepoPath, path.join(__dirname, TEST_REPOS_FOLDER, repoName, DOT_GIT_FOLDER));
     });
 
+    it("should verify FindGitFolder with worktree", function() {
+        const worktree: string = "worktree";
+        const repoName: string = "gitreposubfolder";
+        const repoPath: string = path.join(__dirname, TEST_REPOS_FOLDER, worktree);
+        // Pass in DOT_GIT_FOLDER to find our test repo folder
+        const actualRepoPath: string = Utils.FindGitFolder(repoPath, DOT_GIT_FOLDER);
+        // Although we started with a subfolder in the repository, ensure we get the DOT_GIT_FOLDER
+        assert.equal(actualRepoPath, path.join(__dirname, TEST_REPOS_FOLDER, repoName, DOT_GIT_FOLDER));
+    });
+
     it("should verify FindGitFolder with no found .git folder", function() {
         const repoPath: string = __dirname;
         //We need use DOT_GIT_FOLDER here since the test resides in a .git repository
