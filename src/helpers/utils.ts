@@ -38,14 +38,14 @@ export class Utils {
                 if (fs.lstatSync(gitPath).isDirectory()) {
                     return gitPath;
                 } else {
-                    let contents: string = fs.readFileSync(gitPath, "utf8");
-                    const match = /gitdir: (.+)$/m.exec(contents);
-                    if (match !== null) {
+                    let contents: string = fs.readFileSync(gitPath, "utf8").trim();
+                    const match = /gitdir: (.+)$/.exec(contents);
+                    if (match !== undefined) {
                         let next: string = match[1];
                         gitPath = path.resolve(currentPath, next);
                         next = path.join(gitPath, "commondir");
                         if (fs.existsSync(next)) {
-                            contents = fs.readFileSync(next, "utf8");
+                            contents = fs.readFileSync(next, "utf8").trim();
                             gitPath = path.resolve(gitPath, contents);
                             if (fs.existsSync(gitPath) && fs.lstatSync(gitPath).isDirectory()) {
                                 return gitPath;
