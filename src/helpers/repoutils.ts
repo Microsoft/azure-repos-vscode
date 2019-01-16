@@ -25,7 +25,7 @@ import * as url from "url";
 //that a url is NOT either a TFS or Team Services repository.  So it is up to the caller to only
 //instantiate this class if we know we should have either a TFS or Team Services repository.
 export class RepoUtils {
-    private static sshV3 = new RegExp("git@(?:vs-)?ssh\.(.+):v3\/(.+)\/(.+)\/(.+)");
+    private static sshV3 = new RegExp(".+@(?:vs-)?ssh\.(.+):v3\/(.+)\/(.+)\/(.+)");
 
     //Checks a handful of heuristics to see if the url provided is a TFS or VSTS repo
     public static IsTeamFoundationGitRepo(url: string): boolean {
