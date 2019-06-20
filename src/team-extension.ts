@@ -503,15 +503,12 @@ export class TeamExtension  {
         if (gitExtension) {
             const git = gitExtension.exports;
             if (git) {
-                git.getRepositories()
-                    .then((repos: any[]) => {
-                        if (repos && repos.length > 0) {
-                            const inputBox = repos[0].inputBox;
-                            if (inputBox) {
-                                fn(inputBox);
-                            }
-                        }
-                    });
+                for (const repo of git.getAPI(1).repositories) {
+                    const inputBox = repo.inputBox;
+                    if (inputBox) {
+                        fn(inputBox);
+                    }
+                }
             }
         }
     }
