@@ -84,7 +84,7 @@ The latest version of the extension will prompt for your token and store it secu
 extension, you needed to create a token and store it in your Visual Studio Code settings.
 
 If you do not have a personal access token yet, you will need to create one on your Azure DevOps Services organization.
-To create the token, go [here](https://aka.ms/gtgzt4) to read how. You can also [view our video](https://youtu.be/t6gGfj8WOgg)
+To create the token, go [here](https://bit.ly/2Sdiz4E) to read how. You can also [view our video](https://youtu.be/t6gGfj8WOgg)
 on how to do the same.
 * TFVC repositories require tokens with *All Scopes*. Anything less will cause the extension to fail.
 
