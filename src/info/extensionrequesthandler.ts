@@ -6,7 +6,6 @@
 
 import { IHttpResponse, IRequestHandler } from "vso-node-api/interfaces/common/VsoBaseInterfaces";
 import { getBasicHandler } from "vso-node-api/WebApi";
-import { getNtlmHandler } from "vso-node-api/WebApi";
 import { Constants } from "../helpers/constants";
 import { UserAgentProvider } from "../helpers/useragentprovider";
 
@@ -22,13 +21,13 @@ export class ExtensionRequestHandler implements IRequestHandler {
     constructor(username: string, password?: string, domain?: string, workstation?: string);
 
     constructor(username: string, password?: string, domain?: string, workstation?: string) {
-        if (username !== undefined && password !== undefined) {
-            // NTLM (we don't support Basic auth)
+        if (username && password) {
+            // we'll use basic (we don't support Basic auth, but it must be used for PAT)
             this._username = username;
             this._password = password;
             this._domain = domain;
             this._workstation = workstation;
-            this._credentialHandler = getNtlmHandler(this._username, this._password, this._domain, this._workstation);
+            this._credentialHandler = getBasicHandler(this._username, this._password);
         } else {
             // Personal Access Token
             this._username = Constants.OAuth;
