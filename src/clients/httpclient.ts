@@ -64,7 +64,7 @@ export class HttpClient {
         //options.headers["Accept"] = contentType;
         options.headers["User-Agent"] = this.userAgent;
 
-        var useProxy = proxyUrl && proxyUrl.hostname;
+        var useProxy = proxyUrl && proxyUrl.hostname && process.env.NO_PROXY.split(',').filter(function(u){return (new RegExp(u+'$')).test(parsedUrl.hostname);}).length == 0;
         if (useProxy) {
             var agentOptions: tunnel.TunnelOptions = {
                 maxSockets: http.globalAgent.maxSockets,
