@@ -523,7 +523,7 @@ export class ExtensionManager implements Disposable {
         if (this._teamServicesStatusBarItem !== undefined) {
             //TODO: Should the default command be to display the message?
             this._teamServicesStatusBarItem.command = commandOnClick; // undefined clears the command
-            this._teamServicesStatusBarItem.text = `Team $(icon octicon-stop)`;
+            this._teamServicesStatusBarItem.text = `Team $(stop)`;
             this._teamServicesStatusBarItem.tooltip = message;
             this._teamServicesStatusBarItem.show();
         }
@@ -603,7 +603,7 @@ export class ExtensionManager implements Disposable {
 
     private showFeedbackItem(): void {
         this._feedbackStatusBarItem.command = CommandNames.SendFeedback;
-        this._feedbackStatusBarItem.text = `$(icon octicon-megaphone)`;
+        this._feedbackStatusBarItem.text = `$(megaphone)`;
         this._feedbackStatusBarItem.tooltip = Strings.SendFeedback;
         this._feedbackStatusBarItem.show();
     }

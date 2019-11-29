@@ -2,7 +2,7 @@
   "name": "team",
   "displayName": "Azure Repos",
   "description": "Connect to Azure Repos and work with Git and Team Foundation Version Control (TFVC) repositories. Manage your pull requests, work items, and more.",
-  "version": "1.149.2",
+  "version": "1.161.0",
   "publisher": "ms-vsts",
   "icon": "assets/team.png",
   "markdown": "standard",

@@ -53,7 +53,7 @@ export class BuildClient extends BaseClient {
                 if (this._statusBarItem !== undefined) {
                     const icon: string = Utils.GetBuildResultIcon(build.result);
                     this._statusBarItem.command = CommandNames.OpenBuildSummaryPage;
-                    this._statusBarItem.text = `$(icon octicon-package) ` + `$(icon ${icon})`;
+                    this._statusBarItem.text = `$(package) ` + `$(${icon})`;
                     this._statusBarItem.tooltip = "(" + BuildResult[build.result] + ") " + Strings.NavigateToBuildSummary + " " + build.buildNumber;
                 }
             } else {
@@ -61,7 +61,7 @@ export class BuildClient extends BaseClient {
                     ", repo id " + this._serverContext.RepoInfo.RepositoryId.toString() + ", + branch " + (!context.CurrentBranch ? "UNKNOWN" : context.CurrentBranch.toString()));
                 if (this._statusBarItem !== undefined) {
                     this._statusBarItem.command = CommandNames.OpenBuildSummaryPage;
-                    this._statusBarItem.text = `$(icon octicon-package) ` + `$(icon octicon-dash)`;
+                    this._statusBarItem.text = `$(package) ` + `$(dash)`;
                     this._statusBarItem.tooltip = context.Type === RepositoryType.GIT ? Strings.NoBuildsFound : Strings.NoTfvcBuildsFound;
                 }
             }
@@ -112,6 +112,6 @@ export class BuildClient extends BaseClient {
     }
 
     public static GetOfflineBuildStatusText() : string {
-        return `$(icon octicon-package) ` + `???`;
+        return `$(package) ` + `???`;
     }
 }
