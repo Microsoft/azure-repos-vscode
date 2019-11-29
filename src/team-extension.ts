@@ -416,7 +416,7 @@ export class TeamExtension  {
         if (!this._buildStatusBarItem) {
             this._buildStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, 98);
             this._buildStatusBarItem.command = CommandNames.OpenBuildSummaryPage;
-            this._buildStatusBarItem.text = `$(icon octicon-package) $(icon octicon-dash)`;
+            this._buildStatusBarItem.text = `$(package) $(dash)`;
             this._buildStatusBarItem.tooltip = Strings.NoBuildsFound;
             this._buildStatusBarItem.show();
         }

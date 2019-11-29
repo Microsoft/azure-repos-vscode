@@ -249,7 +249,7 @@ export class WitClient extends BaseClient {
             const msg: string = Strings.UnsupportedWitServerVersion;
             Logger.LogError(msg);
             if (this._statusBarItem !== undefined) {
-                this._statusBarItem.text = `$(icon octicon-bug) $(icon octicon-x)`;
+                this._statusBarItem.text = `$(bug) $(x)`;
                 this._statusBarItem.tooltip = msg;
                 this._statusBarItem.command = undefined; //Clear the existing command
             }
@@ -284,13 +284,13 @@ export class WitClient extends BaseClient {
     }
 
    public static GetOfflinePinnedQueryStatusText() : string {
-        return `$(icon octicon-bug) ???`;
+        return `$(bug) ???`;
     }
 
     public static GetPinnedQueryStatusText(total?: string) : string {
         if (!total) {
-            return `$(icon octicon-bug) $(icon octicon-dash)`;
+            return `$(bug) $(dash)`;
         }
-        return `$(icon octicon-bug) ${total.toString()}`;
+        return `$(bug) ${total.toString()}`;
     }
 }

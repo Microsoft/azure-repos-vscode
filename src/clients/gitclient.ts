@@ -123,8 +123,8 @@ export class GitClient extends BaseClient {
         Logger.LogInfo("Getting pull requests that I requested...");
         const svc: GitVcService = new GitVcService(this._serverContext);
         const myPullRequests: GitPullRequest[] = await svc.GetPullRequests(this._serverContext.RepoInfo.RepositoryId, this._serverContext.UserInfo.Id, undefined, PullRequestStatus.Active);
-        const icon: string = "octicon-search";
-        const label: string = `$(icon ${icon}) `;
+        const icon: string = "search";
+        const label: string = `$(${icon}) `;
         requestItems.push({ label: label + Strings.BrowseYourPullRequests, description: undefined, id: undefined });
 
         myPullRequests.forEach((pr) => {
@@ -156,29 +156,29 @@ export class GitClient extends BaseClient {
     private getPullRequestLabel(displayName: string, title: string, description: string, id: string, score: PullRequestScore): BaseQuickPickItem {
         let scoreIcon: string = "";
         if (score === PullRequestScore.Succeeded) {
-            scoreIcon = "octicon-check";
+            scoreIcon = "check";
         } else if (score === PullRequestScore.Failed) {
-            scoreIcon = "octicon-stop";
+            scoreIcon = "stop";
         } else if (score === PullRequestScore.Waiting) {
-            scoreIcon = "octicon-watch";
+            scoreIcon = "watch";
         } else if (score === PullRequestScore.NoResponse) {
-            scoreIcon = "octicon-git-pull-request";
+            scoreIcon = "git-pull-request";
         }
-        const scoreLabel: string = `$(icon ${scoreIcon}) `;
+        const scoreLabel: string = `$(${scoreIcon}) `;
 
         return { label: scoreLabel + " (" + displayName + ") " + title, description: description, id: id };
     }
 
     public static GetOfflinePullRequestStatusText() : string {
-        return `$(icon octicon-git-pull-request) ???`;
+        return `$(git-pull-request) ???`;
     }
 
     //Sets the text on the pull request status bar
     public static GetPullRequestStatusText(total?: string) : string {
         if (!total) {
-            return `$(icon octicon-git-pull-request) $(icon octicon-dash)`;
+            return `$(git-pull-request) $(dash)`;
         }
-        return `$(icon octicon-git-pull-request) ${total.toString()}`;
+        return `$(git-pull-request) ${total.toString()}`;
     }
 
     //Ensure that we don't accidentally send non-Git (e.g., TFVC) contexts to the Git client

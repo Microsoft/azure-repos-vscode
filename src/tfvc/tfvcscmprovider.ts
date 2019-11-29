@@ -140,6 +140,10 @@ export class TfvcSCMProvider {
     }
 
     private onDidModelChange(): void {
+        if (!this.conflictsGroup) {
+            return;
+        }
+
         this.conflictsGroup.resourceStates = this._model.ConflictsGroup.resources;
         this.includedGroup.resourceStates = this._model.IncludedGroup.resources;
         this.excludedGroup.resourceStates = this._model.ExcludedGroup.resources;

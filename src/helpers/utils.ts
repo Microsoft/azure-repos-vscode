@@ -49,17 +49,17 @@ export class Utils {
     public static GetBuildResultIcon(result: BuildResult) : string {
         switch (result) {
             case BuildResult.Succeeded:
-                return "octicon-check";
+                return "check";
             case BuildResult.Canceled:
-                return "octicon-alert";
+                return "alert";
             case BuildResult.Failed:
-                return "octicon-stop";
+                return "stop";
             case BuildResult.PartiallySucceeded:
-                return "octicon-alert";
+                return "alert";
             case BuildResult.None:
-                return "octicon-question";
+                return "question";
             default:
-                return "octicon-question";
+                return "question";
         }
     }
 
