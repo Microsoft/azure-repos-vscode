@@ -73,7 +73,7 @@ export class GitVcService {
     //https://account.visualstudio.com/DefaultCollection/VSOnline/project/_git/Java.VSCode/pullrequest/79184?view=discussion
     public static GetPullRequestDiscussionUrl(repositoryUrl: string, requestId: string): string {
         let discussionUrl: string = UrlBuilder.Join(repositoryUrl, "pullrequest", requestId);
-        discussionUrl = UrlBuilder.AddQueryParams(discussionUrl, "view=discussion");
+//        discussionUrl = UrlBuilder.AddQueryParams(discussionUrl, "view=discussion");
         return discussionUrl;
     }
 
