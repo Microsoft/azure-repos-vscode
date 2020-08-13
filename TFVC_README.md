@@ -280,3 +280,4 @@ the type of workspace, update the `Location` field and click `OK`.
 
 ## Further Information
 For information on other features of the extension, support, licensing, privacy, or contributing code, please review the main [README](README.md) file.
+
