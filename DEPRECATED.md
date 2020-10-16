@@ -27,7 +27,7 @@ The extension won't receive any updates, bug fixes, or security fixes, so you us
 
 ## Is there any action for me?
 
-If you want to keep using the extension, no, there's no action.
+If you don't want to use the extension anymore, no, there's no action.
 You can uninstall the extension on VS Code's extensions page.
 If you do, you won't be able to reinstall it once it's removed from the Marketplace.
 
